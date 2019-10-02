@@ -1,0 +1,7 @@
+[submodule "pybind11"]
+	path = pybind11
+	url = https://github.com/pybind/pybind11.git
+[submodule "polyscope"]
+	path = polyscope
+  url = https://github.com/nmwsharp/polyscope.git
+  branch = api_cleanup
