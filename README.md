@@ -1,2 +1,2 @@
-# polyscoppe-py
+# polyscope-py
 Python bindings for Polyscope
