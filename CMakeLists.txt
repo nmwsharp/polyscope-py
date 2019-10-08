@@ -11,6 +11,7 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 add_subdirectory(pybind11)
 
 # We need polyscope
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(polyscope)
 
 pybind11_add_module(polyscope_py src/polyscope_py.cpp)
