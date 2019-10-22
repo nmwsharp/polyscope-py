@@ -56,7 +56,7 @@ def main():
 
 
 
-    ## Examples with a mesh
+    ## Examples with a point cloud
     if True:
         ps_points = polyscope.register_point_cloud("test points", verts)
 
@@ -85,7 +85,7 @@ def main():
         # Show 
         polyscope.show() 
 
-        # Remove the whole mesh structure
+        # Remove the whole point cloud structure
         polyscope.remove_all_structures()
 
 

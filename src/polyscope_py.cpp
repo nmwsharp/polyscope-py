@@ -4,9 +4,9 @@
 
 #include "Eigen/Dense"
 
+#include "polyscope/point_cloud.h"
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
-#include "polyscope/point_cloud.h"
 
 namespace py = pybind11;
 namespace ps = polyscope;
@@ -92,6 +92,9 @@ PYBIND11_MODULE(polyscope, m) {
 
   // Helper classes
   py::class_<ps::SurfaceVertexScalarQuantity>(m, "SurfaceVertexScalarQuantity");
+  py::class_<ps::SurfaceFaceScalarQuantity>(m, "SurfaceFaceScalarQuantity");
+  py::class_<ps::SurfaceVertexVectorQuantity>(m, "SurfaceVertexVectorQuantity");
+  py::class_<ps::SurfaceFaceVectorQuantity>(m, "SurfaceFaceVectorQuantity");
 
   // Main class, with adder methods
   py::class_<ps::SurfaceMesh>(m, "SurfaceMesh")
@@ -99,27 +102,15 @@ PYBIND11_MODULE(polyscope, m) {
     .def("add_vertex_scalar_quantity", &ps::SurfaceMesh::addVertexScalarQuantity<Eigen::VectorXd>, "Add a scalar function at vertices",
         py::arg("name"), py::arg("values"), py::arg("data_type")=ps::DataType::STANDARD, py::return_value_policy::reference)
     .def("add_face_scalar_quantity", &ps::SurfaceMesh::addFaceScalarQuantity<Eigen::VectorXd>, "Add a scalar function at faces",
-        py::arg("name"), py::arg("values"), py::arg("data_type")=ps::DataType::STANDARD, py::return_value_policy::reference);
+        py::arg("name"), py::arg("values"), py::arg("data_type")=ps::DataType::STANDARD, py::return_value_policy::reference)
+    .def("add_vertex_vector_quantity", &ps::SurfaceMesh::addVertexVectorQuantity<Eigen::MatrixXd>, "Add a vector function at vertices",
+        py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference)
+    .def("add_face_vector_quantity", &ps::SurfaceMesh::addFaceVectorQuantity<Eigen::MatrixXd>, "Add a vector function at faces",
+        py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference);
 
   // Static adders and getters
   m.def("register_surface_mesh", &register_surface_mesh, "Register a surface mesh", py::return_value_policy::reference);
   m.def("get_surface_mesh", &polyscope::getSurfaceMesh, "Get a surface mesh by name", py::return_value_policy::reference);
-
-	// Wrap the main PlyData class
-  //py::class_<boundplydata>(m, "plydata")
-    //.def(py::init<>())
-		////.def("get_property_double", &BoundPLYData::getProperty<double>)
-		//.def("__getitem__", &BoundPLYData::getElement);
-	//py::return_value_policy::move);
-	//.def(py::init<const std::string &>());
-
-	// Wrap the helper element class
-  //py::class_<BoundPLYElementRef>(m, "PlyElement")
-    //.def(py::init<happly::PLYData&, const std::string&>())
-		//.def("__getitem__", &BoundPLYElementRef::getProperty<double>);
-  
-	//// Loaders
-  //m.def("load", &load, "Load from named file.");
 
 }
 
