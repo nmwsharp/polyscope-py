@@ -1,4 +1,3 @@
-import unittest
 import os
 import sys
 import os.path as path
@@ -11,7 +10,7 @@ import polyscope
 import sys
 import argparse
 import numpy as np
-import igl
+import meshio 
 
 def main():
 
@@ -24,7 +23,10 @@ def main():
     args = parser.parse_args()
 
     # Load a mesh argument
-    verts, faces = igl.read_triangle_mesh(args.mesh)
+    # verts, faces = igl.read_triangle_mesh(args.mesh)
+    m = meshio.read(args.mesh)
+    verts = m.points
+    faces = m.cells['triangle']
 
 
     ### Polyscope things example
