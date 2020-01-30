@@ -4,24 +4,14 @@
 
 #include "Eigen/Dense"
 
-#include "polyscope/polyscope.h"
 #include "polyscope/point_cloud.h"
+#include "polyscope/polyscope.h"
 
 namespace py = pybind11;
 namespace ps = polyscope;
 
-ps::PointCloud* register_point_cloud(std::string name, Eigen::MatrixXd points) {
-  if (points.cols() == 2) {
-    return ps::registerPointCloud2D(name, points);
-  } else if (points.cols() == 3) {
-    return ps::registerPointCloud(name, points);
-  } else {
-    throw std::runtime_error("points array must have 2 or 3 columns. has: " + std::to_string(points.cols()));
-  }
-}
 
-
-
+// clang-format off
 void bind_point_cloud(py::module& m) {
 
   // Helper classes
@@ -32,8 +22,12 @@ void bind_point_cloud(py::module& m) {
   // Main class, with adder methods
   py::class_<ps::PointCloud>(m, "PointCloud")
     .def("remove", &ps::PointCloud::remove, "Remove the structure")
-    .def("enabled", &ps::PointCloud::setEnabled, "Enable the structure")
+    .def("set_enabled", &ps::PointCloud::setEnabled, "Enable the structure")
     .def("remove_all_quantities", &ps::PointCloud::removeAllQuantities, "Remove all quantities")
+    .def("update_point_positions", &ps::PointCloud::updatePointPositions<Eigen::MatrixXd>, "Update point positions")
+    .def("update_point_positions2D", &ps::PointCloud::updatePointPositions2D<Eigen::MatrixXd>, "Update point positions")
+    .def("set_point_radius", &ps::PointCloud::setPointRadius, "Set radius")
+    .def("set_point_color", &ps::PointCloud::setPointColor, "Set color")
     .def("add_color_quantity", &ps::PointCloud::addColorQuantity<Eigen::MatrixXd>, "Add a color function at points",
         py::arg("name"), py::arg("values"), py::return_value_policy::reference)
     .def("add_scalar_quantity", &ps::PointCloud::addScalarQuantity<Eigen::VectorXd>, "Add a scalar function at points",
@@ -42,9 +36,15 @@ void bind_point_cloud(py::module& m) {
         py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference);
 
   // Static adders and getters
-  m.def("register_point_cloud", &register_point_cloud, "Register a point cloud", py::return_value_policy::reference);
+  m.def("register_point_cloud", &ps::registerPointCloud<Eigen::MatrixXd>, 
+      py::arg("name"), py::arg("values"), py::arg("errorIfPresent")=false,
+      "Register a point cloud", py::return_value_policy::reference);
+  m.def("register_point_cloud2D", &ps::registerPointCloud2D<Eigen::MatrixXd>, 
+      py::arg("name"), py::arg("values"), py::arg("errorIfPresent")=false,
+      "Register a point cloud", py::return_value_policy::reference);
   m.def("remove_point_cloud", &polyscope::removePointCloud, "Remove a point cloud by name");
   m.def("get_point_cloud", &polyscope::getPointCloud, "Get a point cloud by name", py::return_value_policy::reference);
   m.def("has_point_cloud", &polyscope::hasPointCloud, "Check for a point cloud by name");
 
 }
+// clang-format on

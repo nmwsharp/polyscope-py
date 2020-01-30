@@ -11,8 +11,6 @@ namespace py = pybind11;
 namespace ps = polyscope;
 
 
-
-
 // Forward-declare bindings from other files
 void bind_surface_mesh(py::module& m);
 void bind_point_cloud(py::module& m);
@@ -45,9 +43,12 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("standard", ps::VectorType::STANDARD)
     .value("ambient", ps::VectorType::AMBIENT)
     .export_values(); 
- 
 
-  // Bind structures defined in other files
+
+  // === Mini bindings for a little bit of glm
+  py::class_<glm::vec3>(m, "glm_vec3").def(py::init<float, float, float>());
+
+  // === Bind structures defined in other files
   bind_surface_mesh(m);
   bind_point_cloud(m);
 
