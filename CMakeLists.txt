@@ -14,6 +14,7 @@ add_subdirectory(deps/polyscope)
 pybind11_add_module(polyscope_bindings 
   src/cpp/core.cpp
   src/cpp/surface_mesh.cpp
+  src/cpp/point_cloud.cpp
 )
 
 target_link_libraries(polyscope_bindings PRIVATE polyscope)
