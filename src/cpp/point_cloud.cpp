@@ -16,18 +16,33 @@ void bind_point_cloud(py::module& m) {
 
   // Helper classes
   py::class_<ps::PointCloudColorQuantity>(m, "PointCloudColorQuantity");
-  py::class_<ps::PointCloudScalarQuantity>(m, "PointCloudScalarQuantity");
+  py::class_<ps::PointCloudScalarQuantity>(m, "PointCloudScalarQuantity")
+    .def("set_enabled", &ps::PointCloudScalarQuantity::setEnabled, "Set enabled")
+    .def("set_color_map", &ps::PointCloudScalarQuantity::setColorMap, "Set color map")
+    .def("set_map_range", &ps::PointCloudScalarQuantity::setMapRange, "Set map range");
   py::class_<ps::PointCloudVectorQuantity>(m, "PointCloudVectorQuantity");
 
   // Main class, with adder methods
   py::class_<ps::PointCloud>(m, "PointCloud")
+
+    // basics
     .def("remove", &ps::PointCloud::remove, "Remove the structure")
     .def("set_enabled", &ps::PointCloud::setEnabled, "Enable the structure")
+    .def("is_enabled", &ps::PointCloud::isEnabled, "Check if the structure is enabled")
     .def("remove_all_quantities", &ps::PointCloud::removeAllQuantities, "Remove all quantities")
+    .def("remove_quantity", &ps::PointCloud::removeQuantity, "Remove a quantity")
     .def("update_point_positions", &ps::PointCloud::updatePointPositions<Eigen::MatrixXd>, "Update point positions")
     .def("update_point_positions2D", &ps::PointCloud::updatePointPositions2D<Eigen::MatrixXd>, "Update point positions")
+
+    // options
     .def("set_point_radius", &ps::PointCloud::setPointRadius, "Set radius")
+    .def("get_point_radius", &ps::PointCloud::getPointRadius, "Get radius")
     .def("set_point_color", &ps::PointCloud::setPointColor, "Set color")
+    .def("get_point_color", &ps::PointCloud::getPointColor, "Get color")
+    .def("set_material", &ps::PointCloud::setMaterial, "Set material")
+    .def("get_material", &ps::PointCloud::getMaterial, "Get material")
+
+    // quantities
     .def("add_color_quantity", &ps::PointCloud::addColorQuantity<Eigen::MatrixXd>, "Add a color function at points",
         py::arg("name"), py::arg("values"), py::return_value_policy::reference)
     .def("add_scalar_quantity", &ps::PointCloud::addScalarQuantity<Eigen::VectorXd>, "Add a scalar function at points",

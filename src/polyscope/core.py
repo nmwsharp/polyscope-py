@@ -27,3 +27,32 @@ def remove_all_structures():
 ### Small options
 def set_errors_throw_exceptions(val):
     psb.set_errors_throw_exceptions(val)
+
+
+
+## String-to-enum translation
+
+def str_to_datatype(s):
+    d = {
+        "standard" : psb.DataType.standard,
+        "symmetric" : psb.DataType.symmetric,
+        "magnitude" : psb.DataType.magnitude,
+    }
+
+    if s not in d:
+        raise ValueError("Bad datatype specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def str_to_vectortype(s):
+    d = {
+        "standard" : psb.VectorType.standard,
+        "ambient" : psb.VectorType.ambient,
+    }
+
+    if s not in d:
+        raise ValueError("Bad vectortype specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]

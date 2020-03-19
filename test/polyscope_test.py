@@ -6,6 +6,7 @@ import numpy as np
 
 # Path to where the bindings live
 sys.path.append(os.path.join(os.path.dirname(__file__), "../build/"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../source/"))
 
 import polyscope as ps
 
@@ -67,13 +68,23 @@ class TestPointCloud(unittest.TestCase):
         p.set_enabled()
         p.set_enabled(False)
         p.set_enabled(True)
+        self.assertTrue(p.is_enabled())
 
         # Radius
         p.set_point_radius(0.01)
         p.set_point_radius(0.1, relative=False)
+        self.assertAlmostEqual(0.1, p.get_point_radius())
         
         # Color
-        p.set_point_color((0.3, 0.3, 0.5))
+        color = (0.3, 0.3, 0.5)
+        p.set_point_color(color)
+        ret_color = p.get_point_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+        
+        # Material
+        p.set_material("candy")
+        self.assertEqual("candy", p.get_material())
         
         
         p2 = ps.register_point_cloud("test_cloud2", self.generate_points(),
@@ -106,6 +117,34 @@ class TestPointCloud(unittest.TestCase):
 
         ps.show(3)
         ps.remove_all_structures()
+
+    def test_scalar(self):
+        pts = self.generate_points()
+        N = pts.shape[0]
+        p = ps.register_point_cloud("test_cloud", pts)
+        vals = np.random.rand(N)
+
+        p.add_scalar_quantity("test_vals", vals)
+        ps.show(3)
+        
+        p.add_scalar_quantity("test_vals", vals, enabled=True)
+        ps.show(3)
+        
+        p.add_scalar_quantity("test_vals_with_range", vals, vminmax=(-5., 5.), enabled=True)
+        ps.show(3)
+        
+        p.add_scalar_quantity("test_vals_with_datatype", vals, enabled=True, datatype='symmetric')
+        ps.show(3)
+        
+        p.add_scalar_quantity("test_vals_with_cmap", vals, enabled=True, cmap='blues')
+        ps.show(3)
+
+        p.remove_quantity("test_vals")
+        p.remove_quantity("not_here") # should not error
+        p.remove_all_quantities()
+        p.remove_all_quantities()
+
+
 
 
 class TestSurfaceMesh(unittest.TestCase):
