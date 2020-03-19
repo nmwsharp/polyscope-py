@@ -41,10 +41,10 @@ void bind_point_cloud(py::module& m) {
     .def("nPoints", &ps::PointCloud::nPoints, "# points")
 
     // options
-    .def("set_point_radius", &ps::PointCloud::setPointRadius, "Set radius")
-    .def("get_point_radius", &ps::PointCloud::getPointRadius, "Get radius")
-    .def("set_point_color", &ps::PointCloud::setPointColor, "Set color")
-    .def("get_point_color", &ps::PointCloud::getPointColor, "Get color")
+    .def("set_radius", &ps::PointCloud::setPointRadius, "Set radius")
+    .def("get_radius", &ps::PointCloud::getPointRadius, "Get radius")
+    .def("set_color", &ps::PointCloud::setPointColor, "Set color")
+    .def("get_color", &ps::PointCloud::getPointColor, "Get color")
     .def("set_material", &ps::PointCloud::setMaterial, "Set material")
     .def("get_material", &ps::PointCloud::getMaterial, "Get material")
 

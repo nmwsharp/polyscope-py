@@ -76,14 +76,14 @@ class TestPointCloud(unittest.TestCase):
         self.assertTrue(p.is_enabled())
 
         # Radius
-        p.set_point_radius(0.01)
-        p.set_point_radius(0.1, relative=False)
-        self.assertAlmostEqual(0.1, p.get_point_radius())
+        p.set_radius(0.01)
+        p.set_radius(0.1, relative=False)
+        self.assertAlmostEqual(0.1, p.get_radius())
         
         # Color
         color = (0.3, 0.3, 0.5)
-        p.set_point_color(color)
-        ret_color = p.get_point_color()
+        p.set_color(color)
+        ret_color = p.get_color()
         for i in range(3):
             self.assertAlmostEqual(ret_color[i], color[i])
         
@@ -94,7 +94,7 @@ class TestPointCloud(unittest.TestCase):
         
         
         p2 = ps.register_point_cloud("test_cloud2", self.generate_points(),
-                enabled=False, point_radius=0.03, point_color=(1., 0., 0.))
+                enabled=False, material='wax', radius=0.03, color=(1., 0., 0.))
 
         ps.show(3)
         ps.remove_all_structures()

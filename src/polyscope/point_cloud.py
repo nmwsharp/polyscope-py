@@ -65,16 +65,16 @@ class PointCloud:
     ## Options
    
     # Point radius
-    def set_point_radius(self, rad, relative=True):
-        self.bound_cloud.set_point_radius(rad, relative)
-    def get_point_radius(self):
-        return self.bound_cloud.get_point_radius()
+    def set_radius(self, rad, relative=True):
+        self.bound_cloud.set_radius(rad, relative)
+    def get_radius(self):
+        return self.bound_cloud.get_radius()
     
     # Point color
-    def set_point_color(self, val):
-        self.bound_cloud.set_point_color(glm3(val))
-    def get_point_color(self):
-        return self.bound_cloud.get_point_color().as_tuple()
+    def set_color(self, val):
+        self.bound_cloud.set_color(glm3(val))
+    def get_color(self):
+        return self.bound_cloud.get_color().as_tuple()
     
     # Point material
     def set_material(self, mat):
@@ -131,8 +131,7 @@ class PointCloud:
             q.set_color(glm3(color))
 
 
-def register_point_cloud(name, points,
-        enabled=None, point_radius=None, point_color=None):
+def register_point_cloud(name, points, enabled=None, radius=None, color=None, material=None):
     """Register a new point cloud"""
 
     p = PointCloud(name, points)
@@ -140,10 +139,12 @@ def register_point_cloud(name, points,
     # == Apply options
     if enabled is not None:
         p.set_enabled(enabled)
-    if point_radius is not None:
-        p.set_point_radius(point_radius)
-    if point_color is not None:
-        p.set_point_color(point_color)
+    if radius is not None:
+        p.set_radius(radius)
+    if color is not None:
+        p.set_color(color)
+    if material is not None:
+        p.set_material(material)
 
     return p
 
