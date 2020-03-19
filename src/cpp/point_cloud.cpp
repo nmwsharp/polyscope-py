@@ -38,7 +38,7 @@ void bind_point_cloud(py::module& m) {
     .def("remove_quantity", &ps::PointCloud::removeQuantity, "Remove a quantity")
     .def("update_point_positions", &ps::PointCloud::updatePointPositions<Eigen::MatrixXd>, "Update point positions")
     .def("update_point_positions2D", &ps::PointCloud::updatePointPositions2D<Eigen::MatrixXd>, "Update point positions")
-    .def("nPoints", &ps::PointCloud::nPoints, "# points")
+    .def("n_points", &ps::PointCloud::nPoints, "# points")
 
     // options
     .def("set_radius", &ps::PointCloud::setPointRadius, "Set radius")
@@ -60,11 +60,9 @@ void bind_point_cloud(py::module& m) {
 
   // Static adders and getters
   m.def("register_point_cloud", &ps::registerPointCloud<Eigen::MatrixXd>, 
-      py::arg("name"), py::arg("values"), py::arg("errorIfPresent")=false,
-      "Register a point cloud", py::return_value_policy::reference);
+      py::arg("name"), py::arg("values"), "Register a point cloud", py::return_value_policy::reference);
   m.def("register_point_cloud2D", &ps::registerPointCloud2D<Eigen::MatrixXd>, 
-      py::arg("name"), py::arg("values"), py::arg("errorIfPresent")=false,
-      "Register a point cloud", py::return_value_policy::reference);
+      py::arg("name"), py::arg("values"), "Register a point cloud", py::return_value_policy::reference);
   m.def("remove_point_cloud", &polyscope::removePointCloud, "Remove a point cloud by name");
   m.def("get_point_cloud", &polyscope::getPointCloud, "Get a point cloud by name", py::return_value_policy::reference);
   m.def("has_point_cloud", &polyscope::hasPointCloud, "Check for a point cloud by name");

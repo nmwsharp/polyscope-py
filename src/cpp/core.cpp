@@ -4,8 +4,8 @@
 
 #include "Eigen/Dense"
 
-#include "polyscope/point_cloud.h"
 #include "polyscope/polyscope.h"
+#include "polyscope/affine_remapper.h"
 
 namespace py = pybind11;
 namespace ps = polyscope;
@@ -14,6 +14,7 @@ namespace ps = polyscope;
 // Forward-declare bindings from other files
 void bind_surface_mesh(py::module& m);
 void bind_point_cloud(py::module& m);
+void bind_curve_network(py::module& m);
 
 // Actual binding code
 // clang-format off
@@ -56,6 +57,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   // === Bind structures defined in other files
   bind_surface_mesh(m);
   bind_point_cloud(m);
+  bind_curve_network(m);
 
 }
 

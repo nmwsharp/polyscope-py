@@ -25,13 +25,16 @@ class PointCloud:
             else:
                 raise ValueError("bad point cloud shape")
 
-        self.N = self.bound_cloud.nPoints()
 
     def check_shape(self, points):
         # Helper to validate arrays
 
         if (len(points.shape) != 2) or (points.shape[1] not in (2,3)):
             raise ValueError("Point cloud positions should have shape (N,3); shape is " + str(points.shape))
+        
+        
+    def n_points(self):
+        return self.bound_cloud.n_points()
 
     ## Structure management
     
@@ -87,7 +90,7 @@ class PointCloud:
        
     # Scalar
     def add_scalar_quantity(self, name, values, enabled=None, datatype="standard", vminmax=None, cmap=None):
-        if len(values.shape) != 1 or values.shape[0] != self.N: raise ValueError("'values' should be a length-N array")
+        if len(values.shape) != 1 or values.shape[0] != self.n_points(): raise ValueError("'values' should be a length-N array")
             
         q = self.bound_cloud.add_scalar_quantity(name, values, str_to_datatype(datatype))
 
@@ -102,7 +105,7 @@ class PointCloud:
     
     # Color
     def add_color_quantity(self, name, values, enabled=None):
-        if len(values.shape) != 2 or values.shape[0] != self.N or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
+        if len(values.shape) != 2 or values.shape[0] != self.n_points() or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
             
         q = self.bound_cloud.add_color_quantity(name, values)
 
@@ -113,7 +116,7 @@ class PointCloud:
     
     # Vector
     def add_vector_quantity(self, name, values, enabled=None, vectortype="standard", length=None, radius=None, color=None):
-        if len(values.shape) != 2 or values.shape[0] != self.N or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
+        if len(values.shape) != 2 or values.shape[0] != self.n_points() or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
         
         if values.shape[1] == 2:
             q = self.bound_cloud.add_vector_quantity2D(name, values, str_to_vectortype(vectortype))
