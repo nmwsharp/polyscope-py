@@ -1,20 +1,31 @@
 import polyscope_bindings as psb
 
-from polyscope.core import str_to_datatype
+from polyscope.core import str_to_datatype, str_to_vectortype, glm3
 
 class PointCloud:
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
 
-    def __init__(self, name, points):
-        self.check_shape(points)
+    # End users should not call this constrctor, use register_point_cloud instead
+    def __init__(self, name=None, points=None, instance=None):
 
-        if points.shape[1] == 3:
-            self.bound_cloud = psb.register_point_cloud(name, points)
-        elif points.shape[1] == 2:
-            self.bound_cloud = psb.register_point_cloud2D(name, points)
+        if instance is not None:
+            # Wrap an existing instance
+            self.bound_cloud = instance
+
         else:
-            raise ValueError("bad point cloud shape")
+            # Create a new instance
+
+            self.check_shape(points)
+
+            if points.shape[1] == 3:
+                self.bound_cloud = psb.register_point_cloud(name, points)
+            elif points.shape[1] == 2:
+                self.bound_cloud = psb.register_point_cloud2D(name, points)
+            else:
+                raise ValueError("bad point cloud shape")
+
+        self.N = self.bound_cloud.nPoints()
 
     def check_shape(self, points):
         # Helper to validate arrays
@@ -61,7 +72,7 @@ class PointCloud:
     
     # Point color
     def set_point_color(self, val):
-        self.bound_cloud.set_point_color(psb.glm_vec3(val[0], val[1], val[2]))
+        self.bound_cloud.set_point_color(glm3(val))
     def get_point_color(self):
         return self.bound_cloud.get_point_color().as_tuple()
     
@@ -76,7 +87,7 @@ class PointCloud:
        
     # Scalar
     def add_scalar_quantity(self, name, values, enabled=None, datatype="standard", vminmax=None, cmap=None):
-        if len(values.shape) != 1: raise ValueError("'values' should be a 1D array")
+        if len(values.shape) != 1 or values.shape[0] != self.N: raise ValueError("'values' should be a length-N array")
             
         q = self.bound_cloud.add_scalar_quantity(name, values, str_to_datatype(datatype))
 
@@ -87,7 +98,37 @@ class PointCloud:
             q.set_map_range(vminmax)
         if cmap is not None:
             q.set_color_map(cmap)
+    
+    
+    # Color
+    def add_color_quantity(self, name, values, enabled=None):
+        if len(values.shape) != 2 or values.shape[0] != self.N or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
+            
+        q = self.bound_cloud.add_color_quantity(name, values)
 
+        # Support optional params
+        if enabled is not None:
+            q.set_enabled(enabled)
+    
+    
+    # Vector
+    def add_vector_quantity(self, name, values, enabled=None, vectortype="standard", length=None, radius=None, color=None):
+        if len(values.shape) != 2 or values.shape[0] != self.N or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
+        
+        if values.shape[1] == 2:
+            q = self.bound_cloud.add_vector_quantity2D(name, values, str_to_vectortype(vectortype))
+        elif values.shape[1] == 3:
+            q = self.bound_cloud.add_vector_quantity(name, values, str_to_vectortype(vectortype))
+
+        # Support optional params
+        if enabled is not None:
+            q.set_enabled(enabled)
+        if length is not None:
+            q.set_length(length, True)
+        if radius is not None:
+            q.set_radius(radius, True)
+        if color is not None:
+            q.set_color(glm3(color))
 
 
 def register_point_cloud(name, points,
@@ -110,8 +151,17 @@ def remove_point_cloud(name, error_if_absent=True):
     """Remove a point cloud by name"""
     psb.remove_point_cloud(name, error_if_absent)
 
+def get_point_cloud(name):
+    """Get point cloud by name"""
+    if not has_point_cloud(name):
+        raise ValueError("no point cloud with name " + str(name))
+
+    raw_cloud = psb.get_point_cloud(name)
+
+    # Wrap the instance
+    return PointCloud(instance=raw_cloud)
 
 def has_point_cloud(name):
-    """Check if a point cloud exists name"""
+    """Check if a point cloud exists by name"""
     return psb.has_point_cloud(name)
     

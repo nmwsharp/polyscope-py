@@ -52,6 +52,11 @@ class TestPointCloud(unittest.TestCase):
         self.assertTrue(ps.has_point_cloud("test_cloud"))
         self.assertFalse(ps.has_point_cloud("test_cloud2"))
 
+        # get by name
+        ps.register_point_cloud("test_cloud3", self.generate_points(n_pts=10))
+        p = ps.get_point_cloud("test_cloud3") # should be wrapped instance, not underlying PSB instance
+        self.assertEqual(p.N, 10) # field N only appears in wrapped instance
+
         ps.remove_all_structures()
         
     def test_render(self):
@@ -85,6 +90,7 @@ class TestPointCloud(unittest.TestCase):
         # Material
         p.set_material("candy")
         self.assertEqual("candy", p.get_material())
+        p.set_material("clay")
         
         
         p2 = ps.register_point_cloud("test_cloud2", self.generate_points(),
@@ -121,7 +127,8 @@ class TestPointCloud(unittest.TestCase):
     def test_scalar(self):
         pts = self.generate_points()
         N = pts.shape[0]
-        p = ps.register_point_cloud("test_cloud", pts)
+        ps.register_point_cloud("test_cloud", pts)
+        p = ps.get_point_cloud("test_cloud")
         vals = np.random.rand(N)
 
         p.add_scalar_quantity("test_vals", vals)
@@ -139,13 +146,55 @@ class TestPointCloud(unittest.TestCase):
         p.add_scalar_quantity("test_vals_with_cmap", vals, enabled=True, cmap='blues')
         ps.show(3)
 
+        # test some additions/removal while we're at it
         p.remove_quantity("test_vals")
         p.remove_quantity("not_here") # should not error
         p.remove_all_quantities()
         p.remove_all_quantities()
+        ps.remove_all_structures()
+    
+    def test_color(self):
+        pts = self.generate_points()
+        N = pts.shape[0]
+        p = ps.register_point_cloud("test_cloud", pts)
+        vals = np.random.rand(N,3)
 
+        p.add_color_quantity("test_vals", vals)
+        ps.show(3)
+        
+        p.add_color_quantity("test_vals", vals, enabled=True)
+        ps.show(3)
+        
+        p.remove_all_quantities()
+        ps.remove_all_structures()
+    
+    def test_vector(self):
+        pts = self.generate_points()
+        N = pts.shape[0]
+        p = ps.register_point_cloud("test_cloud", pts)
+        vals = np.random.rand(N,3)
 
-
+        p.add_vector_quantity("test_vals", vals)
+        ps.show(3)
+        
+        p.add_vector_quantity("test_vals", vals, enabled=True)
+        ps.show(3)
+        
+        p.add_vector_quantity("test_vals", vals, enabled=True, vectortype='ambient')
+        ps.show(3)
+        
+        p.add_vector_quantity("test_vals", vals, enabled=True, length=0.005)
+        ps.show(3)
+        
+        p.add_vector_quantity("test_vals", vals, enabled=True, radius=0.001)
+        ps.show(3)
+        
+        p.add_vector_quantity("test_vals", vals, enabled=True, color=(0.2, 0.5, 0.5))
+        ps.show(3)
+    
+        p.remove_all_quantities()
+        ps.remove_all_structures()
+    
 
 class TestSurfaceMesh(unittest.TestCase):
 

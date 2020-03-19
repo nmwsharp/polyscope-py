@@ -14,13 +14,18 @@ namespace ps = polyscope;
 // clang-format off
 void bind_point_cloud(py::module& m) {
 
-  // Helper classes
-  py::class_<ps::PointCloudColorQuantity>(m, "PointCloudColorQuantity");
+  // Helper quantity classes
+  py::class_<ps::PointCloudColorQuantity>(m, "PointCloudColorQuantity")
+    .def("set_enabled", &ps::PointCloudColorQuantity::setEnabled, "Set enabled");
   py::class_<ps::PointCloudScalarQuantity>(m, "PointCloudScalarQuantity")
     .def("set_enabled", &ps::PointCloudScalarQuantity::setEnabled, "Set enabled")
     .def("set_color_map", &ps::PointCloudScalarQuantity::setColorMap, "Set color map")
     .def("set_map_range", &ps::PointCloudScalarQuantity::setMapRange, "Set map range");
-  py::class_<ps::PointCloudVectorQuantity>(m, "PointCloudVectorQuantity");
+  py::class_<ps::PointCloudVectorQuantity>(m, "PointCloudVectorQuantity")
+    .def("set_enabled", &ps::PointCloudVectorQuantity::setEnabled, "Set enabled")
+    .def("set_length", &ps::PointCloudVectorQuantity::setVectorLengthScale, "Set length")
+    .def("set_radius", &ps::PointCloudVectorQuantity::setVectorRadius, "Set radius")
+    .def("set_color", &ps::PointCloudVectorQuantity::setVectorColor, "Set color");
 
   // Main class, with adder methods
   py::class_<ps::PointCloud>(m, "PointCloud")
@@ -33,6 +38,7 @@ void bind_point_cloud(py::module& m) {
     .def("remove_quantity", &ps::PointCloud::removeQuantity, "Remove a quantity")
     .def("update_point_positions", &ps::PointCloud::updatePointPositions<Eigen::MatrixXd>, "Update point positions")
     .def("update_point_positions2D", &ps::PointCloud::updatePointPositions2D<Eigen::MatrixXd>, "Update point positions")
+    .def("nPoints", &ps::PointCloud::nPoints, "# points")
 
     // options
     .def("set_point_radius", &ps::PointCloud::setPointRadius, "Set radius")
@@ -48,6 +54,8 @@ void bind_point_cloud(py::module& m) {
     .def("add_scalar_quantity", &ps::PointCloud::addScalarQuantity<Eigen::VectorXd>, "Add a scalar function at points",
         py::arg("name"), py::arg("values"), py::arg("data_type")=ps::DataType::STANDARD, py::return_value_policy::reference)
     .def("add_vector_quantity", &ps::PointCloud::addVectorQuantity<Eigen::MatrixXd>, "Add a vector function at points",
+        py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference)
+    .def("add_vector_quantity2D", &ps::PointCloud::addVectorQuantity2D<Eigen::MatrixXd>, "Add a vector function at points",
         py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference);
 
   // Static adders and getters

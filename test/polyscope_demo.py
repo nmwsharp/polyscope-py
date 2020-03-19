@@ -26,7 +26,7 @@ def main():
     # verts, faces = igl.read_triangle_mesh(args.mesh)
     m = meshio.read(args.mesh)
     verts = m.points
-    faces = m.cells['triangle']
+    faces = m.cells[0].data
 
 
     ### Polyscope things example
