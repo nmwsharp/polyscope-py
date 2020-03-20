@@ -36,7 +36,7 @@ class CurveNetwork:
                 # Common case: process edges as numpy array
 
                 if (len(edges.shape) != 2) or (edges.shape[1] != 2):
-                    raise ValueError("curve network edges should have shape (N,2); shape is " + str(edge.shape))
+                    raise ValueError("curve network edges should have shape (N_edge,2); shape is " + str(edges.shape))
 
                 if nodes.shape[1] == 3:
                     self.bound_network = psb.register_curve_network(name, nodes, edges) 

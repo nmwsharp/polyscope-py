@@ -40,7 +40,7 @@ void bind_curve_network(py::module& m) {
     .def("set_radius", &ps::CurveNetworkEdgeVectorQuantity::setVectorRadius, "Set radius")
     .def("set_color", &ps::CurveNetworkEdgeVectorQuantity::setVectorColor, "Set color");
 
-  // Main class, with adder methods
+  // Main class
   py::class_<ps::CurveNetwork>(m, "CurveNetwork")
 
     // basics

@@ -95,7 +95,7 @@ class TestPointCloud(unittest.TestCase):
         
         
         p2 = ps.register_point_cloud("test_cloud2", self.generate_points(),
-                enabled=False, material='wax', radius=0.03, color=(1., 0., 0.))
+                enabled=True, material='wax', radius=0.03, color=(1., 0., 0.))
 
         ps.show(3)
         ps.remove_all_structures()
@@ -369,10 +369,131 @@ class TestCurveNetwork(unittest.TestCase):
         
         ps.remove_all_structures()
 
+
 class TestSurfaceMesh(unittest.TestCase):
 
+    def generate_verts(self, n_pts=10):
+        np.random.seed(777)        
+        return np.random.rand(n_pts, 3)
+    
+    def generate_faces(self, n_pts=10):
+        np.random.seed(777)        
+        return np.random.randint(0, n_pts, size=(2*n_pts,3))
+    
+    def test_add_remove(self):
+
+        # add
+        n = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        self.assertTrue(ps.has_surface_mesh("test_mesh"))
+        self.assertFalse(ps.has_surface_mesh("nope"))
+        self.assertEqual(n.n_vertices(), 10)
+        self.assertEqual(n.n_faces(), 20)
+        self.assertGreater(n.n_edges(), 1)
+        self.assertEqual(n.n_corners(), 3*20)
+        self.assertEqual(n.n_halfedges(), 3*20)
+      
+        # remove by name
+        ps.register_surface_mesh("test_mesh2", self.generate_verts(), self.generate_faces())
+        ps.remove_surface_mesh("test_mesh2")
+        self.assertTrue(ps.has_surface_mesh("test_mesh"))
+        self.assertFalse(ps.has_surface_mesh("test_mesh2"))
+
+        # remove by ref
+        c = ps.register_surface_mesh("test_mesh2", self.generate_verts(), self.generate_faces())
+        c.remove()
+        self.assertTrue(ps.has_surface_mesh("test_mesh"))
+        self.assertFalse(ps.has_surface_mesh("test_mesh2"))
+
+        # get by name
+        ps.register_surface_mesh("test_mesh3", self.generate_verts(), self.generate_faces())
+        p = ps.get_surface_mesh("test_mesh3") # should be wrapped instance, not underlying PSB instance
+        self.assertTrue(isinstance(p, ps.SurfaceMesh))
+
+        ps.remove_all_structures()
+
+
+    def test_render(self):
+
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        ps.show(3)
+        ps.remove_all_structures()
+
+
     def test_options(self):
-        pass
+
+        p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+
+        # Set enabled
+        p.set_enabled()
+        p.set_enabled(False)
+        p.set_enabled(True)
+        self.assertTrue(p.is_enabled())
+    
+        # Color
+        color = (0.3, 0.3, 0.5)
+        p.set_color(color)
+        ret_color = p.get_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+
+        # Edge color
+        color = (0.1, 0.5, 0.5)
+        p.set_edge_color(color)
+        ret_color = p.get_edge_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+        
+        ps.show(3)
+
+        # Smooth shade
+        p.set_smooth_shade(True)
+        ps.show(3)
+        self.assertTrue(p.get_smooth_shade())
+        p.set_smooth_shade(False)
+        ps.show(3)
+
+        # Edge width 
+        p.set_edge_width(1.5)
+        ps.show(3)
+        self.assertAlmostEqual(p.get_edge_width(), 1.5)
+        
+        # Material
+        p.set_material("candy")
+        self.assertEqual("candy", p.get_material())
+        p.set_material("clay")
+      
+        # Set with optional arguments 
+        p2 = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces(), 
+                    enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
+                    smooth_shade=True, edge_width=0.5)
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_update(self):
+
+        p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        ps.show(3)
+
+        newPos = self.generate_verts() - 0.5
+        p.update_vertex_positions(newPos)
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_2D(self):
+        np.random.seed(777)        
+        points2D = self.generate_verts()[:,:2]
+
+        p = ps.register_surface_mesh("test_mesh", points2D, self.generate_faces())
+        ps.show(3)
+
+        newPos = points2D - 0.5
+        p.update_vertex_positions(newPos)
+
+        ps.show(3)
+        ps.remove_all_structures()
+
 
 
 if __name__ == '__main__':
