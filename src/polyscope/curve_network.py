@@ -17,38 +17,34 @@ class CurveNetwork:
             # Create a new instance
             self.check_shape(nodes)
 
-            if isinstance(edges, str) and edges not in ['line', 'loop']:
-                raise ValueError("bad edges setting, if not numpy array must be in 'line' or 'loop', got " + str(edges))
+            if isinstance(edges, str): 
+                # Special case: edges as a string key
 
-            if nodes.shape[1] == 3:
-                if edges == 'line':
-                    self.bound_network = psb.register_curve_network_line(name, nodes)
-                elif edges == 'loop':
-                    self.bound_network = psb.register_curve_network_loop(name, nodes)
-                else:
-                    if (len(edges.shape) != 2) or (edges.shape[1] != 2):
-                        raise ValueError("curve network edges should have shape (N,2); shape is " + str(edge.shape))
+                if edges not in ['line', 'loop']: raise ValueError("bad edges setting, if not numpy array must be in 'line' or 'loop', got " + str(edges))
 
-                    self.bound_network = psb.register_curve_network(name, nodes, edges) 
-
-            elif nodes.shape[1] == 2:
-
-                if edges == 'line':
-                    self.bound_network = psb.register_curve_network_line2D(name, nodes)
-                elif edges == 'loop':
-                    self.bound_network = psb.register_curve_network_loop2D(name, nodes)
-                else:
-                    if (len(edges.shape) != 2) or (edges.shape[1] != 2):
-                        raise ValueError("curve network edges should have shape (N,2); shape is " + str(edge.shape))
-
-                    self.bound_network = psb.register_curve_network2D(name, nodes, edges) 
-
+                if nodes.shape[1] == 3:
+                    if edges == 'line':
+                        self.bound_network = psb.register_curve_network_line(name, nodes)
+                    elif edges == 'loop':
+                        self.bound_network = psb.register_curve_network_loop(name, nodes)
+                elif nodes.shape[1] == 2:
+                    if edges == 'line':
+                        self.bound_network = psb.register_curve_network_line2D(name, nodes)
+                    elif edges == 'loop':
+                        self.bound_network = psb.register_curve_network_loop2D(name, nodes)
             else:
-                raise ValueError("bad curve network shape")
+                # Common case: process edges as numpy array
+
+                if (len(edges.shape) != 2) or (edges.shape[1] != 2):
+                    raise ValueError("curve network edges should have shape (N,2); shape is " + str(edge.shape))
+
+                if nodes.shape[1] == 3:
+                    self.bound_network = psb.register_curve_network(name, nodes, edges) 
+                elif nodes.shape[1] == 2:
+                    self.bound_network = psb.register_curve_network2D(name, nodes, edges) 
 
     def check_shape(self, points):
         # Helper to validate arrays
-
         if (len(points.shape) != 2) or (points.shape[1] not in (2,3)):
             raise ValueError("curve network node positions should have shape (N,3); shape is " + str(points.shape))
        
@@ -112,13 +108,14 @@ class CurveNetwork:
        
     # Scalar
     def add_scalar_quantity(self, name, values, defined_on='nodes', enabled=None, datatype="standard", vminmax=None, cmap=None):
+
         if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
 
         if defined_on == 'nodes':
-            if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes() array")
+            if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes array")
             q = self.bound_network.add_node_scalar_quantity(name, values, str_to_datatype(datatype))
         elif defined_on == 'edges':
-            if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges() array")
+            if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
             q = self.bound_network.add_edge_scalar_quantity(name, values, str_to_datatype(datatype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
@@ -134,10 +131,18 @@ class CurveNetwork:
     
     
     # Color
-    def add_color_quantity(self, name, values, enabled=None):
+    def add_color_quantity(self, name, values, defined_on='nodes', enabled=None):
         if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
             
-        q = self.bound_network.add_color_quantity(name, values)
+        
+        if defined_on == 'nodes':
+            if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes array")
+            q = self.bound_network.add_node_color_quantity(name, values)
+        elif defined_on == 'edges':
+            if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
+            q = self.bound_network.add_edge_color_quantity(name, values)
+        else:
+            raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
 
         # Support optional params
         if enabled is not None:
@@ -145,13 +150,28 @@ class CurveNetwork:
     
     
     # Vector
-    def add_vector_quantity(self, name, values, enabled=None, vectortype="standard", length=None, radius=None, color=None):
-        if len(values.shape) != 2 or values.shape[0] != self.N or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
+    def add_vector_quantity(self, name, values, defined_on='nodes', enabled=None, vectortype="standard", length=None, radius=None, color=None):
+        if len(values.shape) != 2 or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
         
-        if values.shape[1] == 2:
-            q = self.bound_network.add_vector_quantity2D(name, values, str_to_vectortype(vectortype))
-        elif values.shape[1] == 3:
-            q = self.bound_network.add_vector_quantity(name, values, str_to_vectortype(vectortype))
+        
+        if defined_on == 'nodes':
+            if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes array")
+
+            if values.shape[1] == 2:
+                q = self.bound_network.add_node_vector_quantity2D(name, values, str_to_vectortype(vectortype))
+            elif values.shape[1] == 3:
+                q = self.bound_network.add_node_vector_quantity(name, values, str_to_vectortype(vectortype))
+
+        elif defined_on == 'edges':
+            if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
+            
+            if values.shape[1] == 2:
+                q = self.bound_network.add_edge_vector_quantity2D(name, values, str_to_vectortype(vectortype))
+            elif values.shape[1] == 3:
+                q = self.bound_network.add_edge_vector_quantity(name, values, str_to_vectortype(vectortype))
+
+        else:
+            raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
 
         # Support optional params
         if enabled is not None:

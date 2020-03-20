@@ -133,17 +133,9 @@ class TestPointCloud(unittest.TestCase):
         vals = np.random.rand(N)
 
         p.add_scalar_quantity("test_vals", vals)
-        ps.show(3)
-        
         p.add_scalar_quantity("test_vals", vals, enabled=True)
-        ps.show(3)
-        
         p.add_scalar_quantity("test_vals_with_range", vals, vminmax=(-5., 5.), enabled=True)
-        ps.show(3)
-        
         p.add_scalar_quantity("test_vals_with_datatype", vals, enabled=True, datatype='symmetric')
-        ps.show(3)
-        
         p.add_scalar_quantity("test_vals_with_cmap", vals, enabled=True, cmap='blues')
         ps.show(3)
 
@@ -161,8 +153,6 @@ class TestPointCloud(unittest.TestCase):
         vals = np.random.rand(N,3)
 
         p.add_color_quantity("test_vals", vals)
-        ps.show(3)
-        
         p.add_color_quantity("test_vals", vals, enabled=True)
         ps.show(3)
         
@@ -175,22 +165,16 @@ class TestPointCloud(unittest.TestCase):
         p = ps.register_point_cloud("test_cloud", pts)
         vals = np.random.rand(N,3)
 
-        p.add_vector_quantity("test_vals", vals)
-        ps.show(3)
-        
-        p.add_vector_quantity("test_vals", vals, enabled=True)
-        ps.show(3)
-        
-        p.add_vector_quantity("test_vals", vals, enabled=True, vectortype='ambient')
-        ps.show(3)
-        
-        p.add_vector_quantity("test_vals", vals, enabled=True, length=0.005)
-        ps.show(3)
-        
-        p.add_vector_quantity("test_vals", vals, enabled=True, radius=0.001)
-        ps.show(3)
-        
-        p.add_vector_quantity("test_vals", vals, enabled=True, color=(0.2, 0.5, 0.5))
+        p.add_vector_quantity("test_vals1", vals)
+        p.add_vector_quantity("test_vals2", vals, enabled=True)
+        p.add_vector_quantity("test_vals3", vals, enabled=True, vectortype='ambient')
+        p.add_vector_quantity("test_vals4", vals, enabled=True, length=0.005)
+        p.add_vector_quantity("test_vals5", vals, enabled=True, radius=0.001)
+        p.add_vector_quantity("test_vals6", vals, enabled=True, color=(0.2, 0.5, 0.5))
+
+        # 2D 
+        p.add_vector_quantity("test_vals7", vals[:,:2], enabled=True, radius=0.001)
+
         ps.show(3)
     
         p.remove_all_quantities()
@@ -322,7 +306,7 @@ class TestCurveNetwork(unittest.TestCase):
                 vals = np.random.rand(2*N)
 
             p.add_scalar_quantity("test_vals", vals, defined_on=on)
-            p.add_scalar_quantity("test_vals", vals, defined_on=on, enabled=True)
+            p.add_scalar_quantity("test_vals2", vals, defined_on=on, enabled=True)
             p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
             p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, enabled=True, datatype='symmetric')
             p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, enabled=True, cmap='blues')
@@ -341,42 +325,48 @@ class TestCurveNetwork(unittest.TestCase):
         pts = self.generate_points()
         N = pts.shape[0]
         p = ps.register_curve_network("test_network", pts, self.generate_edges())
-        vals = np.random.rand(N,3)
 
-        p.add_color_quantity("test_vals", vals)
-        ps.show(3)
+        for on in ['nodes', 'edges']:
+       
+            if on == 'nodes':
+                vals = np.random.rand(N,3)
+            elif on  == 'edges':
+                vals = np.random.rand(2*N, 3)
+
+            p.add_color_quantity("test_vals", vals, defined_on=on)
+            p.add_color_quantity("test_vals", vals, defined_on=on, enabled=True)
+
+            ps.show(3)
+            p.remove_all_quantities()
         
-        p.add_color_quantity("test_vals", vals, enabled=True)
-        ps.show(3)
-        
-        p.remove_all_quantities()
         ps.remove_all_structures()
     
     def test_vector(self):
         pts = self.generate_points()
         N = pts.shape[0]
-        p = ps.register_curve_network("test_network", pts)
+        p = ps.register_curve_network("test_network", pts, self.generate_edges())
         vals = np.random.rand(N,3)
+        
+        for on in ['nodes', 'edges']:
+       
+            if on == 'nodes':
+                vals = np.random.rand(N,3)
+            elif on  == 'edges':
+                vals = np.random.rand(2*N, 3)
 
-        p.add_vector_quantity("test_vals", vals)
-        ps.show(3)
+            p.add_vector_quantity("test_vals1", vals, defined_on=on)
+            p.add_vector_quantity("test_vals2", vals, defined_on=on, enabled=True)
+            p.add_vector_quantity("test_vals3", vals, defined_on=on, enabled=True, vectortype='ambient')
+            p.add_vector_quantity("test_vals4", vals, defined_on=on, enabled=True, length=0.005)
+            p.add_vector_quantity("test_vals5", vals, defined_on=on, enabled=True, radius=0.001)
+            p.add_vector_quantity("test_vals6", vals, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
+            
+            # 2D 
+            p.add_vector_quantity("test_vals7", vals[:,:2], defined_on=on, enabled=True, radius=0.001)
+
+            ps.show(3)
+            p.remove_all_quantities()
         
-        p.add_vector_quantity("test_vals", vals, enabled=True)
-        ps.show(3)
-        
-        p.add_vector_quantity("test_vals", vals, enabled=True, vectortype='ambient')
-        ps.show(3)
-        
-        p.add_vector_quantity("test_vals", vals, enabled=True, length=0.005)
-        ps.show(3)
-        
-        p.add_vector_quantity("test_vals", vals, enabled=True, radius=0.001)
-        ps.show(3)
-        
-        p.add_vector_quantity("test_vals", vals, enabled=True, color=(0.2, 0.5, 0.5))
-        ps.show(3)
-    
-        p.remove_all_quantities()
         ps.remove_all_structures()
 
 class TestSurfaceMesh(unittest.TestCase):

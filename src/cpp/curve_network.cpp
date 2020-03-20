@@ -15,8 +15,11 @@ namespace ps = polyscope;
 void bind_curve_network(py::module& m) {
 
   // Helper quantity classes
-  py::class_<ps::CurveNetworkColorQuantity>(m, "CurveNetworkColorQuantity")
-    .def("set_enabled", &ps::CurveNetworkColorQuantity::setEnabled, "Set enabled");
+  py::class_<ps::CurveNetworkNodeColorQuantity>(m, "CurveNetworkNodeColorQuantity")
+    .def("set_enabled", &ps::CurveNetworkNodeColorQuantity::setEnabled, "Set enabled");
+  py::class_<ps::CurveNetworkEdgeColorQuantity>(m, "CurveNetworkEdgeColorQuantity")
+    .def("set_enabled", &ps::CurveNetworkEdgeColorQuantity::setEnabled, "Set enabled");
+
   py::class_<ps::CurveNetworkNodeScalarQuantity>(m, "CurveNetworkNodeScalarQuantity")
     .def("set_enabled", &ps::CurveNetworkNodeScalarQuantity::setEnabled, "Set enabled")
     .def("set_color_map", &ps::CurveNetworkNodeScalarQuantity::setColorMap, "Set color map")
@@ -25,11 +28,17 @@ void bind_curve_network(py::module& m) {
     .def("set_enabled", &ps::CurveNetworkEdgeScalarQuantity::setEnabled, "Set enabled")
     .def("set_color_map", &ps::CurveNetworkEdgeScalarQuantity::setColorMap, "Set color map")
     .def("set_map_range", &ps::CurveNetworkEdgeScalarQuantity::setMapRange, "Set map range");
-  py::class_<ps::CurveNetworkVectorQuantity>(m, "CurveNetworkVectorQuantity")
-    .def("set_enabled", &ps::CurveNetworkVectorQuantity::setEnabled, "Set enabled")
-    .def("set_length", &ps::CurveNetworkVectorQuantity::setVectorLengthScale, "Set length")
-    .def("set_radius", &ps::CurveNetworkVectorQuantity::setVectorRadius, "Set radius")
-    .def("set_color", &ps::CurveNetworkVectorQuantity::setVectorColor, "Set color");
+
+  py::class_<ps::CurveNetworkNodeVectorQuantity>(m, "CurveNetworkNodeVectorQuantity")
+    .def("set_enabled", &ps::CurveNetworkNodeVectorQuantity::setEnabled, "Set enabled")
+    .def("set_length", &ps::CurveNetworkNodeVectorQuantity::setVectorLengthScale, "Set length")
+    .def("set_radius", &ps::CurveNetworkNodeVectorQuantity::setVectorRadius, "Set radius")
+    .def("set_color", &ps::CurveNetworkNodeVectorQuantity::setVectorColor, "Set color");
+  py::class_<ps::CurveNetworkEdgeVectorQuantity>(m, "CurveNetworkEdgeVectorQuantity")
+    .def("set_enabled", &ps::CurveNetworkEdgeVectorQuantity::setEnabled, "Set enabled")
+    .def("set_length", &ps::CurveNetworkEdgeVectorQuantity::setVectorLengthScale, "Set length")
+    .def("set_radius", &ps::CurveNetworkEdgeVectorQuantity::setVectorRadius, "Set radius")
+    .def("set_color", &ps::CurveNetworkEdgeVectorQuantity::setVectorColor, "Set color");
 
   // Main class, with adder methods
   py::class_<ps::CurveNetwork>(m, "CurveNetwork")
