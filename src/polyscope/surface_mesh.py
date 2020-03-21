@@ -108,8 +108,68 @@ class SurfaceMesh:
         return self.bound_mesh.get_material()
 
 
+    ## Permutations and bases
+
+    def set_vertex_permutation(self, perm, expected_size=None):
+        if len(perm.shape) != 1 or perm.shape[0] != self.n_vertices(): raise ValueError("'perm' should be an array with one entry per vertex")
+        if expected_size is None: expected_size = 0
+        self.bound_mesh.set_vertex_permutation(perm, expected_size)
+
+    def set_face_permutation(self, perm, expected_size=None):
+        if len(perm.shape) != 1 or perm.shape[0] != self.n_faces(): raise ValueError("'perm' should be an array with one entry per face")
+        if expected_size is None: expected_size = 0
+        self.bound_mesh.set_face_permutation(perm, expected_size)
+    
+    def set_edge_permutation(self, perm, expected_size=None):
+        if len(perm.shape) != 1 or perm.shape[0] != self.n_edges(): raise ValueError("'perm' should be an array with one entry per edge")
+        if expected_size is None: expected_size = 0
+        self.bound_mesh.set_edge_permutation(perm, expected_size)
+    
+    def set_corner_permutation(self, perm, expected_size=None):
+        if len(perm.shape) != 1 or perm.shape[0] != self.n_corners(): raise ValueError("'perm' should be an array with one entry per corner")
+        if expected_size is None: expected_size = 0
+        self.bound_mesh.set_corner_permutation(perm, expected_size)
+    
+    def set_halfedge_permutation(self, perm, expected_size=None):
+        if len(perm.shape) != 1 or perm.shape[0] != self.n_halfedges(): raise ValueError("'perm' should be an array with one entry per halfedge")
+        if expected_size is None: expected_size = 0
+        self.bound_mesh.set_halfedge_permutation(perm, expected_size)
+    
+    def set_all_permutations(self, 
+            vertex_perm=None, vertex_perm_size=None,
+            face_perm=None, face_perm_size=None,
+            edge_perm=None, edge_perm_size=None,
+            corner_perm=None, corner_perm_size=None,
+            halfedge_perm=None, halfedge_perm_size=None):
+
+        if vertex_perm is not None: self.set_vertex_permutation(vertex_perm, vertex_perm_size)
+        if face_perm is not None: self.set_face_permutation(face_perm, face_perm_size)
+        if edge_perm is not None: self.set_edge_permutation(edge_perm, edge_perm_size)
+        if corner_perm is not None: self.set_corner_permutation(corner_perm, corner_perm_size)
+        if halfedge_perm is not None: self.set_halfedge_permutation(halfedge_perm, halfedge_perm_size)
+    
+    def set_vertex_tangent_basisX(self, vectors):
+        if len(vectors.shape) != 2 or vectors.shape[0] != self.n_vertices() or vectors.shape[1] not in (2,3): 
+            raise ValueError("'vectors' should be an array with one entry per vertex")
+
+        if vectors.shape[1] == 2:
+            self.bound_mesh.set_vertex_tangent_basisX2D(vectors)
+        elif vectors.shape[1] == 3:
+            self.bound_mesh.set_vertex_tangent_basisX(vectors)
+    
+    def set_face_tangent_basisX(self, vectors):
+        if len(vectors.shape) != 2 or vectors.shape[0] != self.n_faces() or vectors.shape[1] not in (2,3): 
+            raise ValueError("'vectors' should be an array with one entry per face")
+
+        if vectors.shape[1] == 2:
+            self.bound_mesh.set_face_tangent_basisX2D(vectors)
+        elif vectors.shape[1] == 3:
+            self.bound_mesh.set_face_tangent_basisX(vectors)
+    
+         
+
+
     ## Quantities
-    '''
 
     # Scalar
     def add_scalar_quantity(self, name, values, defined_on='vertices', enabled=None, datatype="standard", vminmax=None, cmap=None):
@@ -117,13 +177,19 @@ class SurfaceMesh:
         if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
 
         if defined_on == 'vertices':
-            if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes array")
-            q = self.bound_mesh.add_node_scalar_quantity(name, values, str_to_datatype(datatype))
+            if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
+            q = self.bound_mesh.add_vertex_scalar_quantity(name, values, str_to_datatype(datatype))
         elif defined_on == 'faces':
+            if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
+            q = self.bound_mesh.add_face_scalar_quantity(name, values, str_to_datatype(datatype))
+        elif defined_on == 'edges':
             if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
             q = self.bound_mesh.add_edge_scalar_quantity(name, values, str_to_datatype(datatype))
+        elif defined_on == 'halfedges':
+            if values.shape[0] != self.n_halfedges(): raise ValueError("'values' should be a length n_halfedges array")
+            q = self.bound_mesh.add_halfedge_scalar_quantity(name, values, str_to_datatype(datatype))
         else:
-            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces', 'edges', 'halfedges']".format(defined_on))
             
 
         # Support optional params
@@ -138,14 +204,13 @@ class SurfaceMesh:
     # Color
     def add_color_quantity(self, name, values, defined_on='vertices', enabled=None):
         if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
-            
         
         if defined_on == 'vertices':
-            if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes array")
-            q = self.bound_mesh.add_node_color_quantity(name, values)
+            if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
+            q = self.bound_mesh.add_vertex_color_quantity(name, values)
         elif defined_on == 'faces':
-            if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
-            q = self.bound_mesh.add_edge_color_quantity(name, values)
+            if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
+            q = self.bound_mesh.add_face_color_quantity(name, values)
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
@@ -153,6 +218,34 @@ class SurfaceMesh:
         if enabled is not None:
             q.set_enabled(enabled)
     
+    
+    # Distance
+    def add_distance_quantity(self, name, values, defined_on='vertices', enabled=None, signed=False, vminmax=None, stripe_size=None, stripe_size_relative=True, cmap=None):
+
+        if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
+
+        if defined_on == 'vertices':
+            if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
+
+            if signed:
+                q = self.bound_mesh.add_vertex_signed_distance_quantity(name, values)
+            else:
+                q = self.bound_mesh.add_vertex_distance_quantity(name, values)
+        else:
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices']".format(defined_on))
+            
+
+        # Support optional params
+        if enabled is not None:
+            q.set_enabled(enabled)
+        if stripe_size is not None:
+            q.set_stripe_size(stripe_size, stripe_size_relative)
+        if vminmax is not None:
+            q.set_map_range(vminmax)
+        if cmap is not None:
+            q.set_color_map(cmap)
+    
+    '''
     
     # Vector
     def add_vector_quantity(self, name, values, defined_on='vertices', enabled=None, vectortype="standard", length=None, radius=None, color=None):

@@ -493,7 +493,125 @@ class TestSurfaceMesh(unittest.TestCase):
 
         ps.show(3)
         ps.remove_all_structures()
+    
+    
+    def test_permutation(self):
+        p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
 
+        p.set_vertex_permutation(np.random.permutation(p.n_vertices()))
+        p.set_vertex_permutation(np.random.permutation(p.n_vertices()), 3*p.n_vertices())
+
+        p.set_face_permutation(np.random.permutation(p.n_faces()))
+        p.set_face_permutation(np.random.permutation(p.n_faces()), 3*p.n_faces())
+        
+        p.set_edge_permutation(np.random.permutation(p.n_edges()))
+        p.set_edge_permutation(np.random.permutation(p.n_edges()), 3*p.n_edges())
+        
+        p.set_corner_permutation(np.random.permutation(p.n_corners()))
+        p.set_corner_permutation(np.random.permutation(p.n_corners()), 3*p.n_corners())
+        
+        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()))
+        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()), 3*p.n_halfedges())
+
+        p.set_all_permutations(
+            vertex_perm=np.random.permutation(p.n_vertices()),
+            face_perm=np.random.permutation(p.n_faces()),
+            edge_perm=np.random.permutation(p.n_edges()),
+            corner_perm=np.random.permutation(p.n_corners()),
+            halfedge_perm=np.random.permutation(p.n_halfedges()),
+        )
+
+        ps.show(3)
+        ps.remove_all_structures()
+
+
+    def test_tangent_basis(self):
+        p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+
+        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3))
+        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 2))
+
+        p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 3))
+        p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 2))
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_scalar(self):
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        p = ps.get_surface_mesh("test_mesh")
+
+        for on in ['vertices', 'faces', 'edges', 'halfedges']:
+       
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices())
+            elif on == 'faces':
+                vals = np.random.rand(p.n_faces())
+            elif on  == 'edges':
+                vals = np.random.rand(p.n_edges())
+            elif on  == 'halfedges':
+                vals = np.random.rand(p.n_halfedges())
+
+            p.add_scalar_quantity("test_vals", vals, defined_on=on)
+            p.add_scalar_quantity("test_vals2", vals, defined_on=on, enabled=True)
+            p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
+            p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, enabled=True, datatype='symmetric')
+            p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, enabled=True, cmap='blues')
+
+            ps.show(3)
+
+            # test some additions/removal while we're at it
+            p.remove_quantity("test_vals")
+            p.remove_quantity("not_here") # should not error
+            p.remove_all_quantities()
+            p.remove_all_quantities()
+
+        ps.remove_all_structures()
+    
+    def test_color(self):
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        p = ps.get_surface_mesh("test_mesh")
+
+        for on in ['vertices', 'faces']:
+       
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices(), 3)
+            elif on == 'faces':
+                vals = np.random.rand(p.n_faces(), 3)
+       
+
+            p.add_color_quantity("test_vals", vals, defined_on=on)
+            p.add_color_quantity("test_vals", vals, defined_on=on, enabled=True)
+
+            ps.show(3)
+            p.remove_all_quantities()
+        
+        ps.remove_all_structures()
+    
+    
+    def test_distance(self):
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        p = ps.get_surface_mesh("test_mesh")
+
+        for on in ['vertices']:
+       
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices())
+
+            p.add_distance_quantity("test_vals", vals, defined_on=on)
+            p.add_distance_quantity("test_vals2", vals, defined_on=on, enabled=True)
+            p.add_distance_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
+            p.add_distance_quantity("test_vals_with_signed", vals, defined_on=on, enabled=True, signed=True)
+            p.add_distance_quantity("test_vals_with_unsigned", vals, defined_on=on, enabled=True, signed=False)
+            p.add_distance_quantity("test_vals_with_stripe", vals, defined_on=on, enabled=True, stripe_size=0.01)
+            p.add_distance_quantity("test_vals_with_stripe_reltrue", vals, defined_on=on, enabled=True, stripe_size=0.01, stripe_size_relative=True)
+            p.add_distance_quantity("test_vals_with_stripe_relfalse", vals, defined_on=on, enabled=True, stripe_size=0.01, stripe_size_relative=False)
+
+            ps.show(3)
+
+            p.remove_all_quantities()
+
+        ps.remove_all_structures()
 
 
 if __name__ == '__main__':
