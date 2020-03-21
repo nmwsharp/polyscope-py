@@ -46,6 +46,22 @@ void bind_surface_mesh(py::module& m) {
     .def("set_color_map", &ps::SurfaceDistanceQuantity::setColorMap, "Set color map")
     .def("set_map_range", &ps::SurfaceDistanceQuantity::setMapRange, "Set map range")
     .def("set_stripe_size", &ps::SurfaceDistanceQuantity::setStripeSize, "Set stripe size");
+  
+  // Parameterization quantities 
+  py::class_<ps::SurfaceCornerParameterizationQuantity>(m, "SurfaceCornerParameterizationQuantity")
+    .def("set_enabled", &ps::SurfaceCornerParameterizationQuantity::setEnabled, "Set enabled")
+    .def("set_style", &ps::SurfaceCornerParameterizationQuantity::setStyle, "Set style")
+    .def("set_grid_colors", &ps::SurfaceCornerParameterizationQuantity::setGridColors, "Set grid colors")
+    .def("set_checker_colors", &ps::SurfaceCornerParameterizationQuantity::setCheckerColors, "Set checker colors")
+    .def("set_checker_size", &ps::SurfaceCornerParameterizationQuantity::setCheckerSize, "Set checker size")
+    .def("set_color_map", &ps::SurfaceCornerParameterizationQuantity::setColorMap, "Set color map");
+  py::class_<ps::SurfaceVertexParameterizationQuantity>(m, "SurfaceVertexParameterizationQuantity")
+    .def("set_enabled", &ps::SurfaceVertexParameterizationQuantity::setEnabled, "Set enabled")
+    .def("set_style", &ps::SurfaceVertexParameterizationQuantity::setStyle, "Set style")
+    .def("set_grid_colors", &ps::SurfaceVertexParameterizationQuantity::setGridColors, "Set grid colors")
+    .def("set_checker_colors", &ps::SurfaceVertexParameterizationQuantity::setCheckerColors, "Set checker colors")
+    .def("set_checker_size", &ps::SurfaceVertexParameterizationQuantity::setCheckerSize, "Set checker size")
+    .def("set_color_map", &ps::SurfaceVertexParameterizationQuantity::setColorMap, "Set color map");
 
 
   // == Main class
@@ -111,14 +127,14 @@ void bind_surface_mesh(py::module& m) {
         "Add a distance function at vertices", py::return_value_policy::reference)
     .def("add_vertex_signed_distance_quantity", &ps::SurfaceMesh::addVertexSignedDistanceQuantity<Eigen::VectorXd>, 
         "Add a signed distance function at vertices", py::return_value_policy::reference)
+    
+    // Parameterization
+    .def("add_corner_parameterization_quantity", &ps::SurfaceMesh::addParameterizationQuantity<Eigen::MatrixXd>, 
+        "Add a parameterization at corners", py::return_value_policy::reference)
+    .def("add_vertex_parameterization_quantity", &ps::SurfaceMesh::addVertexParameterizationQuantity<Eigen::MatrixXd>, 
+        "Add a parameterization at vertices", py::return_value_policy::reference);
+ 
 
-    // Vector
-    .def("add_vertex_vector_quantity", &ps::SurfaceMesh::addVertexVectorQuantity<Eigen::MatrixXd>, "Add a vector function at vertices",
-        py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference)
-    .def("add_face_vector_quantity", &ps::SurfaceMesh::addFaceVectorQuantity<Eigen::MatrixXd>, "Add a vector function at faces",
-        py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference);
-
-  
   // Static adders and getters
   m.def("register_surface_mesh", &ps::registerSurfaceMesh<Eigen::MatrixXd, Eigen::MatrixXi>, 
       py::arg("name"), py::arg("nodes"), py::arg("edges"),

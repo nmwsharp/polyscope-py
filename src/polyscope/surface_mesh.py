@@ -1,6 +1,6 @@
 import polyscope_bindings as psb
 
-from polyscope.core import str_to_datatype, str_to_vectortype, glm3
+from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3
 
 class SurfaceMesh:
 
@@ -244,6 +244,41 @@ class SurfaceMesh:
             q.set_map_range(vminmax)
         if cmap is not None:
             q.set_color_map(cmap)
+    
+    
+    # Parameterization
+    def add_parameterization_quantity(self, name, values, defined_on='vertices', coords_type='unit', enabled=None, viz_style=None, grid_colors=None, checker_colors=None, checker_size=None, cmap=None):
+
+        if len(values.shape) != 2 or values.shape[1] != 2: raise ValueError("'values' should be an (Nx2) array")
+
+        # parse the coords type in to an enum
+        coords_type_enum = str_to_param_coords_type(coords_type)
+
+        if defined_on == 'vertices':
+            if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
+            q = self.bound_mesh.add_vertex_parameterization_quantity(name, values, coords_type_enum)
+        elif defined_on == 'corners':
+            if values.shape[0] != self.n_corners(): raise ValueError("'values' should be a length n_faces array")
+            q = self.bound_mesh.add_corner_parameterization_quantity(name, values, coords_type_enum)
+        else:
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'corners']".format(defined_on))
+            
+
+        # Support optional params
+        if enabled is not None:
+            q.set_enabled(enabled)
+        if viz_style is not None:
+            viz_style_enum = str_to_param_viz_style(viz_style)
+            q.set_style(viz_style_enum)
+        if grid_colors is not None:
+            q.set_grid_colors((glm3(grid_colors[0]), glm3(grid_colors[1])))
+        if checker_colors is not None:
+            q.set_checker_colors((glm3(checker_colors[0]), glm3(checker_colors[1])))
+        if checker_size is not None:
+            q.set_checker_size(checker_size)
+        if cmap is not None:
+            q.set_color_map(cmap)
+    
     
     '''
     

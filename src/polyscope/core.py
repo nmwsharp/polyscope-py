@@ -59,3 +59,29 @@ def str_to_vectortype(s):
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]
+
+def str_to_param_coords_type(s):
+    d = {
+        "unit" : psb.ParamCoordsType.unit,
+        "world" : psb.ParamCoordsType.world,
+    }
+
+    if s not in d:
+        raise ValueError("Bad param coords type specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def str_to_param_viz_style(s):
+    d = {
+        "checker" : psb.ParamVizStyle.checker,
+        "grid" : psb.ParamVizStyle.grid,
+        "local_check" : psb.ParamVizStyle.local_check,
+        "local_rad" : psb.ParamVizStyle.local_rad,
+    }
+
+    if s not in d:
+        raise ValueError("Bad param viz style specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]

@@ -6,10 +6,10 @@
 
 #include "polyscope/polyscope.h"
 #include "polyscope/affine_remapper.h"
+#include "polyscope/surface_parameterization_enums.h"
 
 namespace py = pybind11;
 namespace ps = polyscope;
-
 
 // Forward-declare bindings from other files
 void bind_surface_mesh(py::module& m);
@@ -43,6 +43,18 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   py::enum_<ps::VectorType>(m, "VectorType")
     .value("standard", ps::VectorType::STANDARD)
     .value("ambient", ps::VectorType::AMBIENT)
+    .export_values(); 
+  
+  py::enum_<ps::ParamCoordsType>(m, "ParamCoordsType")
+    .value("unit", ps::ParamCoordsType::UNIT)
+    .value("world", ps::ParamCoordsType::WORLD)
+    .export_values(); 
+  
+  py::enum_<ps::ParamVizStyle>(m, "ParamVizStyle")
+    .value("checker", ps::ParamVizStyle::CHECKER)
+    .value("grid", ps::ParamVizStyle::GRID)
+    .value("local_check", ps::ParamVizStyle::LOCAL_CHECK)
+    .value("local_rad", ps::ParamVizStyle::LOCAL_RAD)
     .export_values(); 
 
 

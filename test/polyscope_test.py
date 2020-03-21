@@ -613,6 +613,42 @@ class TestSurfaceMesh(unittest.TestCase):
 
         ps.remove_all_structures()
 
+    def test_parameterization(self):
+
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        p = ps.get_surface_mesh("test_mesh")
+
+        for on in ['vertices', 'corners']:
+       
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices(), 2)
+            elif on == 'corners':
+                vals = np.random.rand(p.n_corners(), 2)
+
+            cA = (0.1, 0.2, 0.3)
+            cB = (0.4, 0.5, 0.6)
+
+            p.add_parameterization_quantity("test_vals1", vals, defined_on=on, enabled=True)
+
+            p.add_parameterization_quantity("test_vals2", vals, defined_on=on, coords_type='world')
+            p.add_parameterization_quantity("test_vals3", vals, defined_on=on, coords_type='unit')
+
+            p.add_parameterization_quantity("test_vals4", vals, defined_on=on, viz_style='checker')
+            p.add_parameterization_quantity("test_vals5", vals, defined_on=on, viz_style='grid')
+            p.add_parameterization_quantity("test_vals6", vals, defined_on=on, viz_style='local_check')
+            p.add_parameterization_quantity("test_vals7", vals, defined_on=on, viz_style='local_rad')
+
+            p.add_parameterization_quantity("test_vals8", vals, defined_on=on, grid_colors=(cA, cB))
+            p.add_parameterization_quantity("test_vals9", vals, defined_on=on, checker_colors=(cA, cB))
+            p.add_parameterization_quantity("test_vals10", vals, defined_on=on, checker_size=0.1)
+            p.add_parameterization_quantity("test_vals11", vals, defined_on=on, cmap='blues')
+
+            ps.show(3)
+
+            p.remove_all_quantities()
+
+        ps.remove_all_structures()
+
 
 if __name__ == '__main__':
 
