@@ -11,6 +11,11 @@
 namespace py = pybind11;
 namespace ps = polyscope;
 
+// For overloaded functions, with C++11 compiler only
+template <typename... Args>
+using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
+
+
 // Forward-declare bindings from other files
 void bind_surface_mesh(py::module& m);
 void bind_point_cloud(py::module& m);
@@ -29,6 +34,10 @@ PYBIND11_MODULE(polyscope_bindings, m) {
 
   // === Structure management
   m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
+  
+  // === Screenshots
+  m.def("screenshot", overload_cast_<bool>()(&ps::screenshot), "Take a screenshot");
+  m.def("named_screenshot", overload_cast_<std::string, bool>()(&ps::screenshot), "Take a screenshot");
 
   // === Small options
   m.def("set_errors_throw_exceptions", [](bool x) { ps::options::errorsThrowExceptions = x; });

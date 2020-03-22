@@ -24,6 +24,15 @@ def remove_all_structures():
     psb.remove_all_structures()
 
 
+### Screenshots
+def screenshot(filename=None, transparent_bg=True):
+
+    if filename is None:
+        psb.screenshot(transparent_bg)
+    else:
+        psb.named_screenshot(filename, transparent_bg)
+
+
 ### Small options
 def set_errors_throw_exceptions(val):
     psb.set_errors_throw_exceptions(val)
@@ -32,6 +41,8 @@ def set_errors_throw_exceptions(val):
 ## Small utilities
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])
+
+
 
 ## String-to-enum translation
 

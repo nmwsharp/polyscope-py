@@ -20,6 +20,12 @@ class TestCore(unittest.TestCase):
     def test_show(self):
         ps.show(forFrames=3)
 
+    def test_screenshot(self):
+
+        ps.screenshot()
+        ps.screenshot(transparent_bg=False)
+        ps.screenshot("test_shot.png", transparent_bg=True)
+
 
 class TestStructureManagement(unittest.TestCase):
 
