@@ -20,12 +20,57 @@ class TestCore(unittest.TestCase):
     def test_show(self):
         ps.show(forFrames=3)
 
+    def test_options(self):
+
+        # Remember, polyscope has global state, so we're actually setting these for the remainder of the tests (lol)
+
+        ps.set_program_name("polyscope test prog")
+        ps.set_verbosity(2)
+        ps.set_print_prefix("polyscope test")
+        ps.set_errors_throw_exceptions(True)
+        ps.set_max_fps(60)
+        ps.set_use_prefs_file(True)
+        ps.set_always_redraw(False)
+        
+        ps.set_autocenter_structures(False)
+        ps.set_autoscale_structures(False)
+        
+        ps.show(3)
+    
+    def test_view_options(self):
+
+        ps.set_navigation_style("turntable")
+        ps.set_navigation_style("free")
+        ps.set_navigation_style("planar")
+
+        ps.set_up_dir("x_up")
+        ps.set_up_dir("y_up")
+        ps.set_up_dir("z_up")
+        
+        ps.show(3)
+
     def test_screenshot(self):
 
         ps.screenshot()
         ps.screenshot(transparent_bg=False)
         ps.screenshot("test_shot.png", transparent_bg=True)
+    
+        ps.show(3)
+   
+    '''
+    # This test doesn't play nice with global state
+    def test_screenshot(self):
 
+        ps.info("hi world")
+        ps.warning("hi world again")
+        for i in range(10):
+            ps.warning("hi world again", "detail " + str(i))
+
+        ps.error("ERROR!")
+        ps.terminating_error("BAD ERROR!")
+
+        ps.show(3)
+    '''
 
 class TestStructureManagement(unittest.TestCase):
 
