@@ -1,4 +1,5 @@
 import polyscope_bindings as psb
+import numpy as np
 
 from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3
 
@@ -19,19 +20,35 @@ class SurfaceMesh:
         else:
             # Create a new instance
             self.check_shape(vertices)
+    
+            if isinstance(faces, np.ndarray):
+                # Faces is a numpy array
+            
+                if (len(faces.shape) != 2): raise ValueError("surface mesh face array should have shape (F,D) for some D; shape is " + str(faces.shape))
 
-            if (len(faces.shape) != 2):
-                raise ValueError("surface mesh face array should have shape (F,D) for some D; shape is " + str(faces.shape))
+                if vertices.shape[1] == 3:
+                    self.bound_mesh = psb.register_surface_mesh(name, vertices, faces) 
+                elif vertices.shape[1] == 2:
+                    self.bound_mesh = psb.register_surface_mesh2D(name, vertices, faces) 
 
-            if vertices.shape[1] == 3:
-                self.bound_mesh = psb.register_surface_mesh(name, vertices, faces) 
-            elif vertices.shape[1] == 2:
-                self.bound_mesh = psb.register_surface_mesh2D(name, vertices, faces) 
+            else:
+                # Faces is something else, try to iterate through it to build a list of lists
+                faces_copy = []
+                for f in faces:
+                    f_copy = [v for v in f]
+                    faces_copy.append(f_copy)
+
+                if vertices.shape[1] == 3:
+                    self.bound_mesh = psb.register_surface_mesh_list(name, vertices, faces) 
+                elif vertices.shape[1] == 2:
+                    self.bound_mesh = psb.register_surface_mesh_list2D(name, vertices, faces) 
+
+                        
 
     def check_shape(self, points):
         # Helper to validate arrays
         if (len(points.shape) != 2) or (points.shape[1] not in (2,3)):
-            raise ValueError("surface mesh node positions should have shape (N,3) or (N,2); shape is " + str(points.shape))
+            raise ValueError("surface mesh vertex positions should have shape (N,3) or (N,2); shape is " + str(points.shape))
       
 
     def n_vertices(self):
@@ -72,7 +89,7 @@ class SurfaceMesh:
         elif vertices.shape[1] == 2:
             self.bound_mesh.update_vertex_positions2D(vertices)
         else:
-            raise ValueError("bad node shape")
+            raise ValueError("bad vertex shape")
 
     ## Options
 
@@ -280,28 +297,26 @@ class SurfaceMesh:
             q.set_color_map(cmap)
     
     
-    '''
-    
     # Vector
     def add_vector_quantity(self, name, values, defined_on='vertices', enabled=None, vectortype="standard", length=None, radius=None, color=None):
         if len(values.shape) != 2 or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
         
         
         if defined_on == 'vertices':
-            if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes array")
+            if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
 
             if values.shape[1] == 2:
-                q = self.bound_mesh.add_node_vector_quantity2D(name, values, str_to_vectortype(vectortype))
+                q = self.bound_mesh.add_vertex_vector_quantity2D(name, values, str_to_vectortype(vectortype))
             elif values.shape[1] == 3:
-                q = self.bound_mesh.add_node_vector_quantity(name, values, str_to_vectortype(vectortype))
+                q = self.bound_mesh.add_vertex_vector_quantity(name, values, str_to_vectortype(vectortype))
 
         elif defined_on == 'faces':
-            if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
+            if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
             
             if values.shape[1] == 2:
-                q = self.bound_mesh.add_edge_vector_quantity2D(name, values, str_to_vectortype(vectortype))
+                q = self.bound_mesh.add_face_vector_quantity2D(name, values, str_to_vectortype(vectortype))
             elif values.shape[1] == 3:
-                q = self.bound_mesh.add_edge_vector_quantity(name, values, str_to_vectortype(vectortype))
+                q = self.bound_mesh.add_face_vector_quantity(name, values, str_to_vectortype(vectortype))
 
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
@@ -315,7 +330,57 @@ class SurfaceMesh:
             q.set_radius(radius, True)
         if color is not None:
             q.set_color(glm3(color))
-    '''
+    
+    
+    def add_intrinsic_vector_quantity(self, name, values, n_sym=1, defined_on='vertices', enabled=None, vectortype="standard", length=None, radius=None, color=None, ribbon=None):
+
+        if len(values.shape) != 2 or values.shape[1] != 2: raise ValueError("'values' should be an Nx2 array")
+        
+        
+        if defined_on == 'vertices':
+            if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
+
+            q = self.bound_mesh.add_vertex_intrinsic_vector_quantity(name, values, n_sym, str_to_vectortype(vectortype))
+
+        elif defined_on == 'faces':
+            if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
+            
+            q = self.bound_mesh.add_face_intrinsic_vector_quantity(name, values, n_sym, str_to_vectortype(vectortype))
+
+        else:
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
+
+        # Support optional params
+        if enabled is not None:
+            q.set_enabled(enabled)
+        if length is not None:
+            q.set_length(length, True)
+        if radius is not None:
+            q.set_radius(radius, True)
+        if color is not None:
+            q.set_color(glm3(color))
+        if ribbon is not None:
+            q.set_ribbon_enabled(ribbon)
+    
+    
+    def add_one_form_vector_quantity(self, name, values, orientations, enabled=None, length=None, radius=None, color=None, ribbon=None):
+
+        if len(values.shape) != 1 or values.shape[0] != self.n_edges(): raise ValueError("'values' should be length n_edges array")
+        if len(orientations.shape) != 1 or orientations.shape[0] != self.n_edges(): raise ValueError("'orientations' should be length n_edges array")
+
+        q = self.bound_mesh.add_one_form_intrinsic_vector_quantity(name, values, orientations)
+
+        # Support optional params
+        if enabled is not None:
+            q.set_enabled(enabled)
+        if length is not None:
+            q.set_length(length, True)
+        if radius is not None:
+            q.set_radius(radius, True)
+        if color is not None:
+            q.set_color(glm3(color))
+        if ribbon is not None:
+            q.set_ribbon_enabled(ribbon)
 
 
 def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_color=None, smooth_shade=None, 

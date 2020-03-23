@@ -416,7 +416,29 @@ class TestSurfaceMesh(unittest.TestCase):
         self.assertTrue(isinstance(p, ps.SurfaceMesh))
 
         ps.remove_all_structures()
+    
+    
+    def test_add_quad(self):
 
+        n_pts=10
+        faces = np.random.randint(0, n_pts, size=(2*n_pts,4))
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), faces)
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_add_varied_degree(self):
+
+        n_pts = 10
+        n_face = 20
+        faces = []
+        for i in range(n_face):
+            faces.append([0,1,2,])
+            faces.append([0,1,2,4])
+            faces.append([0,1,2,4,5])
+
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), faces)
+        ps.show(3)
+        ps.remove_all_structures()
 
     def test_render(self):
 
@@ -653,6 +675,81 @@ class TestSurfaceMesh(unittest.TestCase):
 
             p.remove_all_quantities()
 
+        ps.remove_all_structures()
+    
+    def test_vector(self):
+
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        p = ps.get_surface_mesh("test_mesh")
+        
+        for on in ['vertices', 'faces']:
+       
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices(),3)
+            elif on  == 'faces':
+                vals = np.random.rand(p.n_faces(), 3)
+
+            p.add_vector_quantity("test_vals1", vals, defined_on=on)
+            p.add_vector_quantity("test_vals2", vals, defined_on=on, enabled=True)
+            p.add_vector_quantity("test_vals3", vals, defined_on=on, enabled=True, vectortype='ambient')
+            p.add_vector_quantity("test_vals4", vals, defined_on=on, enabled=True, length=0.005)
+            p.add_vector_quantity("test_vals5", vals, defined_on=on, enabled=True, radius=0.001)
+            p.add_vector_quantity("test_vals6", vals, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
+            
+            # 2D 
+            p.add_vector_quantity("test_vals7", vals[:,:2], defined_on=on, enabled=True, radius=0.001)
+
+            ps.show(3)
+            p.remove_all_quantities()
+        
+        ps.remove_all_structures()
+   
+
+    def test_intrinsic_vector(self):
+
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        p = ps.get_surface_mesh("test_mesh")
+        
+        for on in ['vertices', 'faces']:
+       
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices(),2)
+            elif on  == 'faces':
+                vals = np.random.rand(p.n_faces(), 2)
+
+            p.add_intrinsic_vector_quantity("test_vals1", vals, defined_on=on)
+            p.add_intrinsic_vector_quantity("test_vals2", vals, defined_on=on, enabled=True)
+            p.add_intrinsic_vector_quantity("test_vals3", vals, defined_on=on, enabled=True, vectortype='ambient')
+            p.add_intrinsic_vector_quantity("test_vals4", vals, defined_on=on, enabled=True, length=0.005)
+            p.add_intrinsic_vector_quantity("test_vals5", vals, defined_on=on, enabled=True, radius=0.001)
+            p.add_intrinsic_vector_quantity("test_vals6", vals, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
+            p.add_intrinsic_vector_quantity("test_vals7", vals, defined_on=on, enabled=True, radius=0.001, ribbon=True)
+            p.add_intrinsic_vector_quantity("test_vals8", vals, n_sym=4, defined_on=on, enabled=True)
+
+            ps.show(3)
+            p.remove_all_quantities()
+        
+        ps.remove_all_structures()
+    
+    def test_one_form_intrinsic_vector(self):
+
+        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        p = ps.get_surface_mesh("test_mesh")
+        
+        vals = np.random.rand(p.n_edges())
+        orients = np.random.rand(p.n_edges()) > 0.5
+
+        p.add_one_form_vector_quantity("test_vals1", vals, orients)
+        p.add_one_form_vector_quantity("test_vals2", vals, orients, enabled=True)
+        p.add_one_form_vector_quantity("test_vals3", vals, orients, enabled=True) 
+        p.add_one_form_vector_quantity("test_vals4", vals, orients, enabled=True, length=0.005)
+        p.add_one_form_vector_quantity("test_vals5", vals, orients, enabled=True, radius=0.001)
+        p.add_one_form_vector_quantity("test_vals6", vals, orients, enabled=True, color=(0.2, 0.5, 0.5))
+        p.add_one_form_vector_quantity("test_vals7", vals, orients, enabled=True, radius=0.001, ribbon=True)
+
+        ps.show(3)
+        p.remove_all_quantities()
+        
         ps.remove_all_structures()
 
 
