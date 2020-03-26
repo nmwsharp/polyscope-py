@@ -71,4 +71,5 @@ setup(
     # setup_requires=['pybind11>=2.4'],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
+    packages=setuptools.find_packages(),
 )
