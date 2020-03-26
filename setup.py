@@ -1,7 +1,11 @@
+import os
+import re
+import sys
+import platform
+import subprocess
+
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
-import sys
-import setuptools
 from distutils.version import LooseVersion
 
 __version__ = '0.0.1'
@@ -58,12 +62,12 @@ setup(
     name='polyscope',
     version=__version__,
     author='Nicholas Sharp',
-    author_email='nsharp33@gmail.com',
-    url='https://github.com/nmwsharp/polyscope',
-    description='Polyscope! Easy 3D visualization for your data.',
+    author_email='nmwsharp@gmail.com',
+    url='https://polyscope.run',
+    description='Polyscope! A viewer and user interface for 3D data.',
     long_description='',
     ext_modules=[CMakeExtension('polyscope')],
-    # install_requires=['pybind11>=2.4'],
+    install_requires=['numpy'],
     # setup_requires=['pybind11>=2.4'],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
