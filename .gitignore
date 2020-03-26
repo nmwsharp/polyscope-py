@@ -1,6 +1,7 @@
 # Build directories
 build/
 build_debug/
+dist/
 *.pyc
 __pycache__/
 

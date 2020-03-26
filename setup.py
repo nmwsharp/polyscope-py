@@ -9,7 +9,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 
 class CMakeExtension(Extension):
@@ -70,11 +70,13 @@ setup(
     url='https://polyscope.run',
     description='Polyscope: A viewer and user interface for 3D data.',
     long_description=long_description,
-    ext_modules=[CMakeExtension('polyscope')],
+    long_description_content_type='text/markdown',
+    package_dir = {'': 'src'},
+    packages=setuptools.find_packages(where="src"),
+    ext_modules=[CMakeExtension('.')],
     install_requires=['numpy'],
     # setup_requires=['pybind11>=2.4'],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
     test_suite="test",
-    packages=setuptools.find_packages(),
 )

@@ -1,0 +1,7 @@
+include README.md LICENSE
+include CMakeLists.txt
+recursive-include deps/polyscope *
+recursive-include deps/pybind11 *.h CMakeLists.txt *.cmake
+recursive-include src *.cpp *.h
+recursive-include src/polyscope *.py
+exclude dist
