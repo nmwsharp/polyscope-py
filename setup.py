@@ -4,6 +4,7 @@ import sys
 import platform
 import subprocess
 
+import setuptools
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
@@ -58,18 +59,22 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+with open('deps/polyscope/README.md') as f:
+    long_description = f.read()
+
 setup(
     name='polyscope',
     version=__version__,
     author='Nicholas Sharp',
     author_email='nmwsharp@gmail.com',
     url='https://polyscope.run',
-    description='Polyscope! A viewer and user interface for 3D data.',
-    long_description='',
+    description='Polyscope: A viewer and user interface for 3D data.',
+    long_description=long_description,
     ext_modules=[CMakeExtension('polyscope')],
     install_requires=['numpy'],
     # setup_requires=['pybind11>=2.4'],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
+    test_suite="test",
     packages=setuptools.find_packages(),
 )
