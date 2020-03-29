@@ -8,6 +8,8 @@ import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), "../build/"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "../source/"))
 
+print("sys.path:" + "\n".join(sys.path))
+
 import polyscope as ps
 
 # Path to test assets

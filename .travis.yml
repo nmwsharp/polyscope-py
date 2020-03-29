@@ -7,6 +7,9 @@ python:
   - 3.7
   #- 3.8
 
+git:
+  depth: 1
+
 before_install:
   - |
     if [[ "$TRAVIS_OS_NAME" = windows ]]; then
@@ -54,6 +57,7 @@ jobs:
         - cmake ..
         - make
         - cd ..
+        - python --version
         - python test/polyscope_test.py
     
     # Deploy source distribution
