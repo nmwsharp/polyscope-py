@@ -6,7 +6,7 @@ import numpy as np
 
 # Path to where the bindings live
 sys.path.append(os.path.join(os.path.dirname(__file__), "../build/"))
-sys.path.append(os.path.join(os.path.dirname(__file__), "../source/"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../src/"))
 
 print("sys.path:" + "\n".join(sys.path))
 
