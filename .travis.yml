@@ -1,11 +1,11 @@
 language: python
-python:
-  #- 2.7
-  #- 3.4
-  #- 3.5
-  #- 3.6
+python: # note: this only applies to the test target, not the generated wheels
+  - 2.7
+  - 3.4
+  - 3.5
+  - 3.6
   - 3.7
-  #- 3.8
+  - 3.8
 
 git:
   depth: 1
