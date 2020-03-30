@@ -58,7 +58,7 @@ jobs:
         - make
         - cd ..
         - python --version
-        - python test/polyscope_test.py
+        - python test/polyscope_test.py backend=openGL_mock
     
     # Deploy source distribution
     - stage: deploy

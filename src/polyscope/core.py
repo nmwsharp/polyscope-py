@@ -2,9 +2,9 @@ import polyscope_bindings as psb
 
 ### Basic setup and teardown 
 
-def init():
+def init(backend=""):
     """Initialize Polyscope"""
-    psb.init()
+    psb.init(backend)
 
 
 def show(forFrames=None):

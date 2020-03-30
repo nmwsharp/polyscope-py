@@ -8,8 +8,6 @@ import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), "../build/"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "../src/"))
 
-print("sys.path:" + "\n".join(sys.path))
-
 import polyscope as ps
 
 # Path to test assets
@@ -18,6 +16,7 @@ assetpath_spot = path.join(assets_prefix, "spot.obj")
 
 
 class TestCore(unittest.TestCase):
+
 
     def test_show(self):
         ps.show(forFrames=3)
@@ -802,10 +801,18 @@ class TestSurfaceMesh(unittest.TestCase):
 
 if __name__ == '__main__':
 
+    # Parse out test-specific args (this is kinda poor design, but very useful)
+    ps_backend = "openGL_mock"
+    if len(sys.argv) > 1:
+        for a in sys.argv:
+            if a.startswith("backend="):
+                ps_backend = a[len("backend="):]
+                sys.argv.remove(a)
+
     # Really global setup.
     # Note that since these tests depend on the bound object's global state, 
     # we generally cannot continue past the first failed test.
     ps.set_errors_throw_exceptions(True)
-    ps.init() 
+    ps.init(ps_backend) 
 
     unittest.main()
