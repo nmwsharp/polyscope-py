@@ -46,15 +46,15 @@ stages:
 jobs:
   include:
     # Optional: run tests
-    - stage: test
-      name: Build and run tests
-      script: 
-        - mkdir build && cd build
-        - cmake ..
-        - make
-        - cd ..
-        - python --version
-        - python test/polyscope_test.py backend=openGL_mock
+    #- stage: test
+      #name: Build and run tests
+      #script: 
+        #- mkdir build && cd build
+        #- cmake ..
+        #- make
+        #- cd ..
+        #- python --version
+        #- python test/polyscope_test.py backend=openGL_mock
     
     # Deploy source distribution
     - stage: deploy
