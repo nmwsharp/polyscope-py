@@ -2,6 +2,8 @@ name: Build wheels using cibuildwheel
 
 on: [push]
 
+# seem to be hitting this issue: https://github.com/actions/virtual-environments/issues/34
+
 jobs:
   build_wheels:
     name: Build wheel on ${{ matrix.os }}
@@ -37,3 +39,15 @@ jobs:
       with:
         name: wheels
         path: ./wheelhouse
+  
+  upload_wheels:
+    name: Upload wheels
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/download-artifact@v1
+      with:
+        name: wheels
+    - run: ls wheels
+    - run: ls wheelhouse
+    
