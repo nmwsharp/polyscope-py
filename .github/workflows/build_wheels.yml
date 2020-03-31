@@ -9,9 +9,14 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04, windows-latest, macos-latest]
+    
+    env:
+      CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
 
     steps:
     - uses: actions/checkout@v1
+      with:
+        submodules: recursive
 
     - uses: actions/setup-python@v1
       name: Install Python
