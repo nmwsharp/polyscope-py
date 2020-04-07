@@ -27,12 +27,16 @@ init:
 install: 
   - git submodule update --init --recursive
   - python -m pip install cibuildwheel==1.3.0
+
 # Build source distribution on linux
-  - >
-    IF %APPVEYOR_BUILD_WORKER_IMAGE% == "Ubuntu"
-    (
-    python setup.py sdist -d wheelhouse --formats=gztar,zip 
-    )
+for:
+  -
+    matrix:
+      only:
+        - image: Ubuntu
+
+    install:
+      - python setup.py sdist -d wheelhouse --formats=gztar,zip 
 
 build_script:
   - pip install cibuildwheel==1.3.0
