@@ -30,10 +30,6 @@ addons:
 before_script:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y xpra xserver-xorg-video-dummy freeglut3-dev; fi
 
-script:
-  - python setup.py install
-  - python test/polyscope_test.py
-
 stages:
   - test
   # Only execute deployment stage on tagged commits, and from your repository
