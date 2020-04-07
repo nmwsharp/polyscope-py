@@ -8,9 +8,10 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       APPVEYOR_JOB_NAME: "python37-x64-vs2015 cp3"
       CIBW_BUILD: cp3*
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      APPVEYOR_JOB_NAME: "python37-x64-vs2015 pp"
-      CIBW_BUILD: pp*
+    # Doesn't work, not sure why
+    #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      #APPVEYOR_JOB_NAME: "python37-x64-vs2015 pp"
+      #CIBW_BUILD: pp*
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       APPVEYOR_JOB_NAME: "python37-x64-ubuntu cp2"
       CIBW_BUILD: cp2*
