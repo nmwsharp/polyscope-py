@@ -17,8 +17,8 @@ matrix:
   fast_finish: true # cancel other jobs once first fails
 
 # Shallow clone
-shallow_clone: true
-clone_depth: 5 
+#shallow_clone: true
+#clone_depth: 5 
 
 stack: python 3.7
 
