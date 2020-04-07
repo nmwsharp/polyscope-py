@@ -26,6 +26,7 @@ init:
   - cmd: set PATH=C:\Python37;C:\Python37\Scripts;%PATH%
 
 install: 
+  - setup.py --version
   - git submodule update --init --recursive
   - python -m pip install cibuildwheel==1.3.0
 
@@ -40,9 +41,11 @@ for:
       - python setup.py sdist -d wheelhouse --formats=gztar,zip 
 
 build_script:
+  - python setup.py sdist -d wheelhouse --formats=gztar,zip  # source build (should really be done just once, but oh well)
   - python -m cibuildwheel --output-dir wheelhouse
   - >
     #IF "%APPVEYOR_REPO_TAG%" == "true"
+    #IF "%APPVEYOR_REPO_TAG%" == $(setup.py --version)
     IF "true" == "true"
     (
     python -m pip install twine
