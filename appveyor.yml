@@ -32,9 +32,9 @@ install:
 build_script:
   - python setup.py sdist -d wheelhouse --formats=gztar,zip  # source build (should really be done just once, but oh well)
   - python -m cibuildwheel --output-dir wheelhouse # build ALL the wheels
-  - >
     #IF "%APPVEYOR_REPO_TAG%" == "true"
     #IF "%APPVEYOR_REPO_TAG%" == $(setup.py --version)
+  - >
     IF "true" == "true"
     (
     python -m pip install twine
