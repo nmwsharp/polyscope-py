@@ -12,7 +12,7 @@ environment:
   CIBW_BEFORE_BUILD_LINUX : "yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake"
   CIBW_BUILD_VERBOSITY: 3
   CIBW_TEST_COMMAND: python {project}/test/polyscope_test.py backend=openGL_mock
-  CIBW_BUILD: cp27-* cp37-* # faster builds
+  #CIBW_BUILD: cp27-* cp37-* # faster builds
 
 matrix: 
   fast_finish: true # cancel other jobs once first fails
