@@ -2,17 +2,17 @@ environment:
   TWINE_USERNAME: __token__
   # Note: TWINE_PASSWORD is set to an API token in Appveyor settings
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
-      APPVEYOR_JOB_NAME: "python37-x64-ubuntu"
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       APPVEYOR_JOB_NAME: "python37-x64-vs2015"
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      APPVEYOR_JOB_NAME: "python37-x64-ubuntu"
     - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
       APPVEYOR_JOB_NAME: "python37-x64-macos-mojave"
 
   CIBW_BEFORE_BUILD_LINUX : "yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake"
   CIBW_BUILD_VERBOSITY: 3
   CIBW_TEST_COMMAND: python {project}/test/polyscope_test.py backend=openGL_mock
-  #CIBW_BUILD: cp27-* cp37-* # faster builds
+  CIBW_BUILD: cp27-*
 
 matrix: 
   fast_finish: true # cancel other jobs once first fails
