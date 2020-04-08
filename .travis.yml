@@ -1,11 +1,11 @@
 language: python
-python: # note: this only applies to the test target, not the generated wheels
-  - 2.7
-  - 3.4
-  - 3.5
-  - 3.6
-  - 3.7
-  - 3.8
+#python: # note: this only applies to the test target, not the generated wheels
+  #- 2.7
+  #- 3.4
+  #- 3.5
+  #- 3.6
+  #- 3.7
+  #- 3.8
 
 git:
   depth: 5
@@ -44,24 +44,31 @@ stages:
     #   if: tag =~ ^v\d+\.\d+\.\d+$ AND repo = joerick/cibuildwheel
       
 env:
-    - CIBW_TEST_COMMAND: python {project}/test/polyscope_test.py backend=openGL_mock
+    - CIBW_TEST_COMMAND: "'python {project}/test/polyscope_test.py backend=openGL_mock'"
         
 #python3 -m twine upload --skip-existing wheelhouse/*.whl
 #python3 -m twine upload --skip-existing dist/*.tar.gz
 
-install:
-  - python -m pip install setuptools
-  - python setup.py install
-script:
-  - python test/polyscope_test.py backend=openGL_mock
 
 
 jobs:
   include:
     # Optional: run a test on Windows
-    - os: windows
-      language: shell
+    - stage: test
       name: Test on Windows
+      os:
+        - windows
+        - linux
+        - osx
+      language: python
+      python:
+        - 3.7
+        - 2.7
+      install:
+        - python -m pip install setuptools
+        - python setup.py install
+      script:
+        - python test/polyscope_test.py backend=openGL_mock
 
     # Deploy source distribution
     - stage: deploy
