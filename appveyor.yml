@@ -2,6 +2,15 @@ environment:
   TWINE_USERNAME: __token__
   # Note: TWINE_PASSWORD is set to an API token in Appveyor settings
   matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
+      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave cp2"
+      CIBW_BUILD: cp2*
+    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
+      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave cp3"
+      CIBW_BUILD: cp3*
+    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
+      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave pp"
+      CIBW_BUILD: pp*
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       APPVEYOR_JOB_NAME: "python37-x64-vs2015 cp2"
       CIBW_BUILD: cp2*
@@ -20,15 +29,6 @@ environment:
       CIBW_BUILD: cp3*
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       APPVEYOR_JOB_NAME: "python37-x64-ubuntu pp"
-      CIBW_BUILD: pp*
-    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave cp2"
-      CIBW_BUILD: cp2*
-    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave cp3"
-      CIBW_BUILD: cp3*
-    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave pp"
       CIBW_BUILD: pp*
 
   CIBW_BEFORE_BUILD_LINUX : "yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake"

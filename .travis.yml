@@ -56,10 +56,12 @@ jobs:
     - stage: deploy
       name: Deploy source distribution
       install: skip
-      script: python3 setup.py sdist --formats=gztar
-      after_success: |
-        python3 -m pip install twine
-        python3 -m twine upload --skip-existing dist/*.tar.gz
+      script: 
+        - python3 -m pip install setuptools
+        - python3 setup.py sdist --formats=gztar
+      after_success:
+        - python3 -m pip install twine
+        - python3 -m twine upload --skip-existing dist/*.tar.gz
     # Deploy on linux
     - stage: deploy
       name: Build and deploy Linux wheels
