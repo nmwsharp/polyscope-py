@@ -1,8 +1,4 @@
 os: linux
-#os:
-  #- windows     :(  travis says "python is not supported for Windows"
-  #- linux
-  #- osx
 language: python
 python:
   - 2.7
@@ -26,10 +22,10 @@ stages:
   # (e.g. not PRs). Replace with your repo name.
   - name: build
   - name: deploy
-    if: repo = nmwsharp/polyscope-py
-    #if: tag IS PRESENT AND repo = nmwsharp/polyscope-py
+    #if: repo = nmwsharp/polyscope-py
     # To only build tags that look like vX.Y.Z:
-    #   if: tag =~ ^v\d+\.\d+\.\d+$ AND repo = joerick/cibuildwheel
+    if: repo = nmwsharp/polyscope-py AND tag =~ ^v\d+\.\d+\.\d+$
+    #if: tag IS PRESENT AND repo = nmwsharp/polyscope-py
       
 env:
   global:
@@ -44,14 +40,11 @@ before_script:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y xpra xserver-xorg-video-dummy freeglut3-dev; fi
 
 script:
-  - echo "hi mom"
-  #- python setup.py install
-  #- python test/polyscope_test.py
+  - python setup.py install
+  - python test/polyscope_test.py
 
 # NOTE: build & deploy stages should be identical, except that deploy uploads after building. Any changes made to either should be made to both. This ensures that uploads will only be performed if all builds succeeded.
 
-#python3 -m twine upload --skip-existing wheelhouse/*.whl
-#python3 -m twine upload --skip-existing dist/*.tar.gz
 
 # See https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
 # for some annoying subtle details about cross OS python (here and below)
@@ -79,7 +72,7 @@ jobs:
         [[ "$TRAVIS_TAG" ==  "" ]] || [[ "$TRAVIS_TAG" == "v$(python setup.py --version)" ]]
       script:
         - python3 -m pip install setuptools
-        - python3 setup.py sdist --formats=gztar
+        - python3 setup.py sdist --formats=gztar,zip
         
     # Build on linux
     - stage: build 
@@ -118,9 +111,11 @@ jobs:
       install: skip
       script: 
         - python3 -m pip install setuptools
-        - python3 setup.py sdist --formats=gztar
-      after_success: |
-        python3 -m pip install twine
+        - python3 setup.py sdist --formats=gztar,zip
+      after_success:
+        - python3 -m pip install twine
+        - python3 -m twine upload --skip-existing dist/*.tar.gz 
+        - python3 -m twine upload --skip-existing dist/*.zip
 
     # Deploy on linux
     - stage: deploy
@@ -131,8 +126,9 @@ jobs:
       services: docker
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
-      after_success: |
-        python3 -m pip install twine
+      after_success:
+        - python3 -m pip install twine
+        - python3 -m twine upload --skip-existing wheelhouse/*.whl
     
     # Deploy on mac
     - stage: deploy
@@ -142,8 +138,9 @@ jobs:
       language: shell       
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
-      after_success: |
-        python3 -m pip install twine
+      after_success:
+        - python3 -m pip install twine
+        - python3 -m twine upload --skip-existing wheelhouse/*.whl
         
     # Deploy on windows
     - stage: deploy
@@ -153,4 +150,5 @@ jobs:
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
       after_success: |
-        python3 -m pip install twine
+        - python3 -m pip install twine
+        - python3 -m twine upload --skip-existing wheelhouse/*.whl
