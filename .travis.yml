@@ -65,14 +65,11 @@ script:
 jobs:
   include:
 
-    # Deploy source distribution
-    - stage: deploy
+    # Build source distribution
+    - stage: build  
       name: Deploy source distribution
       install: skip
       script: python3 setup.py sdist --formats=gztar
-      after_success: |
-        python3 -m pip install twine
-    
         
     # Build on linux
     - stage: build 
@@ -85,16 +82,24 @@ jobs:
       script: python3 -m cibuildwheel --output-dir wheelhouse
     
         
-    # Deploy on mac
+    # Build on mac
     - stage: build 
       name: Build macOS wheels
       os: osx
       language: shell
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
+
     
+    # Deploy source distribution
+    - stage: deploy
+      name: Deploy source distribution
+      install: skip
+      script: python3 setup.py sdist --formats=gztar
+      after_success: |
+        python3 -m pip install twine
         
-    # Deploy on windows
+    # Build on windows
     - stage: build 
       name: Build Windows wheels
       os: windows
@@ -103,7 +108,8 @@ jobs:
         - CIBW_BUILD: "cp2* cp3*"
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
-    
+   
+
     # Deploy on linux
     - stage: deploy
       name: Build and deploy Linux wheels
@@ -116,7 +122,6 @@ jobs:
       after_success: |
         python3 -m pip install twine
     
-        
     # Deploy on mac
     - stage: deploy
       name: Build and deploy macOS wheels
@@ -126,7 +131,6 @@ jobs:
       script: python3 -m cibuildwheel --output-dir wheelhouse
       after_success: |
         python3 -m pip install twine
-    
         
     # Deploy on windows
     - stage: deploy
