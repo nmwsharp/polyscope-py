@@ -24,22 +24,11 @@ before_install:
         # make sure it's on PATH as 'python'
         ln -s /c/Python38/python.exe /c/Python38/python3.exe
     fi
-#install:
-  #- 
 
 addons:
   apt:
     packages:
     - xorg-dev  
-
-before_script:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y xpra xserver-xorg-video-dummy freeglut3-dev; fi
-
-script:
-  - python setup.py install
-  - python test/polyscope_test.py
-
-# NOTE: build & deploy stages should be identical, except that deploy uploads after building. Any changes made to either should be made to both. This ensures that uploads will only be performed if all builds succeeded.
 
 stages:
   - name: test
@@ -53,8 +42,21 @@ stages:
     #   if: tag =~ ^v\d+\.\d+\.\d+$ AND repo = joerick/cibuildwheel
       
 env:
+  global:
+    - TWINE_USERNAME=__token__
+    # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
     - CIBW_TEST_COMMAND: "'python {project}/test/polyscope_test.py backend=openGL_mock'"
         
+
+before_script:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y xpra xserver-xorg-video-dummy freeglut3-dev; fi
+
+script:
+  - python setup.py install
+  - python test/polyscope_test.py
+
+# NOTE: build & deploy stages should be identical, except that deploy uploads after building. Any changes made to either should be made to both. This ensures that uploads will only be performed if all builds succeeded.
+
 #python3 -m twine upload --skip-existing wheelhouse/*.whl
 #python3 -m twine upload --skip-existing dist/*.tar.gz
 
@@ -62,14 +64,6 @@ env:
 
 jobs:
   include:
-    # Optional: run a test on Windows
-    - stage: test
-      name: Run tests
-      install:
-        - python -m pip install setuptools
-        - python setup.py install
-      script:
-        - python test/polyscope_test.py backend=openGL_mock
 
     # Deploy source distribution
     - stage: deploy
@@ -148,6 +142,3 @@ jobs:
 
       
 env:
-  global:
-    - TWINE_USERNAME=__token__
-    # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
