@@ -72,7 +72,7 @@ jobs:
         [[ "$TRAVIS_TAG" ==  "" ]] || [[ "$TRAVIS_TAG" == "v$(python setup.py --version)" ]]
       script:
         - python3 -m pip install setuptools
-        - python3 setup.py sdist --formats=gztar,zip
+        - python3 setup.py sdist --formats=gztar
         
     # Build on linux
     - stage: build 
@@ -111,11 +111,10 @@ jobs:
       install: skip
       script: 
         - python3 -m pip install setuptools
-        - python3 setup.py sdist --formats=gztar,zip
+        - python3 setup.py sdist --formats=gztar
       after_success:
         - python3 -m pip install twine
         - python3 -m twine upload --skip-existing dist/*.tar.gz 
-        - python3 -m twine upload --skip-existing dist/*.zip
 
     # Deploy on linux
     - stage: deploy
