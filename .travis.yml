@@ -1,13 +1,17 @@
 language: python
-os:
-  - windows
-  - linux
-  - osx
+os: linux
+#os:
+  #- windows     :(  travis says "python is not supported for Windows"
+  #- linux
+  #- osx
 language: python
 python:
-  - 3.4
-  - 3.7
   - 2.7
+  - 3.4
+  - 3.5
+  - 3.6
+  - 3.7
+  - 3.8
 
 git:
   depth: 5
@@ -35,10 +39,13 @@ script:
   - python setup.py install
   - python test/polyscope_test.py
 
+# NOTE: build & deploy stages should be identical, except that deploy uploads after building. Any changes made to either should be made to both. This ensures that uploads will only be performed if all builds succeeded.
+
 stages:
-  - test
+  - name: test
   # Only execute deployment stage on tagged commits, and from your repository
   # (e.g. not PRs). Replace with your repo name.
+  - name: build
   - name: deploy
     if: repo = nmwsharp/polyscope-py
     #if: tag IS PRESENT AND repo = nmwsharp/polyscope-py
@@ -72,9 +79,41 @@ jobs:
       after_success: |
         python3 -m pip install twine
     
+        
+    # Build on linux
+    - stage: build 
+      name: Build Linux wheels
+      os: linux
+      services: docker
+      env:
+        - CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
+      install: python3 -m pip install cibuildwheel==1.3.0
+      script: python3 -m cibuildwheel --output-dir wheelhouse
+    
+        
+    # Deploy on mac
+    - stage: build 
+      name: Build macOS wheels
+      os: osx
+      language: shell
+      install: python3 -m pip install cibuildwheel==1.3.0
+      script: python3 -m cibuildwheel --output-dir wheelhouse
+    
+        
+    # Deploy on windows
+    - stage: build 
+      name: Build Windows wheels
+      os: windows
+      language: shell
+      env:
+        - CIBW_BUILD: "cp2* cp3*"
+      install: python3 -m pip install cibuildwheel==1.3.0
+      script: python3 -m cibuildwheel --output-dir wheelhouse
+    
     # Deploy on linux
     - stage: deploy
       name: Build and deploy Linux wheels
+      os: linux
       services: docker
       env:
         - CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
@@ -107,66 +146,7 @@ jobs:
       after_success: |
         python3 -m pip install twine
 
-
-
-
-jobs:
-  include:
-    # Optional: run tests
-    #- stage: test
-      #name: Build, install, and run tests
-      #script: 
-        #- python setup.py install
-        #- python test/polyscope_test.py backend=openGL_mock
-    
-    # Deploy source distribution
-    - stage: deploy
-      name: Deploy source distribution
-      install: skip
-      script: 
-        - python -m pip install setuptools
-        - python setup.py sdist --formats=gztar
-      after_success:
-        - python -m pip install twine
-        #- python -m twine upload --skip-existing dist/*.tar.gz
-    # Deploy on linux
-    - stage: deploy
-      name: Build and deploy Linux wheels
-      services: docker
-      install: python -m pip install cibuildwheel==1.3.0
-      env:
-        - CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
-        - CIBW_TEST_COMMAND: python {project}/test/polyscope_test.py backend=openGL_mock
-      script: python -m cibuildwheel --output-dir wheelhouse
-      after_success: |
-        python -m pip install twine
-        #python -m twine upload --skip-existing wheelhouse/*.whl
-    # Deploy on mac
-    - stage: deploy
-      name: Build and deploy macOS wheels
-      os: osx
-      language: shell
-      install: python3 -m pip install cibuildwheel==1.3.0
-      env:
-        - CIBW_TEST_COMMAND: python {project}/test/polyscope_test.py backend=openGL_mock
-      script: python3 -m cibuildwheel --output-dir wheelhouse
-      after_success: |
-        python3 -m pip install twine
-        #python -m twine upload --skip-existing wheelhouse/*.whl
-    # Deploy on windows
-    - stage: deploy
-      name: Build and deploy Windows wheels
-      os: windows
-      language: shell
-      install: python -m pip install cibuildwheel==1.3.0
-      env:
-        # don't build pypy wheels on Windows
-        - CIBW_BUILD: cp*
-        - CIBW_TEST_COMMAND: python {project}/test/polyscope_test.py backend=openGL_mock
-      script: python -m cibuildwheel --output-dir wheelhouse
-      after_success: |
-        python -m pip install twine
-        #python -m twine upload --skip-existing wheelhouse/*.whl
+      
 env:
   global:
     - TWINE_USERNAME=__token__
