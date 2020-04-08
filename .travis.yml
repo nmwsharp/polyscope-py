@@ -53,8 +53,9 @@ before_script:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y xpra xserver-xorg-video-dummy freeglut3-dev; fi
 
 script:
-  - python setup.py install
-  - python test/polyscope_test.py
+  - echo "hi mom"
+  #- python setup.py install
+  #- python test/polyscope_test.py
 
 # NOTE: build & deploy stages should be identical, except that deploy uploads after building. Any changes made to either should be made to both. This ensures that uploads will only be performed if all builds succeeded.
 
@@ -71,6 +72,7 @@ jobs:
       name: Build source distribution
       os: linux
       language: python
+      python: 3.7
       install: skip
       # if the build has a tag, it must match setup.py
       before_script: |
