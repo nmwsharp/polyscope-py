@@ -45,6 +45,8 @@ env:
     - TWINE_USERNAME=__token__
     # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
     - CIBW_TEST_COMMAND: "'python {project}/test/polyscope_test.py backend=openGL_mock'"
+    - CIBW_SKIP: "'pp27-win32 pp36-win32'"
+    - CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
         
 
 before_script:
@@ -67,6 +69,8 @@ jobs:
     # Build source distribution
     - stage: build  
       name: Build source distribution
+      os: linux
+      language: python
       install: skip
       script: 
         # if the build has a tag, it must match setup.py
@@ -78,18 +82,16 @@ jobs:
     - stage: build 
       name: Build Linux wheels
       os: linux
+      language: python
       services: docker
-      env:
-        - CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
-    
         
     # Build on mac
     - stage: build 
       name: Build macOS wheels
       os: osx
-      language: shell
+      language: python
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
 
@@ -98,8 +100,6 @@ jobs:
       name: Build Windows wheels
       os: windows
       language: shell
-      env:
-        - CIBW_BUILD: "cp2* cp3*"
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
    
@@ -107,6 +107,8 @@ jobs:
     # Deploy source distribution
     - stage: deploy
       name: Build and deploy source distribution
+      os: linux
+      language: python
       install: skip
       script: 
         - python3 -m pip install setuptools
@@ -118,9 +120,8 @@ jobs:
     - stage: deploy
       name: Build and deploy Linux wheels
       os: linux
+      language: python
       services: docker
-      env:
-        - CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
       after_success: |
@@ -130,7 +131,7 @@ jobs:
     - stage: deploy
       name: Build and deploy macOS wheels
       os: osx
-      language: shell
+      language: python
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
       after_success: |
@@ -141,8 +142,6 @@ jobs:
       name: Build and deploy Windows wheels
       os: windows
       language: shell
-      env:
-        - CIBW_BUILD: "cp2* cp3*"
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
       after_success: |
