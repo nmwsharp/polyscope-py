@@ -1,11 +1,13 @@
 language: python
-#python: # note: this only applies to the test target, not the generated wheels
-  #- 2.7
-  #- 3.4
-  #- 3.5
-  #- 3.6
-  #- 3.7
-  #- 3.8
+os:
+  - windows
+  - linux
+  - osx
+language: python
+python:
+  - 3.4
+  - 3.7
+  - 2.7
 
 git:
   depth: 5
@@ -55,15 +57,7 @@ jobs:
   include:
     # Optional: run a test on Windows
     - stage: test
-      name: Test on Windows
-      os:
-        - windows
-        - linux
-        - osx
-      language: python
-      python:
-        - 3.7
-        - 2.7
+      name: Run tests
       install:
         - python -m pip install setuptools
         - python setup.py install
@@ -106,6 +100,8 @@ jobs:
       name: Build and deploy Windows wheels
       os: windows
       language: shell
+      env:
+        - CIBW_BUILD: "cp2* cp3*"
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
       after_success: |
