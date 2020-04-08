@@ -2,6 +2,9 @@ environment:
   TWINE_USERNAME: __token__
   # Note: TWINE_PASSWORD is set to an API token in Appveyor settings
   matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      APPVEYOR_JOB_NAME: "python37-x64-vs2015 pp3"
+      CIBW_BUILD: pp3*
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       APPVEYOR_JOB_NAME: "python37-x64-ubuntu cp2"
       CIBW_BUILD: cp2*
@@ -17,9 +20,6 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       APPVEYOR_JOB_NAME: "python37-x64-vs2015 cp3"
       CIBW_BUILD: cp3*
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      APPVEYOR_JOB_NAME: "python37-x64-vs2015 pp3"
-      CIBW_BUILD: pp3*
     # Doesn't work, not sure why
     #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       #APPVEYOR_JOB_NAME: "python37-x64-vs2015 pp"
