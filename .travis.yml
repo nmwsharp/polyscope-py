@@ -1,4 +1,3 @@
-language: python
 os: linux
 #os:
   #- windows     :(  travis says "python is not supported for Windows"
@@ -67,9 +66,13 @@ jobs:
 
     # Build source distribution
     - stage: build  
-      name: Deploy source distribution
+      name: Build source distribution
       install: skip
-      script: python3 setup.py sdist --formats=gztar
+      script: 
+        # if the build has a tag, it must match setup.py
+        - [[ "$TRAVIS_TAG" ==  "" ]] [[ "$TRAVIS_TAG" == "v$(python setup.py --version)" ]]
+        - python3 -m pip install setuptools
+        - python3 setup.py sdist --formats=gztar
         
     # Build on linux
     - stage: build 
@@ -90,15 +93,6 @@ jobs:
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
 
-    
-    # Deploy source distribution
-    - stage: deploy
-      name: Deploy source distribution
-      install: skip
-      script: python3 setup.py sdist --formats=gztar
-      after_success: |
-        python3 -m pip install twine
-        
     # Build on windows
     - stage: build 
       name: Build Windows wheels
@@ -109,6 +103,16 @@ jobs:
       install: python3 -m pip install cibuildwheel==1.3.0
       script: python3 -m cibuildwheel --output-dir wheelhouse
    
+
+    # Deploy source distribution
+    - stage: deploy
+      name: Build and deploy source distribution
+      install: skip
+      script: 
+        - python3 -m pip install setuptools
+        - python3 setup.py sdist --formats=gztar
+      after_success: |
+        python3 -m pip install twine
 
     # Deploy on linux
     - stage: deploy
@@ -143,6 +147,3 @@ jobs:
       script: python3 -m cibuildwheel --output-dir wheelhouse
       after_success: |
         python3 -m pip install twine
-
-      
-env:
