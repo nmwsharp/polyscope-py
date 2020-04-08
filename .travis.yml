@@ -1,14 +1,14 @@
 language: python
-#python: # note: this only applies to the test target, not the generated wheels
-  #- 2.7
-  #- 3.4
-  #- 3.5
-  #- 3.6
-  #- 3.7
-  #- 3.8
+python: # note: this only applies to the test target, not the generated wheels
+  - 2.7
+  - 3.4
+  - 3.5
+  - 3.6
+  - 3.7
+  - 3.8
 
 git:
-  depth: 1
+  depth: 5
 
 before_install:
   - |
@@ -42,6 +42,70 @@ stages:
     #if: tag IS PRESENT AND repo = nmwsharp/polyscope-py
     # To only build tags that look like vX.Y.Z:
     #   if: tag =~ ^v\d+\.\d+\.\d+$ AND repo = joerick/cibuildwheel
+      
+env:
+    - CIBW_TEST_COMMAND: python {project}/test/polyscope_test.py backend=openGL_mock
+        
+#python3 -m twine upload --skip-existing wheelhouse/*.whl
+#python3 -m twine upload --skip-existing dist/*.tar.gz
+
+install:
+  - python -m pip install setuptools
+  - python setup.py install
+script:
+  - python test/polyscope_test.py backend=openGL_mock
+
+
+jobs:
+  include:
+    # Optional: run a test on Windows
+    - os: windows
+      language: shell
+      name: Test on Windows
+
+    # Deploy source distribution
+    - stage: deploy
+      name: Deploy source distribution
+      install: skip
+      script: python3 setup.py sdist --formats=gztar
+      after_success: |
+        python3 -m pip install twine
+    
+    # Deploy on linux
+    - stage: deploy
+      name: Build and deploy Linux wheels
+      services: docker
+      env:
+        - CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
+      install: python3 -m pip install cibuildwheel==1.3.0
+      script: python3 -m cibuildwheel --output-dir wheelhouse
+      after_success: |
+        python3 -m pip install twine
+    
+        
+    # Deploy on mac
+    - stage: deploy
+      name: Build and deploy macOS wheels
+      os: osx
+      language: shell
+      install: python3 -m pip install cibuildwheel==1.3.0
+      script: python3 -m cibuildwheel --output-dir wheelhouse
+      after_success: |
+        python3 -m pip install twine
+    
+        
+    # Deploy on windows
+    - stage: deploy
+      name: Build and deploy Windows wheels
+      os: windows
+      language: shell
+      install: python3 -m pip install cibuildwheel==1.3.0
+      script: python3 -m cibuildwheel --output-dir wheelhouse
+      after_success: |
+        python3 -m pip install twine
+
+
+
 
 jobs:
   include:
