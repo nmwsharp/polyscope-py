@@ -73,10 +73,10 @@ jobs:
       language: python
       install: skip
       # if the build has a tag, it must match setup.py
-      script: |
-        [[ "$TRAVIS_TAG" ==  "" ]] || [[ "$TRAVIS_TAG" == "v$(python setup.py --version)" ]]
-        python3 -m pip install setuptools
-        python3 setup.py sdist --formats=gztar
+      before_script: [[ "$TRAVIS_TAG" ==  "" ]] || [[ "$TRAVIS_TAG" == "v$(python setup.py --version)" ]]
+      script:
+        - python3 -m pip install setuptools
+        - python3 setup.py sdist --formats=gztar
         
     # Build on linux
     - stage: build 
