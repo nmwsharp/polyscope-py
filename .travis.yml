@@ -25,7 +25,7 @@ stages:
     if: FALSE # DEPLOYMENT CURRENTLY DISABLED, USING APPVEYOR
     #if: repo = nmwsharp/polyscope-py
     # To only build tags that look like vX.Y.Z:
-    if: repo = nmwsharp/polyscope-py AND tag =~ ^v\d+\.\d+\.\d+$
+    #if: repo = nmwsharp/polyscope-py AND tag =~ ^v\d+\.\d+\.\d+$
     #if: tag IS PRESENT AND repo = nmwsharp/polyscope-py
       
 env:
