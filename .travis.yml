@@ -17,7 +17,7 @@ addons:
     - xorg-dev  
 
 stages:
-  - name: test
+  #- name: test
   # Only execute deployment stage on tagged commits, and from your repository
   # (e.g. not PRs). Replace with your repo name.
   - name: build
@@ -33,30 +33,30 @@ env:
     # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
     - CIBW_TEST_COMMAND: "'python {project}/test/polyscope_test.py backend=openGL_mock'"
     #- CIBW_SKIP: "'pp27-win32 pp36-win32'"
-    - CIBW_BUILD: "'cp27*'"
+    #- CIBW_BUILD: "'cp27*'"
     - CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
         
 
-before_script:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y xpra xserver-xorg-video-dummy freeglut3-dev; fi
+#before_script:
+  #- if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y xpra xserver-xorg-video-dummy freeglut3-dev; fi
 
-script:
-  - python setup.py install
-  - python test/polyscope_test.py
+#script:
+  #- python setup.py install
+  #- python test/polyscope_test.py
 
 # NOTE: build & deploy stages should be identical, except that deploy uploads after building. Any changes made to either should be made to both. This ensures that uploads will only be performed if all builds succeeded.
 
 
 # See https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
 # for some annoying subtle details about cross OS python (here and below)
-before_install:
-  - |
-    if [[ "$TRAVIS_OS_NAME" = windows ]]; then
-        choco install python --version 3.8.0
-        export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-        # make sure it's on PATH as 'python'
-        ln -s /c/Python38/python.exe /c/Python38/python3.exe
-    fi
+#before_install:
+  #- |
+    #if [[ "$TRAVIS_OS_NAME" = windows ]]; then
+        #choco install python --version 3.8.0
+        #export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+        ## make sure it's on PATH as 'python'
+        #ln -s /c/Python38/python.exe /c/Python38/python3.exe
+    #fi
 
 jobs:
   include:
@@ -100,7 +100,7 @@ jobs:
       os: windows
       language: shell
       install: python3 -m pip install cibuildwheel==1.3.0
-      script: python3 -m cibuildwheel --output-dir wheelhouse
+      script: python3 -m cibuildwheel --print-build-identifiers --output-dir wheelhouse
    
     # Deploy on linux
     # Also deploy source here. Otherwise source gets uploaded much earlier 
