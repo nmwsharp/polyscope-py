@@ -58,18 +58,21 @@ build_script:
   - python setup.py sdist -d wheelhouse --formats=gztar # source build (should really be done just once, but oh well)
   - python -m cibuildwheel --output-dir wheelhouse # build ALL the wheels
 
-deploy_script:
-  - >
-    IF "%APPVEYOR_REPO_TAG%" == "true"
-    (
-    python -m pip install twine
-    &&
-    python -m twine upload wheelhouse/*.tar.gz
-    python -m twine upload wheelhouse/*.whl
-    )
-
 artifacts:
   #- path: "wheelhouse\\*.whl"
   - path: "wheelhouse\\*"
     name: Wheels
+
+# Deploy to GitHub Releases
+deploy:
+  - provider: GitHub
+    artifact: "wheelhouse\\*" 
+    draft: false
+    prerelease: false
+    auth_token:
+      secure: X+0NdjMcRyztCOVe4UXNU2QpPsd5vHl/u4c8mN6j82oCe4zkLwC0ggRguwwqtAV0
+    on:
+      branch: master                # release from master branch only
+      APPVEYOR_REPO_TAG: true       # deploy on tag push only
+    force_update: true
 
