@@ -1,16 +1,5 @@
 environment:
-  TWINE_USERNAME: __token__
-  # Note: TWINE_PASSWORD is set to an API token in Appveyor settings
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave cp2"
-      CIBW_BUILD: cp2*
-    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave cp3"
-      CIBW_BUILD: cp3*
-    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave pp"
-      CIBW_BUILD: pp*
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       APPVEYOR_JOB_NAME: "python37-x64-ubuntu cp2"
       CIBW_BUILD: cp2*
@@ -30,6 +19,15 @@ environment:
     #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       #APPVEYOR_JOB_NAME: "python37-x64-vs2015 pp"
       #CIBW_BUILD: pp*
+    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
+      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave cp2"
+      CIBW_BUILD: cp2*
+    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
+      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave cp3"
+      CIBW_BUILD: cp3*
+    - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
+      APPVEYOR_JOB_NAME: "python37-x64-macos-mojave pp"
+      CIBW_BUILD: pp*
 
   CIBW_BEFORE_BUILD_LINUX : "yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake"
   #CIBW_BUILD_VERBOSITY: 3
@@ -37,6 +35,9 @@ environment:
   #CIBW_TEST_COMMAND: python {project}/test/polyscope_test.py backend=openGL_mock
   CIBW_TEST_COMMAND_WINDOWS: python {project}/test/polyscope_test.py backend=openGL_mock
   CIBW_TEST_COMMAND_LINUX: python {project}/test/polyscope_test.py backend=openGL_mock
+  
+  TWINE_USERNAME: __token__
+  # Note: TWINE_PASSWORD is set to an API token in Appveyor settings
 
 matrix: 
   fast_finish: true # cancel other jobs once first fails
@@ -56,19 +57,16 @@ install:
 build_script:
   - python setup.py sdist -d wheelhouse --formats=gztar # source build (should really be done just once, but oh well)
   - python -m cibuildwheel --output-dir wheelhouse # build ALL the wheels
-    #IF "%APPVEYOR_REPO_TAG%" == "true"
-    #IF "%APPVEYOR_REPO_TAG%" == $(setup.py --version)
 
-
-#deploy:
-  #- >
-    #IF "true" == "true"
-    #(
-    #python -m pip install twine
-    #&&
-    #python -m twine upload wheelhouse/*.whl
-    #python -m twine upload wheelhouse/*.tar.gz
-    #)
+deploy:
+  - >
+    IF "%APPVEYOR_REPO_TAG%" == "true"
+    (
+    python -m pip install twine
+    &&
+    python -m twine upload wheelhouse/*.tar.gz
+    python -m twine upload wheelhouse/*.whl
+    )
 
 artifacts:
   #- path: "wheelhouse\\*.whl"
