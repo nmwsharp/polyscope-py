@@ -22,19 +22,22 @@ stages:
   # (e.g. not PRs). Replace with your repo name.
   - name: build
   - name: deploy
-    if: FALSE # DEPLOYMENT CURRENTLY DISABLED, USING APPVEYOR
+    if: FALSE # DEPLOYMENT CURRENTLY DISABLED, USING APPVEYOR INSTEAD (see note below)
     #if: repo = nmwsharp/polyscope-py
     # To only build tags that look like vX.Y.Z:
     #if: repo = nmwsharp/polyscope-py AND tag =~ ^v\d+\.\d+\.\d+$
     #if: tag IS PRESENT AND repo = nmwsharp/polyscope-py
-      
+     
+# Travis has recently gotten pretty good support for Windows builds, which is great. However, 
+# cibuildwheel cannot do Python 2.7 builds on Travis, due to some platform problems (see https://github.com/joerick/cibuildwheel/pull/160). Also, I can't get pypy builds to work either, but that may be a separate issue.
+# Thus, this config is set to perform all the builds it can, so we get nice travis errors. A separate appveyor config does the actual cross-platform builds.
+
 env:
   global:
     - TWINE_USERNAME=__token__
     # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
     - CIBW_TEST_COMMAND: "'python {project}/test/polyscope_test.py backend=openGL_mock'"
-    #- CIBW_SKIP: "'pp27-win32 pp36-win32'"
-    #- CIBW_BUILD: "'cp27*'"
+    - CIBW_SKIP: "'pp27-win32 pp36-win32'"
     - CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
         
 
@@ -46,7 +49,6 @@ script:
   - python test/polyscope_test.py
 
 # NOTE: build & deploy stages should be identical, except that deploy uploads after building. Any changes made to either should be made to both. This ensures that uploads will only be performed if all builds succeeded.
-
 
 # See https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
 # for some annoying subtle details about cross OS python (here and below)
@@ -101,7 +103,7 @@ jobs:
       os: windows
       language: shell
       install: python3 -m pip install cibuildwheel==1.3.0
-      script: python3 -m cibuildwheel --print-build-identifiers --output-dir wheelhouse
+      script: python3 -m cibuildwheel --output-dir wheelhouse
    
     # Deploy on linux
     # Also deploy source here. Otherwise source gets uploaded much earlier 
