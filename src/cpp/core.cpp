@@ -66,6 +66,9 @@ PYBIND11_MODULE(polyscope_bindings, m) {
         "Load a blendable material from explicit names");
   m.def("load_blendable_material_baseext", overload_cast_<std::string, std::string, std::string>()(&ps::loadBlendableMaterial), 
         "Load a blendable material from base and ext names");
+  
+  // === Colormaps
+  m.def("load_color_map", ps::loadColorMap, "Load a color map from file");
 
   // === Enums
   

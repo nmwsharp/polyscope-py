@@ -87,6 +87,9 @@ class TestCore(unittest.TestCase):
             filename_base=path.join(assets_prefix, "testwax"),
             filename_ext=".jpg")
     
+    def test_load_cmap(self):
+        ps.load_color_map("test_cmap", path.join(assets_prefix, "test_colormap.png"))
+    
 
 class TestStructureManagement(unittest.TestCase):
 

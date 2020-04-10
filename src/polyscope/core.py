@@ -108,6 +108,9 @@ def load_blendable_material(mat_name, filenames=None, filename_base=None, filena
 
 ### Colormaps
 
+def load_color_map(cmap_name, filename):
+    psb.load_color_map(cmap_name, filename)
+
 ## String-to-enum translation
 
 def str_to_navigate_style(s):
