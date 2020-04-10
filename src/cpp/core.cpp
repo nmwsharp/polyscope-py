@@ -1,6 +1,7 @@
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "Eigen/Dense"
 
@@ -58,6 +59,13 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("warning", ps::warning, "Send a warning message");
   m.def("error", ps::error, "Send an error message");
   m.def("terminating_error", ps::terminatingError, "Send a terminating error message");
+  
+  // === Materials
+  m.def("load_static_material", ps::loadStaticMaterial, "Load a static material");
+  m.def("load_blendable_material_explicit", overload_cast_<std::string, std::array<std::string,4>>()(&ps::loadBlendableMaterial), 
+        "Load a blendable material from explicit names");
+  m.def("load_blendable_material_baseext", overload_cast_<std::string, std::string, std::string>()(&ps::loadBlendableMaterial), 
+        "Load a blendable material from base and ext names");
 
   // === Enums
   

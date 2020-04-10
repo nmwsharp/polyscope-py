@@ -60,7 +60,7 @@ class TestCore(unittest.TestCase):
    
     '''
     # This test doesn't play nice with global state
-    def test_screenshot(self):
+    def test_messages(self):
 
         ps.info("hi world")
         ps.warning("hi world again")
@@ -72,6 +72,21 @@ class TestCore(unittest.TestCase):
 
         ps.show(3)
     '''
+
+    def test_load_material(self):
+
+        ps.load_static_material("test_static", path.join(assets_prefix, "testwax_b.jpg"))
+        ps.load_blendable_material("test_blend1", filenames=(
+                        path.join(assets_prefix, "testwax_r.jpg"),
+                        path.join(assets_prefix, "testwax_b.jpg"),
+                        path.join(assets_prefix, "testwax_g.jpg"),
+                        path.join(assets_prefix, "testwax_k.jpg")
+                    ))
+        
+        ps.load_blendable_material("test_blend2", 
+            filename_base=path.join(assets_prefix, "testwax"),
+            filename_ext=".jpg")
+    
 
 class TestStructureManagement(unittest.TestCase):
 

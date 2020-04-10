@@ -84,7 +84,29 @@ def terminating_error(message):
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])
 
+### Materials
 
+def load_static_material(mat_name, filename):
+    psb.load_static_material(mat_name, filename)
+
+def load_blendable_material(mat_name, filenames=None, filename_base=None, filename_ext=None):
+
+    # list of names
+    if filenames is not None:
+        if filename_base is not None or filename_ext is not None:
+            raise ValueError("`filenames` was specified, `filename_base`/`filename_ext` should NOT be specified")
+
+        psb.load_blendable_material_explicit(mat_name, filenames)
+
+    # base/ext pair
+    if filename_base is not None and filename_ext is not None:
+        if filenames is not None:
+            raise ValueError("`filename_base`/`filename_ext` were specified, `filenames` should NOT be specified")
+
+        psb.load_blendable_material_baseext(mat_name, filename_base, filename_ext)
+
+
+### Colormaps
 
 ## String-to-enum translation
 
