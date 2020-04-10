@@ -1,9 +1,12 @@
-import os, subprocess
-
-# print(os.getenv("APPVEYOR_REPO_TAG"))
+import sys, os, subprocess
 
 if os.getenv("APPVEYOR_REPO_TAG") == "true":
-    subprocess.Popen(['python','-m', 'twine', 'upload','--skip-existing', 'wheelhouse/*.whl'])
-    subprocess.Popen(['python','-m', 'twine', 'upload','--skip-existing', 'wheelhouse/*.tar.gz'])
+    proc = subprocess.Popen(['python','-m', 'twine', 'upload','--skip-existing', 'wheelhouse/*'])
+    proc.communicate() # wait for it to terminate
+
+    # forward the return code
+    code = proc.returncode
+    sys.exit(code)
+
 else:
-    print("no deploying, no appveyor tag present")
+    print("not deploying, no appveyor repo tag present")
