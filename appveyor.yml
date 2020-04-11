@@ -45,15 +45,13 @@ environment:
 matrix: 
   fast_finish: true # cancel other jobs once first fails
 
-init:
-  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
-
 # Shallow clone
 clone_depth: 5
 
 stack: python 3.7
 
 init:
+  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
   - cmd: set PATH=C:\Python37;C:\Python37\Scripts;%PATH%
 
 install: 
