@@ -40,7 +40,6 @@ environment:
   # Note: TWINE_PASSWORD is set to an API token in Appveyor settings
 
   APPVEYOR_SSH_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCoOsSHZp4V1TMcNw0WJ7IvsJUqDNI+5bdDHvM1HBi5PeMmcUe/hplh34OCsJAM2Rk2vY4j0xj3xkH4efNLnI7gDGhAlSTfRd5jzHM06rOB25yl8tgvIq1RchwANmrlddeh/bywlzWJJf0Je7WHPOmZMIhRHMyZ9jb4d6kpo3QWJEiaar3d8YZL3BykfCZW6Lu6jQXpZ1Ug5MYi4XnBHvLy9RbeMSYrfExqdA5W4fFqqxO668qWB0p//QHAtoxWkPEHUoNMJnDJ85QflodEszPrlX+/tFyEXKpCaPd8v0BV9seaZiaLRTtWpz9UjRuc6tIP27ph0T2lPM1UDOzAukmZLmr+Gk/om+qhsnbZGGM4mv3Jc2yYYkRGTRt0TZ4onSj8U1HTSJji7fe9OG/UHbzYqf9qvcHSIE/y3Pf7kTWPLQihr6Mo7uElmkCqr9FsCEgpiuv2HXHn9dPbIb+jfp4lTeOP8Lh7otLM1UPAAEcdw2FY6TFZdcrWaHBI+p+/Gbu/bDnNUjR2Cwe7scTUX8f3rIBA4baszivavCPXJ88mphfqa/kZbqXuJaiCFUCqHkTwbAM6K4/W2cfnmKvhCDpYSqVscPMFbIx+fKPHfQWqy+hiiZQEBNcP1R292VdF2DX/mTJ523af9YJrEcidONNX6pwIx5LzmXwE4HnfDJNFTQ==
-  APPVEYOR_SSH_BLOCK: true
 
 matrix: 
   fast_finish: true # cancel other jobs once first fails
@@ -50,8 +49,12 @@ clone_depth: 5
 
 stack: python 3.7
 
+# For debugging
+#on_finish:
+  #- sh: export APPVEYOR_SSH_BLOCK=true
+  #- sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+
 init:
-  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
   - cmd: set PATH=C:\Python37;C:\Python37\Scripts;%PATH%
 
 install: 
