@@ -9,7 +9,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -70,7 +70,7 @@ setup(
     description='Polyscope: A viewer and user interface for 3D data.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    license="MIT (dependencies separately licensed)",
+    license="MIT",
     package_dir = {'': 'src'},
     packages=setuptools.find_packages(where="src"),
     ext_modules=[CMakeExtension('.')],
