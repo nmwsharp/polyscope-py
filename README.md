@@ -3,8 +3,8 @@ Python bindings for Polyscope. https://polyscope.run
 
 [![travis build status](https://travis-ci.com/nmwsharp/polyscope-py.svg?branch=master)](https://travis-ci.com/nmwsharp/polyscope-py)
 [![appveyor build status](https://ci.appveyor.com/api/projects/status/epf2tpgc0oarjrrx/branch/master?svg=true)](https://ci.appveyor.com/project/nmwsharp/polyscope-py/branch/master)
-![PyPI](https://img.shields.io/pypi/v/polyscope?style=plastic)
-![Conda](https://img.shields.io/conda/v/conda-forge/polyscope)
+[![PyPI](https://img.shields.io/pypi/v/polyscope?style=plastic)](https://pypi.org/project/polyscope/)
+[![Conda](https://img.shields.io/conda/v/conda-forge/polyscope)](https://anaconda.org/conda-forge/polyscope)
 
 This library is a python wrapper and deployment system. The core C++ library lives at https://github.com/nmwsharp/polyscope.
 
