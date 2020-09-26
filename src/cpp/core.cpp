@@ -91,6 +91,9 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("x_up", ps::view::UpDir::XUp)
     .value("y_up", ps::view::UpDir::YUp)
     .value("z_up", ps::view::UpDir::ZUp)
+    .value("neg_x_up", ps::view::UpDir::NegXUp)
+    .value("neg_y_up", ps::view::UpDir::NegYUp)
+    .value("neg_z_up", ps::view::UpDir::NegZUp)
     .export_values(); 
 
   py::enum_<ps::DataType>(m, "DataType")
