@@ -4,6 +4,7 @@ import os.path as path
 
 # Path to where the bindings live
 sys.path.append(os.path.join(os.path.dirname(__file__), "../build/"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../src/"))
 
 import polyscope
 
@@ -40,8 +41,8 @@ def main():
         ps_mesh = polyscope.register_surface_mesh("test mesh", verts, faces, enabled=False)
 
         # Scalar functions
-        ps_mesh.add_vertex_scalar_quantity("X", verts[:,0])
-        ps_mesh.add_vertex_scalar_quantity("Y", verts[:,1])
+        ps_mesh.add_scalar_quantity("X", verts[:,0])
+        ps_mesh.add_scalar_quantity("Y", verts[:,1])
 
         # Look at them
         polyscope.show() 
@@ -50,7 +51,7 @@ def main():
         ps_mesh.remove_all_quantities()
 
         # Add another one and look again
-        polyscope.get_surface_mesh("test mesh").add_vertex_scalar_quantity("Z", verts[:,2]) # this time, get mesh by name
+        polyscope.get_surface_mesh("test mesh").add_scalar_quantity("Z", verts[:,2]) # this time, get mesh by name
         polyscope.show() 
         
         # Remove the whole mesh structure
@@ -59,7 +60,7 @@ def main():
 
 
     ## Examples with a point cloud
-    if True:
+    if False:
         ps_points = polyscope.register_point_cloud("test points", verts)
 
         # Scalar functions
