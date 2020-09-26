@@ -31,13 +31,14 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Basic flow 
   m.def("init", &ps::init, py::arg("backend")="", "Initialize Polyscope");
-  m.def("show",  []() {
+  m.def("show", [](size_t forFrames) {
         // use a callback to check for signals like ctrl-C
         ps::options::openImGuiWindowForUserCallback = false;
         auto f = []() { if (PyErr_CheckSignals() != 0) throw py::error_already_set(); };
         ps::state::userCallback = f;
-        ps::show();
-      }
+        ps::show(forFrames);
+      },
+      py::arg("forFrames")=std::numeric_limits<size_t>::max()
   );
 
   // === Structure management
