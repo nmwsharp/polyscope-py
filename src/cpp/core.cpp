@@ -31,8 +31,14 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Basic flow 
   m.def("init", &ps::init, py::arg("backend")="", "Initialize Polyscope");
-  m.def("show", &ps::show, "Show the Polyscope GUI (blocks until UI is exited)", 
-      py::arg("forFrames") = std::numeric_limits<size_t>::max());
+  m.def("show",  []() {
+        // use a callback to check for signals like ctrl-C
+        ps::options::openImGuiWindowForUserCallback = false;
+        auto f = []() { if (PyErr_CheckSignals() != 0) throw py::error_already_set(); };
+        ps::state::userCallback = f;
+        ps::show();
+      }
+  );
 
   // === Structure management
   m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
