@@ -52,7 +52,9 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
   m.def("set_autoscale_structures", [](bool x) { ps::options::autoscaleStructures = x; });
   m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
-  m.def("set_up_dir", [](ps::view::UpDir x) { ps::view::upDir = x; });
+  m.def("set_up_dir", [](ps::view::UpDir x) { 
+      ps::view::setUpDir(x); 
+  });
   
   // === Messages
   m.def("info", ps::info, "Send an info message");
