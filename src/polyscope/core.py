@@ -74,6 +74,9 @@ def set_navigation_style(s):
 def set_up_dir(d):
     psb.set_up_dir(str_to_updir(d))
 
+def reset_camera_to_home_view():
+    psb.reset_camera_to_home_view()
+
 ### Messages
 
 def info(message):

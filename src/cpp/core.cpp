@@ -61,6 +61,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_up_dir", [](ps::view::UpDir x) { 
       ps::view::setUpDir(x); 
   });
+  m.def("reset_camera_to_home_view", ps::view::resetCameraToHomeView);
+
   
   // === Messages
   m.def("info", ps::info, "Send an info message");
