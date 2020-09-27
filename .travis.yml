@@ -85,7 +85,7 @@ jobs:
       language: python
       python: 3.7
       services: docker
-      install: python3 -m pip install cibuildwheel==1.3.0
+      install: python3 -m pip install cibuildwheel==1.6.1
       script: python3 -m cibuildwheel --output-dir wheelhouse
         
     # Build on mac
@@ -94,7 +94,7 @@ jobs:
       os: osx
       osx_image: xcode11.2  
       language: shell       
-      install: python3 -m pip install cibuildwheel==1.3.0
+      install: python3 -m pip install cibuildwheel==1.6.1
       script: python3 -m cibuildwheel --output-dir wheelhouse
 
     # Build on windows
@@ -102,7 +102,7 @@ jobs:
       name: Build Windows wheels
       os: windows
       language: shell
-      install: python3 -m pip install cibuildwheel==1.3.0
+      install: python3 -m pip install cibuildwheel==1.6.1
       script: python3 -m cibuildwheel --output-dir wheelhouse
    
     # Deploy on linux
@@ -115,7 +115,7 @@ jobs:
       python: 3.7
       services: docker
       install: 
-        - python3 -m pip install cibuildwheel==1.3.0
+        - python3 -m pip install cibuildwheel==1.6.1
         - python3 -m pip install setuptools
       script: 
         - python3 setup.py sdist --formats=gztar
@@ -131,7 +131,7 @@ jobs:
       os: osx
       osx_image: xcode11.2  
       language: shell       
-      install: python3 -m pip install cibuildwheel==1.3.0
+      install: python3 -m pip install cibuildwheel==1.6.1
       script: python3 -m cibuildwheel --output-dir wheelhouse
       after_success:
         - python3 -m pip install twine
@@ -142,7 +142,7 @@ jobs:
       name: Build and deploy Windows wheels
       os: windows
       language: shell
-      install: python3 -m pip install cibuildwheel==1.3.0
+      install: python3 -m pip install cibuildwheel==1.6.1
       script: python3 -m cibuildwheel --output-dir wheelhouse
       after_success:
         - python3 -m pip install twine
