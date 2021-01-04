@@ -47,8 +47,7 @@ jobs:
         run: |
           python -m cibuildwheel --output-dir wheelhouse
 
-      # Just 
+      # Upload binaries to github
       - uses: actions/upload-artifact@v2
-        run: |
-          python -m twine upload --skip-existing dist/*.tar.gz 
-          python -m twine upload --skip-existing wheelhouse/*.whl
+        with:
+          path: ./wheelhouse/*.whl dist/*.tar.gz 
