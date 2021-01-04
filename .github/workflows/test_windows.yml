@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
       with:
-        submodules: recursive
+        submodules: 'recursive'
     
     - uses: actions/setup-python@v2
       name: Install Python
@@ -24,7 +24,7 @@ jobs:
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..
 
     - name: build
-      run: cmake --build "."
+      run: cd build && cmake --build "."
 
     - name: run test
-      run: cd .. & python3 test/polyscope_test.py
+      run: python3 test/polyscope_test.py
