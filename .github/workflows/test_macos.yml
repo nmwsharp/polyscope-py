@@ -14,11 +14,12 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: 'recursive'
-    
-    - uses: actions/setup-python@v2
-      name: Install Python
-      with:
-        python-version: '3.7'
+
+    # Use system python on mac; 3.9 seems to be available and this way there aren't multiple versions floating around 
+    #- uses: actions/setup-python@v2
+      #name: Install Python
+      #with:
+        #python-version: '3.7'
 
     - name: install python packages
       run: python3 -m pip install numpy
