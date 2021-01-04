@@ -15,15 +15,6 @@ else:
     # normal / unix case
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 
-print(sys.path)
-
-for d in sys.path:
-    print("== path directory " + str(d))
-    if os.path.isdir(d):
-        for f in os.listdir(d):
-            print("  file: " + str(os.path.join(d, f)))
-    else:
-        print("[file]")
 
 import polyscope as ps
 
