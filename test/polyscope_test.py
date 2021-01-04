@@ -605,6 +605,8 @@ class TestSurfaceMesh(unittest.TestCase):
         p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()))
         p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()), 3*p.n_halfedges())
 
+        p = ps.register_surface_mesh("test_mesh2", self.generate_verts(), self.generate_faces())
+
         p.set_all_permutations(
             vertex_perm=np.random.permutation(p.n_vertices()),
             face_perm=np.random.permutation(p.n_faces()),
@@ -778,8 +780,10 @@ class TestSurfaceMesh(unittest.TestCase):
        
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices(),2)
+                p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3));
             elif on  == 'faces':
                 vals = np.random.rand(p.n_faces(), 2)
+                p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 3));
 
             p.add_intrinsic_vector_quantity("test_vals1", vals, defined_on=on)
             p.add_intrinsic_vector_quantity("test_vals2", vals, defined_on=on, enabled=True)
@@ -799,6 +803,7 @@ class TestSurfaceMesh(unittest.TestCase):
 
         ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
         p = ps.get_surface_mesh("test_mesh")
+        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3));
         
         vals = np.random.rand(p.n_edges())
         orients = np.random.rand(p.n_edges()) > 0.5
