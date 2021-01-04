@@ -7,8 +7,13 @@ from os import listdir
 from os.path import isfile, join
 
 # Path to where the bindings live
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+if os.name == 'nt': # if Windows
+    # handle default location where VS puts binary
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build", "Debug")))
+else:
+    # normal / unix case
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 
 print(sys.path)
 
