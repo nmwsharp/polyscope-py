@@ -1,4 +1,4 @@
-name: windows
+name: Test Windows
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
         python-version: '3.7'
 
     - name: configure
-      run: mkdir build && cd build && cmake cmake -DCMAKE_BUILD_TYPE=Debug
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..
 
     - name: build
       run: cmake --build "."
