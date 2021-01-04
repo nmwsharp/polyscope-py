@@ -57,7 +57,13 @@ class CMakeBuild(build_ext):
                                                               self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
+
+        if(self.distribution.verbose > 0):
+            print("Running cmake configure command: " + " ".join(['cmake', ext.sourcedir] + cmake_args))
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
+        
+        if(self.distribution.verbose > 0):
+            print("Running cmake build command: " + " ".join(['cmake', '--build', '.'] + build_args))
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
 def main():
