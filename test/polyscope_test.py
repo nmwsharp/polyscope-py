@@ -5,8 +5,8 @@ import os.path as path
 import numpy as np
 
 # Path to where the bindings live
-sys.path.append(os.path.join(os.path.dirname(__file__), "../build/"))
-sys.path.append(os.path.join(os.path.dirname(__file__), "../src/"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "build"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
 print(sys.path)
 
@@ -14,8 +14,6 @@ import polyscope as ps
 
 # Path to test assets
 assets_prefix = path.join(path.dirname(__file__), "assets/")
-assetpath_spot = path.join(assets_prefix, "spot.obj")
-
 
 class TestCore(unittest.TestCase):
 
