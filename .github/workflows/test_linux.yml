@@ -1,4 +1,4 @@
-name: linux
+name: Test Linux
 
 on:
   push:
