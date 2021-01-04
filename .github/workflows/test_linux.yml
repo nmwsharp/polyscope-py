@@ -22,6 +22,9 @@ jobs:
 
     - name: install packages
       run: sudo apt-get install -y xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
+    
+    - name: install python packages
+      run: python3 -m pip install numpy
 
     - name: configure
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..

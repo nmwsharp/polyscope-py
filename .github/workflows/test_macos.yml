@@ -20,6 +20,9 @@ jobs:
       with:
         python-version: '3.7'
 
+    - name: install python packages
+      run: python3 -m pip install numpy
+
     - name: configure
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DPOLYSCOPE_BACKEND_OPENGL3_GLFW=ON -DPOLYSCOPE_BACKEND_OPENGL_MOCK=ON ..
 
