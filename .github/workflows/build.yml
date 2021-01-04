@@ -21,7 +21,7 @@ jobs:
         os: [ubuntu-18.04, windows-2019, macos-10.15]
     env:
       CIBW_BUILD: "cp*-manylinux_x86_64 cp*-manylinux_i686 cp*-macosx_x86_64 cp*-win_amd64 cp*-win32"
-      CIBW_BEFORE_BUILD_LINUX : "'yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake'"
+      CIBW_BEFORE_BUILD_LINUX : "yum remove -y cmake && yum install -y cmake3 libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel libXi-devel freeglut-devel && ln -sfn /usr/bin/cmake3 /usr/bin/cmake"
 
     steps:
       - uses: actions/checkout@v2
