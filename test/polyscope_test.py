@@ -3,12 +3,22 @@ import os
 import sys
 import os.path as path
 import numpy as np
+from os import listdir
+from os.path import isfile, join
 
 # Path to where the bindings live
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "build"))
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
 print(sys.path)
+
+for d in sys.path:
+    print("== path directory " + str(d))
+    if os.path.isdir(d):
+        for f in os.listdir(d):
+            print("  file: " + str(os.path.join(d, f)))
+    else:
+        print("[file]")
 
 import polyscope as ps
 
