@@ -19,6 +19,9 @@ jobs:
       name: Install Python
       with:
         python-version: '3.7'
+    
+    - name: install python packages
+      run: python3 -m pip install numpy
 
     - name: configure
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..
@@ -27,4 +30,4 @@ jobs:
       run: cd build && cmake --build "."
 
     - name: run test
-      run: python3 test/polyscope_test.py
+      run: python test/polyscope_test.py
