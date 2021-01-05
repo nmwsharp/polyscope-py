@@ -44,6 +44,11 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install vcpython27 -f -y
+      
+      - name: Package source distribution
+        if: runner.os == 'Linux'
+        run: |
+          python setup.py sdist -d wheelhouse --formats=gztar 
 
       - name: Build wheels
         run: |
