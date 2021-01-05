@@ -24,12 +24,16 @@ polyscope-py should work out-of-the-box on any combination of Python 2.7, 3.5-3.
 
 ## For developers
 
-This repo is configured with CI on both travis and appveyor. Travis is useful for running tests and quick builds, but appveyor generates final deployment wheels, because it supports a broader combination of platforms.
+This repo is configured with CI on github actions. 
+
+- By default, all commits to the main branch build & run tests. Use `[ci skip]` to skip this.
+- Tagging a commit with `[ci build]` causes it to also build all precompiled wheels and upload them as artifacts.
+- Creating a tagged version like `v1.2.3` will build wheels as above, and ALSO automatically upload them to pypi as described below.
 
 ### Deploy a new version
 
-- Commit the desired version to the `master` branch, be sure the version string in `setup.py` corresponds to the new version number.
-- Watch the travis & appveyor builds to ensure the test & build stages succeed and all wheels are compiled (takes ~1 hr on Travis, ~2 hrs on Appveyor).
+- Commit the desired version to the `master` branch, be sure the version string in `setup.py` corresponds to the new version number. Use the `[ci build]` tag in the commit message to trigger builds.
+- Watch the github actions builds to ensure all wheels build successfully. The resulting binaries will be saved as artifacts if you want try test with them.
 - While you're waiting, update the docs, including the changelog.
-- Tag the commit with a tag like `v1.2.3`, matching the version in `setup.py`. This will kick off a new Appveyor build which deploys the wheels to PyPI after compilation.
-- Update the conda builds by committing to the [feedstock repository](https://github.com/conda-forge/polyscope-feedstock). This generally just requires bumping the version number and updating the hash in `meta.yml`. Since `meta.yml` is configured to pull source from PyPi, you can't do this until after the source build has been uploaded from Appveyor (generally <15 min).
+- Tag the commit with a tag like `v1.2.3`, matching the version in `setup.py`. This will kick off a new github actions build which deploys the wheels to PyPI after compilation.
+- Update the conda builds by committing to the [feedstock repository](https://github.com/conda-forge/polyscope-feedstock). This generally just requires bumping the version number and updating the hash in `meta.yml`. Since `meta.yml` is configured to pull source from PyPi, you can't do this until after the source build has been uploaded from the github action.
