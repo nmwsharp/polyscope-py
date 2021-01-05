@@ -52,5 +52,6 @@ jobs:
       # Upload binaries to github
       - uses: actions/upload-artifact@v2
         with:
-          #path: ./wheelhouse/*.whl dist/*.tar.gz 
-          path: ./wheelhouse/*.whl
+          path: |
+            ./wheelhouse/*.whl 
+            ./dist/*.tar.gz 
