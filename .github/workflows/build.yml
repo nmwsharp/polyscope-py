@@ -59,4 +59,4 @@ jobs:
         with:
           path: |
             ./wheelhouse/*.whl 
-            ./dist/*.tar.gz 
+            ./wheelhouse/*.tar.gz 
