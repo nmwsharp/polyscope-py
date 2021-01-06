@@ -9,7 +9,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir='', exclude_arch=False):
@@ -53,6 +53,10 @@ class CMakeBuild(build_ext):
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             build_args += ['--', '-j3']
+
+        if self.distribution.verbose > 0:
+            cmake_args += ['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON']
+
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
