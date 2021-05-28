@@ -256,7 +256,7 @@ class SurfaceMesh:
         if enabled is not None:
             q.set_enabled(enabled)
         if stripe_size is not None:
-            q.set_stripe_size(stripe_size, stripe_size_relative)
+            q.set_isoline_width(stripe_size, stripe_size_relative)
         if vminmax is not None:
             q.set_map_range(vminmax)
         if cmap is not None:

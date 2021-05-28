@@ -21,19 +21,23 @@ void bind_surface_mesh(py::module& m) {
   py::class_<ps::SurfaceVertexScalarQuantity>(m, "SurfaceVertexScalarQuantity")
       .def("set_enabled", &ps::SurfaceVertexScalarQuantity::setEnabled, "Set enabled")
       .def("set_color_map", &ps::SurfaceVertexScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::SurfaceVertexScalarQuantity::setMapRange, "Set map range");
+      .def("set_map_range", &ps::SurfaceVertexScalarQuantity::setMapRange, "Set map range")
+      .def("set_isoline_width", &ps::SurfaceVertexScalarQuantity::setIsolineWidth, "Set isoline width");
   py::class_<ps::SurfaceFaceScalarQuantity>(m, "SurfaceFaceScalarQuantity")
       .def("set_enabled", &ps::SurfaceFaceScalarQuantity::setEnabled, "Set enabled")
       .def("set_color_map", &ps::SurfaceFaceScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::SurfaceFaceScalarQuantity::setMapRange, "Set map range");
+      .def("set_map_range", &ps::SurfaceFaceScalarQuantity::setMapRange, "Set map range")
+      .def("set_isoline_width", &ps::SurfaceFaceScalarQuantity::setIsolineWidth, "Set isoline width");
   py::class_<ps::SurfaceEdgeScalarQuantity>(m, "SurfaceEdgeScalarQuantity")
       .def("set_enabled", &ps::SurfaceEdgeScalarQuantity::setEnabled, "Set enabled")
       .def("set_color_map", &ps::SurfaceEdgeScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::SurfaceEdgeScalarQuantity::setMapRange, "Set map range");
+      .def("set_map_range", &ps::SurfaceEdgeScalarQuantity::setMapRange, "Set map range")
+      .def("set_isoline_width", &ps::SurfaceEdgeScalarQuantity::setIsolineWidth, "Set isoline width");
   py::class_<ps::SurfaceHalfedgeScalarQuantity>(m, "SurfaceHalfedgeScalarQuantity")
       .def("set_enabled", &ps::SurfaceHalfedgeScalarQuantity::setEnabled, "Set enabled")
       .def("set_color_map", &ps::SurfaceHalfedgeScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::SurfaceHalfedgeScalarQuantity::setMapRange, "Set map range");
+      .def("set_map_range", &ps::SurfaceHalfedgeScalarQuantity::setMapRange, "Set map range")
+      .def("set_isoline_width", &ps::SurfaceHalfedgeScalarQuantity::setIsolineWidth, "Set isoline width");
 
   // Color quantities
   py::class_<ps::SurfaceVertexColorQuantity>(m, "SurfaceVertexColorQuantity")
@@ -42,11 +46,11 @@ void bind_surface_mesh(py::module& m) {
       .def("set_enabled", &ps::SurfaceFaceColorQuantity::setEnabled, "Set enabled");
 
   // Distance quantities
-  py::class_<ps::SurfaceDistanceQuantity>(m, "SurfaceDistanceQuantity")
-      .def("set_enabled", &ps::SurfaceDistanceQuantity::setEnabled, "Set enabled")
-      .def("set_color_map", &ps::SurfaceDistanceQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::SurfaceDistanceQuantity::setMapRange, "Set map range")
-      .def("set_stripe_size", &ps::SurfaceDistanceQuantity::setStripeSize, "Set stripe size");
+  //py::class_<ps::SurfaceDistanceQuantity>(m, "SurfaceDistanceQuantity")
+      //.def("set_enabled", &ps::SurfaceDistanceQuantity::setEnabled, "Set enabled")
+      //.def("set_color_map", &ps::SurfaceDistanceQuantity::setColorMap, "Set color map")
+      //.def("set_map_range", &ps::SurfaceDistanceQuantity::setMapRange, "Set map range")
+      //.def("set_stripe_size", &ps::SurfaceDistanceQuantity::setStripeSize, "Set stripe size");
 
   // Parameterization quantities
   py::class_<ps::SurfaceCornerParameterizationQuantity>(m, "SurfaceCornerParameterizationQuantity")
