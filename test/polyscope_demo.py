@@ -7,11 +7,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../build/"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "../src/"))
 
 import polyscope
+import potpourri3d as pp3d
 
 import sys
 import argparse
 import numpy as np
-import meshio 
 
 def main():
 
@@ -24,10 +24,7 @@ def main():
     args = parser.parse_args()
 
     # Load a mesh argument
-    # verts, faces = igl.read_triangle_mesh(args.mesh)
-    m = meshio.read(args.mesh)
-    verts = m.points
-    faces = m.cells[0].data
+    verts, faces = pp3d.read_mesh(args.mesh)
 
 
     ### Polyscope things example
