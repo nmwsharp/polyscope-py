@@ -833,73 +833,82 @@ class TestVolumeMesh(unittest.TestCase):
         np.random.seed(777)        
         return np.random.rand(n_pts, 3)
     
-    def generate_cells(self, n_pts=10):
+    def generate_tets(self, n_pts=10):
         np.random.seed(777)        
         return np.random.randint(0, n_pts, size=(2*n_pts,4))
     
     def test_add_remove(self):
 
         # add
-        n = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
+        n = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
         self.assertTrue(ps.has_volume_mesh("test_mesh"))
         self.assertFalse(ps.has_volume_mesh("nope"))
         self.assertEqual(n.n_vertices(), 10)
         self.assertEqual(n.n_cells(), 20)
-        self.assertGreater(n.n_edges(), 1)
       
         # remove by name
-        ps.register_volume_mesh("test_mesh2", self.generate_verts(), self.generate_cells())
+        ps.register_volume_mesh("test_mesh2", self.generate_verts(), self.generate_tets())
         ps.remove_volume_mesh("test_mesh2")
         self.assertTrue(ps.has_volume_mesh("test_mesh"))
         self.assertFalse(ps.has_volume_mesh("test_mesh2"))
 
         # remove by ref
-        c = ps.register_volume_mesh("test_mesh2", self.generate_verts(), self.generate_cells())
+        c = ps.register_volume_mesh("test_mesh2", self.generate_verts(), self.generate_tets())
         c.remove()
         self.assertTrue(ps.has_volume_mesh("test_mesh"))
         self.assertFalse(ps.has_volume_mesh("test_mesh2"))
 
         # get by name
-        ps.register_volume_mesh("test_mesh3", self.generate_verts(), self.generate_cells())
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), self.generate_tets())
         p = ps.get_volume_mesh("test_mesh3") # should be wrapped instance, not underlying PSB instance
-        self.assertTrue(isinstance(p, ps.volumeMesh))
+        self.assertTrue(isinstance(p, ps.VolumeMesh))
 
         ps.remove_all_structures()
     
-    
-"""
-    def test_add_quad(self):
-
-        n_pts=10
-        faces = np.random.randint(0, n_pts, size=(2*n_pts,4))
-        ps.register_volume_mesh("test_mesh", self.generate_verts(), faces)
-        ps.show(3)
-        ps.remove_all_structures()
-    
-    def test_add_varied_degree(self):
-
-        n_pts = 10
-        n_face = 20
-        faces = []
-        for i in range(n_face):
-            faces.append([0,1,2,])
-            faces.append([0,1,2,4])
-            faces.append([0,1,2,4,5])
-
-        ps.register_volume_mesh("test_mesh", self.generate_verts(), faces)
-        ps.show(3)
-        ps.remove_all_structures()
-
     def test_render(self):
 
-        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
+        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_add_tet(self):
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), tets=self.generate_tets())
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_add_hex(self):
+        np.random.seed(777)
+        n_pts = 10
+        cells = np.random.randint(0, n_pts, size=(2*n_pts,8))
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), hexes=cells)
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_add_combined(self):
+        np.random.seed(777)
+        n_pts = 10
+        cells = np.random.randint(0, n_pts, size=(2*n_pts,8))
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), tets=self.generate_tets(), hexes=cells)
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_add_mixed(self):
+        np.random.seed(777)
+        n_pts = 10
+        cells = np.random.randint(0, n_pts, size=(2*n_pts,8))
+        cells[-5:,4:] = -1 # clear out some rows at end
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), mixed_cells=cells)
         ps.show(3)
         ps.remove_all_structures()
 
+        # test a few error cases
+        # cells = np.random.randint(0, n_pts, size=(2*n_pts,8))
+        # cells[-5:,4:] = -1 # clear out some rows at end
+        # ps.register_volume_mesh("test_mesh3", self.generate_verts(), hexes=self.generate_tets())
 
     def test_options(self):
 
-        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
+        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
 
         # Set enabled
         p.set_enabled()
@@ -913,6 +922,13 @@ class TestVolumeMesh(unittest.TestCase):
         ret_color = p.get_color()
         for i in range(3):
             self.assertAlmostEqual(ret_color[i], color[i])
+        
+        # Interior Color
+        color = (0.45, 0.85, 0.2)
+        p.set_interior_color(color)
+        ret_color = p.get_interior_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
 
         # Edge color
         color = (0.1, 0.5, 0.5)
@@ -921,13 +937,6 @@ class TestVolumeMesh(unittest.TestCase):
         for i in range(3):
             self.assertAlmostEqual(ret_color[i], color[i])
         
-        ps.show(3)
-
-        # Smooth shade
-        p.set_smooth_shade(True)
-        ps.show(3)
-        self.assertTrue(p.get_smooth_shade())
-        p.set_smooth_shade(False)
         ps.show(3)
 
         # Edge width 
@@ -941,16 +950,16 @@ class TestVolumeMesh(unittest.TestCase):
         p.set_material("clay")
       
         # Set with optional arguments 
-        p2 = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells(), 
+        p2 = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
-                    smooth_shade=True, edge_width=0.5)
+                    interior_color=(0.2, 0.2, 0.2), edge_width=0.5)
 
         ps.show(3)
         ps.remove_all_structures()
-    
+
     def test_update(self):
 
-        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
+        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
         ps.show(3)
 
         newPos = self.generate_verts() - 0.5
@@ -958,79 +967,17 @@ class TestVolumeMesh(unittest.TestCase):
 
         ps.show(3)
         ps.remove_all_structures()
-    
-    def test_2D(self):
-        np.random.seed(777)        
-        points2D = self.generate_verts()[:,:2]
 
-        p = ps.register_volume_mesh("test_mesh", points2D, self.generate_cells())
-        ps.show(3)
-
-        newPos = points2D - 0.5
-        p.update_vertex_positions(newPos)
-
-        ps.show(3)
-        ps.remove_all_structures()
-    
-    
-    def test_permutation(self):
-        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
-
-        p.set_vertex_permutation(np.random.permutation(p.n_vertices()))
-        p.set_vertex_permutation(np.random.permutation(p.n_vertices()), 3*p.n_vertices())
-
-        p.set_face_permutation(np.random.permutation(p.n_faces()))
-        p.set_face_permutation(np.random.permutation(p.n_faces()), 3*p.n_faces())
-        
-        p.set_edge_permutation(np.random.permutation(p.n_edges()))
-        p.set_edge_permutation(np.random.permutation(p.n_edges()), 3*p.n_edges())
-        
-        p.set_corner_permutation(np.random.permutation(p.n_corners()))
-        p.set_corner_permutation(np.random.permutation(p.n_corners()), 3*p.n_corners())
-        
-        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()))
-        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()), 3*p.n_halfedges())
-
-        p = ps.register_volume_mesh("test_mesh2", self.generate_verts(), self.generate_cells())
-
-        p.set_all_permutations(
-            vertex_perm=np.random.permutation(p.n_vertices()),
-            face_perm=np.random.permutation(p.n_faces()),
-            edge_perm=np.random.permutation(p.n_edges()),
-            corner_perm=np.random.permutation(p.n_corners()),
-            halfedge_perm=np.random.permutation(p.n_halfedges()),
-        )
-
-        ps.show(3)
-        ps.remove_all_structures()
-
-
-    def test_tangent_basis(self):
-        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
-
-        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3))
-        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 2))
-
-        p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 3))
-        p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 2))
-
-        ps.show(3)
-        ps.remove_all_structures()
-    
     def test_scalar(self):
-        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
+        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
         p = ps.get_volume_mesh("test_mesh")
 
-        for on in ['vertices', 'faces', 'edges', 'halfedges']:
+        for on in ['vertices', 'cells']:
        
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices())
-            elif on == 'faces':
-                vals = np.random.rand(p.n_faces())
-            elif on  == 'edges':
-                vals = np.random.rand(p.n_edges())
-            elif on  == 'halfedges':
-                vals = np.random.rand(p.n_halfedges())
+            elif on  == 'cells':
+                vals = np.random.rand(p.n_cells())
 
             p.add_scalar_quantity("test_vals", vals, defined_on=on)
             p.add_scalar_quantity("test_vals2", vals, defined_on=on, enabled=True)
@@ -1048,16 +995,17 @@ class TestVolumeMesh(unittest.TestCase):
 
         ps.remove_all_structures()
     
+    
     def test_color(self):
-        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
+        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
         p = ps.get_volume_mesh("test_mesh")
 
-        for on in ['vertices', 'faces']:
+        for on in ['vertices', 'cells']:
        
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices(), 3)
-            elif on == 'faces':
-                vals = np.random.rand(p.n_faces(), 3)
+            elif on == 'cells':
+                vals = np.random.rand(p.n_cells(), 3)
        
 
             p.add_color_quantity("test_vals", vals, defined_on=on)
@@ -1068,78 +1016,18 @@ class TestVolumeMesh(unittest.TestCase):
         
         ps.remove_all_structures()
     
-    
-    def test_distance(self):
-        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
-        p = ps.get_volume_mesh("test_mesh")
 
-        for on in ['vertices']:
-       
-            if on == 'vertices':
-                vals = np.random.rand(p.n_vertices())
-
-            p.add_distance_quantity("test_vals", vals, defined_on=on)
-            p.add_distance_quantity("test_vals2", vals, defined_on=on, enabled=True)
-            p.add_distance_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
-            p.add_distance_quantity("test_vals_with_signed", vals, defined_on=on, enabled=True, signed=True)
-            p.add_distance_quantity("test_vals_with_unsigned", vals, defined_on=on, enabled=True, signed=False)
-            p.add_distance_quantity("test_vals_with_stripe", vals, defined_on=on, enabled=True, stripe_size=0.01)
-            p.add_distance_quantity("test_vals_with_stripe_reltrue", vals, defined_on=on, enabled=True, stripe_size=0.01, stripe_size_relative=True)
-            p.add_distance_quantity("test_vals_with_stripe_relfalse", vals, defined_on=on, enabled=True, stripe_size=0.01, stripe_size_relative=False)
-
-            ps.show(3)
-
-            p.remove_all_quantities()
-
-        ps.remove_all_structures()
-
-    def test_parameterization(self):
-
-        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
-        p = ps.get_volume_mesh("test_mesh")
-
-        for on in ['vertices', 'corners']:
-       
-            if on == 'vertices':
-                vals = np.random.rand(p.n_vertices(), 2)
-            elif on == 'corners':
-                vals = np.random.rand(p.n_corners(), 2)
-
-            cA = (0.1, 0.2, 0.3)
-            cB = (0.4, 0.5, 0.6)
-
-            p.add_parameterization_quantity("test_vals1", vals, defined_on=on, enabled=True)
-
-            p.add_parameterization_quantity("test_vals2", vals, defined_on=on, coords_type='world')
-            p.add_parameterization_quantity("test_vals3", vals, defined_on=on, coords_type='unit')
-
-            p.add_parameterization_quantity("test_vals4", vals, defined_on=on, viz_style='checker')
-            p.add_parameterization_quantity("test_vals5", vals, defined_on=on, viz_style='grid')
-            p.add_parameterization_quantity("test_vals6", vals, defined_on=on, viz_style='local_check')
-            p.add_parameterization_quantity("test_vals7", vals, defined_on=on, viz_style='local_rad')
-
-            p.add_parameterization_quantity("test_vals8", vals, defined_on=on, grid_colors=(cA, cB))
-            p.add_parameterization_quantity("test_vals9", vals, defined_on=on, checker_colors=(cA, cB))
-            p.add_parameterization_quantity("test_vals10", vals, defined_on=on, checker_size=0.1)
-            p.add_parameterization_quantity("test_vals11", vals, defined_on=on, cmap='blues')
-
-            ps.show(3)
-
-            p.remove_all_quantities()
-
-        ps.remove_all_structures()
-    
     def test_vector(self):
 
-        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_cells())
+        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
         p = ps.get_volume_mesh("test_mesh")
         
-        for on in ['vertices', 'faces']:
+        for on in ['vertices', 'cells']:
        
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices(),3)
-            elif on  == 'faces':
-                vals = np.random.rand(p.n_faces(), 3)
+            elif on  == 'cells':
+                vals = np.random.rand(p.n_cells(), 3)
 
             p.add_vector_quantity("test_vals1", vals, defined_on=on)
             p.add_vector_quantity("test_vals2", vals, defined_on=on, enabled=True)
@@ -1147,15 +1035,11 @@ class TestVolumeMesh(unittest.TestCase):
             p.add_vector_quantity("test_vals4", vals, defined_on=on, enabled=True, length=0.005)
             p.add_vector_quantity("test_vals5", vals, defined_on=on, enabled=True, radius=0.001)
             p.add_vector_quantity("test_vals6", vals, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
-            
-            # 2D 
-            p.add_vector_quantity("test_vals7", vals[:,:2], defined_on=on, enabled=True, radius=0.001)
 
             ps.show(3)
             p.remove_all_quantities()
         
         ps.remove_all_structures()
-"""
 
 if __name__ == '__main__':
 

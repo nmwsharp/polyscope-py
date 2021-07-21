@@ -42,7 +42,6 @@ void bind_volume_mesh(py::module& m) {
       .def("update_vertex_positions", &ps::VolumeMesh::updateVertexPositions<Eigen::MatrixXd>,
            "Update vertex positions")
       .def("n_vertices", &ps::VolumeMesh::nVertices, "# vertices")
-      .def("n_edges", &ps::VolumeMesh::nEdges, "# edges")
       .def("n_faces", &ps::VolumeMesh::nFaces, "# faces")
       .def("n_cells", &ps::VolumeMesh::nCells, "# cells")
 

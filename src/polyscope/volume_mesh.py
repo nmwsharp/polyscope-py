@@ -31,7 +31,7 @@ class VolumeMesh:
             else:
                 if tets is None:
                     self.bound_mesh = psb.register_hex_mesh(name, vertices, hexes)
-                else if hexes is None:
+                elif hexes is None:
                     self.bound_mesh = psb.register_tet_mesh(name, vertices, tets)
                 else:
                     self.bound_mesh = psb.register_tet_hex_mesh(name, vertices, tets, hexes)
@@ -43,7 +43,7 @@ class VolumeMesh:
         if points is None:
             raise ValueError("must specify volume mesh vertex positions")
         
-        if len(points.shape) !points.shape[1] != 3:
+        if len(points.shape) !=2 or points.shape[1] != 3:
             raise ValueError("volume mesh vertex positions should have shape (N,3); shape is " + str(points.shape))
 
     def check_index_array(self, arr, dim, name):
@@ -59,13 +59,11 @@ class VolumeMesh:
 
         # check the dimension
         if (len(arr.shape) != 2) or (arr.shape[1] != dim):
-            raise ValueError("volume mesh {} array should have shape (N,{}); shape is {}".format(name, dim, str(points.shape)))
+            raise ValueError("volume mesh {} array should have shape (N,{}); shape is {}".format(name, dim, str(arr.shape)))
 
 
     def n_vertices(self):
         return self.bound_mesh.n_vertices()
-    def n_edges(self):
-        return self.bound_mesh.n_edges()
     def n_faces(self):
         return self.bound_mesh.n_faces()
     def n_cells(self):
@@ -215,8 +213,6 @@ def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None
         p.set_edge_color(edge_color)
     if edge_width is not None:
         p.set_edge_width(edge_width)
-    if smooth_shade is not None:
-        p.set_smooth_shade(smooth_shade)
     if material is not None:
         p.set_material(material)
 
