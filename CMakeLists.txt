@@ -16,6 +16,7 @@ pybind11_add_module(polyscope_bindings
   src/cpp/surface_mesh.cpp
   src/cpp/point_cloud.cpp
   src/cpp/curve_network.cpp
+  src/cpp/volume_mesh.cpp
 )
 
 target_include_directories(polyscope_bindings PUBLIC "${EIGEN3_INCLUDE_DIR}")
