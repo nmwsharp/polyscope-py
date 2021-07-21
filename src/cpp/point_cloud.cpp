@@ -7,6 +7,8 @@
 #include "polyscope/point_cloud.h"
 #include "polyscope/polyscope.h"
 
+#include "utils.h"
+
 namespace py = pybind11;
 namespace ps = polyscope;
 
@@ -14,20 +16,19 @@ namespace ps = polyscope;
 // clang-format off
 void bind_point_cloud(py::module& m) {
 
-  // Helper quantity classes
-  py::class_<ps::PointCloudColorQuantity>(m, "PointCloudColorQuantity")
-    .def("set_enabled", &ps::PointCloudColorQuantity::setEnabled, "Set enabled");
-  py::class_<ps::PointCloudScalarQuantity>(m, "PointCloudScalarQuantity")
-    .def("set_enabled", &ps::PointCloudScalarQuantity::setEnabled, "Set enabled")
-    .def("set_color_map", &ps::PointCloudScalarQuantity::setColorMap, "Set color map")
-    .def("set_map_range", &ps::PointCloudScalarQuantity::setMapRange, "Set map range");
-  py::class_<ps::PointCloudVectorQuantity>(m, "PointCloudVectorQuantity")
-    .def("set_enabled", &ps::PointCloudVectorQuantity::setEnabled, "Set enabled")
-    .def("set_length", &ps::PointCloudVectorQuantity::setVectorLengthScale, "Set length")
-    .def("set_radius", &ps::PointCloudVectorQuantity::setVectorRadius, "Set radius")
-    .def("set_color", &ps::PointCloudVectorQuantity::setVectorColor, "Set color");
+  // == Helper quantity classes
 
-  // Main class, with adder methods
+  // Scalar quantities
+  bindScalarQuantity<ps::PointCloudScalarQuantity>(m, "PointCloudScalarQuantity");
+
+  // Color quantities
+  bindColorQuantity<ps::PointCloudColorQuantity>(m, "PointCloudColorQuantity");
+
+  // Vector quantities
+  bindVectorQuantity<ps::PointCloudVectorQuantity>(m, "PointCloudVectorQuantity");
+
+
+  // == Main class
   py::class_<ps::PointCloud>(m, "PointCloud")
 
     // basics

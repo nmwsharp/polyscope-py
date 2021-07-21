@@ -8,6 +8,8 @@
 #include "polyscope/polyscope.h"
 #include "polyscope/volume_mesh.h"
 
+#include "utils.h"
+
 namespace py = pybind11;
 namespace ps = polyscope;
 
@@ -17,34 +19,16 @@ void bind_volume_mesh(py::module& m) {
   // == Helper quantity classes
 
   // Scalar quantities
-  py::class_<ps::VolumeMeshVertexScalarQuantity>(m, "VolumeMeshVertexScalarQuantity")
-      .def("set_enabled", &ps::VolumeMeshVertexScalarQuantity::setEnabled, "Set enabled")
-      .def("set_color_map", &ps::VolumeMeshVertexScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::VolumeMeshVertexScalarQuantity::setMapRange, "Set map range")
-      .def("set_isoline_width", &ps::VolumeMeshVertexScalarQuantity::setIsolineWidth, "Set isoline width");
-  py::class_<ps::VolumeMeshCellScalarQuantity>(m, "VolumeMeshCellScalarQuantity")
-      .def("set_enabled", &ps::VolumeMeshCellScalarQuantity::setEnabled, "Set enabled")
-      .def("set_color_map", &ps::VolumeMeshCellScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::VolumeMeshCellScalarQuantity::setMapRange, "Set map range")
-      .def("set_isoline_width", &ps::VolumeMeshCellScalarQuantity::setIsolineWidth, "Set isoline width");
+  bindScalarQuantity<ps::VolumeMeshVertexScalarQuantity>(m, "VolumeMeshVertexScalarQuantity");
+  bindScalarQuantity<ps::VolumeMeshCellScalarQuantity>(m, "VolumeMeshCellScalarQuantity");
 
   // Color quantities
-  py::class_<ps::VolumeMeshVertexColorQuantity>(m, "VolumeMeshVertexColorQuantity")
-      .def("set_enabled", &ps::VolumeMeshVertexColorQuantity::setEnabled, "Set enabled");
-  py::class_<ps::VolumeMeshCellColorQuantity>(m, "VolumeMeshCellColorQuantity")
-      .def("set_enabled", &ps::VolumeMeshCellColorQuantity::setEnabled, "Set enabled");
+  bindColorQuantity<ps::VolumeMeshVertexColorQuantity>(m, "VolumeMeshVertexColorQuantity");
+  bindColorQuantity<ps::VolumeMeshCellColorQuantity>(m, "VolumeMeshCellColorQuantity");
 
   // Vector quantities
-  py::class_<ps::VolumeMeshVertexVectorQuantity>(m, "VolumeMeshVertexVectorQuantity")
-      .def("set_enabled", &ps::VolumeMeshVertexVectorQuantity::setEnabled, "Set enabled")
-      .def("set_length", &ps::VolumeMeshVertexVectorQuantity::setVectorLengthScale, "Set length")
-      .def("set_radius", &ps::VolumeMeshVertexVectorQuantity::setVectorRadius, "Set radius")
-      .def("set_color", &ps::VolumeMeshVertexVectorQuantity::setVectorColor, "Set color");
-  py::class_<ps::VolumeMeshCellVectorQuantity>(m, "VolumeMeshCellVectorQuantity")
-      .def("set_enabled", &ps::VolumeMeshCellVectorQuantity::setEnabled, "Set enabled")
-      .def("set_length", &ps::VolumeMeshCellVectorQuantity::setVectorLengthScale, "Set length")
-      .def("set_radius", &ps::VolumeMeshCellVectorQuantity::setVectorRadius, "Set radius")
-      .def("set_color", &ps::VolumeMeshCellVectorQuantity::setVectorColor, "Set color");
+  bindVectorQuantity<ps::VolumeMeshVertexVectorQuantity>(m, "VolumeMeshVertexVectorQuantity");
+  bindVectorQuantity<ps::VolumeMeshCellVectorQuantity>(m, "VolumeMeshCellVectorQuantity");
 
   // == Main class
   py::class_<ps::VolumeMesh>(m, "VolumeMesh")
@@ -100,16 +84,19 @@ void bind_volume_mesh(py::module& m) {
 
   // Static adders and getters
   m.def("register_tet_mesh", &ps::registerTetMesh<Eigen::MatrixXd, Eigen::MatrixXi>, py::arg("name"),
-        py::arg("vertices"), py::arg("tets"), "Register a volume mesh of tet cells", py::return_value_policy::reference);
+        py::arg("vertices"), py::arg("tets"), "Register a volume mesh of tet cells",
+        py::return_value_policy::reference);
   m.def("register_hex_mesh", &ps::registerHexMesh<Eigen::MatrixXd, Eigen::MatrixXi>, py::arg("name"),
-        py::arg("vertices"), py::arg("hexes"), "Register a volume mesh of hex cells", py::return_value_policy::reference);
+        py::arg("vertices"), py::arg("hexes"), "Register a volume mesh of hex cells",
+        py::return_value_policy::reference);
   m.def("register_volume_mesh", &ps::registerVolumeMesh<Eigen::MatrixXd, Eigen::MatrixXi>, py::arg("name"),
-        py::arg("vertices"), py::arg("cells"), "Register a volume mesh with a mix of element types", py::return_value_policy::reference);
-  m.def("register_tet_hex_mesh", &ps::registerTetHexMesh<Eigen::MatrixXd, Eigen::MatrixXi, Eigen::MatrixXi>, py::arg("name"),
-        py::arg("vertices"), py::arg("tets"), py::arg("hexes"), "Register a volume mesh with lists of tet and hex elements", py::return_value_policy::reference);
+        py::arg("vertices"), py::arg("cells"), "Register a volume mesh with a mix of element types",
+        py::return_value_policy::reference);
+  m.def("register_tet_hex_mesh", &ps::registerTetHexMesh<Eigen::MatrixXd, Eigen::MatrixXi, Eigen::MatrixXi>,
+        py::arg("name"), py::arg("vertices"), py::arg("tets"), py::arg("hexes"),
+        "Register a volume mesh with lists of tet and hex elements", py::return_value_policy::reference);
 
   m.def("remove_volume_mesh", &polyscope::removeVolumeMesh, "Remove a volume mesh by name");
-  m.def("get_volume_mesh", &polyscope::getVolumeMesh, "Get a volume mesh by name",
-        py::return_value_policy::reference);
+  m.def("get_volume_mesh", &polyscope::getVolumeMesh, "Get a volume mesh by name", py::return_value_policy::reference);
   m.def("has_volume_mesh", &polyscope::hasVolumeMesh, "Check for a volume mesh by name");
 }
