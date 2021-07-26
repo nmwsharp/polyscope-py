@@ -12,6 +12,10 @@
 namespace py = pybind11;
 namespace ps = polyscope;
 
+// For overloaded functions, with C++11 compiler only
+template <typename... Args>
+using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
+
 
 // clang-format off
 void bind_point_cloud(py::module& m) {
@@ -49,6 +53,15 @@ void bind_point_cloud(py::module& m) {
     .def("set_material", &ps::PointCloud::setMaterial, "Set material")
     .def("get_material", &ps::PointCloud::getMaterial, "Get material")
 
+    // variable radius
+    .def("set_point_radius_quantity", 
+        overload_cast_<ps::PointCloudScalarQuantity*, bool>()(&ps::PointCloud::setPointRadiusQuantity), 
+        "Use a scalar to set radius", py::arg("quantity"), py::arg("autoscale")=true)
+    .def("set_point_radius_quantity", 
+        overload_cast_<std::string, bool>()(&ps::PointCloud::setPointRadiusQuantity), 
+        "Use a scalar to set radius by name", py::arg("quantity_name"), py::arg("autoscale")=true)
+    .def("clear_point_radius_quantity", &ps::PointCloud::clearPointRadiusQuantity, "Clear any quantity setting the radius")
+        
     // quantities
     .def("add_color_quantity", &ps::PointCloud::addColorQuantity<Eigen::MatrixXd>, "Add a color function at points",
         py::arg("name"), py::arg("values"), py::return_value_policy::reference)

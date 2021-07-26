@@ -256,6 +256,25 @@ class TestPointCloud(unittest.TestCase):
         p.remove_all_quantities()
         ps.remove_all_structures()
     
+
+    def test_variable_radius(self):
+        pts = self.generate_points()
+        N = pts.shape[0]
+        ps.register_point_cloud("test_cloud", pts)
+        p = ps.get_point_cloud("test_cloud")
+        vals = np.random.rand(N)
+
+        p.add_scalar_quantity("test_vals", vals)
+
+        p.set_point_radius_quantity("test_vals")
+        ps.show(3)
+        p.clear_point_radius_quantity()
+        ps.show(3)
+        p.set_point_radius_quantity("test_vals", False)
+        ps.show(3)
+
+        ps.remove_all_structures()
+    
 class TestCurveNetwork(unittest.TestCase):
 
     def generate_points(self, n_pts=10):

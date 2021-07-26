@@ -65,6 +65,12 @@ class PointCloud:
         else:
             raise ValueError("bad point cloud shape")
 
+    def set_point_radius_quantity(self, quantity_name, autoscale=True):
+        self.bound_cloud.set_point_radius_quantity(quantity_name, autoscale)
+    
+    def clear_point_radius_quantity(self):
+        self.bound_cloud.clear_point_radius_quantity()
+
     ## Options
    
     # Point radius
