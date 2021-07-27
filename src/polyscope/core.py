@@ -91,6 +91,18 @@ def error(message):
 def terminating_error(message):
     psb.terminating_error(message)
 
+## Ground plane and shadows
+def set_ground_plane_mode(x):
+    psb.set_ground_plane_mode(str_to_ground_plane_mode(x))
+
+def set_ground_plane_height_factor(x, is_relative=True):
+    psb.set_ground_plane_height_factor(x, is_relative)
+
+def set_shadow_blur_iters(x):
+    psb.set_shadow_blur_iters(x)
+
+def set_shadow_darkness(x):
+    psb.set_shadow_darkness(x)
 
 ## Small utilities
 def glm3(vals):
@@ -224,6 +236,21 @@ def back_face_policy_to_str(s):
 
     if s not in d:
         raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+  
+
+def str_to_ground_plane_mode(s):
+    d = {
+        "none": psb.GroundPlaneMode.none,
+        "tile" : psb.GroundPlaneMode.tile,
+        "tile_reflection" : psb.GroundPlaneMode.tile_reflection,
+        "shadow_only" : psb.GroundPlaneMode.shadow_only
+    }
+
+    if s not in d:
+        raise ValueError("Bad ground plane mode specifier '{}', should be one of [{}]".format(s, 
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]

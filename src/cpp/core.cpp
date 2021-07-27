@@ -72,6 +72,12 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("error", ps::error, "Send an error message");
   m.def("terminating_error", ps::terminatingError, "Send a terminating error message");
   
+  // === Ground plane and shadows
+  m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });
+  m.def("set_ground_plane_height_factor", [](float x, bool isRelative) { ps::options::groundPlaneHeightFactor.set(x, isRelative); });
+  m.def("set_shadow_blur_iters", [](int x) { ps::options::shadowBlurIters = x; });
+  m.def("set_shadow_darkness", [](float x) { ps::options::shadowDarkness = x; });
+  
   // === Materials
   m.def("load_static_material", ps::loadStaticMaterial, "Load a static material");
   m.def("load_blendable_material_explicit", overload_cast_<std::string, std::array<std::string,4>>()(&ps::loadBlendableMaterial), 
@@ -127,6 +133,13 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("identical", ps::BackFacePolicy::Identical)
     .value("different", ps::BackFacePolicy::Different)
     .value("cull", ps::BackFacePolicy::Cull)
+    .export_values(); 
+  
+  py::enum_<ps::GroundPlaneMode>(m, "GroundPlaneMode")
+    .value("none", ps::GroundPlaneMode::None)
+    .value("tile", ps::GroundPlaneMode::Tile)
+    .value("tile_reflection", ps::GroundPlaneMode::TileReflection)
+    .value("shadow_only", ps::GroundPlaneMode::ShadowOnly)
     .export_values(); 
 
   // === Mini bindings for a little bit of glm

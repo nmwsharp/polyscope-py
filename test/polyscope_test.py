@@ -55,6 +55,21 @@ class TestCore(unittest.TestCase):
         ps.set_up_dir("z_up")
         
         ps.show(3)
+    
+    def test_ground_options(self):
+
+        ps.set_ground_plane_mode("none")
+        ps.set_ground_plane_mode("tile")
+        ps.set_ground_plane_mode("tile_reflection")
+        ps.set_ground_plane_mode("shadow_only")
+
+        ps.set_ground_plane_height_factor(1.5, is_relative=False)
+        ps.set_ground_plane_height_factor(0.)
+        
+        ps.set_shadow_blur_iters(3)
+        ps.set_shadow_darkness(0.1)
+        
+        ps.show(3)
 
     def test_screenshot(self):
 
@@ -590,6 +605,9 @@ class TestSurfaceMesh(unittest.TestCase):
         p2 = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
                     smooth_shade=True, edge_width=0.5, back_face_policy="cull")
+        
+        # Make sure shadows work
+        ps.set_ground_plane_mode("shadow_only")
 
         ps.show(3)
         ps.remove_all_structures()

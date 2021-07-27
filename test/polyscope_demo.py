@@ -32,6 +32,7 @@ def main():
     # Always initialize exactly once
     polyscope.init() 
 
+    polyscope.set_ground_plane_mode("shadow_only")
 
     ## Examples with a mesh
     if True:
