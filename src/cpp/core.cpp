@@ -123,6 +123,11 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("local_rad", ps::ParamVizStyle::LOCAL_RAD)
     .export_values(); 
 
+  py::enum_<ps::BackFacePolicy>(m, "BackFacePolicy")
+    .value("identical", ps::BackFacePolicy::Identical)
+    .value("different", ps::BackFacePolicy::Different)
+    .value("cull", ps::BackFacePolicy::Cull)
+    .export_values(); 
 
   // === Mini bindings for a little bit of glm
   py::class_<glm::vec3>(m, "glm_vec3").

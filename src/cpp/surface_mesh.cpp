@@ -86,6 +86,8 @@ void bind_surface_mesh(py::module& m) {
       .def("get_smooth_shade", &ps::SurfaceMesh::isSmoothShade, "Get if smooth shading is enabled")
       .def("set_material", &ps::SurfaceMesh::setMaterial, "Set material")
       .def("get_material", &ps::SurfaceMesh::getMaterial, "Get material")
+      .def("set_back_face_policy", &ps::SurfaceMesh::setBackFacePolicy, "Set back face policy")
+      .def("get_back_face_policy", &ps::SurfaceMesh::getBackFacePolicy, "Get back face policy")
 
       // permutations & bases
       .def("set_vertex_permutation", &ps::SurfaceMesh::setVertexPermutation<Eigen::VectorXi>, "Set vertex permutation")

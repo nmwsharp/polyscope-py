@@ -172,6 +172,7 @@ class TestPointCloud(unittest.TestCase):
         
         p2 = ps.register_point_cloud("test_cloud2", self.generate_points(),
                 enabled=True, material='wax', radius=0.03, color=(1., 0., 0.))
+                
 
         ps.show(3)
         ps.remove_all_structures()
@@ -578,11 +579,17 @@ class TestSurfaceMesh(unittest.TestCase):
         p.set_material("candy")
         self.assertEqual("candy", p.get_material())
         p.set_material("clay")
+        
+        # Back face policy
+        p.set_back_face_policy("different")
+        self.assertEqual("different", p.get_back_face_policy())
+        p.set_back_face_policy("cull")
+        
       
         # Set with optional arguments 
         p2 = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
-                    smooth_shade=True, edge_width=0.5)
+                    smooth_shade=True, edge_width=0.5, back_face_policy="cull")
 
         ps.show(3)
         ps.remove_all_structures()

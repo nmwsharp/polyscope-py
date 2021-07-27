@@ -201,3 +201,29 @@ def str_to_param_viz_style(s):
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]
+
+def str_to_back_face_policy(s):
+    d = {
+        "identical" : psb.BackFacePolicy.identical,
+        "different" : psb.BackFacePolicy.different,
+        "cull" : psb.BackFacePolicy.cull,
+    }
+
+    if s not in d:
+        raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def back_face_policy_to_str(s):
+    d = {
+        psb.BackFacePolicy.identical : "identical" ,
+        psb.BackFacePolicy.different : "different" ,
+        psb.BackFacePolicy.cull : "cull" 
+    }
+
+    if s not in d:
+        raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]

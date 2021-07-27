@@ -1,7 +1,9 @@
 import polyscope_bindings as psb
 import numpy as np
 
-from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3
+from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type,            \
+                           str_to_param_viz_style, str_to_back_face_policy, back_face_policy_to_str,\
+                           glm3
 
 class SurfaceMesh:
 
@@ -124,6 +126,11 @@ class SurfaceMesh:
     def get_material(self):
         return self.bound_mesh.get_material()
 
+    # Color
+    def set_back_face_policy(self, val):
+        self.bound_mesh.set_back_face_policy(str_to_back_face_policy(val))
+    def get_back_face_policy(self):
+        return back_face_policy_to_str(self.bound_mesh.get_back_face_policy())
 
     ## Permutations and bases
 
@@ -384,7 +391,7 @@ class SurfaceMesh:
 
 
 def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_color=None, smooth_shade=None, 
-                          edge_width=None, material=None):
+                          edge_width=None, material=None, back_face_policy=None):
     """Register a new surface mesh"""
 
     p = SurfaceMesh(name, vertices, faces)
@@ -402,6 +409,8 @@ def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_
         p.set_smooth_shade(smooth_shade)
     if material is not None:
         p.set_material(material)
+    if back_face_policy is not None:
+        p.set_back_face_policy(back_face_policy)
 
     return p
 
