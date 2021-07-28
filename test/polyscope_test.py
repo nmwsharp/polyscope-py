@@ -39,6 +39,8 @@ class TestCore(unittest.TestCase):
         ps.set_use_prefs_file(True)
         ps.set_always_redraw(False)
         
+        ps.set_enable_render_error_checks(True)
+        
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
         
@@ -53,6 +55,18 @@ class TestCore(unittest.TestCase):
         ps.set_up_dir("x_up")
         ps.set_up_dir("y_up")
         ps.set_up_dir("z_up")
+        
+        ps.show(3)
+    
+    def test_camera_movement(self):
+
+        ps.reset_camera_to_home_view()
+       
+        ps.look_at((0., 0., 5.), (1., 1., 1.))
+        ps.look_at(np.array((0., 0., 5.)), (1., 1., 1.), fly_to=True)
+        
+        ps.look_at_dir((0., 0., 5.), (1., 1., 1.), (-1., -1., 0.))
+        ps.look_at_dir((0., 0., 5.), (1., 1., 1.), np.array((-1., -1., 0.)), fly_to=True)
         
         ps.show(3)
     

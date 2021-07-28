@@ -36,7 +36,7 @@ def main():
 
     ## Examples with a mesh
     if True:
-        ps_mesh = polyscope.register_surface_mesh("test mesh", verts, faces, enabled=False)
+        ps_mesh = polyscope.register_surface_mesh("test mesh", verts, faces, enabled=True)
 
         # Scalar functions
         ps_mesh.add_scalar_quantity("X", verts[:,0])

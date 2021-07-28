@@ -57,13 +57,20 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_errors_throw_exceptions", [](bool x) { ps::options::errorsThrowExceptions = x; });
   m.def("set_use_prefs_file", [](bool x) { ps::options::usePrefsFile = x; });
   m.def("set_always_redraw", [](bool x) { ps::options::alwaysRedraw = x; });
+  m.def("set_enable_render_error_checks", [](bool x) { ps::options::enableRenderErrorChecks = x; });
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
   m.def("set_autoscale_structures", [](bool x) { ps::options::autoscaleStructures = x; });
   m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
-  m.def("set_up_dir", [](ps::view::UpDir x) { 
-      ps::view::setUpDir(x); 
-  });
+  m.def("set_up_dir", [](ps::view::UpDir x) { ps::view::setUpDir(x); });
+
+  // === Camera controls
   m.def("reset_camera_to_home_view", ps::view::resetCameraToHomeView);
+  m.def("look_at", [](glm::vec3 location, glm::vec3 target, bool flyTo) { 
+      ps::view::lookAt(location, target, flyTo); 
+  });
+  m.def("look_at_dir", [](glm::vec3 location, glm::vec3 target, glm::vec3 upDir, bool flyTo) { 
+      ps::view::lookAt(location, target, upDir, flyTo); 
+  });
 
   
   // === Messages

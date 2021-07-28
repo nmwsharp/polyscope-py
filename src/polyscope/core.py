@@ -62,6 +62,9 @@ def set_use_prefs_file(v):
 def set_always_redraw(v):
     psb.set_always_redraw(v)
 
+def set_enable_render_error_checks(b):
+    psb.set_enable_render_error_checks(b)
+
 def set_autocenter_structures(b):
     psb.set_autocenter_structures(b)
 
@@ -74,8 +77,16 @@ def set_navigation_style(s):
 def set_up_dir(d):
     psb.set_up_dir(str_to_updir(d))
 
+### Camera controls
+
 def reset_camera_to_home_view():
     psb.reset_camera_to_home_view()
+
+def look_at(camera_location, target, fly_to=False):
+    psb.look_at(glm3(camera_location), glm3(target), fly_to)
+
+def look_at_dir(camera_location, target, up_dir, fly_to=False):
+    psb.look_at_dir(glm3(camera_location), glm3(target), glm3(up_dir), fly_to)
 
 ### Messages
 
