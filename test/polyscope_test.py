@@ -53,11 +53,16 @@ class TestCore(unittest.TestCase):
         ps.set_navigation_style("planar")
 
         ps.set_up_dir("x_up")
+        ps.set_up_dir("neg_x_up")
         ps.set_up_dir("y_up")
+        ps.set_up_dir("neg_y_up")
         ps.set_up_dir("z_up")
+        ps.set_up_dir("neg_z_up")
         
         ps.show(3)
     
+        ps.set_up_dir("y_up")
+
     def test_camera_movement(self):
 
         ps.reset_camera_to_home_view()

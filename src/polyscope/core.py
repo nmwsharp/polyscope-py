@@ -175,8 +175,11 @@ def str_to_navigate_style(s):
 def str_to_updir(s):
     d = {
         "x_up" : psb.UpDir.x_up,
+        "neg_x_up" : psb.UpDir.neg_x_up,
         "y_up" : psb.UpDir.y_up,
+        "neg_y_up" : psb.UpDir.neg_y_up,
         "z_up" : psb.UpDir.z_up,
+        "neg_z_up" : psb.UpDir.neg_z_up,
     }
 
     if s not in d:
