@@ -104,6 +104,17 @@ def set_shadow_blur_iters(n):
 def set_shadow_darkness(val):
     psb.set_shadow_darkness(val)
 
+## Ground plane and shadows
+def set_transparency_mode(mode_str):
+    psb.set_transparency_mode(str_to_transparency_mode(mode_str))
+
+def set_transparency_render_passes(n):
+    psb.set_transparency_render_passes(n)
+
+## Rendering
+def set_SSAA_factor(n):
+    psb.set_SSAA_factor(n)
+
 ## Small utilities
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])
@@ -251,6 +262,19 @@ def str_to_ground_plane_mode(s):
 
     if s not in d:
         raise ValueError("Bad ground plane mode specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def str_to_transparency_mode(s):
+    d = {
+        "none": psb.TransparencyMode.none,
+        "simple" : psb.TransparencyMode.simple,
+        "pretty" : psb.TransparencyMode.pretty,
+    }
+
+    if s not in d:
+        raise ValueError("Bad transparenccy mode specifier '{}', should be one of [{}]".format(s, 
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]

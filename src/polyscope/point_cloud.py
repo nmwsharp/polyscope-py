@@ -53,6 +53,12 @@ class PointCloud:
         self.bound_cloud.set_enabled(val)
     def is_enabled(self):
         return self.bound_cloud.is_enabled()
+    
+    # Transparency
+    def set_transparency(self, val):
+        self.bound_cloud.set_transparency(val)
+    def get_transparency(self):
+        return self.bound_cloud.get_transparency()
 
     # Update
     def update_point_positions(self, points):
@@ -140,7 +146,7 @@ class PointCloud:
             q.set_color(glm3(color))
 
 
-def register_point_cloud(name, points, enabled=None, radius=None, color=None, material=None):
+def register_point_cloud(name, points, enabled=None, radius=None, color=None, material=None, transparency=None):
     """Register a new point cloud"""
 
     p = PointCloud(name, points)
@@ -154,6 +160,8 @@ def register_point_cloud(name, points, enabled=None, radius=None, color=None, ma
         p.set_color(color)
     if material is not None:
         p.set_material(material)
+    if transparency is not None:
+        p.set_transparency(transparency)
 
     return p
 

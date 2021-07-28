@@ -78,6 +78,10 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_shadow_blur_iters", [](int x) { ps::options::shadowBlurIters = x; });
   m.def("set_shadow_darkness", [](float x) { ps::options::shadowDarkness = x; });
   
+  // === Transparency
+  m.def("set_transparency_mode", [](ps::TransparencyMode x) { ps::options::transparencyMode = x; });
+  m.def("set_transparency_render_passes", [](int n) { ps::options::transparencyRenderPasses = n; });
+  
   // === Materials
   m.def("load_static_material", ps::loadStaticMaterial, "Load a static material");
   m.def("load_blendable_material_explicit", overload_cast_<std::string, std::array<std::string,4>>()(&ps::loadBlendableMaterial), 
@@ -87,8 +91,12 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Colormaps
   m.def("load_color_map", ps::loadColorMap, "Load a color map from file");
+  
+  // === Rendering
+  m.def("load_color_map", ps::loadColorMap, "Load a color map from file");
 
   // === Enums
+  m.def("set_SSAA_factor", [](int n) { ps::options::ssaaFactor = n; });
   
   py::enum_<ps::view::NavigateStyle>(m, "NavigateStyle")
     .value("turntable", ps::view::NavigateStyle::Turntable)
@@ -140,6 +148,12 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("tile", ps::GroundPlaneMode::Tile)
     .value("tile_reflection", ps::GroundPlaneMode::TileReflection)
     .value("shadow_only", ps::GroundPlaneMode::ShadowOnly)
+    .export_values(); 
+  
+  py::enum_<ps::TransparencyMode>(m, "TransparencyMode")
+    .value("none", ps::TransparencyMode::None)
+    .value("simple", ps::TransparencyMode::Simple)
+    .value("pretty", ps::TransparencyMode::Pretty)
     .export_values(); 
 
   // === Mini bindings for a little bit of glm

@@ -70,6 +70,24 @@ class TestCore(unittest.TestCase):
         ps.set_shadow_darkness(0.1)
         
         ps.show(3)
+    
+    def test_transparency_options(self):
+
+        ps.set_transparency_mode('none')
+        ps.set_transparency_mode('simple')
+        ps.set_transparency_mode('pretty')
+        
+        ps.set_transparency_render_passes(6)
+        
+        ps.show(3)
+        
+        ps.set_transparency_mode('none')
+    
+    def test_render_options(self):
+
+        ps.set_SSAA_factor(2)
+        ps.show(3)
+        ps.set_SSAA_factor(1)
 
     def test_screenshot(self):
 
@@ -184,13 +202,17 @@ class TestPointCloud(unittest.TestCase):
         self.assertEqual("candy", p.get_material())
         p.set_material("clay")
         
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
         
         p2 = ps.register_point_cloud("test_cloud2", self.generate_points(),
-                enabled=True, material='wax', radius=0.03, color=(1., 0., 0.))
+                enabled=True, material='wax', radius=0.03, color=(1., 0., 0.), transparency=0.7)
                 
 
         ps.show(3)
         ps.remove_all_structures()
+        ps.set_transparency_mode('none')
     
     def test_update(self):
 
@@ -216,6 +238,20 @@ class TestPointCloud(unittest.TestCase):
 
         ps.show(3)
         ps.remove_all_structures()
+    
+    def test_transparent_rendering(self):
+
+        p = ps.register_point_cloud("test_cloud", self.generate_points(),
+                transparency=0.5)
+
+        ps.set_transparency_mode('none')
+        ps.show(3)
+        ps.set_transparency_mode('simple')
+        ps.show(3)
+        ps.set_transparency_mode('pretty')
+        ps.show(3)
+        
+        ps.set_transparency_mode('none')
 
     def test_scalar(self):
         pts = self.generate_points()
@@ -371,12 +407,16 @@ class TestCurveNetwork(unittest.TestCase):
         self.assertEqual("candy", p.get_material())
         p.set_material("clay")
         
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
         
         p2 = ps.register_curve_network("test_network2", self.generate_points(), self.generate_edges(), 
-                enabled=False, material='wax', radius=0.03, color=(1., 0., 0.))
+                enabled=False, material='wax', radius=0.03, color=(1., 0., 0.), transparency=0.9)
 
         ps.show(3)
         ps.remove_all_structures()
+        ps.set_transparency_mode('none')
     
     def test_update(self):
 
@@ -600,17 +640,22 @@ class TestSurfaceMesh(unittest.TestCase):
         self.assertEqual("different", p.get_back_face_policy())
         p.set_back_face_policy("cull")
         
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
       
         # Set with optional arguments 
         p2 = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
-                    smooth_shade=True, edge_width=0.5, back_face_policy="cull")
+                    smooth_shade=True, edge_width=0.5, back_face_policy="cull",
+                    transparency=0.9)
         
         # Make sure shadows work
         ps.set_ground_plane_mode("shadow_only")
 
         ps.show(3)
         ps.remove_all_structures()
+        ps.set_transparency_mode('none')
     
     def test_update(self):
 
@@ -992,14 +1037,20 @@ class TestVolumeMesh(unittest.TestCase):
         p.set_material("candy")
         self.assertEqual("candy", p.get_material())
         p.set_material("clay")
+        
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
       
         # Set with optional arguments 
         p2 = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
-                    interior_color=(0.2, 0.2, 0.2), edge_width=0.5)
+                    interior_color=(0.2, 0.2, 0.2), edge_width=0.5,
+                    transparency=0.9)
 
         ps.show(3)
         ps.remove_all_structures()
+        ps.set_transparency_mode('none')
 
     def test_update(self):
 

@@ -86,6 +86,12 @@ class VolumeMesh:
         self.bound_mesh.set_enabled(val)
     def is_enabled(self):
         return self.bound_mesh.is_enabled()
+    
+    # Transparency
+    def set_transparency(self, val):
+        self.bound_mesh.set_transparency(val)
+    def get_transparency(self):
+        return self.bound_mesh.get_transparency()
 
     # Update
     def update_vertex_positions(self, vertices):
@@ -196,7 +202,7 @@ class VolumeMesh:
     
     
 
-def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None, enabled=None, color=None, interior_color=None, edge_color=None, edge_width=None, material=None):
+def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None, enabled=None, color=None, interior_color=None, edge_color=None, edge_width=None, material=None, transparency=None):
 
     """Register a new surface mesh"""
 
@@ -215,6 +221,8 @@ def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None
         p.set_edge_width(edge_width)
     if material is not None:
         p.set_material(material)
+    if transparency is not None:
+        p.set_transparency(transparency)
 
     return p
 

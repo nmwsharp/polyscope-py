@@ -81,6 +81,12 @@ class SurfaceMesh:
         self.bound_mesh.set_enabled(val)
     def is_enabled(self):
         return self.bound_mesh.is_enabled()
+    
+    # Transparency
+    def set_transparency(self, val):
+        self.bound_mesh.set_transparency(val)
+    def get_transparency(self):
+        return self.bound_mesh.get_transparency()
 
     # Update
     def update_vertex_positions(self, vertices):
@@ -391,7 +397,7 @@ class SurfaceMesh:
 
 
 def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_color=None, smooth_shade=None, 
-                          edge_width=None, material=None, back_face_policy=None):
+                          edge_width=None, material=None, back_face_policy=None, transparency=None):
     """Register a new surface mesh"""
 
     p = SurfaceMesh(name, vertices, faces)
@@ -411,6 +417,8 @@ def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_
         p.set_material(material)
     if back_face_policy is not None:
         p.set_back_face_policy(back_face_policy)
+    if transparency is not None:
+        p.set_transparency(transparency)
 
     return p
 

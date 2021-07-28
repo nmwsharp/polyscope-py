@@ -37,6 +37,8 @@ void bind_volume_mesh(py::module& m) {
       .def("remove", &ps::VolumeMesh::remove, "Remove the structure")
       .def("set_enabled", &ps::VolumeMesh::setEnabled, "Enable the structure")
       .def("is_enabled", &ps::VolumeMesh::isEnabled, "Check if the structure is enabled")
+      .def("set_transparency", &ps::VolumeMesh::setTransparency, "Set transparency alpha")
+      .def("get_transparency", &ps::VolumeMesh::getTransparency, "Get transparency alpha")
       .def("remove_all_quantities", &ps::VolumeMesh::removeAllQuantities, "Remove all quantities")
       .def("remove_quantity", &ps::VolumeMesh::removeQuantity, "Remove a quantity")
       .def("update_vertex_positions", &ps::VolumeMesh::updateVertexPositions<Eigen::MatrixXd>,
