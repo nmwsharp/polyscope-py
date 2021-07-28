@@ -113,6 +113,9 @@ class TestCore(unittest.TestCase):
         ps.screenshot()
         ps.screenshot(transparent_bg=False)
         ps.screenshot("test_shot.png", transparent_bg=True)
+        
+        ps.set_screenshot_extension(".jpg")
+        ps.set_screenshot_extension(".png")
     
         ps.show(3)
    

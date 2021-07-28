@@ -48,6 +48,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   // === Screenshots
   m.def("screenshot", overload_cast_<bool>()(&ps::screenshot), "Take a screenshot");
   m.def("named_screenshot", overload_cast_<std::string, bool>()(&ps::screenshot), "Take a screenshot");
+  m.def("set_screenshot_extension", [](std::string x) { ps::options::screenshotExtension = x; });
 
   // === Small options
   m.def("set_program_name", [](std::string x) { ps::options::programName = x; });

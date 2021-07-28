@@ -38,6 +38,9 @@ def screenshot(filename=None, transparent_bg=True):
     else:
         psb.named_screenshot(filename, transparent_bg)
 
+def set_screenshot_extension(ext):
+    psb.set_screenshot_extension(ext)
+
 
 ### Small options
 
