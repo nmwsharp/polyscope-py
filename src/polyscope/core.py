@@ -92,17 +92,17 @@ def terminating_error(message):
     psb.terminating_error(message)
 
 ## Ground plane and shadows
-def set_ground_plane_mode(x):
-    psb.set_ground_plane_mode(str_to_ground_plane_mode(x))
+def set_ground_plane_mode(mode_str):
+    psb.set_ground_plane_mode(str_to_ground_plane_mode(mode_str))
 
-def set_ground_plane_height_factor(x, is_relative=True):
-    psb.set_ground_plane_height_factor(x, is_relative)
+def set_ground_plane_height_factor(h, is_relative=True):
+    psb.set_ground_plane_height_factor(h, is_relative)
 
-def set_shadow_blur_iters(x):
-    psb.set_shadow_blur_iters(x)
+def set_shadow_blur_iters(n):
+    psb.set_shadow_blur_iters(n)
 
-def set_shadow_darkness(x):
-    psb.set_shadow_darkness(x)
+def set_shadow_darkness(val):
+    psb.set_shadow_darkness(val)
 
 ## Small utilities
 def glm3(vals):
