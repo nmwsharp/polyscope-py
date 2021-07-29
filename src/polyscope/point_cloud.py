@@ -53,6 +53,30 @@ class PointCloud:
         self.bound_cloud.set_enabled(val)
     def is_enabled(self):
         return self.bound_cloud.is_enabled()
+    
+    # Transparency
+    def set_transparency(self, val):
+        self.bound_cloud.set_transparency(val)
+    def get_transparency(self):
+        return self.bound_cloud.get_transparency()
+
+    # Slice planes
+    def set_cull_whole_elements(self, val):
+        self.bound_cloud.set_cull_whole_elements(val)
+    def get_cull_whole_elements(self):
+        return self.bound_cloud.get_cull_whole_elements()
+    def set_ignore_slice_plane(self, plane, val):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            self.bound_cloud.set_ignore_slice_plane(plane, val)
+        else:
+            self.bound_cloud.set_ignore_slice_plane(plane.get_name(), val)
+    def get_ignore_slice_plane(self, plane):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            return self.bound_cloud.get_ignore_slice_plane(plane)
+        else:
+            return self.bound_cloud.get_ignore_slice_plane(plane.get_name())
 
     # Update
     def update_point_positions(self, points):
@@ -64,6 +88,12 @@ class PointCloud:
             self.bound_cloud.update_point_positions2D(points)
         else:
             raise ValueError("bad point cloud shape")
+
+    def set_point_radius_quantity(self, quantity_name, autoscale=True):
+        self.bound_cloud.set_point_radius_quantity(quantity_name, autoscale)
+    
+    def clear_point_radius_quantity(self):
+        self.bound_cloud.clear_point_radius_quantity()
 
     ## Options
    
@@ -134,7 +164,7 @@ class PointCloud:
             q.set_color(glm3(color))
 
 
-def register_point_cloud(name, points, enabled=None, radius=None, color=None, material=None):
+def register_point_cloud(name, points, enabled=None, radius=None, color=None, material=None, transparency=None):
     """Register a new point cloud"""
 
     p = PointCloud(name, points)
@@ -148,6 +178,8 @@ def register_point_cloud(name, points, enabled=None, radius=None, color=None, ma
         p.set_color(color)
     if material is not None:
         p.set_material(material)
+    if transparency is not None:
+        p.set_transparency(transparency)
 
     return p
 

@@ -8,6 +8,8 @@
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
 
+#include "utils.h"
+
 namespace py = pybind11;
 namespace ps = polyscope;
 
@@ -18,39 +20,14 @@ void bind_surface_mesh(py::module& m) {
   // == Helper quantity classes
 
   // Scalar quantities
-  py::class_<ps::SurfaceVertexScalarQuantity>(m, "SurfaceVertexScalarQuantity")
-      .def("set_enabled", &ps::SurfaceVertexScalarQuantity::setEnabled, "Set enabled")
-      .def("set_color_map", &ps::SurfaceVertexScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::SurfaceVertexScalarQuantity::setMapRange, "Set map range")
-      .def("set_isoline_width", &ps::SurfaceVertexScalarQuantity::setIsolineWidth, "Set isoline width");
-  py::class_<ps::SurfaceFaceScalarQuantity>(m, "SurfaceFaceScalarQuantity")
-      .def("set_enabled", &ps::SurfaceFaceScalarQuantity::setEnabled, "Set enabled")
-      .def("set_color_map", &ps::SurfaceFaceScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::SurfaceFaceScalarQuantity::setMapRange, "Set map range")
-      .def("set_isoline_width", &ps::SurfaceFaceScalarQuantity::setIsolineWidth, "Set isoline width");
-  py::class_<ps::SurfaceEdgeScalarQuantity>(m, "SurfaceEdgeScalarQuantity")
-      .def("set_enabled", &ps::SurfaceEdgeScalarQuantity::setEnabled, "Set enabled")
-      .def("set_color_map", &ps::SurfaceEdgeScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::SurfaceEdgeScalarQuantity::setMapRange, "Set map range")
-      .def("set_isoline_width", &ps::SurfaceEdgeScalarQuantity::setIsolineWidth, "Set isoline width");
-  py::class_<ps::SurfaceHalfedgeScalarQuantity>(m, "SurfaceHalfedgeScalarQuantity")
-      .def("set_enabled", &ps::SurfaceHalfedgeScalarQuantity::setEnabled, "Set enabled")
-      .def("set_color_map", &ps::SurfaceHalfedgeScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &ps::SurfaceHalfedgeScalarQuantity::setMapRange, "Set map range")
-      .def("set_isoline_width", &ps::SurfaceHalfedgeScalarQuantity::setIsolineWidth, "Set isoline width");
+  bindScalarQuantity<ps::SurfaceVertexScalarQuantity>(m, "SurfaceVertexScalarQuantity");
+  bindScalarQuantity<ps::SurfaceFaceScalarQuantity>(m, "SurfaceFaceScalarQuantity");
+  bindScalarQuantity<ps::SurfaceEdgeScalarQuantity>(m, "SurfaceEdgeScalarQuantity");
+  bindScalarQuantity<ps::SurfaceHalfedgeScalarQuantity>(m, "SurfaceHalfedgeScalarQuantity");
 
   // Color quantities
-  py::class_<ps::SurfaceVertexColorQuantity>(m, "SurfaceVertexColorQuantity")
-      .def("set_enabled", &ps::SurfaceVertexColorQuantity::setEnabled, "Set enabled");
-  py::class_<ps::SurfaceFaceColorQuantity>(m, "SurfaceFaceColorQuantity")
-      .def("set_enabled", &ps::SurfaceFaceColorQuantity::setEnabled, "Set enabled");
-
-  // Distance quantities
-  //py::class_<ps::SurfaceDistanceQuantity>(m, "SurfaceDistanceQuantity")
-      //.def("set_enabled", &ps::SurfaceDistanceQuantity::setEnabled, "Set enabled")
-      //.def("set_color_map", &ps::SurfaceDistanceQuantity::setColorMap, "Set color map")
-      //.def("set_map_range", &ps::SurfaceDistanceQuantity::setMapRange, "Set map range")
-      //.def("set_stripe_size", &ps::SurfaceDistanceQuantity::setStripeSize, "Set stripe size");
+  bindColorQuantity<ps::SurfaceVertexColorQuantity>(m, "SurfaceVertexColorQuantity");
+  bindColorQuantity<ps::SurfaceFaceColorQuantity>(m, "SurfaceFaceColorQuantity");
 
   // Parameterization quantities
   py::class_<ps::SurfaceCornerParameterizationQuantity>(m, "SurfaceCornerParameterizationQuantity")
@@ -69,33 +46,13 @@ void bind_surface_mesh(py::module& m) {
       .def("set_color_map", &ps::SurfaceVertexParameterizationQuantity::setColorMap, "Set color map");
 
   // Vector quantities
-  py::class_<ps::SurfaceVertexVectorQuantity>(m, "SurfaceVertexVectorQuantity")
-      .def("set_enabled", &ps::SurfaceVertexVectorQuantity::setEnabled, "Set enabled")
-      .def("set_length", &ps::SurfaceVertexVectorQuantity::setVectorLengthScale, "Set length")
-      .def("set_radius", &ps::SurfaceVertexVectorQuantity::setVectorRadius, "Set radius")
-      .def("set_color", &ps::SurfaceVertexVectorQuantity::setVectorColor, "Set color");
-  py::class_<ps::SurfaceFaceVectorQuantity>(m, "SurfaceFaceVectorQuantity")
-      .def("set_enabled", &ps::SurfaceFaceVectorQuantity::setEnabled, "Set enabled")
-      .def("set_length", &ps::SurfaceFaceVectorQuantity::setVectorLengthScale, "Set length")
-      .def("set_radius", &ps::SurfaceFaceVectorQuantity::setVectorRadius, "Set radius")
-      .def("set_color", &ps::SurfaceFaceVectorQuantity::setVectorColor, "Set color");
-  py::class_<ps::SurfaceVertexIntrinsicVectorQuantity>(m, "SurfaceVertexIntrinsicVectorQuantity")
-      .def("set_enabled", &ps::SurfaceVertexIntrinsicVectorQuantity::setEnabled, "Set enabled")
-      .def("set_length", &ps::SurfaceVertexIntrinsicVectorQuantity::setVectorLengthScale, "Set length")
-      .def("set_radius", &ps::SurfaceVertexIntrinsicVectorQuantity::setVectorRadius, "Set radius")
-      .def("set_color", &ps::SurfaceVertexIntrinsicVectorQuantity::setVectorColor, "Set color")
+  bindVectorQuantity<ps::SurfaceVertexVectorQuantity>(m, "SurfaceVertexVectorQuantity");
+  bindVectorQuantity<ps::SurfaceFaceVectorQuantity>(m, "SurfaceFaceVectorQuantity");
+  bindVectorQuantity<ps::SurfaceVertexIntrinsicVectorQuantity>(m, "SurfaceVertexIntrinsicVectorQuantity")
       .def("set_ribbon_enabled", &ps::SurfaceVertexIntrinsicVectorQuantity::setEnabled, "Set ribbon enabled");
-  py::class_<ps::SurfaceFaceIntrinsicVectorQuantity>(m, "SurfaceFaceIntrinsicVectorQuantity")
-      .def("set_enabled", &ps::SurfaceFaceIntrinsicVectorQuantity::setEnabled, "Set enabled")
-      .def("set_length", &ps::SurfaceFaceIntrinsicVectorQuantity::setVectorLengthScale, "Set length")
-      .def("set_radius", &ps::SurfaceFaceIntrinsicVectorQuantity::setVectorRadius, "Set radius")
-      .def("set_color", &ps::SurfaceFaceIntrinsicVectorQuantity::setVectorColor, "Set color")
+  bindVectorQuantity<ps::SurfaceFaceIntrinsicVectorQuantity>(m, "SurfaceFaceIntrinsicVectorQuantity")
       .def("set_ribbon_enabled", &ps::SurfaceFaceIntrinsicVectorQuantity::setEnabled, "Set ribbon enabled");
-  py::class_<ps::SurfaceOneFormIntrinsicVectorQuantity>(m, "SurfaceOneFormIntrinsicVectorQuantity")
-      .def("set_enabled", &ps::SurfaceOneFormIntrinsicVectorQuantity::setEnabled, "Set enabled")
-      .def("set_length", &ps::SurfaceOneFormIntrinsicVectorQuantity::setVectorLengthScale, "Set length")
-      .def("set_radius", &ps::SurfaceOneFormIntrinsicVectorQuantity::setVectorRadius, "Set radius")
-      .def("set_color", &ps::SurfaceOneFormIntrinsicVectorQuantity::setVectorColor, "Set color")
+  bindVectorQuantity<ps::SurfaceOneFormIntrinsicVectorQuantity>(m, "SurfaceOneFormIntrinsicVectorQuantity")
       .def("set_ribbon_enabled", &ps::SurfaceOneFormIntrinsicVectorQuantity::setEnabled, "Set ribbon enabled");
 
 
@@ -106,6 +63,8 @@ void bind_surface_mesh(py::module& m) {
       .def("remove", &ps::SurfaceMesh::remove, "Remove the structure")
       .def("set_enabled", &ps::SurfaceMesh::setEnabled, "Enable the structure")
       .def("is_enabled", &ps::SurfaceMesh::isEnabled, "Check if the structure is enabled")
+      .def("set_transparency", &ps::SurfaceMesh::setTransparency, "Set transparency alpha")
+      .def("get_transparency", &ps::SurfaceMesh::getTransparency, "Get transparency alpha")
       .def("remove_all_quantities", &ps::SurfaceMesh::removeAllQuantities, "Remove all quantities")
       .def("remove_quantity", &ps::SurfaceMesh::removeQuantity, "Remove a quantity")
       .def("update_vertex_positions", &ps::SurfaceMesh::updateVertexPositions<Eigen::MatrixXd>,
@@ -129,6 +88,15 @@ void bind_surface_mesh(py::module& m) {
       .def("get_smooth_shade", &ps::SurfaceMesh::isSmoothShade, "Get if smooth shading is enabled")
       .def("set_material", &ps::SurfaceMesh::setMaterial, "Set material")
       .def("get_material", &ps::SurfaceMesh::getMaterial, "Get material")
+      .def("set_back_face_policy", &ps::SurfaceMesh::setBackFacePolicy, "Set back face policy")
+      .def("get_back_face_policy", &ps::SurfaceMesh::getBackFacePolicy, "Get back face policy")
+
+      // slice planes
+      .def("set_ignore_slice_plane", &ps::SurfaceMesh::setIgnoreSlicePlane, "Set ignore slice plane")
+      .def("get_ignore_slice_plane", &ps::SurfaceMesh::getIgnoreSlicePlane, "Get ignore slice plane")
+      .def("set_cull_whole_elements", &ps::SurfaceMesh::setCullWholeElements, "Set cull whole elements")
+      .def("get_cull_whole_elements", &ps::SurfaceMesh::getCullWholeElements, "Get cull whole elements")
+     
 
       // permutations & bases
       .def("set_vertex_permutation", &ps::SurfaceMesh::setVertexPermutation<Eigen::VectorXi>, "Set vertex permutation")

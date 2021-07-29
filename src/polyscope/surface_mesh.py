@@ -1,7 +1,9 @@
 import polyscope_bindings as psb
 import numpy as np
 
-from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3
+from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type,            \
+                           str_to_param_viz_style, str_to_back_face_policy, back_face_policy_to_str,\
+                           glm3
 
 class SurfaceMesh:
 
@@ -9,9 +11,6 @@ class SurfaceMesh:
 
     # End users should not call this constrctor, use register_surface_mesh instead
     def __init__(self, name=None, vertices=None, faces=None, instance=None):
-
-
-        # TODO ragged vertex arrays
 
         if instance is not None:
             # Wrap an existing instance
@@ -79,6 +78,30 @@ class SurfaceMesh:
         self.bound_mesh.set_enabled(val)
     def is_enabled(self):
         return self.bound_mesh.is_enabled()
+    
+    # Transparency
+    def set_transparency(self, val):
+        self.bound_mesh.set_transparency(val)
+    def get_transparency(self):
+        return self.bound_mesh.get_transparency()
+    
+    # Slice planes
+    def set_cull_whole_elements(self, val):
+        self.bound_mesh.set_cull_whole_elements(val)
+    def get_cull_whole_elements(self):
+        return self.bound_mesh.get_cull_whole_elements()
+    def set_ignore_slice_plane(self, plane, val):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            self.bound_mesh.set_ignore_slice_plane(plane, val)
+        else:
+            self.bound_mesh.set_ignore_slice_plane(plane.get_name(), val)
+    def get_ignore_slice_plane(self, plane):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            return self.bound_mesh.get_ignore_slice_plane(plane)
+        else:
+            return self.bound_mesh.get_ignore_slice_plane(plane.get_name())
 
     # Update
     def update_vertex_positions(self, vertices):
@@ -124,6 +147,11 @@ class SurfaceMesh:
     def get_material(self):
         return self.bound_mesh.get_material()
 
+    # Color
+    def set_back_face_policy(self, val):
+        self.bound_mesh.set_back_face_policy(str_to_back_face_policy(val))
+    def get_back_face_policy(self):
+        return back_face_policy_to_str(self.bound_mesh.get_back_face_policy())
 
     ## Permutations and bases
 
@@ -384,7 +412,7 @@ class SurfaceMesh:
 
 
 def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_color=None, smooth_shade=None, 
-                          edge_width=None, material=None):
+                          edge_width=None, material=None, back_face_policy=None, transparency=None):
     """Register a new surface mesh"""
 
     p = SurfaceMesh(name, vertices, faces)
@@ -402,6 +430,10 @@ def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_
         p.set_smooth_shade(smooth_shade)
     if material is not None:
         p.set_material(material)
+    if back_face_policy is not None:
+        p.set_back_face_policy(back_face_policy)
+    if transparency is not None:
+        p.set_transparency(transparency)
 
     return p
 

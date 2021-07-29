@@ -71,6 +71,30 @@ class CurveNetwork:
         self.bound_network.set_enabled(val)
     def is_enabled(self):
         return self.bound_network.is_enabled()
+    
+    # Transparency
+    def set_transparency(self, val):
+        self.bound_network.set_transparency(val)
+    def get_transparency(self):
+        return self.bound_network.get_transparency()
+    
+    # Slice planes
+    def set_cull_whole_elements(self, val):
+        self.bound_network.set_cull_whole_elements(val)
+    def get_cull_whole_elements(self):
+        return self.bound_network.get_cull_whole_elements()
+    def set_ignore_slice_plane(self, plane, val):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            self.bound_network.set_ignore_slice_plane(plane, val)
+        else:
+            self.bound_network.set_ignore_slice_plane(plane.get_name(), val)
+    def get_ignore_slice_plane(self, plane):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            return self.bound_network.get_ignore_slice_plane(plane)
+        else:
+            return self.bound_network.get_ignore_slice_plane(plane.get_name())
 
     # Update
     def update_node_positions(self, nodes):
@@ -184,7 +208,7 @@ class CurveNetwork:
             q.set_color(glm3(color))
 
 
-def register_curve_network(name, nodes, edges, enabled=None, radius=None, color=None, material=None):
+def register_curve_network(name, nodes, edges, enabled=None, radius=None, color=None, material=None, transparency=None):
     """Register a new curve network"""
 
     p = CurveNetwork(name, nodes, edges)
@@ -198,6 +222,8 @@ def register_curve_network(name, nodes, edges, enabled=None, radius=None, color=
         p.set_color(color)
     if material is not None:
         p.set_material(material)
+    if transparency is not None:
+        p.set_transparency(transparency)
 
     return p
 

@@ -39,6 +39,8 @@ class TestCore(unittest.TestCase):
         ps.set_use_prefs_file(True)
         ps.set_always_redraw(False)
         
+        ps.set_enable_render_error_checks(True)
+        
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
         
@@ -51,33 +53,93 @@ class TestCore(unittest.TestCase):
         ps.set_navigation_style("planar")
 
         ps.set_up_dir("x_up")
+        ps.set_up_dir("neg_x_up")
         ps.set_up_dir("y_up")
+        ps.set_up_dir("neg_y_up")
         ps.set_up_dir("z_up")
+        ps.set_up_dir("neg_z_up")
         
         ps.show(3)
+    
+        ps.set_up_dir("y_up")
+
+    def test_camera_movement(self):
+
+        ps.reset_camera_to_home_view()
+       
+        ps.look_at((0., 0., 5.), (1., 1., 1.))
+        ps.look_at(np.array((0., 0., 5.)), (1., 1., 1.), fly_to=True)
+        
+        ps.look_at_dir((0., 0., 5.), (1., 1., 1.), (-1., -1., 0.))
+        ps.look_at_dir((0., 0., 5.), (1., 1., 1.), np.array((-1., -1., 0.)), fly_to=True)
+        
+        ps.show(3)
+    
+    def test_ground_options(self):
+
+        ps.set_ground_plane_mode("none")
+        ps.set_ground_plane_mode("tile")
+        ps.set_ground_plane_mode("tile_reflection")
+        ps.set_ground_plane_mode("shadow_only")
+
+        ps.set_ground_plane_height_factor(1.5, is_relative=False)
+        ps.set_ground_plane_height_factor(0.)
+        
+        ps.set_shadow_blur_iters(3)
+        ps.set_shadow_darkness(0.1)
+        
+        ps.show(3)
+    
+    def test_transparency_options(self):
+
+        ps.set_transparency_mode('none')
+        ps.set_transparency_mode('simple')
+        ps.set_transparency_mode('pretty')
+        
+        ps.set_transparency_render_passes(6)
+        
+        ps.show(3)
+        
+        ps.set_transparency_mode('none')
+    
+    def test_render_options(self):
+
+        ps.set_SSAA_factor(2)
+        ps.show(3)
+        ps.set_SSAA_factor(1)
 
     def test_screenshot(self):
 
         ps.screenshot()
         ps.screenshot(transparent_bg=False)
         ps.screenshot("test_shot.png", transparent_bg=True)
+        
+        ps.set_screenshot_extension(".jpg")
+        ps.set_screenshot_extension(".png")
     
         ps.show(3)
-   
-    '''
-    # This test doesn't play nice with global state
-    def test_messages(self):
+    
+    def test_slice_plane(self):
 
-        ps.info("hi world")
-        ps.warning("hi world again")
-        for i in range(10):
-            ps.warning("hi world again", "detail " + str(i))
+        plane1 = ps.add_scene_slice_plane()
+        plane2 = ps.add_scene_slice_plane()
 
-        ps.error("ERROR!")
-        ps.terminating_error("BAD ERROR!")
+        plane1.set_pose((-.5, 0., 0.), (1., 1., 1.)) 
+
+        plane1.set_active(False)
+        self.assertEqual(False, plane1.get_active())
+        
+        plane1.set_draw_plane(False)
+        self.assertEqual(False, plane1.get_draw_plane())
+        
+        plane1.set_draw_widget(False)
+        self.assertEqual(False, plane1.get_draw_widget())
 
         ps.show(3)
-    '''
+
+        ps.remove_last_scene_slice_plane()
+        ps.remove_last_scene_slice_plane()
+
 
     def test_load_material(self):
 
@@ -169,12 +231,17 @@ class TestPointCloud(unittest.TestCase):
         self.assertEqual("candy", p.get_material())
         p.set_material("clay")
         
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
         
         p2 = ps.register_point_cloud("test_cloud2", self.generate_points(),
-                enabled=True, material='wax', radius=0.03, color=(1., 0., 0.))
+                enabled=True, material='wax', radius=0.03, color=(1., 0., 0.), transparency=0.7)
+                
 
         ps.show(3)
         ps.remove_all_structures()
+        ps.set_transparency_mode('none')
     
     def test_update(self):
 
@@ -200,6 +267,39 @@ class TestPointCloud(unittest.TestCase):
 
         ps.show(3)
         ps.remove_all_structures()
+    
+    def test_transparent_rendering(self):
+
+        p = ps.register_point_cloud("test_cloud", self.generate_points(),
+                transparency=0.5)
+
+        ps.set_transparency_mode('none')
+        ps.show(3)
+        ps.set_transparency_mode('simple')
+        ps.show(3)
+        ps.set_transparency_mode('pretty')
+        ps.show(3)
+        
+        ps.set_transparency_mode('none')
+        ps.remove_all_structures()
+    
+    def test_slice_plane(self):
+
+        p = ps.register_point_cloud("test_cloud", self.generate_points())
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
 
     def test_scalar(self):
         pts = self.generate_points()
@@ -254,6 +354,25 @@ class TestPointCloud(unittest.TestCase):
         ps.show(3)
     
         p.remove_all_quantities()
+        ps.remove_all_structures()
+    
+
+    def test_variable_radius(self):
+        pts = self.generate_points()
+        N = pts.shape[0]
+        ps.register_point_cloud("test_cloud", pts)
+        p = ps.get_point_cloud("test_cloud")
+        vals = np.random.rand(N)
+
+        p.add_scalar_quantity("test_vals", vals)
+
+        p.set_point_radius_quantity("test_vals")
+        ps.show(3)
+        p.clear_point_radius_quantity()
+        ps.show(3)
+        p.set_point_radius_quantity("test_vals", False)
+        ps.show(3)
+
         ps.remove_all_structures()
     
 class TestCurveNetwork(unittest.TestCase):
@@ -336,12 +455,35 @@ class TestCurveNetwork(unittest.TestCase):
         self.assertEqual("candy", p.get_material())
         p.set_material("clay")
         
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
         
         p2 = ps.register_curve_network("test_network2", self.generate_points(), self.generate_edges(), 
-                enabled=False, material='wax', radius=0.03, color=(1., 0., 0.))
+                enabled=False, material='wax', radius=0.03, color=(1., 0., 0.), transparency=0.9)
 
         ps.show(3)
         ps.remove_all_structures()
+        ps.set_transparency_mode('none')
+    
+    def test_slice_plane(self):
+
+        p = ps.register_curve_network("test_network", self.generate_points(), self.generate_edges())
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
+
     
     def test_update(self):
 
@@ -559,14 +701,46 @@ class TestSurfaceMesh(unittest.TestCase):
         p.set_material("candy")
         self.assertEqual("candy", p.get_material())
         p.set_material("clay")
+        
+        # Back face policy
+        p.set_back_face_policy("different")
+        self.assertEqual("different", p.get_back_face_policy())
+        p.set_back_face_policy("cull")
+        
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
       
         # Set with optional arguments 
         p2 = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
-                    smooth_shade=True, edge_width=0.5)
+                    smooth_shade=True, edge_width=0.5, back_face_policy="cull",
+                    transparency=0.9)
+        
+        # Make sure shadows work
+        ps.set_ground_plane_mode("shadow_only")
 
         ps.show(3)
         ps.remove_all_structures()
+        ps.set_transparency_mode('none')
+    
+    def test_slice_plane(self):
+
+        p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
     
     def test_update(self):
 
@@ -827,6 +1001,243 @@ class TestSurfaceMesh(unittest.TestCase):
         
         ps.remove_all_structures()
 
+class TestVolumeMesh(unittest.TestCase):
+
+    def generate_verts(self, n_pts=10):
+        np.random.seed(777)        
+        return np.random.rand(n_pts, 3)
+    
+    def generate_tets(self, n_pts=10):
+        np.random.seed(777)        
+        return np.random.randint(0, n_pts, size=(2*n_pts,4))
+    
+    def test_add_remove(self):
+
+        # add
+        n = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+        self.assertTrue(ps.has_volume_mesh("test_mesh"))
+        self.assertFalse(ps.has_volume_mesh("nope"))
+        self.assertEqual(n.n_vertices(), 10)
+        self.assertEqual(n.n_cells(), 20)
+      
+        # remove by name
+        ps.register_volume_mesh("test_mesh2", self.generate_verts(), self.generate_tets())
+        ps.remove_volume_mesh("test_mesh2")
+        self.assertTrue(ps.has_volume_mesh("test_mesh"))
+        self.assertFalse(ps.has_volume_mesh("test_mesh2"))
+
+        # remove by ref
+        c = ps.register_volume_mesh("test_mesh2", self.generate_verts(), self.generate_tets())
+        c.remove()
+        self.assertTrue(ps.has_volume_mesh("test_mesh"))
+        self.assertFalse(ps.has_volume_mesh("test_mesh2"))
+
+        # get by name
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), self.generate_tets())
+        p = ps.get_volume_mesh("test_mesh3") # should be wrapped instance, not underlying PSB instance
+        self.assertTrue(isinstance(p, ps.VolumeMesh))
+
+        ps.remove_all_structures()
+    
+    def test_render(self):
+
+        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_add_tet(self):
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), tets=self.generate_tets())
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_add_hex(self):
+        np.random.seed(777)
+        n_pts = 10
+        cells = np.random.randint(0, n_pts, size=(2*n_pts,8))
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), hexes=cells)
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_add_combined(self):
+        np.random.seed(777)
+        n_pts = 10
+        cells = np.random.randint(0, n_pts, size=(2*n_pts,8))
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), tets=self.generate_tets(), hexes=cells)
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_add_mixed(self):
+        np.random.seed(777)
+        n_pts = 10
+        cells = np.random.randint(0, n_pts, size=(2*n_pts,8))
+        cells[-5:,4:] = -1 # clear out some rows at end
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), mixed_cells=cells)
+        ps.show(3)
+        ps.remove_all_structures()
+
+        # test a few error cases
+        # cells = np.random.randint(0, n_pts, size=(2*n_pts,8))
+        # cells[-5:,4:] = -1 # clear out some rows at end
+        # ps.register_volume_mesh("test_mesh3", self.generate_verts(), hexes=self.generate_tets())
+
+    def test_options(self):
+
+        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+
+        # Set enabled
+        p.set_enabled()
+        p.set_enabled(False)
+        p.set_enabled(True)
+        self.assertTrue(p.is_enabled())
+    
+        # Color
+        color = (0.3, 0.3, 0.5)
+        p.set_color(color)
+        ret_color = p.get_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+        
+        # Interior Color
+        color = (0.45, 0.85, 0.2)
+        p.set_interior_color(color)
+        ret_color = p.get_interior_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+
+        # Edge color
+        color = (0.1, 0.5, 0.5)
+        p.set_edge_color(color)
+        ret_color = p.get_edge_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+        
+        ps.show(3)
+
+        # Edge width 
+        p.set_edge_width(1.5)
+        ps.show(3)
+        self.assertAlmostEqual(p.get_edge_width(), 1.5)
+        
+        # Material
+        p.set_material("candy")
+        self.assertEqual("candy", p.get_material())
+        p.set_material("clay")
+        
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
+      
+        # Set with optional arguments 
+        p2 = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets(), 
+                    enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
+                    interior_color=(0.2, 0.2, 0.2), edge_width=0.5,
+                    transparency=0.9)
+
+        ps.show(3)
+        ps.remove_all_structures()
+        ps.set_transparency_mode('none')
+   
+    def test_slice_plane(self):
+
+        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
+
+    def test_update(self):
+
+        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+        ps.show(3)
+
+        newPos = self.generate_verts() - 0.5
+        p.update_vertex_positions(newPos)
+
+        ps.show(3)
+        ps.remove_all_structures()
+
+    def test_scalar(self):
+        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+        p = ps.get_volume_mesh("test_mesh")
+
+        for on in ['vertices', 'cells']:
+       
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices())
+            elif on  == 'cells':
+                vals = np.random.rand(p.n_cells())
+
+            p.add_scalar_quantity("test_vals", vals, defined_on=on)
+            p.add_scalar_quantity("test_vals2", vals, defined_on=on, enabled=True)
+            p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
+            p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, enabled=True, datatype='symmetric')
+            p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, enabled=True, cmap='blues')
+
+            ps.show(3)
+
+            # test some additions/removal while we're at it
+            p.remove_quantity("test_vals")
+            p.remove_quantity("not_here") # should not error
+            p.remove_all_quantities()
+            p.remove_all_quantities()
+
+        ps.remove_all_structures()
+    
+    
+    def test_color(self):
+        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+        p = ps.get_volume_mesh("test_mesh")
+
+        for on in ['vertices', 'cells']:
+       
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices(), 3)
+            elif on == 'cells':
+                vals = np.random.rand(p.n_cells(), 3)
+       
+
+            p.add_color_quantity("test_vals", vals, defined_on=on)
+            p.add_color_quantity("test_vals", vals, defined_on=on, enabled=True)
+
+            ps.show(3)
+            p.remove_all_quantities()
+        
+        ps.remove_all_structures()
+    
+
+    def test_vector(self):
+
+        ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+        p = ps.get_volume_mesh("test_mesh")
+        
+        for on in ['vertices', 'cells']:
+       
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices(),3)
+            elif on  == 'cells':
+                vals = np.random.rand(p.n_cells(), 3)
+
+            p.add_vector_quantity("test_vals1", vals, defined_on=on)
+            p.add_vector_quantity("test_vals2", vals, defined_on=on, enabled=True)
+            p.add_vector_quantity("test_vals3", vals, defined_on=on, enabled=True, vectortype='ambient')
+            p.add_vector_quantity("test_vals4", vals, defined_on=on, enabled=True, length=0.005)
+            p.add_vector_quantity("test_vals5", vals, defined_on=on, enabled=True, radius=0.001)
+            p.add_vector_quantity("test_vals6", vals, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
+
+            ps.show(3)
+            p.remove_all_quantities()
+        
+        ps.remove_all_structures()
 
 if __name__ == '__main__':
 

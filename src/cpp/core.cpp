@@ -22,6 +22,7 @@ using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
 void bind_surface_mesh(py::module& m);
 void bind_point_cloud(py::module& m);
 void bind_curve_network(py::module& m);
+void bind_volume_mesh(py::module& m);
 
 // Actual binding code
 // clang-format off
@@ -47,6 +48,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   // === Screenshots
   m.def("screenshot", overload_cast_<bool>()(&ps::screenshot), "Take a screenshot");
   m.def("named_screenshot", overload_cast_<std::string, bool>()(&ps::screenshot), "Take a screenshot");
+  m.def("set_screenshot_extension", [](std::string x) { ps::options::screenshotExtension = x; });
 
   // === Small options
   m.def("set_program_name", [](std::string x) { ps::options::programName = x; });
@@ -56,13 +58,20 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_errors_throw_exceptions", [](bool x) { ps::options::errorsThrowExceptions = x; });
   m.def("set_use_prefs_file", [](bool x) { ps::options::usePrefsFile = x; });
   m.def("set_always_redraw", [](bool x) { ps::options::alwaysRedraw = x; });
+  m.def("set_enable_render_error_checks", [](bool x) { ps::options::enableRenderErrorChecks = x; });
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
   m.def("set_autoscale_structures", [](bool x) { ps::options::autoscaleStructures = x; });
   m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
-  m.def("set_up_dir", [](ps::view::UpDir x) { 
-      ps::view::setUpDir(x); 
-  });
+  m.def("set_up_dir", [](ps::view::UpDir x) { ps::view::setUpDir(x); });
+
+  // === Camera controls
   m.def("reset_camera_to_home_view", ps::view::resetCameraToHomeView);
+  m.def("look_at", [](glm::vec3 location, glm::vec3 target, bool flyTo) { 
+      ps::view::lookAt(location, target, flyTo); 
+  });
+  m.def("look_at_dir", [](glm::vec3 location, glm::vec3 target, glm::vec3 upDir, bool flyTo) { 
+      ps::view::lookAt(location, target, upDir, flyTo); 
+  });
 
   
   // === Messages
@@ -70,6 +79,16 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("warning", ps::warning, "Send a warning message");
   m.def("error", ps::error, "Send an error message");
   m.def("terminating_error", ps::terminatingError, "Send a terminating error message");
+  
+  // === Ground plane and shadows
+  m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });
+  m.def("set_ground_plane_height_factor", [](float x, bool isRelative) { ps::options::groundPlaneHeightFactor.set(x, isRelative); });
+  m.def("set_shadow_blur_iters", [](int x) { ps::options::shadowBlurIters = x; });
+  m.def("set_shadow_darkness", [](float x) { ps::options::shadowDarkness = x; });
+  
+  // === Transparency
+  m.def("set_transparency_mode", [](ps::TransparencyMode x) { ps::options::transparencyMode = x; });
+  m.def("set_transparency_render_passes", [](int n) { ps::options::transparencyRenderPasses = n; });
   
   // === Materials
   m.def("load_static_material", ps::loadStaticMaterial, "Load a static material");
@@ -80,7 +99,26 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Colormaps
   m.def("load_color_map", ps::loadColorMap, "Load a color map from file");
+  
+  // === Rendering
+  m.def("load_color_map", ps::loadColorMap, "Load a color map from file");
+  m.def("set_SSAA_factor", [](int n) { ps::options::ssaaFactor = n; });
 
+  // === Slice planes
+  py::class_<ps::SlicePlane>(m, "SlicePlane")
+   .def(py::init<std::string>())
+   .def_readonly("name", &ps::SlicePlane::name) 
+   .def("set_pose", &ps::SlicePlane::setPose, "set pose")
+   .def("set_active", &ps::SlicePlane::setActive, "set active")
+   .def("get_active", &ps::SlicePlane::getActive, "get active")
+   .def("set_draw_plane", &ps::SlicePlane::setDrawPlane, "set draw plane")
+   .def("get_draw_plane", &ps::SlicePlane::getDrawPlane, "get draw plane")
+   .def("set_draw_widget", &ps::SlicePlane::setDrawWidget, "set draw widget")
+   .def("get_draw_widget", &ps::SlicePlane::getDrawWidget, "get draw widget");
+
+  m.def("add_scene_slice_plane", ps::addSceneSlicePlane, "add a slice plane", py::return_value_policy::reference);
+  m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene plane");
+  
   // === Enums
   
   py::enum_<ps::view::NavigateStyle>(m, "NavigateStyle")
@@ -122,6 +160,24 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("local_rad", ps::ParamVizStyle::LOCAL_RAD)
     .export_values(); 
 
+  py::enum_<ps::BackFacePolicy>(m, "BackFacePolicy")
+    .value("identical", ps::BackFacePolicy::Identical)
+    .value("different", ps::BackFacePolicy::Different)
+    .value("cull", ps::BackFacePolicy::Cull)
+    .export_values(); 
+  
+  py::enum_<ps::GroundPlaneMode>(m, "GroundPlaneMode")
+    .value("none", ps::GroundPlaneMode::None)
+    .value("tile", ps::GroundPlaneMode::Tile)
+    .value("tile_reflection", ps::GroundPlaneMode::TileReflection)
+    .value("shadow_only", ps::GroundPlaneMode::ShadowOnly)
+    .export_values(); 
+  
+  py::enum_<ps::TransparencyMode>(m, "TransparencyMode")
+    .value("none", ps::TransparencyMode::None)
+    .value("simple", ps::TransparencyMode::Simple)
+    .value("pretty", ps::TransparencyMode::Pretty)
+    .export_values(); 
 
   // === Mini bindings for a little bit of glm
   py::class_<glm::vec3>(m, "glm_vec3").
@@ -135,6 +191,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   bind_surface_mesh(m);
   bind_point_cloud(m);
   bind_curve_network(m);
+  bind_volume_mesh(m);
 
 }
 

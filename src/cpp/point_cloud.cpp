@@ -7,33 +7,40 @@
 #include "polyscope/point_cloud.h"
 #include "polyscope/polyscope.h"
 
+#include "utils.h"
+
 namespace py = pybind11;
 namespace ps = polyscope;
+
+// For overloaded functions, with C++11 compiler only
+template <typename... Args>
+using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
 
 
 // clang-format off
 void bind_point_cloud(py::module& m) {
 
-  // Helper quantity classes
-  py::class_<ps::PointCloudColorQuantity>(m, "PointCloudColorQuantity")
-    .def("set_enabled", &ps::PointCloudColorQuantity::setEnabled, "Set enabled");
-  py::class_<ps::PointCloudScalarQuantity>(m, "PointCloudScalarQuantity")
-    .def("set_enabled", &ps::PointCloudScalarQuantity::setEnabled, "Set enabled")
-    .def("set_color_map", &ps::PointCloudScalarQuantity::setColorMap, "Set color map")
-    .def("set_map_range", &ps::PointCloudScalarQuantity::setMapRange, "Set map range");
-  py::class_<ps::PointCloudVectorQuantity>(m, "PointCloudVectorQuantity")
-    .def("set_enabled", &ps::PointCloudVectorQuantity::setEnabled, "Set enabled")
-    .def("set_length", &ps::PointCloudVectorQuantity::setVectorLengthScale, "Set length")
-    .def("set_radius", &ps::PointCloudVectorQuantity::setVectorRadius, "Set radius")
-    .def("set_color", &ps::PointCloudVectorQuantity::setVectorColor, "Set color");
+  // == Helper quantity classes
 
-  // Main class, with adder methods
+  // Scalar quantities
+  bindScalarQuantity<ps::PointCloudScalarQuantity>(m, "PointCloudScalarQuantity");
+
+  // Color quantities
+  bindColorQuantity<ps::PointCloudColorQuantity>(m, "PointCloudColorQuantity");
+
+  // Vector quantities
+  bindVectorQuantity<ps::PointCloudVectorQuantity>(m, "PointCloudVectorQuantity");
+
+
+  // == Main class
   py::class_<ps::PointCloud>(m, "PointCloud")
 
     // basics
     .def("remove", &ps::PointCloud::remove, "Remove the structure")
     .def("set_enabled", &ps::PointCloud::setEnabled, "Enable the structure")
     .def("is_enabled", &ps::PointCloud::isEnabled, "Check if the structure is enabled")
+    .def("set_transparency", &ps::PointCloud::setTransparency, "Set transparency alpha")
+    .def("get_transparency", &ps::PointCloud::getTransparency, "Get transparency alpha")
     .def("remove_all_quantities", &ps::PointCloud::removeAllQuantities, "Remove all quantities")
     .def("remove_quantity", &ps::PointCloud::removeQuantity, "Remove a quantity")
     .def("update_point_positions", &ps::PointCloud::updatePointPositions<Eigen::MatrixXd>, "Update point positions")
@@ -48,6 +55,22 @@ void bind_point_cloud(py::module& m) {
     .def("set_material", &ps::PointCloud::setMaterial, "Set material")
     .def("get_material", &ps::PointCloud::getMaterial, "Get material")
 
+    // slice planes
+    .def("set_ignore_slice_plane", &ps::PointCloud::setIgnoreSlicePlane, "Set ignore slice plane")
+    .def("get_ignore_slice_plane", &ps::PointCloud::getIgnoreSlicePlane, "Get ignore slice plane")
+    .def("set_cull_whole_elements", &ps::PointCloud::setCullWholeElements, "Set cull whole elements")
+    .def("get_cull_whole_elements", &ps::PointCloud::getCullWholeElements, "Get cull whole elements")
+     
+
+    // variable radius
+    .def("set_point_radius_quantity", 
+        overload_cast_<ps::PointCloudScalarQuantity*, bool>()(&ps::PointCloud::setPointRadiusQuantity), 
+        "Use a scalar to set radius", py::arg("quantity"), py::arg("autoscale")=true)
+    .def("set_point_radius_quantity", 
+        overload_cast_<std::string, bool>()(&ps::PointCloud::setPointRadiusQuantity), 
+        "Use a scalar to set radius by name", py::arg("quantity_name"), py::arg("autoscale")=true)
+    .def("clear_point_radius_quantity", &ps::PointCloud::clearPointRadiusQuantity, "Clear any quantity setting the radius")
+        
     // quantities
     .def("add_color_quantity", &ps::PointCloud::addColorQuantity<Eigen::MatrixXd>, "Add a color function at points",
         py::arg("name"), py::arg("values"), py::return_value_policy::reference)

@@ -38,6 +38,9 @@ def screenshot(filename=None, transparent_bg=True):
     else:
         psb.named_screenshot(filename, transparent_bg)
 
+def set_screenshot_extension(ext):
+    psb.set_screenshot_extension(ext)
+
 
 ### Small options
 
@@ -62,6 +65,9 @@ def set_use_prefs_file(v):
 def set_always_redraw(v):
     psb.set_always_redraw(v)
 
+def set_enable_render_error_checks(b):
+    psb.set_enable_render_error_checks(b)
+
 def set_autocenter_structures(b):
     psb.set_autocenter_structures(b)
 
@@ -74,8 +80,16 @@ def set_navigation_style(s):
 def set_up_dir(d):
     psb.set_up_dir(str_to_updir(d))
 
+### Camera controls
+
 def reset_camera_to_home_view():
     psb.reset_camera_to_home_view()
+
+def look_at(camera_location, target, fly_to=False):
+    psb.look_at(glm3(camera_location), glm3(target), fly_to)
+
+def look_at_dir(camera_location, target, up_dir, fly_to=False):
+    psb.look_at_dir(glm3(camera_location), glm3(target), glm3(up_dir), fly_to)
 
 ### Messages
 
@@ -90,6 +104,72 @@ def error(message):
 
 def terminating_error(message):
     psb.terminating_error(message)
+
+## Ground plane and shadows
+def set_ground_plane_mode(mode_str):
+    psb.set_ground_plane_mode(str_to_ground_plane_mode(mode_str))
+
+def set_ground_plane_height_factor(h, is_relative=True):
+    psb.set_ground_plane_height_factor(h, is_relative)
+
+def set_shadow_blur_iters(n):
+    psb.set_shadow_blur_iters(n)
+
+def set_shadow_darkness(val):
+    psb.set_shadow_darkness(val)
+
+## Ground plane and shadows
+def set_transparency_mode(mode_str):
+    psb.set_transparency_mode(str_to_transparency_mode(mode_str))
+
+def set_transparency_render_passes(n):
+    psb.set_transparency_render_passes(n)
+
+## Rendering
+def set_SSAA_factor(n):
+    psb.set_SSAA_factor(n)
+
+## Slice planes
+
+class SlicePlane:
+    # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
+
+    # End users should not call this constrctor, use add_scene_slice_plane() instead
+    def __init__(self, instance):
+
+        # Wrap an existing instance
+        self.bound_slice_plane = instance
+    
+    def get_name(self):
+        return self.bound_slice_plane.name
+
+    def set_pose(self, plane_position, plane_normal):
+        self.bound_slice_plane.set_pose(glm3(plane_position), glm3(plane_normal))
+    
+    def set_active(self, val):
+        self.bound_slice_plane.set_active(val)
+    
+    def get_active(self):
+        return self.bound_slice_plane.get_active()
+    
+    def set_draw_plane(self, val):
+        self.bound_slice_plane.set_draw_plane(val)
+    
+    def get_draw_plane(self):
+        return self.bound_slice_plane.get_draw_plane()
+    
+    def set_draw_widget(self, val):
+        self.bound_slice_plane.set_draw_widget(val)
+    
+    def get_draw_widget(self):
+        return self.bound_slice_plane.get_draw_widget()
+
+def add_scene_slice_plane():
+    instance = psb.add_scene_slice_plane(False)
+    return SlicePlane(instance)
+
+def remove_last_scene_slice_plane():
+    psb.remove_last_scene_slice_plane()
 
 
 ## Small utilities
@@ -141,8 +221,11 @@ def str_to_navigate_style(s):
 def str_to_updir(s):
     d = {
         "x_up" : psb.UpDir.x_up,
+        "neg_x_up" : psb.UpDir.neg_x_up,
         "y_up" : psb.UpDir.y_up,
+        "neg_y_up" : psb.UpDir.neg_y_up,
         "z_up" : psb.UpDir.z_up,
+        "neg_z_up" : psb.UpDir.neg_z_up,
     }
 
     if s not in d:
@@ -198,6 +281,60 @@ def str_to_param_viz_style(s):
 
     if s not in d:
         raise ValueError("Bad param viz style specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def str_to_back_face_policy(s):
+    d = {
+        "identical" : psb.BackFacePolicy.identical,
+        "different" : psb.BackFacePolicy.different,
+        "cull" : psb.BackFacePolicy.cull,
+    }
+
+    if s not in d:
+        raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def back_face_policy_to_str(s):
+    d = {
+        psb.BackFacePolicy.identical : "identical" ,
+        psb.BackFacePolicy.different : "different" ,
+        psb.BackFacePolicy.cull : "cull" 
+    }
+
+    if s not in d:
+        raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+  
+
+def str_to_ground_plane_mode(s):
+    d = {
+        "none": psb.GroundPlaneMode.none,
+        "tile" : psb.GroundPlaneMode.tile,
+        "tile_reflection" : psb.GroundPlaneMode.tile_reflection,
+        "shadow_only" : psb.GroundPlaneMode.shadow_only
+    }
+
+    if s not in d:
+        raise ValueError("Bad ground plane mode specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def str_to_transparency_mode(s):
+    d = {
+        "none": psb.TransparencyMode.none,
+        "simple" : psb.TransparencyMode.simple,
+        "pretty" : psb.TransparencyMode.pretty,
+    }
+
+    if s not in d:
+        raise ValueError("Bad transparenccy mode specifier '{}', should be one of [{}]".format(s, 
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]
