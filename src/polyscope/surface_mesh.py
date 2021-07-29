@@ -12,9 +12,6 @@ class SurfaceMesh:
     # End users should not call this constrctor, use register_surface_mesh instead
     def __init__(self, name=None, vertices=None, faces=None, instance=None):
 
-
-        # TODO ragged vertex arrays
-
         if instance is not None:
             # Wrap an existing instance
             self.bound_mesh = instance
@@ -87,6 +84,24 @@ class SurfaceMesh:
         self.bound_mesh.set_transparency(val)
     def get_transparency(self):
         return self.bound_mesh.get_transparency()
+    
+    # Slice planes
+    def set_cull_whole_elements(self, val):
+        self.bound_mesh.set_cull_whole_elements(val)
+    def get_cull_whole_elements(self):
+        return self.bound_mesh.get_cull_whole_elements()
+    def set_ignore_slice_plane(self, plane, val):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            self.bound_mesh.set_ignore_slice_plane(plane, val)
+        else:
+            self.bound_mesh.set_ignore_slice_plane(plane.get_name(), val)
+    def get_ignore_slice_plane(self, plane):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            return self.bound_mesh.get_ignore_slice_plane(plane)
+        else:
+            return self.bound_mesh.get_ignore_slice_plane(plane.get_name())
 
     # Update
     def update_vertex_positions(self, vertices):

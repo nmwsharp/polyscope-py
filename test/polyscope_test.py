@@ -118,21 +118,28 @@ class TestCore(unittest.TestCase):
         ps.set_screenshot_extension(".png")
     
         ps.show(3)
-   
-    '''
-    # This test doesn't play nice with global state
-    def test_messages(self):
+    
+    def test_slice_plane(self):
 
-        ps.info("hi world")
-        ps.warning("hi world again")
-        for i in range(10):
-            ps.warning("hi world again", "detail " + str(i))
+        plane1 = ps.add_scene_slice_plane()
+        plane2 = ps.add_scene_slice_plane()
 
-        ps.error("ERROR!")
-        ps.terminating_error("BAD ERROR!")
+        plane1.set_pose((-.5, 0., 0.), (1., 1., 1.)) 
+
+        plane1.set_active(False)
+        self.assertEqual(False, plane1.get_active())
+        
+        plane1.set_draw_plane(False)
+        self.assertEqual(False, plane1.get_draw_plane())
+        
+        plane1.set_draw_widget(False)
+        self.assertEqual(False, plane1.get_draw_widget())
 
         ps.show(3)
-    '''
+
+        ps.remove_last_scene_slice_plane()
+        ps.remove_last_scene_slice_plane()
+
 
     def test_load_material(self):
 
@@ -274,6 +281,25 @@ class TestPointCloud(unittest.TestCase):
         ps.show(3)
         
         ps.set_transparency_mode('none')
+        ps.remove_all_structures()
+    
+    def test_slice_plane(self):
+
+        p = ps.register_point_cloud("test_cloud", self.generate_points())
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
 
     def test_scalar(self):
         pts = self.generate_points()
@@ -439,6 +465,25 @@ class TestCurveNetwork(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_slice_plane(self):
+
+        p = ps.register_curve_network("test_network", self.generate_points(), self.generate_edges())
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
+
     
     def test_update(self):
 
@@ -678,6 +723,24 @@ class TestSurfaceMesh(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_slice_plane(self):
+
+        p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
     
     def test_update(self):
 
@@ -1073,6 +1136,24 @@ class TestVolumeMesh(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+   
+    def test_slice_plane(self):
+
+        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
 
     def test_update(self):
 

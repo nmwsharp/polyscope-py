@@ -59,6 +59,13 @@ void bind_volume_mesh(py::module& m) {
       .def("set_material", &ps::VolumeMesh::setMaterial, "Set material")
       .def("get_material", &ps::VolumeMesh::getMaterial, "Get material")
 
+      // slice planes
+      .def("set_ignore_slice_plane", &ps::VolumeMesh::setIgnoreSlicePlane, "Set ignore slice plane")
+      .def("get_ignore_slice_plane", &ps::VolumeMesh::getIgnoreSlicePlane, "Get ignore slice plane")
+      .def("set_cull_whole_elements", &ps::VolumeMesh::setCullWholeElements, "Set cull whole elements")
+      .def("get_cull_whole_elements", &ps::VolumeMesh::getCullWholeElements, "Get cull whole elements")
+
+
       // = quantities
 
       // Scalars

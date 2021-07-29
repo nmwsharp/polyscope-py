@@ -91,6 +91,13 @@ void bind_surface_mesh(py::module& m) {
       .def("set_back_face_policy", &ps::SurfaceMesh::setBackFacePolicy, "Set back face policy")
       .def("get_back_face_policy", &ps::SurfaceMesh::getBackFacePolicy, "Get back face policy")
 
+      // slice planes
+      .def("set_ignore_slice_plane", &ps::SurfaceMesh::setIgnoreSlicePlane, "Set ignore slice plane")
+      .def("get_ignore_slice_plane", &ps::SurfaceMesh::getIgnoreSlicePlane, "Get ignore slice plane")
+      .def("set_cull_whole_elements", &ps::SurfaceMesh::setCullWholeElements, "Set cull whole elements")
+      .def("get_cull_whole_elements", &ps::SurfaceMesh::getCullWholeElements, "Get cull whole elements")
+     
+
       // permutations & bases
       .def("set_vertex_permutation", &ps::SurfaceMesh::setVertexPermutation<Eigen::VectorXi>, "Set vertex permutation")
       .def("set_face_permutation", &ps::SurfaceMesh::setFacePermutation<Eigen::VectorXi>, "Set face permutation")

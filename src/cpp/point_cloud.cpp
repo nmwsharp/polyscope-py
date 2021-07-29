@@ -55,6 +55,13 @@ void bind_point_cloud(py::module& m) {
     .def("set_material", &ps::PointCloud::setMaterial, "Set material")
     .def("get_material", &ps::PointCloud::getMaterial, "Get material")
 
+    // slice planes
+    .def("set_ignore_slice_plane", &ps::PointCloud::setIgnoreSlicePlane, "Set ignore slice plane")
+    .def("get_ignore_slice_plane", &ps::PointCloud::getIgnoreSlicePlane, "Get ignore slice plane")
+    .def("set_cull_whole_elements", &ps::PointCloud::setCullWholeElements, "Set cull whole elements")
+    .def("get_cull_whole_elements", &ps::PointCloud::getCullWholeElements, "Get cull whole elements")
+     
+
     // variable radius
     .def("set_point_radius_quantity", 
         overload_cast_<ps::PointCloudScalarQuantity*, bool>()(&ps::PointCloud::setPointRadiusQuantity), 

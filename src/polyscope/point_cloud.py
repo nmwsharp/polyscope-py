@@ -60,6 +60,24 @@ class PointCloud:
     def get_transparency(self):
         return self.bound_cloud.get_transparency()
 
+    # Slice planes
+    def set_cull_whole_elements(self, val):
+        self.bound_cloud.set_cull_whole_elements(val)
+    def get_cull_whole_elements(self):
+        return self.bound_cloud.get_cull_whole_elements()
+    def set_ignore_slice_plane(self, plane, val):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            self.bound_cloud.set_ignore_slice_plane(plane, val)
+        else:
+            self.bound_cloud.set_ignore_slice_plane(plane.get_name(), val)
+    def get_ignore_slice_plane(self, plane):
+        # take either a string or a slice plane object as input
+        if isinstance(plane, str):
+            return self.bound_cloud.get_ignore_slice_plane(plane)
+        else:
+            return self.bound_cloud.get_ignore_slice_plane(plane.get_name())
+
     # Update
     def update_point_positions(self, points):
         self.check_shape(points)

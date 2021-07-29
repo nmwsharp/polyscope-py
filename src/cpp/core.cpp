@@ -102,9 +102,24 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Rendering
   m.def("load_color_map", ps::loadColorMap, "Load a color map from file");
-
-  // === Enums
   m.def("set_SSAA_factor", [](int n) { ps::options::ssaaFactor = n; });
+
+  // === Slice planes
+  py::class_<ps::SlicePlane>(m, "SlicePlane")
+   .def(py::init<std::string>())
+   .def_readonly("name", &ps::SlicePlane::name) 
+   .def("set_pose", &ps::SlicePlane::setPose, "set pose")
+   .def("set_active", &ps::SlicePlane::setActive, "set active")
+   .def("get_active", &ps::SlicePlane::getActive, "get active")
+   .def("set_draw_plane", &ps::SlicePlane::setDrawPlane, "set draw plane")
+   .def("get_draw_plane", &ps::SlicePlane::getDrawPlane, "get draw plane")
+   .def("set_draw_widget", &ps::SlicePlane::setDrawWidget, "set draw widget")
+   .def("get_draw_widget", &ps::SlicePlane::getDrawWidget, "get draw widget");
+
+  m.def("add_scene_slice_plane", ps::addSceneSlicePlane, "add a slice plane", py::return_value_policy::reference);
+  m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene plane");
+  
+  // === Enums
   
   py::enum_<ps::view::NavigateStyle>(m, "NavigateStyle")
     .value("turntable", ps::view::NavigateStyle::Turntable)

@@ -129,6 +129,49 @@ def set_transparency_render_passes(n):
 def set_SSAA_factor(n):
     psb.set_SSAA_factor(n)
 
+## Slice planes
+
+class SlicePlane:
+    # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
+
+    # End users should not call this constrctor, use add_scene_slice_plane() instead
+    def __init__(self, instance):
+
+        # Wrap an existing instance
+        self.bound_slice_plane = instance
+    
+    def get_name(self):
+        return self.bound_slice_plane.name
+
+    def set_pose(self, plane_position, plane_normal):
+        self.bound_slice_plane.set_pose(glm3(plane_position), glm3(plane_normal))
+    
+    def set_active(self, val):
+        self.bound_slice_plane.set_active(val)
+    
+    def get_active(self):
+        return self.bound_slice_plane.get_active()
+    
+    def set_draw_plane(self, val):
+        self.bound_slice_plane.set_draw_plane(val)
+    
+    def get_draw_plane(self):
+        return self.bound_slice_plane.get_draw_plane()
+    
+    def set_draw_widget(self, val):
+        self.bound_slice_plane.set_draw_widget(val)
+    
+    def get_draw_widget(self):
+        return self.bound_slice_plane.get_draw_widget()
+
+def add_scene_slice_plane():
+    instance = psb.add_scene_slice_plane(False)
+    return SlicePlane(instance)
+
+def remove_last_scene_slice_plane():
+    psb.remove_last_scene_slice_plane()
+
+
 ## Small utilities
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])

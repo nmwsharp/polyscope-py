@@ -54,6 +54,13 @@ void bind_curve_network(py::module& m) {
     .def("get_color", &ps::CurveNetwork::getColor, "Get color")
     .def("set_material", &ps::CurveNetwork::setMaterial, "Set material")
     .def("get_material", &ps::CurveNetwork::getMaterial, "Get material")
+    
+    // slice planes
+    .def("set_ignore_slice_plane", &ps::CurveNetwork::setIgnoreSlicePlane, "Set ignore slice plane")
+    .def("get_ignore_slice_plane", &ps::CurveNetwork::getIgnoreSlicePlane, "Get ignore slice plane")
+    .def("set_cull_whole_elements", &ps::CurveNetwork::setCullWholeElements, "Set cull whole elements")
+    .def("get_cull_whole_elements", &ps::CurveNetwork::getCullWholeElements, "Get cull whole elements")
+
 
     // quantities
     .def("add_node_color_quantity", &ps::CurveNetwork::addNodeColorQuantity<Eigen::MatrixXd>, "Add a color function at nodes",
