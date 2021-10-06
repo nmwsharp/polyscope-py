@@ -9,6 +9,8 @@ Python bindings for Polyscope. https://polyscope.run/py
 
 This library is a python wrapper and deployment system. The core library lives at https://github.com/nmwsharp/polyscope. See documentation at https://polyscope.run/py.
 
+To contribute, check out the [instructions here](https://polyscope.run/about/contributing/).
+
 ### Installation
 
 ```
