@@ -114,7 +114,9 @@ PYBIND11_MODULE(polyscope_bindings, m) {
    .def("set_draw_plane", &ps::SlicePlane::setDrawPlane, "set draw plane")
    .def("get_draw_plane", &ps::SlicePlane::getDrawPlane, "get draw plane")
    .def("set_draw_widget", &ps::SlicePlane::setDrawWidget, "set draw widget")
-   .def("get_draw_widget", &ps::SlicePlane::getDrawWidget, "get draw widget");
+   .def("get_draw_widget", &ps::SlicePlane::getDrawWidget, "get draw widget")
+   .def("set_sliced_volume_mesh", &ps::SlicePlane::setVolumeMeshToSlice, "set name of sliced volume mesh")
+   .def("get_sliced_volume_mesh", &ps::SlicePlane::setVolumeMeshToSlice, "get name of sliced volume mesh");
 
   m.def("add_scene_slice_plane", ps::addSceneSlicePlane, "add a slice plane", py::return_value_policy::reference);
   m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene plane");
