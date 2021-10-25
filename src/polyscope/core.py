@@ -163,6 +163,12 @@ class SlicePlane:
     
     def get_draw_widget(self):
         return self.bound_slice_plane.get_draw_widget()
+    
+    def set_sliced_volume_mesh(self, val):
+        return self.bound_slice_plane.set_sliced_volume_mesh(val)
+
+    def get_sliced_volume_mesh(self):
+        return self.bound_slice_plane.get_sliced_volume_mesh()
 
 def add_scene_slice_plane():
     instance = psb.add_scene_slice_plane(False)
