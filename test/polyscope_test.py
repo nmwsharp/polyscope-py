@@ -59,6 +59,9 @@ class TestCore(unittest.TestCase):
         ps.set_up_dir("z_up")
         ps.set_up_dir("neg_z_up")
         
+        ps.set_view_projection_mode("orthographic")
+        ps.set_view_projection_mode("perspective")
+        
         ps.show(3)
     
         ps.set_up_dir("y_up")

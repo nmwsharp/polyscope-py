@@ -91,6 +91,9 @@ def look_at(camera_location, target, fly_to=False):
 def look_at_dir(camera_location, target, up_dir, fly_to=False):
     psb.look_at_dir(glm3(camera_location), glm3(target), glm3(up_dir), fly_to)
 
+def set_view_projection_mode(s):
+    psb.set_view_projection_mode(str_to_projection_mode(s))
+
 ### Messages
 
 def info(message):
@@ -214,6 +217,18 @@ def str_to_navigate_style(s):
 
     if s not in d:
         raise ValueError("Bad navigate style specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def str_to_projection_mode(s):
+    d = {
+        "perspective" : psb.ProjectionMode.perspective,
+        "orthographic" : psb.ProjectionMode.orthographic,
+    }
+
+    if s not in d:
+        raise ValueError("Bad projection mode specifier '{}', should be one of [{}]".format(s, 
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]

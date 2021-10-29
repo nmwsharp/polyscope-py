@@ -72,7 +72,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("look_at_dir", [](glm::vec3 location, glm::vec3 target, glm::vec3 upDir, bool flyTo) { 
       ps::view::lookAt(location, target, upDir, flyTo); 
   });
-
+  m.def("set_view_projection_mode", [](ps::ProjectionMode x) { ps::view::projectionMode = x; });
   
   // === Messages
   m.def("info", ps::info, "Send an info message");
@@ -126,6 +126,11 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("free", ps::view::NavigateStyle::Free)
     .value("planar", ps::view::NavigateStyle::Planar)
     .value("arcball", ps::view::NavigateStyle::Arcball)
+    .export_values(); 
+  
+  py::enum_<ps::ProjectionMode>(m, "ProjectionMode")
+    .value("perspective", ps::ProjectionMode::Perspective)
+    .value("orthographic", ps::ProjectionMode::Orthographic)
     .export_values(); 
   
   py::enum_<ps::view::UpDir>(m, "UpDir")
