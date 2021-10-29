@@ -705,9 +705,13 @@ class TestSurfaceMesh(unittest.TestCase):
         self.assertEqual("candy", p.get_material())
         p.set_material("clay")
         
-        # Back face policy
+        # Back face 
         p.set_back_face_policy("different")
         self.assertEqual("different", p.get_back_face_policy())
+        p.set_back_face_policy("custom")
+        self.assertEqual("custom", p.get_back_face_policy())
+        p.set_back_face_color((0.25, 0.25, 0.25))
+        self.assertEqual((0.25, 0.25, 0.25), p.get_back_face_color())
         p.set_back_face_policy("cull")
         
         # Transparency

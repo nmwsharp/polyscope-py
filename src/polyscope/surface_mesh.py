@@ -152,6 +152,12 @@ class SurfaceMesh:
         self.bound_mesh.set_back_face_policy(str_to_back_face_policy(val))
     def get_back_face_policy(self):
         return back_face_policy_to_str(self.bound_mesh.get_back_face_policy())
+    
+    # Back face color
+    def set_back_face_color(self, val):
+        self.bound_mesh.set_back_face_color(glm3(val))
+    def get_back_face_color(self):
+        return self.bound_mesh.get_back_face_color().as_tuple()
 
     ## Permutations and bases
 

@@ -304,6 +304,7 @@ def str_to_back_face_policy(s):
     d = {
         "identical" : psb.BackFacePolicy.identical,
         "different" : psb.BackFacePolicy.different,
+        "custom" : psb.BackFacePolicy.custom,
         "cull" : psb.BackFacePolicy.cull,
     }
 
@@ -317,6 +318,7 @@ def back_face_policy_to_str(s):
     d = {
         psb.BackFacePolicy.identical : "identical" ,
         psb.BackFacePolicy.different : "different" ,
+        psb.BackFacePolicy.custom : "custom",
         psb.BackFacePolicy.cull : "cull" 
     }
 

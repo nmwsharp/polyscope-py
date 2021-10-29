@@ -168,6 +168,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   py::enum_<ps::BackFacePolicy>(m, "BackFacePolicy")
     .value("identical", ps::BackFacePolicy::Identical)
     .value("different", ps::BackFacePolicy::Different)
+    .value("custom", ps::BackFacePolicy::Custom)
     .value("cull", ps::BackFacePolicy::Cull)
     .export_values(); 
   
