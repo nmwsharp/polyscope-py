@@ -418,7 +418,7 @@ class SurfaceMesh:
 
 
 def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_color=None, smooth_shade=None, 
-                          edge_width=None, material=None, back_face_policy=None, transparency=None):
+                          edge_width=None, material=None, back_face_policy=None, back_face_color=None, transparency=None):
     """Register a new surface mesh"""
 
     p = SurfaceMesh(name, vertices, faces)
@@ -438,6 +438,8 @@ def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_
         p.set_material(material)
     if back_face_policy is not None:
         p.set_back_face_policy(back_face_policy)
+    if back_face_color is not None:
+        p.set_back_face_color(back_face_color)
     if transparency is not None:
         p.set_transparency(transparency)
 

@@ -721,8 +721,7 @@ class TestSurfaceMesh(unittest.TestCase):
         # Set with optional arguments 
         p2 = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
-                    smooth_shade=True, edge_width=0.5, back_face_policy="cull",
-                    transparency=0.9)
+                    smooth_shade=True, edge_width=0.5, back_face_policy="cull", back_face_color=(0.1, 0.1, 0.1), transparency=0.9)
         
         # Make sure shadows work
         ps.set_ground_plane_mode("shadow_only")
