@@ -1,9 +1,12 @@
+compile_commands.json
+
 # Build directories
 build/
 build_debug/
 dist/
 *.pyc
 __pycache__/
+.cache
 
 # Editor and OS things
 imgui.ini
