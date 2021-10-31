@@ -54,6 +54,8 @@ void bind_point_cloud(py::module& m) {
     .def("get_color", &ps::PointCloud::getPointColor, "Get color")
     .def("set_material", &ps::PointCloud::setMaterial, "Set material")
     .def("get_material", &ps::PointCloud::getMaterial, "Get material")
+    .def("set_point_render_mode", &ps::PointCloud::setPointRenderMode, "Set point render mode")
+    .def("get_point_render_mode", &ps::PointCloud::getPointRenderMode, "Get point render mode")
 
     // slice planes
     .def("set_ignore_slice_plane", &ps::PointCloud::setIgnoreSlicePlane, "Set ignore slice plane")

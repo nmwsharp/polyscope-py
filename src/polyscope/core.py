@@ -12,8 +12,7 @@ def init(backend=""):
     psb.init(backend)
    
     # NOTE: For some reason I do not understand, calling psb.init() changes the working directory, causing e.g. writes to relative file paths to write to unexpected locations afterwards.
-    # As a simple workaround, we restore the CWD from before the call. Of course, this does not address the underlying cause, so there may be other subtle problems lurking.
-    os.chdir(cwd_before)
+    # As a simple workaround, we restore the CWD from before the call. Of course, this does not address the underlying cause, so there may be other subtle problems lurking.  os.chdir(cwd_before)
 
 
 def show(forFrames=None):
@@ -300,33 +299,30 @@ def str_to_param_viz_style(s):
 
     return d[s]
 
+# Back face policy to/from string
+d_back_face_policy = {
+    "identical" : psb.BackFacePolicy.identical,
+    "different" : psb.BackFacePolicy.different,
+    "custom" : psb.BackFacePolicy.custom,
+    "cull" : psb.BackFacePolicy.cull,
+}
+
 def str_to_back_face_policy(s):
-    d = {
-        "identical" : psb.BackFacePolicy.identical,
-        "different" : psb.BackFacePolicy.different,
-        "custom" : psb.BackFacePolicy.custom,
-        "cull" : psb.BackFacePolicy.cull,
-    }
 
-    if s not in d:
+    if s not in d_back_face_policy:
         raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(s, 
-            ",".join(["'{}'".format(x) for x in d.keys()])))
+            ",".join(["'{}'".format(x) for x in d_back_face_policy.keys()])))
 
-    return d[s]
+    return d_back_face_policy[s]
 
-def back_face_policy_to_str(s):
-    d = {
-        psb.BackFacePolicy.identical : "identical" ,
-        psb.BackFacePolicy.different : "different" ,
-        psb.BackFacePolicy.custom : "custom",
-        psb.BackFacePolicy.cull : "cull" 
-    }
+def back_face_policy_to_str(val):
 
-    if s not in d:
-        raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(s, 
-            ",".join(["'{}'".format(x) for x in d.keys()])))
+    for k,v in d_back_face_policy.items():
+        if v == val:
+            return k
 
-    return d[s]
+    raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_back_face_policy.values()])))
   
 
 def str_to_ground_plane_mode(s):
@@ -355,3 +351,26 @@ def str_to_transparency_mode(s):
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]
+
+# Point render mode to/from string
+d_point_render_mode = {
+        "sphere" : psb.PointRenderMode.sphere,
+        "quad" : psb.PointRenderMode.quad,
+    }
+
+def str_to_point_render_mode(s):
+
+    if s not in d_point_render_mode:
+        raise ValueError("Bad point render mode specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_point_render_mode.keys()])))
+
+    return d_point_render_mode[s]
+
+def point_render_mode_to_str(val):
+
+    for k,v in d_point_render_mode.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad point render mode specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_point_render_mode.values()])))

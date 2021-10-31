@@ -221,6 +221,12 @@ class TestPointCloud(unittest.TestCase):
         p.set_radius(0.01)
         p.set_radius(0.1, relative=False)
         self.assertAlmostEqual(0.1, p.get_radius())
+       
+        # Render mode
+        p.set_point_render_mode("sphere")
+        self.assertEqual("sphere", p.get_point_render_mode())
+        p.set_point_render_mode("quad")
+        self.assertEqual("quad", p.get_point_render_mode())
         
         # Color
         color = (0.3, 0.3, 0.5)

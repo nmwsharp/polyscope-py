@@ -184,6 +184,11 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("simple", ps::TransparencyMode::Simple)
     .value("pretty", ps::TransparencyMode::Pretty)
     .export_values(); 
+  
+  py::enum_<ps::PointRenderMode>(m, "PointRenderMode")
+    .value("sphere", ps::PointRenderMode::Sphere)
+    .value("quad", ps::PointRenderMode::Quad)
+    .export_values(); 
 
   // === Mini bindings for a little bit of glm
   py::class_<glm::vec3>(m, "glm_vec3").

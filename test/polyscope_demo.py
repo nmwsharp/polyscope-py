@@ -64,7 +64,7 @@ def main():
 
     ## Examples with a point cloud
     if True:
-        ps_points = polyscope.register_point_cloud("test points", verts)
+        ps_points = polyscope.register_point_cloud("test points", verts, point_render_mode='sphere')
 
         # Scalar functions
         ps_points.add_scalar_quantity("X", verts[:,0])
