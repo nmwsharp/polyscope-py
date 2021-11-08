@@ -37,6 +37,17 @@ void defaultCallback() { checkSignals(); }
 PYBIND11_MODULE(polyscope_bindings, m) {
   m.doc() = "Polyscope low-level bindings";
   
+
+  // Register a cleanup function which will run when the module is exiting.
+  // Suggested at: https://pybind11.readthedocs.io/en/stable/advanced/misc.html#module-destructors
+  // We use it to ensure any Python data held on the C++ side gets properly deleted and cleaned up. This
+  // is particularly difficult to do any other way, because Polyscope extensively uses static variables 
+  // to hold this state, so we can't just fall back on some other object's lifetime.
+  auto atexit = py::module_::import("atexit");
+  atexit.attr("register")(py::cpp_function([]() {
+        ps::state::userCallback = nullptr;
+  }));
+  
   // === Basic flow 
   m.def("init", &ps::init, py::arg("backend")="", "Initialize Polyscope");
   m.def("show", [](size_t forFrames) {
@@ -101,6 +112,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
       // Captures by value, because otherwise func seems to become invalid. This is probably happening
       // on the Python side, and could be fixed with some Pybind11 keep_alive-s or something, but in
       // lieu of figuring that out capture by value seems fine.
+      // See also the atexit() cleanup registered above, which is used to ensure any bound functions get deleted and we can exit cleanly.
       auto wrapperFunc = [=]()  { 
         checkSignals(); 
         func();
