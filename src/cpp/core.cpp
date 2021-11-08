@@ -1,4 +1,5 @@
 #include <pybind11/eigen.h>
+#include <pybind11/functional.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -24,20 +25,33 @@ void bind_point_cloud(py::module& m);
 void bind_curve_network(py::module& m);
 void bind_volume_mesh(py::module& m);
 
+// Signal handler (makes ctrl-c work, etc)
+void checkSignals() {
+  if (PyErr_CheckSignals() != 0) throw py::error_already_set();
+}
+void defaultCallback() { checkSignals(); }
+
 // Actual binding code
 // clang-format off
 PYBIND11_MODULE(polyscope_bindings, m) {
   m.doc() = "Polyscope low-level bindings";
   
-  
   // === Basic flow 
   m.def("init", &ps::init, py::arg("backend")="", "Initialize Polyscope");
   m.def("show", [](size_t forFrames) {
-        // use a callback to check for signals like ctrl-C
-        ps::options::openImGuiWindowForUserCallback = false;
-        auto f = []() { if (PyErr_CheckSignals() != 0) throw py::error_already_set(); };
-        ps::state::userCallback = f;
-        ps::show(forFrames);
+        if (ps::state::userCallback == nullptr) {
+          bool oldVal = ps::options::openImGuiWindowForUserCallback;
+          ps::options::openImGuiWindowForUserCallback = false;
+          ps::state::userCallback = defaultCallback; // use the default callback to ensure signals get checked
+          ps::show(forFrames);
+          ps::state::userCallback = nullptr;
+          ps::options::openImGuiWindowForUserCallback = oldVal;
+        } else {
+          // otherwise, we can just directly call show()
+          // (the set_user_callback()) function ensures that the signal check is performed in
+          // this case
+          ps::show(forFrames);
+        }
       },
       py::arg("forFrames")=std::numeric_limits<size_t>::max()
   );
@@ -79,6 +93,20 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("warning", ps::warning, "Send a warning message");
   m.def("error", ps::error, "Send an error message");
   m.def("terminating_error", ps::terminatingError, "Send a terminating error message");
+
+  // === Callback
+  m.def("set_user_callback", [](const std::function<void(void)>& func) { 
+      // Create a wrapper which checks signals before calling the passed fuction
+      // Captures by value, because otherwise func seems to become invalid. This is probably happening
+      // on the Python side, and could be fixed with some Pybind11 keep_alive-s or something, but in
+      // lieu of figuring that out capture by value seems fine.
+      auto wrapperFunc = [=]()  { 
+        checkSignals(); 
+        func();
+      };
+      ps::state::userCallback = wrapperFunc;
+  });
+  m.def("clear_user_callback", []() {ps::state::userCallback = nullptr;});
   
   // === Ground plane and shadows
   m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });

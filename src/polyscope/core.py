@@ -107,6 +107,13 @@ def error(message):
 def terminating_error(message):
     psb.terminating_error(message)
 
+### Callback
+def set_user_callback(func):
+    psb.set_user_callback(func)
+
+def clear_user_callback():
+    psb.clear_user_callback()
+
 ## Ground plane and shadows
 def set_ground_plane_mode(mode_str):
     psb.set_ground_plane_mode(str_to_ground_plane_mode(mode_str))

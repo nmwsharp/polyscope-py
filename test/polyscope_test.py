@@ -45,6 +45,30 @@ class TestCore(unittest.TestCase):
         ps.set_autoscale_structures(False)
         
         ps.show(3)
+
+    def test_callbacks(self):
+
+        # Simple callback function
+        # (we use 'counts' to ensure it gets called)
+        counts = [0]
+        def sample_callback():
+            counts[0] = counts[0] + 1
+
+        ps.set_user_callback(sample_callback)
+        ps.show(3)
+       
+        # Make sure the callback got called
+        self.assertEqual(3, counts[0])
+
+        ps.clear_user_callback()
+        ps.show(3)
+        
+        # Make sure the callback didn't get called any more
+        self.assertEqual(3, counts[0])
+        
+        # Make sure clearing twice is ok
+        ps.clear_user_callback()
+
     
     def test_view_options(self):
 
