@@ -24,6 +24,7 @@ void bind_surface_mesh(py::module& m);
 void bind_point_cloud(py::module& m);
 void bind_curve_network(py::module& m);
 void bind_volume_mesh(py::module& m);
+void bind_imgui(py::module& m);
 
 // Signal handler (makes ctrl-c work, etc)
 void checkSignals() {
@@ -231,6 +232,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   bind_point_cloud(m);
   bind_curve_network(m);
   bind_volume_mesh(m);
+  bind_imgui(m);
 
 }
 
