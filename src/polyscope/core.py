@@ -184,6 +184,8 @@ def remove_last_scene_slice_plane():
 ## Small utilities
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])
+def glm4(vals):
+    return psb.glm_vec4(vals[0], vals[1], vals[2], vals[3])
 
 ### Materials
 

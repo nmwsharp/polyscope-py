@@ -238,6 +238,13 @@ PYBIND11_MODULE(polyscope_bindings, m) {
         [](const glm::vec3& x) {
         return std::tuple<float, float, float>(x[0], x[1], x[2]);
         });
+  
+  py::class_<glm::vec4>(m, "glm_vec4").
+    def(py::init<float, float, float, float>())
+   .def("as_tuple",
+        [](const glm::vec4& x) {
+        return std::tuple<float, float, float, float>(x[0], x[1], x[2], x[3]);
+        });
 
   // === Bind structures defined in other files
   bind_surface_mesh(m);

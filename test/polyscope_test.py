@@ -17,6 +17,7 @@ else:
 
 
 import polyscope as ps
+import polyscope.imgui as psim
 
 # Path to test assets
 assets_prefix = path.join(path.dirname(__file__), "assets/")
@@ -68,7 +69,6 @@ class TestCore(unittest.TestCase):
         
         # Make sure clearing twice is ok
         ps.clear_user_callback()
-
     
     def test_view_options(self):
 
@@ -184,13 +184,82 @@ class TestCore(unittest.TestCase):
     
     def test_load_cmap(self):
         ps.load_color_map("test_cmap", path.join(assets_prefix, "test_colormap.png"))
+   
+
+class TestImGuiBindings(unittest.TestCase):
+
+    def test_ui_calls(self):
     
+        # Values for the callback
+        is_true = False
+        ui_int = 7
+        ui_float1 = -3.2
+        ui_float2 = 0.8
+        ui_color3 = (1., 0.5, 0.5)
+        ui_color4 = (0.3, 0.5, 0.5, 0.8)
+        ui_text = "some input text"
+        ui_options = ["option A", "option B", "option C"]
+        ui_options_selected = ui_options[1]
+
+        def imgui_callback():
+            nonlocal is_true, ui_int, ui_float1, ui_float2, ui_color3, ui_color4, ui_text, ui_options_selected
+            
+            psim.PushItemWidth(150)
+
+            psim.TextUnformatted("Sample UI")
+            psim.Separator()
+
+            psim.TextUnformatted("My First GUI")
+            if(psim.Button("Do something")):
+                print("Hi Mom")
+
+            psim.SameLine()
+            
+            if(psim.Button("Crash")):
+                raise RuntimeError("unhandled")
+
+            changed, is_true = psim.Checkbox("is true", is_true) 
+            changed, ui_int = psim.InputInt("ui_int", ui_int) 
+            psim.Indent(2.)
+            changed, ui_float1 = psim.InputFloat("ui_float1", ui_float1) 
+            psim.NewLine()
+            changed, ui_float2 = psim.SliderFloat("ui_float2", ui_float2, v_min=-1, v_max=1) 
+            psim.Unindent(2.)
+            if(psim.TreeNode("color tests", DefaultOpen=False)):
+                changed, ui_color3 = psim.ColorEdit3("ui_color3", ui_color3, NoInputs=True)
+                changed, ui_color4 = psim.ColorEdit4("ui_color4", ui_color4)
+                psim.TreePop()
+            changed, ui_text = psim.InputText("enter text", ui_text)
+
+
+            psim.PushItemWidth(300)
+            changed = psim.BeginCombo("Pick one", ui_options_selected)
+            if changed:
+                for val in ui_options:
+                    changed = psim.Selectable(val, ui_options_selected==val)
+                    if changed:
+                        ui_options_selected = val
+                psim.EndCombo()
+            psim.PopItemWidth()
+
+            psim.PushID("temp_id")
+            if(psim.Button("another buttom")):
+                print("hello")
+            psim.PopID()
+            
+            psim.PopItemWidth()
+
+
+        ps.set_user_callback(imgui_callback)
+        ps.show(3)
+        
+        ps.clear_user_callback()
+
 
 class TestStructureManagement(unittest.TestCase):
 
     def test_remove_all(self):
         pass
-
 
 class TestPointCloud(unittest.TestCase):
 
