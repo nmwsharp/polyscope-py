@@ -46,6 +46,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   auto atexit = py::module_::import("atexit");
   atexit.attr("register")(py::cpp_function([]() {
         ps::state::userCallback = nullptr;
+        ps::shutdown();
   }));
   
   // === Basic flow 
