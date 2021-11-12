@@ -74,8 +74,8 @@ def set_autocenter_structures(b):
 def set_autoscale_structures(b):
     psb.set_autoscale_structures(b)
 
-def give_focus_on_show(b):
-    psb.give_focus_on_show(b)
+def set_give_focus_on_show(b):
+    psb.set_give_focus_on_show(b)
 
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))
