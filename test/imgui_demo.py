@@ -2,7 +2,7 @@ import polyscope as pscope
 from polyscope import imgui
 
 
-pscope.set_program_name("Formlogic")
+pscope.set_program_name("Demo")
 pscope.init()
 pscope.set_up_dir("z_up")
 
