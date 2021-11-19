@@ -74,6 +74,15 @@ def set_autocenter_structures(b):
 def set_autoscale_structures(b):
     psb.set_autoscale_structures(b)
 
+def set_build_gui(b):
+    psb.set_build_gui(b)
+
+def set_open_imgui_window_for_user_callback(b):
+    psb.set_open_imgui_window_for_user_callback(b)
+
+def set_invoke_user_callback_for_nested_show(b):
+    psb.set_invoke_user_callback_for_nested_show(b)
+
 def set_give_focus_on_show(b):
     psb.set_give_focus_on_show(b)
 

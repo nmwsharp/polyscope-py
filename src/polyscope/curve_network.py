@@ -78,6 +78,24 @@ class CurveNetwork:
     def get_transparency(self):
         return self.bound_network.get_transparency()
     
+    # Transformation things
+    def center_bounding_box(self):
+        self.bound_network.center_bounding_box()
+    def rescale_to_unit(self):
+        self.bound_network.rescale_to_unit()
+    def reset_transform(self):
+        self.bound_network.reset_transform()
+    def set_transform(self, new_mat4x4):
+        self.bound_network.set_transform(new_mat4x4)
+    def set_position(self, new_vec3):
+        self.bound_network.set_position(new_vec3)
+    def translate(self, trans_vec3):
+        self.bound_network.translate(trans_vec3)
+    def get_transform(self):
+        return self.bound_network.get_transform()
+    def get_position(self):
+        return self.bound_network.get_position()
+    
     # Slice planes
     def set_cull_whole_elements(self, val):
         self.bound_network.set_cull_whole_elements(val)

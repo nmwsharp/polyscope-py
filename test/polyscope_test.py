@@ -44,6 +44,11 @@ class TestCore(unittest.TestCase):
         
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
+
+        ps.set_build_gui(True)
+        ps.set_open_imgui_window_for_user_callback(True)
+        ps.set_invoke_user_callback_for_nested_show(False)
+        ps.set_give_focus_on_show(True)
         
         ps.show(3)
 
@@ -335,6 +340,36 @@ class TestStructureManagement(unittest.TestCase):
     def test_remove_all(self):
         pass
 
+def test_transforms(t,s):
+
+    T = np.array([
+        [1., 0., 0., 3.],
+        [0., 0., -1., -2.],
+        [0., 1., 0., 5.],
+        [0., 0., 0., 1.]
+        ])
+    v = np.array([1., 2., 3.])
+
+    s.get_transform()
+    s.get_position()
+    s.center_bounding_box()
+    s.rescale_to_unit()
+
+    s.reset_transform()
+    t.assertTrue(np.abs(s.get_transform()-np.eye(4)).sum() < 1e-4)
+    t.assertTrue(np.abs(s.get_position()).sum() < 1e-4)
+    
+    s.set_transform(T)
+    t.assertTrue(np.abs(s.get_transform()-T).sum() < 1e-4)
+
+    s.reset_transform()
+    s.set_position(v)
+    t.assertTrue(np.abs(s.get_position()-v).sum() < 1e-4)
+
+    s.translate(v)
+    t.assertTrue(np.abs(s.get_position()-2.*v).sum() < 1e-4)
+
+
 class TestPointCloud(unittest.TestCase):
 
     def generate_points(self, n_pts=10):
@@ -418,6 +453,12 @@ class TestPointCloud(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        ps_cloud = ps.register_point_cloud("test_cloud", self.generate_points())
+        test_transforms(self,ps_cloud)
+        ps.remove_all_structures()
     
     def test_update(self):
 
@@ -641,6 +682,12 @@ class TestCurveNetwork(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        p = ps.register_curve_network("test_network", self.generate_points(), self.generate_edges())
+        test_transforms(self,p)
+        ps.remove_all_structures()
     
     def test_slice_plane(self):
 
@@ -902,6 +949,12 @@ class TestSurfaceMesh(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        test_transforms(self,p)
+        ps.remove_all_structures()
     
     def test_slice_plane(self):
 
@@ -1315,6 +1368,12 @@ class TestVolumeMesh(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+        test_transforms(self,p)
+        ps.remove_all_structures()
    
     def test_slice_plane(self):
 
