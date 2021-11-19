@@ -12,6 +12,7 @@ else:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 
 import polyscope
+import polyscope.imgui as psim
 from polyscope import imgui as psim
 import potpourri3d as pp3d
 
