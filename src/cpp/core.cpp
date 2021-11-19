@@ -1,4 +1,5 @@
 #include <pybind11/eigen.h>
+#include <pybind11/functional.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -23,21 +24,49 @@ void bind_surface_mesh(py::module& m);
 void bind_point_cloud(py::module& m);
 void bind_curve_network(py::module& m);
 void bind_volume_mesh(py::module& m);
+void bind_imgui(py::module& m);
+
+// Signal handler (makes ctrl-c work, etc)
+void checkSignals() {
+  if (PyErr_CheckSignals() != 0) throw py::error_already_set();
+}
+void defaultCallback() { checkSignals(); }
 
 // Actual binding code
 // clang-format off
 PYBIND11_MODULE(polyscope_bindings, m) {
   m.doc() = "Polyscope low-level bindings";
   
+
+  // Register a cleanup function which will run when the module is exiting.
+  // Suggested at: https://pybind11.readthedocs.io/en/stable/advanced/misc.html#module-destructors
+  // We use it to ensure any Python data held on the C++ side gets properly deleted and cleaned up. This
+  // is particularly difficult to do any other way, because Polyscope extensively uses static variables 
+  // to hold this state, so we can't just fall back on some other object's lifetime.
+  auto atexit = py::module_::import("atexit");
+  atexit.attr("register")(py::cpp_function([]() {
+        ps::state::userCallback = nullptr;
+        if (ps::render::engine != nullptr) {
+          ps::shutdown();
+        }
+  }));
   
   // === Basic flow 
   m.def("init", &ps::init, py::arg("backend")="", "Initialize Polyscope");
   m.def("show", [](size_t forFrames) {
-        // use a callback to check for signals like ctrl-C
-        ps::options::openImGuiWindowForUserCallback = false;
-        auto f = []() { if (PyErr_CheckSignals() != 0) throw py::error_already_set(); };
-        ps::state::userCallback = f;
-        ps::show(forFrames);
+        if (ps::state::userCallback == nullptr) {
+          bool oldVal = ps::options::openImGuiWindowForUserCallback;
+          ps::options::openImGuiWindowForUserCallback = false;
+          ps::state::userCallback = defaultCallback; // use the default callback to ensure signals get checked
+          ps::show(forFrames);
+          ps::state::userCallback = nullptr;
+          ps::options::openImGuiWindowForUserCallback = oldVal;
+        } else {
+          // otherwise, we can just directly call show()
+          // (the set_user_callback()) function ensures that the signal check is performed in
+          // this case
+          ps::show(forFrames);
+        }
       },
       py::arg("forFrames")=std::numeric_limits<size_t>::max()
   );
@@ -80,6 +109,21 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("warning", ps::warning, "Send a warning message");
   m.def("error", ps::error, "Send an error message");
   m.def("terminating_error", ps::terminatingError, "Send a terminating error message");
+
+  // === Callback
+  m.def("set_user_callback", [](const std::function<void(void)>& func) { 
+      // Create a wrapper which checks signals before calling the passed fuction
+      // Captures by value, because otherwise func seems to become invalid. This is probably happening
+      // on the Python side, and could be fixed with some Pybind11 keep_alive-s or something, but in
+      // lieu of figuring that out capture by value seems fine.
+      // See also the atexit() cleanup registered above, which is used to ensure any bound functions get deleted and we can exit cleanly.
+      auto wrapperFunc = [=]()  { 
+        checkSignals(); 
+        func();
+      };
+      ps::state::userCallback = wrapperFunc;
+  });
+  m.def("clear_user_callback", []() {ps::state::userCallback = nullptr;});
   
   // === Ground plane and shadows
   m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });
@@ -198,12 +242,20 @@ PYBIND11_MODULE(polyscope_bindings, m) {
         [](const glm::vec3& x) {
         return std::tuple<float, float, float>(x[0], x[1], x[2]);
         });
+  
+  py::class_<glm::vec4>(m, "glm_vec4").
+    def(py::init<float, float, float, float>())
+   .def("as_tuple",
+        [](const glm::vec4& x) {
+        return std::tuple<float, float, float, float>(x[0], x[1], x[2], x[3]);
+        });
 
   // === Bind structures defined in other files
   bind_surface_mesh(m);
   bind_point_cloud(m);
   bind_curve_network(m);
   bind_volume_mesh(m);
+  bind_imgui(m);
 
 }
 

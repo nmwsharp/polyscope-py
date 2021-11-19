@@ -111,6 +111,13 @@ def error(message):
 def terminating_error(message):
     psb.terminating_error(message)
 
+### Callback
+def set_user_callback(func):
+    psb.set_user_callback(func)
+
+def clear_user_callback():
+    psb.clear_user_callback()
+
 ## Ground plane and shadows
 def set_ground_plane_mode(mode_str):
     psb.set_ground_plane_mode(str_to_ground_plane_mode(mode_str))
@@ -181,6 +188,8 @@ def remove_last_scene_slice_plane():
 ## Small utilities
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])
+def glm4(vals):
+    return psb.glm_vec4(vals[0], vals[1], vals[2], vals[3])
 
 ### Materials
 
