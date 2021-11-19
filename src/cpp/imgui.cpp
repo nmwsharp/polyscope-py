@@ -99,7 +99,7 @@ void bind_imgui_methods(py::module& m) {
         "GetColorU32", [](ImU32 col) { return ImGui::GetColorU32(col); }, py::arg("col"));
 
     // Cursor / Layout
-    m.def("separator", []() { ImGui::Separator(); });
+    m.def("Separator", []() { ImGui::Separator(); });
     m.def(
         "SameLine",
         [](float offset_from_start_x, float spacing) { ImGui::SameLine(); },
@@ -170,12 +170,14 @@ void bind_imgui_methods(py::module& m) {
 
     // ID stack/scopes
     m.def(
-        "PushId", [](const char* str_id) { ImGui::PushID(str_id); }, py::arg("str_id"));
+        "PushID", [](const char* str_id) { ImGui::PushID(str_id); }, py::arg("str_id"));
     m.def("PopID", []() { ImGui::PopID(); });
     m.def(
-        "GetId", [](const char* str_id) { ImGui::GetID(str_id); }, py::arg("str_id"));
+        "GetID", [](const char* str_id) { ImGui::GetID(str_id); }, py::arg("str_id"));
 
     // Widgets: Text
+    m.def(
+        "TextUnformatted", [](const char* text) { ImGui::TextUnformatted(text); }, py::arg("text"));
     m.def(
         "Text", [](const char* fmt) { ImGui::Text("%s", fmt); }, py::arg("text"));
     m.def(
@@ -273,7 +275,7 @@ void bind_imgui_methods(py::module& m) {
         },
         py::arg("label"),
         py::arg("preview_value"),
-        py::arg("flags"));
+        py::arg("flags") = 0);
     m.def("EndCombo", []() { ImGui::EndCombo(); });
     m.def(
         "Combo",
@@ -944,11 +946,10 @@ void bind_imgui_methods(py::module& m) {
         "Selectable",
         [](const char* label, bool selected, ImGuiSelectableFlags flags, const Vec2T& size) {
             auto selected_ = selected;
-            const auto clicked = ImGui::Selectable(label, &selected, flags, to_vec2(size));
-            return std::make_tuple(clicked, selected_);
+            return ImGui::Selectable(label, &selected, flags, to_vec2(size));
         },
         py::arg("label"),
-        py::arg("selected"),
+        py::arg("selected") = false,
         py::arg("flags") = 0,
         py::arg("size") = std::make_tuple(0.f, 0.f));
 
