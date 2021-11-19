@@ -12,7 +12,7 @@ else:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 
 import polyscope
-import polyscope.imgui as psim
+from polyscope import imgui as psim
 import potpourri3d as pp3d
 
 import sys
@@ -33,16 +33,14 @@ def main():
     verts, faces = pp3d.read_mesh(args.mesh)
 
 
-    def callback():
-        psim.TextUnformatted("My First GUI")
-        if(psim.Button("Do something")):
-            print("Hi Mom")
-    
-            verts, faces = pp3d.read_mesh(args.mesh)
-            verts *= 2.
-            ps_mesh = polyscope.register_surface_mesh("test mesh 2", verts, faces, enabled=True)
-        
+    # Set up a simple callback and UI button
+    def my_function():
+        pass
 
+    def callback():
+        # Executed every frame
+        if(psim.Button("Test button")):
+            my_function()
     polyscope.set_user_callback(callback)
    
 
@@ -54,7 +52,7 @@ def main():
     polyscope.set_ground_plane_mode("shadow_only")
 
     ## Examples with a mesh
-    if False:
+    if True:
         ps_mesh = polyscope.register_surface_mesh("test mesh", verts, faces, enabled=True)
 
         # Scalar functions
