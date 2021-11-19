@@ -12,7 +12,8 @@ def init(backend=""):
     psb.init(backend)
    
     # NOTE: For some reason I do not understand, calling psb.init() changes the working directory, causing e.g. writes to relative file paths to write to unexpected locations afterwards.
-    # As a simple workaround, we restore the CWD from before the call. Of course, this does not address the underlying cause, so there may be other subtle problems lurking.  os.chdir(cwd_before)
+    # As a simple workaround, we restore the CWD from before the call. Of course, this does not address the underlying cause, so there may be other subtle problems lurking.  
+    os.chdir(cwd_before)
 
 
 def show(forFrames=None):
@@ -72,6 +73,9 @@ def set_autocenter_structures(b):
 
 def set_autoscale_structures(b):
     psb.set_autoscale_structures(b)
+
+def set_give_focus_on_show(b):
+    psb.set_give_focus_on_show(b)
 
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))

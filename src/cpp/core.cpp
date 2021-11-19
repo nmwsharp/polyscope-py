@@ -90,6 +90,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_enable_render_error_checks", [](bool x) { ps::options::enableRenderErrorChecks = x; });
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
   m.def("set_autoscale_structures", [](bool x) { ps::options::autoscaleStructures = x; });
+  m.def("set_give_focus_on_show", [](bool x) { ps::options::giveFocusOnShow = x; });
   m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
   m.def("set_up_dir", [](ps::view::UpDir x) { ps::view::setUpDir(x); });
 
