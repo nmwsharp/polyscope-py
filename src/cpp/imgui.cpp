@@ -119,21 +119,21 @@ void bind_imgui_methods(py::module& m) {
     m.def("GetCursorPosY", []() { return ImGui::GetCursorPosY(); });
     m.def(
         "SetCursorPos",
-        [](const Vec2T& local_pos) { return ImGui::SetCursorPos(to_vec2(local_pos)); },
+        [](const Vec2T& local_pos) { ImGui::SetCursorPos(to_vec2(local_pos)); },
         py::arg("local_pos"));
     m.def(
         "SetCursorPosX",
-        [](float local_x) { return ImGui::SetCursorPosX(local_x); },
+        [](float local_x) { ImGui::SetCursorPosX(local_x); },
         py::arg("local_x"));
     m.def(
         "SetCursorPosY",
-        [](float local_y) { return ImGui::SetCursorPosY(local_y); },
+        [](float local_y) { ImGui::SetCursorPosY(local_y); },
         py::arg("local_y"));
     m.def("GetCursorStartPos", []() { return from_vec2(ImGui::GetCursorStartPos()); });
     m.def("GetCursorScreenPos", []() { return from_vec2(ImGui::GetCursorScreenPos()); });
     m.def(
         "SetCursorScreenPos",
-        [](const Vec2T& pos) { return ImGui::SetCursorScreenPos(to_vec2(pos)); },
+        [](const Vec2T& pos) { ImGui::SetCursorScreenPos(to_vec2(pos)); },
         py::arg("pos"));
     m.def("AlignTextToFramePadding", []() { ImGui::AlignTextToFramePadding(); });
     m.def("GetTextLineHeight", []() { ImGui::GetTextLineHeight(); });
@@ -148,7 +148,7 @@ void bind_imgui_methods(py::module& m) {
         py::arg("item_width"));
     m.def("PopItemWidth", []() { ImGui::PopItemWidth(); });
     m.def(
-        "PushItemWidth",
+        "SetNextItemWidth",
         [](float item_width) { ImGui::SetNextItemWidth(item_width); },
         py::arg("item_width"));
     m.def("CalcItemWidth", []() { return ImGui::CalcItemWidth(); });
@@ -156,17 +156,17 @@ void bind_imgui_methods(py::module& m) {
         "PushTextWrapPos",
         [](float wrap_local_pos_x) { ImGui::PushTextWrapPos(wrap_local_pos_x); },
         py::arg("wrap_local_pos_x") = 0.0f);
-    m.def("PopTextWrapPos", []() { return ImGui::PopTextWrapPos(); });
+    m.def("PopTextWrapPos", []() { ImGui::PopTextWrapPos(); });
     m.def(
         "PushAllowKeyboardFocus",
         [](bool allow_keyboard_focus) { ImGui::PushAllowKeyboardFocus(allow_keyboard_focus); },
         py::arg("allow_keyboard_focus"));
-    m.def("PopAllowKeyboardFocus", []() { return ImGui::PopAllowKeyboardFocus(); });
+    m.def("PopAllowKeyboardFocus", []() { ImGui::PopAllowKeyboardFocus(); });
     m.def(
         "PushButtonRepeat",
         [](bool repeat) { ImGui::PushButtonRepeat(repeat); },
         py::arg("allow_keyboard_focus"));
-    m.def("PopButtonRepeat", []() { return ImGui::PopButtonRepeat(); });
+    m.def("PopButtonRepeat", []() { ImGui::PopButtonRepeat(); });
 
     // ID stack/scopes
     m.def(
