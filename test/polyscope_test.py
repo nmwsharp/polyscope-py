@@ -189,6 +189,23 @@ class TestCore(unittest.TestCase):
     
     def test_load_cmap(self):
         ps.load_color_map("test_cmap", path.join(assets_prefix, "test_colormap.png"))
+    
+
+    def test_scene_extents(self):
+
+        ps.set_automatically_compute_scene_extents(False)
+
+        ps.set_length_scale(3.)
+        self.assertAlmostEqual(ps.get_length_scale(), 3.)
+
+        low = np.array((-1, -2., -3.)) 
+        high = np.array((1., 2., 3.))
+        ps.set_bounding_box(low, high)
+        plow, phigh = ps.get_bounding_box()
+        self.assertTrue(np.abs(plow-low).sum() < 0.0001)
+        self.assertTrue(np.abs(phigh-high).sum() < 0.0001)
+        
+        ps.set_automatically_compute_scene_extents(True)
    
 
 class TestImGuiBindings(unittest.TestCase):

@@ -2,6 +2,8 @@ import polyscope_bindings as psb
 
 import os
 
+import numpy as np
+
 ### Basic setup and teardown 
 
 def init(backend=""):
@@ -91,6 +93,24 @@ def set_navigation_style(s):
 
 def set_up_dir(d):
     psb.set_up_dir(str_to_updir(d))
+
+### Scene extents
+
+def set_automatically_compute_scene_extents(b):
+    psb.set_automatically_compute_scene_extents(b)
+
+def set_length_scale(s):
+    psb.set_length_scale(s)
+
+def get_length_scale():
+    return psb.get_length_scale()
+
+def set_bounding_box(low, high):
+    psb.set_bounding_box(glm3(low), glm3(high))
+
+def get_bounding_box():
+    low, high = psb.get_bounding_box()
+    return np.array(low.as_tuple()), np.array(high.as_tuple())
 
 ### Camera controls
 

@@ -97,6 +97,13 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
   m.def("set_up_dir", [](ps::view::UpDir x) { ps::view::setUpDir(x); });
 
+  // === Scene extents
+  m.def("set_automatically_compute_scene_extents", [](bool x) { ps::options::automaticallyComputeSceneExtents = x; });
+  m.def("set_length_scale", [](float x) { ps::state::lengthScale = x; });
+  m.def("get_length_scale", []() { return ps::state::lengthScale; });
+  m.def("set_bounding_box", [](glm::vec3 low, glm::vec3 high) { ps::state::boundingBox = std::tuple<glm::vec3, glm::vec3>(low, high); });
+  m.def("get_bounding_box", []() { return ps::state::boundingBox; });
+
   // === Camera controls
   m.def("reset_camera_to_home_view", ps::view::resetCameraToHomeView);
   m.def("look_at", [](glm::vec3 location, glm::vec3 target, bool flyTo) { 
