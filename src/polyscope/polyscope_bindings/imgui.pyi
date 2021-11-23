@@ -1,9 +1,15 @@
-from typing import NewType, Optional, Tuple, Union
+from typing import NewType, List, Optional, Tuple, Union
 
 ImGuiWindowFlags = NewType("ImGuiWindowFlags", int)
 ImGuiFocusedFlags = NewType("ImGuiFocusedFlags", int)
 ImGuiStyleVar = NewType("ImGuiStyleVar", int)
-ImGuiID = NewType("ImGuiID", int)
+ImGuiComboFlags = NewType("ImGuiComboFlags", int)
+ImGuiDataType = NewType("ImGuiDataType", int)
+ImGuiInputTextFlags = NewType("ImGuiInputTextFlags", int)
+ImGuiColorEditFlags = NewType("ImGuiColorEditFlags", int)
+ImGuiTreeNodeFlags = NewType("ImGuiTreeNodeFlags", int)
+ImGuiSelectableFlags = NewType("ImGuiSelectableFlags", int)
+ImGuiMouseButton = NewType("ImGuiMouseButton", int)
 ImGuiDir = NewType("ImGuiDir", int)
 ImGuiCond = NewType("ImGuiCond", int)
 ImU32 = NewType("ImU32", int)
@@ -155,7 +161,284 @@ def CheckboxFlags(label: str, flags: int, flags_value: int) -> Tuple[bool, int]:
 def RadioButton(label: str, active: bool) -> bool: ...
 def RadioButton(label: str, v: int, v_button: int) -> Tuple[bool, int]: ...
 def ProgressBar(fraction: float, size_arg: ImVec2 = (-1, 0)) -> None: ...
-def Bullte() -> None: ...
+def Bullet() -> None: ...
+
+# Widgets: Combo Box
+def BeginCombo(label: str, preview_value: str, flags: ImGuiComboFlags = 0) -> bool: ...
+def EndCombo() -> None: ...
+def Combo(
+    label: str, current_item: int, items: List[str], popup_max_height_in_items: int - 1
+) -> Tuple[bool, int]: ...
+
+# Widgets: Drags
+def DragFloat(
+    label: str,
+    v: float,
+    v_speed: float = 1.0,
+    v_min: float = 0.0,
+    v_max: float = 0.0,
+    format: str = "%.3f",
+    power: float = 1.0,
+) -> Tuple[bool, float]: ...
+def DragFloat2(
+    label: str,
+    v: List[float],
+    v_speed: float = 1.0,
+    v_min: float = 0.0,
+    v_max: float = 0.0,
+    format: str = "%.3f",
+    power: float = 1.0,
+) -> Tuple[bool, List[float]]: ...
+def DragFloat3(
+    label: str,
+    v: List[float],
+    v_speed: float = 1.0,
+    v_min: float = 0.0,
+    v_max: float = 0.0,
+    format: str = "%.3f",
+    power: float = 1.0,
+) -> Tuple[bool, List[float]]: ...
+def DragFloat4(
+    label: str,
+    v: List[float],
+    v_speed: float = 1.0,
+    v_min: float = 0.0,
+    v_max: float = 0.0,
+    format: str = "%.3f",
+    power: float = 1.0,
+) -> Tuple[bool, List[float]]: ...
+def DragFloatRange2(
+    label: str,
+    v_current_min: List[float],
+    v_current_max: List[float],
+    v_speed: float = 1.0,
+    v_min: float = 0.0,
+    v_max: float = 0.0,
+    format: str = "%.3f",
+    format_max: Optional[str] = None,
+    power: float = 1.0,
+) -> Tuple[bool, List[float], List[float]]: ...
+def DragInt(
+    label: str,
+    v: int,
+    v_speed: float = 1.0,
+    v_min: int = 0,
+    v_max: int = 0,
+    format: str = "%d",
+) -> Tuple[bool, float]: ...
+def DragInt2(
+    label: str,
+    v: List[int],
+    v_speed: float = 1.0,
+    v_min: int = 0,
+    v_max: int = 0,
+    format: str = "%d",
+) -> Tuple[bool, List[float]]: ...
+def DragInt3(
+    label: str,
+    v: List[int],
+    v_speed: float = 1.0,
+    v_min: int = 0,
+    v_max: int = 0,
+    format: str = "%d",
+) -> Tuple[bool, List[float]]: ...
+def DragInt4(
+    label: str,
+    v: List[int],
+    v_speed: float = 1.0,
+    v_min: int = 0,
+    v_max: int = 0,
+    format: str = "%d",
+) -> Tuple[bool, List[float]]: ...
+def DragIntRange2(
+    label: str,
+    v_current_min: List[int],
+    v_current_max: List[int],
+    v_speed: float = 1.0,
+    v_min: int = 0,
+    v_max: int = 0,
+    format: str = "%d",
+    format_max: Optional[str] = None,
+) -> Tuple[bool, List[int], List[int]]: ...
+
+# Widgets: Input with Keyboard
+def InputText(
+    label: str, buf: str, flags: ImGuiInputTextFlags = 0
+) -> Tuple[bool, str]: ...
+def InputTextMultiline(
+    label: str, buf: str, size: ImVec2 = (0.0, 0.0), flags: ImGuiInputTextFlags = 0
+) -> Tuple[bool, ImVec2]: ...
+def InputTextWithHint(
+    label: str, hint: str, buf: str, flags: ImGuiInputTextFlags = 0
+) -> Tuple[bool, ImVec2]: ...
+def InputFloat(
+    label: str,
+    v: float,
+    step: float = 0.0,
+    step_fast: float = 0.0,
+    format: str = "%.3f",
+    flags: ImGuiInputTextFlags = 0,
+) -> Tuple[bool, float]: ...
+def InputFloat2(
+    label: str,
+    v: List[float],
+    format: str = "%.3f",
+    flags: ImGuiInputTextFlags = 0,
+) -> Tuple[bool, List[float]]: ...
+def InputFloat3(
+    label: str,
+    v: List[float],
+    format: str = "%.3f",
+    flags: ImGuiInputTextFlags = 0,
+) -> Tuple[bool, List[float]]: ...
+def InputFloat4(
+    label: str,
+    v: List[float],
+    format: str = "%.3f",
+    flags: ImGuiInputTextFlags = 0,
+) -> Tuple[bool, List[float]]: ...
+def InputInt(
+    label: str,
+    v: int,
+    step: int = 1,
+    step_fast: int = 100,
+    flags: ImGuiInputTextFlags = 0,
+) -> Tuple[bool, float]: ...
+def InputInt2(
+    label: str,
+    v: List[int],
+    flags: ImGuiInputTextFlags = 0,
+) -> Tuple[bool, List[int]]: ...
+def InputInt3(
+    label: str,
+    v: List[int],
+    flags: ImGuiInputTextFlags = 0,
+) -> Tuple[bool, List[int]]: ...
+def InputInt4(
+    label: str,
+    v: List[int],
+    flags: ImGuiInputTextFlags = 0,
+) -> Tuple[bool, List[int]]: ...
+def InputDouble(
+    label: str,
+    v: float,
+    step: float = 0.0,
+    step_fast: float = 0.0,
+    format: str = "%.6f",
+    flags: ImGuiInputTextFlags = 0,
+) -> Tuple[bool, float]: ...
+
+# Widgets: Color Editor/Picker
+def ColorEdit3(
+    label: str, col: List[float], flags: ImGuiColorEditFlags = 0
+) -> Tuple[bool, List[float]]: ...
+def ColorEdit4(
+    label: str, col: List[float], flags: ImGuiColorEditFlags = 0
+) -> Tuple[bool, List[float]]: ...
+def ColorPicker3(
+    label: str, col: List[float], flags: ImGuiColorEditFlags = 0
+) -> Tuple[bool, List[float]]: ...
+def ColorPicker4(
+    label: str,
+    col: List[float],
+    flags: ImGuiColorEditFlags = 0,
+    ref_col: Optional[List[float]] = None,
+) -> Tuple[bool, List[float]]: ...
+def ColorButton(
+    desc_id: str, col: ImVec4, flags: ImGuiColorEditFlags = 0, size: ImVec2 = (0, 0)
+) -> bool: ...
+def SetColorEditOptions(flags: ImGuiColorEditFlags) -> None: ...
+
+# Widgets: Trees
+def TreeNode(label: str) -> bool: ...
+def TreeNodeEx(label: str, flags: ImGuiTreeNodeFlags = 0) -> bool: ...
+def TreePush(str_id: str) -> None: ...
+def TreePop() -> None: ...
+def GetTreeNodeToLabelSpacing() -> float: ...
+def CollapsingHeader(label: str, flags: ImGuiTreeNodeFlags = 0) -> bool: ...
+def CollapsingHeader(
+    label: str, p_open: bool, flags: ImGuiTreeNodeFlags = 0
+) -> Tuple[bool, bool]: ...
+def SetNextItemOpen(is_open: bool, cond: ImGuiCond = 0) -> None: ...
+
+# Widgets: Selectables
+def Selectable(
+    label: str,
+    selected: bool = False,
+    flags: ImGuiSelectableFlags = 0,
+    size: ImVec2 = (0, 0),
+) -> Tuple[bool, bool]: ...
+
+# Widgets: List Boxes
+def ListBox(
+    label: str, current_item: int, items: List[str], height_in_items: int - 1
+) -> Tuple[bool, int]: ...
+def ListBoxHeader(label: str, size: ImVec2 = (0, 0)) -> bool: ...
+def ListBoxFooter() -> None: ...
+
+# Widgets: Data Plotting
+def PlotLines(
+    label: str,
+    values: List[float],
+    values_offset: int = 0,
+    overlay_text: Optional[str] = None,
+    scale_min: Optional[float] = None,
+    graph_size: ImVec2 = (0, 0),
+) -> None: ...
+def PlotHistogram(
+    label: str,
+    values: List[float],
+    values_offset: int = 0,
+    overlay_text: Optional[str] = None,
+    scale_min: Optional[float] = None,
+    scale_max: Optional[float] = None,
+    graph_size: ImVec2 = (0, 0),
+) -> None: ...
+
+# Widgets: Value() Helpers.
+def Value(prefix: str, b: bool) -> None: ...
+def Value(prefix: str, v: int) -> None: ...
+def Value(prefix: str, b: float, float_format: Optional[str] = None) -> None: ...
+
+# Widgets: Menus
+def BeginMenuBar() -> bool: ...
+def EndMenuBar() -> None: ...
+def BeginMainMenuBar() -> bool: ...
+def EndMainMenuBar() -> None: ...
+def BeginMenu(label: str, enabled: bool = True) -> bool: ...
+def EndMenu() -> None: ...
+def MenuItem(
+    label: str, shortcut: Optional[str], selected: bool = False, enabled: bool = False
+) -> Tuple[bool, bool]: ...
+
+# Tooltips
+def BeginToolTip() -> None: ...
+def EndToolTip() -> None: ...
+def SetToolTip(value: str) -> None: ...
+
+# Popups, Modals
+def OpenPopup(str_id: str) -> None: ...
+def BeginPopUp(str_id: str, flags: ImGuiWindowFlags = 0) -> bool: ...
+def BeginPopupContextItem(
+    str_id: Optional[str], mouse_button: ImGuiMouseButton = 1
+) -> bool: ...
+def BeginPopupContextWindow(
+    str_id: Optional[str],
+    mouse_button: ImGuiMouseButton = 1,
+    also_over_items: bool = True,
+) -> bool: ...
+def BeginPopupContextVoid(
+    str_id: Optional[str], mouse_button: ImGuiMouseButton = 1
+) -> bool: ...
+def BeginPopupModal(
+    name: str, p_open: bool, flags: ImGuiWindowFlags = 0
+) -> Tuple[bool, bool]: ...
+def EndPopup() -> None: ...
+def OpenPopupOnItemClick(
+    str_id: Optional[str], mouse_button: ImGuiMouseButton = 1
+) -> bool: ...
+def IsPopupOpen(str_id: str) -> bool: ...
+def CloseCurrentPopup() -> None: ...
 
 #
 def PushStyleColor(idx: ImGuiCol, col: ImU32) -> None: ...
