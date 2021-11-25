@@ -53,10 +53,177 @@ void bind_imgui(py::module& m) {
 
 // clang-format off
 void bind_imgui_methods(py::module& m) {
+    // Windows
+    m.def(
+        "Begin",
+        [](const char* name, bool open, ImGuiWindowFlags flags) {
+            const auto clicked = ImGui::Begin(name, &open, flags);
+            return std::make_tuple(clicked, open);
+        },
+        py::arg("name"),
+        py::arg("open"),
+        py::arg("flags") = 0);
+    m.def("End", []() { ImGui::End(); });
+
+    // Child Windows
+    m.def(
+        "BeginChild",
+        [](const char* str_id, const Vec2T& size, bool border, ImGuiWindowFlags flags) {
+            return ImGui::BeginChild(str_id, to_vec2(size), border, flags);
+        },
+        py::arg("str_id"),
+        py::arg("size") = std::make_tuple(0.f, 0.f),
+        py::arg("border") = false,
+        py::arg("flags") = 0);
+    m.def(
+        "BeginChild",
+        [](ImGuiID id, const Vec2T& size, bool border, ImGuiWindowFlags flags) {
+            return ImGui::BeginChild(id, to_vec2(size), border, flags);
+        },
+        py::arg("id"),
+        py::arg("size") = std::make_tuple(0.f, 0.f),
+        py::arg("border") = false,
+        py::arg("flags") = 0);
+    m.def("EndChild", []() { ImGui::EndChild(); });
+
+    // Windows Utilities
+    m.def("IsWindowAppearing", []() { return ImGui::IsWindowAppearing(); });
+    m.def("IsWindowCollapsed", []() { return ImGui::IsWindowCollapsed(); });
+    m.def(
+        "IsWindowFocused",
+        [](ImGuiFocusedFlags flags) { return ImGui::IsWindowFocused(flags); },
+        py::arg("flags") = 0);
+    m.def(
+        "IsWindowHovered",
+        [](ImGuiFocusedFlags flags) { return ImGui::IsWindowHovered(flags); },
+        py::arg("flags") = 0);
+    m.def("GetWindowPos", []() { return from_vec2(ImGui::GetWindowPos()); });
+    m.def("GetWindowSize", []() { return from_vec2(ImGui::GetWindowSize()); });
+    m.def("GetWindowWidth", []() { return ImGui::GetWindowWidth(); });
+    m.def("GetWindowHeight", []() { return ImGui::GetWindowHeight(); });
+    m.def(
+        "SetNextWindowPos",
+        [](const Vec2T& pos, ImGuiCond cond, const Vec2T& pivot) {
+            ImGui::SetNextWindowPos(to_vec2(pos), cond, to_vec2(pivot));
+        },
+        py::arg("pos"),
+        py::arg("cond") = 0,
+        py::arg("pivot") = std::make_tuple(0., 0.));
+    m.def(
+        "SetNextWindowSize",
+        [](const Vec2T& size, ImGuiCond cond) { ImGui::SetNextWindowSize(to_vec2(size), cond); },
+        py::arg("size"),
+        py::arg("cond") = 0);
+    m.def(
+        "SetNextWindowSizeConstraints",
+        [](const Vec2T& size_min, const Vec2T& size_max) {
+            ImGui::SetNextWindowSizeConstraints(to_vec2(size_min), to_vec2(size_max));
+        },
+        py::arg("size_min"),
+        py::arg("size_max"));
+    m.def(
+        "SetNextWindowContextSize",
+        [](const Vec2T& size) { ImGui::SetNextWindowContentSize(to_vec2(size)); },
+        py::arg("size"));
+    m.def(
+        "SetNextWindowCollapsed",
+        [](bool collapsed, ImGuiCond cond) { ImGui::SetNextWindowCollapsed(collapsed, cond); },
+        py::arg("collapsed"),
+        py::arg("cond") = 0);
+    m.def("SetNextWindowFocus", []() { ImGui::SetNextWindowFocus(); });
+    m.def("SetNextWindowBgAlpha", [](float alpha) { ImGui::SetNextWindowBgAlpha(alpha); });
+    m.def(
+        "SetWindowPos",
+        [](const Vec2T& pos, ImGuiCond cond) { ImGui::SetWindowPos(to_vec2(pos), cond); },
+        py::arg("pos"),
+        py::arg("cond") = 0);
+    m.def(
+        "SetWindowSize",
+        [](const Vec2T& size, ImGuiCond cond) { ImGui::SetWindowSize(to_vec2(size), cond); },
+        py::arg("size"),
+        py::arg("cond") = 0);
+    m.def(
+        "SetWindowCollapsed",
+        [](bool collapsed, ImGuiCond cond) { ImGui::SetWindowCollapsed(collapsed, cond); },
+        py::arg("collapsed"),
+        py::arg("cond") = 0);
+    m.def("set_window_focus", []() { ImGui::SetWindowFocus(); });
+    m.def(
+        "SetWindowFontScale",
+        [](float scale) { ImGui::SetWindowFontScale(scale); },
+        py::arg("scale"));
+    m.def(
+        "SetWindowPos",
+        [](const char* name, const Vec2T& pos, ImGuiCond cond) {
+            ImGui::SetWindowPos(name, to_vec2(pos), cond);
+        },
+        py::arg("name"),
+        py::arg("pos"),
+        py::arg("cond") = 0);
+    m.def(
+        "SetWindowSize",
+        [](const char* name, const Vec2T& size, ImGuiCond cond) {
+            ImGui::SetWindowSize(name, to_vec2(size), cond);
+        },
+        py::arg("name"),
+        py::arg("size"),
+        py::arg("cond") = 0);
+    m.def(
+        "SetWindowCollapsed",
+        [](const char* name, bool collapsed, ImGuiCond cond) {
+            ImGui::SetWindowCollapsed(name, collapsed, cond);
+        },
+        py::arg("name"),
+        py::arg("collapsed"),
+        py::arg("cond") = 0);
+    m.def(
+        "SetWindowFocus", [](const char* name) { ImGui::SetWindowFocus(name); }, py::arg("name"));
+
+    // Content region
+    m.def("GetContentRegionMax", []() {
+        return from_vec2(ImGui::GetContentRegionMax()); });
+    m.def("GetContentRegionAvail", []() {
+        return from_vec2(ImGui::GetContentRegionAvail()); });
+    m.def("GetWindowContentRegionMin", []() {
+        return from_vec2(ImGui::GetWindowContentRegionMin()); });
+    m.def("GetWindowContentRegionMax", []() {
+        return from_vec2(ImGui::GetWindowContentRegionMax()); });
+    m.def("GetWindowContentRegionWidth", []() {
+        return ImGui::GetWindowContentRegionWidth(); });
+
+    // Windows Scrolling
+    m.def("GetScrollX", []() { return ImGui::GetScrollX(); });
+    m.def("GetScrollY", []() { return ImGui::GetScrollY(); });
+    m.def("GetScrollMaxX", []() { return ImGui::GetScrollMaxX(); });
+    m.def("GetScrollMaxY", []() { return ImGui::GetScrollMaxY(); });
+    m.def(
+        "SetScrollX",
+        [](float scroll_x) { ImGui::SetScrollX(scroll_x); },
+        py::arg("scroll_x"));
+    m.def(
+        "SetScrollY",
+        [](float scroll_y) { ImGui::SetScrollY(scroll_y); },
+        py::arg("scroll_y"));
+    m.def(
+        "SetScrollHereX",
+        [](float center_x_ratio) { ImGui::SetScrollHereX(center_x_ratio); },
+        py::arg("center_x_ratio") = 0.5f);
+    m.def(
+        "SetScrollHereY",
+        [](float center_y_ratio) { ImGui::SetScrollHereY(center_y_ratio); },
+        py::arg("center_y_ratio") = 0.5f);
+    m.def(
+        "SetScrollFromPosX",
+        [](float local_x, float center_x_ratio) { ImGui::SetScrollFromPosX(local_x, center_x_ratio); },
+        py::arg("local_x"),
+        py::arg("center_x_ratio") = 0.5f);
+    m.def(
+        "SetScrollFromPosY",
+        [](float local_y, float center_y_ratio) { ImGui::SetScrollFromPosY(local_y, center_y_ratio); },
+        py::arg("local_y"),
+        py::arg("center_y_ratio") = 0.5f);
 
     // Parameters stacks (shared)
-    // m.def("PushFront")
-    // m.def("PopFront")
     m.def(
         "PushStyleColor",
         [](ImGuiCol idx, ImU32 col) { ImGui::PushStyleColor(idx, col); },
@@ -85,7 +252,6 @@ void bind_imgui_methods(py::module& m) {
         "GetStyleColorVec4",
         [](ImGuiCol idx) { return from_vec4(ImGui::GetStyleColorVec4(idx)); },
         py::arg("idx"));
-    // GetFont
     m.def("GetFontSize", []() { return ImGui::GetFontSize(); });
     m.def("GetFontTexUvWhitePixel",
             []() { return from_vec2(ImGui::GetFontTexUvWhitePixel()); });
@@ -98,6 +264,33 @@ void bind_imgui_methods(py::module& m) {
         "GetColorU32", [](const ImVec4& col) { return ImGui::GetColorU32(col); }, py::arg("col"));
     m.def(
         "GetColorU32", [](ImU32 col) { return ImGui::GetColorU32(col); }, py::arg("col"));
+
+    // Parameters stacks (current window)
+    m.def(
+        "PushItemWidth",
+        [](float item_width) { return ImGui::PushItemWidth(item_width); },
+        py::arg("item_width"));
+    m.def("PopItemWidth", []() { ImGui::PopItemWidth(); });
+    m.def(
+        "SetNextItemWidth",
+        [](float item_width) { return ImGui::SetNextItemWidth(item_width); },
+        py::arg("item_width"));
+    m.def("CalcItemWidth", []() { return ImGui::CalcItemWidth(); });
+    m.def(
+        "PushTextWrapPos",
+        [](float wrap_local_pos_x) { ImGui::PushTextWrapPos(wrap_local_pos_x); },
+        py::arg("wrap_local_pos_x") = 0.0f);
+    m.def("PopTextWrapPos", []() { ImGui::PopTextWrapPos(); });
+    m.def(
+        "PushAllowKeyboardFocus",
+        [](bool allow_keyboard_focus) { ImGui::PushAllowKeyboardFocus(allow_keyboard_focus); },
+        py::arg("allow_keyboard_focus"));
+    m.def("PopAllowKeyboardFocus", []() { ImGui::PopAllowKeyboardFocus(); });
+    m.def(
+        "PushButtonRepeat",
+        [](bool repeat) { ImGui::PushButtonRepeat(repeat); },
+        py::arg("allow_keyboard_focus"));
+    m.def("PopButtonRepeat", []() { ImGui::PopButtonRepeat(); });
 
     // Cursor / Layout
     m.def("separator", []() { ImGui::Separator(); });
@@ -137,66 +330,40 @@ void bind_imgui_methods(py::module& m) {
         [](const Vec2T& pos) { ImGui::SetCursorScreenPos(to_vec2(pos)); },
         py::arg("pos"));
     m.def("AlignTextToFramePadding", []() { ImGui::AlignTextToFramePadding(); });
-    m.def("GetTextLineHeight", []() { ImGui::GetTextLineHeight(); });
-    m.def("GetTextLineHeightWithSpacing", []() { ImGui::GetTextLineHeightWithSpacing(); });
-    m.def("GetFrameHeight", []() { ImGui::GetFrameHeight(); });
-    m.def("GetFrameHeightWithSpacing", []() { ImGui::GetFrameHeightWithSpacing(); });
-
-    // Parameters stacks (current window)
-    m.def(
-        "PushItemWidth",
-        [](float item_width) { ImGui::PushItemWidth(item_width); },
-        py::arg("item_width"));
-    m.def("PopItemWidth", []() { ImGui::PopItemWidth(); });
-    m.def(
-        "SetNextItemWidth",
-        [](float item_width) { ImGui::SetNextItemWidth(item_width); },
-        py::arg("item_width"));
-    m.def("CalcItemWidth", []() { return ImGui::CalcItemWidth(); });
-    m.def(
-        "PushTextWrapPos",
-        [](float wrap_local_pos_x) { ImGui::PushTextWrapPos(wrap_local_pos_x); },
-        py::arg("wrap_local_pos_x") = 0.0f);
-    m.def("PopTextWrapPos", []() { ImGui::PopTextWrapPos(); });
-    m.def(
-        "PushAllowKeyboardFocus",
-        [](bool allow_keyboard_focus) { ImGui::PushAllowKeyboardFocus(allow_keyboard_focus); },
-        py::arg("allow_keyboard_focus"));
-    m.def("PopAllowKeyboardFocus", []() { ImGui::PopAllowKeyboardFocus(); });
-    m.def(
-        "PushButtonRepeat",
-        [](bool repeat) { ImGui::PushButtonRepeat(repeat); },
-        py::arg("allow_keyboard_focus"));
-    m.def("PopButtonRepeat", []() { ImGui::PopButtonRepeat(); });
+    m.def("GetTextLineHeight", []() { return ImGui::GetTextLineHeight(); });
+    m.def("GetTextLineHeightWithSpacing", []() { return ImGui::GetTextLineHeightWithSpacing(); });
+    m.def("GetFrameHeight", []() { return ImGui::GetFrameHeight(); });
+    m.def("GetFrameHeightWithSpacing", []() { return ImGui::GetFrameHeightWithSpacing(); });
 
     // ID stack/scopes
     m.def(
         "PushId", [](const char* str_id) { ImGui::PushID(str_id); }, py::arg("str_id"));
+    m.def(
+        "PushId", [](int int_id) { ImGui::PushID(int_id); }, py::arg("int_id"));
     m.def("PopID", []() { ImGui::PopID(); });
     m.def(
-        "GetId", [](const char* str_id) { ImGui::GetID(str_id); }, py::arg("str_id"));
+        "GetId", [](const char* str_id) { return ImGui::GetID(str_id); }, py::arg("str_id"));
 
     // Widgets: Text
     m.def(
-        "Text", [](const char* fmt) { ImGui::Text("%s", fmt); }, py::arg("text"));
+        "Text", [](const char* text) { ImGui::Text("%s", text); }, py::arg("text"));
     m.def(
         "TextColored",
-        [](const Vec4T& color, const char* fmt) { ImGui::TextColored(to_vec4(color), "%s", fmt); },
+        [](const Vec4T& color, const char* text) { ImGui::TextColored(to_vec4(color), "%s", text); },
         py::arg("color"),
         py::arg("text"));
     m.def(
-        "TextDisabled", [](const char* fmt) { ImGui::TextDisabled("%s", fmt); }, py::arg("text"));
+        "TextDisabled", [](const char* text) { ImGui::TextDisabled("%s", text); }, py::arg("text"));
     m.def(
-        "TextWrapped", [](const char* fmt) { ImGui::TextWrapped("%s", fmt); }, py::arg("text"));
+        "TextWrapped", [](const char* text) { ImGui::TextWrapped("%s", text); }, py::arg("text"));
     m.def(
         "LabelText",
-        [](const char* label, const char* fmt) { ImGui::LabelText(label, "%s", fmt); },
+        [](const char* label, const char* text) { ImGui::LabelText(label, "%s", text); },
         py::arg("label"),
         py::arg("text"));
     m.def(
         "BulletText",
-        [](const char* label, const char* fmt) { ImGui::BulletText(label, "%s", fmt); },
-        py::arg("label"),
+        [](const char* fmt) { ImGui::BulletText("%s", fmt); },
         py::arg("text"));
 
     // Widgets: Main
@@ -221,23 +388,19 @@ void bind_imgui_methods(py::module& m) {
         [](const char* str_id, ImGuiDir dir) { return ImGui::ArrowButton(str_id, dir); },
         py::arg("str_id"),
         py::arg("dir"));
-    // Image
-    // ImageButton
     m.def(
         "Checkbox",
         [](const char* label, bool v) {
-            auto v_ = v;
-            const auto clicked = ImGui::Checkbox(label, &v_);
-            return std::make_tuple(clicked, v_);
+            const auto clicked = ImGui::Checkbox(label, &v);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"));
     m.def(
         "CheckboxFlags",
         [](const char* label, unsigned int flags, unsigned int flags_value) {
-            auto flags_ = flags;
-            const auto clicked = ImGui::CheckboxFlags(label, &flags_, flags_value);
-            return std::make_tuple(clicked, flags_);
+            const auto clicked = ImGui::CheckboxFlags(label, &flags, flags_value);
+            return std::make_tuple(clicked, flags);
         },
         py::arg("label"),
         py::arg("flags"),
@@ -250,9 +413,8 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "RadioButton",
         [](const char* label, unsigned int v, unsigned int v_button) {
-            auto v_ = v;
-            const auto clicked = ImGui::CheckboxFlags(label, &v_, v_button);
-            return std::make_tuple(clicked, v_);
+            const auto clicked = ImGui::CheckboxFlags(label, &v, v_button);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -274,7 +436,7 @@ void bind_imgui_methods(py::module& m) {
         },
         py::arg("label"),
         py::arg("preview_value"),
-        py::arg("flags"));
+        py::arg("flags") = 0);
     m.def("EndCombo", []() { ImGui::EndCombo(); });
     m.def(
         "Combo",
@@ -282,10 +444,9 @@ void bind_imgui_methods(py::module& m) {
             int current_item,
             const std::vector<const char*>& items,
             int popup_max_height_in_items) {
-            auto current_item_ = current_item;
             const auto clicked = ImGui::Combo(
-                label, &current_item_, items.data(), items.size(), popup_max_height_in_items);
-            return std::make_tuple(clicked, current_item_);
+                label, &current_item, items.data(), items.size(), popup_max_height_in_items);
+            return std::make_tuple(clicked, current_item);
         },
         py::arg("label"),
         py::arg("current_item"),
@@ -296,12 +457,10 @@ void bind_imgui_methods(py::module& m) {
         [](const char* label,
             int current_item,
             const char* items_separated_by_zeros,
-
             int popup_max_height_in_items) {
-            auto current_item_ = current_item;
             const auto clicked = ImGui::Combo(
-                label, &current_item_, items_separated_by_zeros, popup_max_height_in_items);
-            return std::make_tuple(clicked, current_item_);
+                label, &current_item, items_separated_by_zeros, popup_max_height_in_items);
+            return std::make_tuple(clicked, current_item);
         },
         py::arg("label"),
         py::arg("current_item"),
@@ -318,9 +477,8 @@ void bind_imgui_methods(py::module& m) {
             float v_max,
             const char* format,
             float power) {
-            auto v_ = v;
-            auto clicked = ImGui::DragFloat(label, &v_, v_speed, v_min, v_max, format, power);
-            return std::make_tuple(clicked, v_);
+            auto clicked = ImGui::DragFloat(label, &v, v_speed, v_min, v_max, format, power);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -332,16 +490,15 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "DragFloat2",
         [](const char* label,
-            const std::array<float, 2>& v,
+            std::array<float, 2> v,
             float v_speed,
             float v_min,
             float v_max,
             const char* format,
             float power) {
-            auto v_ = v;
             auto clicked =
-                ImGui::DragFloat2(label, v_.data(), v_speed, v_min, v_max, format, power);
-            return std::make_tuple(clicked, v_);
+                ImGui::DragFloat2(label, v.data(), v_speed, v_min, v_max, format, power);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -353,16 +510,15 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "DragFloat3",
         [](const char* label,
-            const std::array<float, 3>& v,
+            std::array<float, 3> v,
             float v_speed,
             float v_min,
             float v_max,
             const char* format,
             float power) {
-            auto v_ = v;
             auto clicked =
-                ImGui::DragFloat3(label, v_.data(), v_speed, v_min, v_max, format, power);
-            return std::make_tuple(clicked, v_);
+                ImGui::DragFloat3(label, v.data(), v_speed, v_min, v_max, format, power);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -374,16 +530,15 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "DragFloat4",
         [](const char* label,
-            const std::array<float, 4>& v,
+            std::array<float, 4> v,
             float v_speed,
             float v_min,
             float v_max,
             const char* format,
             float power) {
-            auto v_ = v;
             auto clicked =
-                ImGui::DragFloat4(label, v_.data(), v_speed, v_min, v_max, format, power);
-            return std::make_tuple(clicked, v_);
+                ImGui::DragFloat4(label, v.data(), v_speed, v_min, v_max, format, power);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -395,26 +550,24 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "DragFloatRange2",
         [](const char* label,
-            const std::array<float, 2>& v_current_min,
-            const std::array<float, 2>& v_current_max,
+            std::array<float, 2> v_current_min,
+            std::array<float, 2> v_current_max,
             float v_speed,
             float v_min,
             float v_max,
             const char* format,
             const char* format_max,
             float power) {
-            auto v_current_min_ = v_current_min;
-            auto v_current_max_ = v_current_max;
             auto clicked = ImGui::DragFloatRange2(label,
-                                                    v_current_min_.data(),
-                                                    v_current_max_.data(),
+                                                    v_current_min.data(),
+                                                    v_current_max.data(),
                                                     v_speed,
                                                     v_min,
                                                     v_max,
                                                     format,
                                                     format_max,
                                                     power);
-            return std::make_tuple(clicked, v_current_min_, v_current_max_);
+            return std::make_tuple(clicked, v_current_min, v_current_max);
         },
         py::arg("label"),
         py::arg("v_current_min"),
@@ -429,9 +582,8 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "DragInt",
         [](const char* label, int v, float v_speed, int v_min, int v_max, const char* format) {
-            auto v_ = v;
-            auto clicked = ImGui::DragInt(label, &v_, v_speed, v_min, v_max, format);
-            return std::make_tuple(clicked, v_);
+            auto clicked = ImGui::DragInt(label, &v, v_speed, v_min, v_max, format);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -442,14 +594,13 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "DragInt2",
         [](const char* label,
-            const std::array<int, 2>& v,
+            std::array<int, 2> v,
             float v_speed,
             int v_min,
             int v_max,
             const char* format) {
-            auto v_ = v;
-            auto clicked = ImGui::DragInt2(label, v_.data(), v_speed, v_min, v_max, format);
-            return std::make_tuple(clicked, v_);
+            auto clicked = ImGui::DragInt2(label, v.data(), v_speed, v_min, v_max, format);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -460,14 +611,13 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "DragInt3",
         [](const char* label,
-            const std::array<int, 3>& v,
+            std::array<int, 3> v,
             float v_speed,
             int v_min,
             int v_max,
             const char* format) {
-            auto v_ = v;
-            auto clicked = ImGui::DragInt3(label, v_.data(), v_speed, v_min, v_max, format);
-            return std::make_tuple(clicked, v_);
+            auto clicked = ImGui::DragInt3(label, v.data(), v_speed, v_min, v_max, format);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -478,14 +628,13 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "DragInt4",
         [](const char* label,
-            const std::array<int, 4>& v,
+            std::array<int, 4> v,
             float v_speed,
             int v_min,
             int v_max,
             const char* format) {
-            auto v_ = v;
-            auto clicked = ImGui::DragInt4(label, v_.data(), v_speed, v_min, v_max, format);
-            return std::make_tuple(clicked, v_);
+            auto clicked = ImGui::DragInt4(label, v.data(), v_speed, v_min, v_max, format);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -496,24 +645,22 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "DragIntRange2",
         [](const char* label,
-            const std::array<int, 2>& v_current_min,
-            const std::array<int, 2>& v_current_max,
+            std::array<int, 2> v_current_min,
+            std::array<int, 2> v_current_max,
             float v_speed,
             int v_min,
             int v_max,
             const char* format,
             const char* format_max) {
-            auto v_current_min_ = v_current_min;
-            auto v_current_max_ = v_current_max;
             auto clicked = ImGui::DragIntRange2(label,
-                                                v_current_min_.data(),
-                                                v_current_max_.data(),
+                                                v_current_min.data(),
+                                                v_current_max.data(),
                                                 v_speed,
                                                 v_min,
                                                 v_max,
                                                 format,
                                                 format_max);
-            return std::make_tuple(clicked, v_current_min_, v_current_max_);
+            return std::make_tuple(clicked, v_current_min, v_current_max);
         },
         py::arg("label"),
         py::arg("v_current_min"),
@@ -528,9 +675,8 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "SliderFloat",
         [](const char* label, float v, float v_min, float v_max, const char* format, float power) {
-            auto v_ = v;
-            auto clicked = ImGui::SliderFloat(label, &v_, v_min, v_max, format, power);
-            return std::make_tuple(clicked, v_);
+            auto clicked = ImGui::SliderFloat(label, &v, v_min, v_max, format, power);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -541,14 +687,13 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "SliderFloat2",
         [](const char* label,
-            const std::array<float, 2>& v,
+            std::array<float, 2> v,
             float v_min,
             float v_max,
             const char* format,
             float power) {
-            auto v_ = v;
-            auto clicked = ImGui::SliderFloat2(label, v_.data(), v_min, v_max, format, power);
-            return std::make_tuple(clicked, v_);
+            auto clicked = ImGui::SliderFloat2(label, v.data(), v_min, v_max, format, power);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -559,14 +704,13 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "SliderFloat3",
         [](const char* label,
-            const std::array<float, 3>& v,
+            std::array<float, 3> v,
             float v_min,
             float v_max,
             const char* format,
             float power) {
-            auto v_ = v;
-            auto clicked = ImGui::SliderFloat3(label, v_.data(), v_min, v_max, format, power);
-            return std::make_tuple(clicked, v_);
+            auto clicked = ImGui::SliderFloat3(label, v.data(), v_min, v_max, format, power);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -577,14 +721,13 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "SliderFloat4",
         [](const char* label,
-            const std::array<float, 4>& v,
+            std::array<float, 4> v,
             float v_min,
             float v_max,
             const char* format,
             float power) {
-            auto v_ = v;
-            auto clicked = ImGui::SliderFloat4(label, v_.data(), v_min, v_max, format, power);
-            return std::make_tuple(clicked, v_);
+            auto clicked = ImGui::SliderFloat4(label, v.data(), v_min, v_max, format, power);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -600,9 +743,8 @@ void bind_imgui_methods(py::module& m) {
             float v_degrees_min,
             float v_degrees_max,
             const char* format) {
-            auto v_rad_ = v_rad;
-            auto clicked = ImGui::SliderAngle(label, &v_rad_, v_degrees_min, v_degrees_max, format);
-            return std::make_tuple(clicked, v_rad_);
+            auto clicked = ImGui::SliderAngle(label, &v_rad, v_degrees_min, v_degrees_max, format);
+            return std::make_tuple(clicked, v_rad);
         },
         py::arg("label"),
         py::arg("v_rad"),
@@ -753,9 +895,8 @@ void bind_imgui_methods(py::module& m) {
             float step_fast,
             const char* format,
             ImGuiInputTextFlags flags) {
-            auto v_ = v;
-            const auto clicked = ImGui::InputFloat(label, &v_, step, step_fast, format, flags);
-            return std::make_tuple(clicked, v_);
+            const auto clicked = ImGui::InputFloat(label, &v, step, step_fast, format, flags);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -766,12 +907,11 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "InputFloat2",
         [](const char* label,
-            const std::array<float, 2>& v,
+            std::array<float, 2> v,
             const char* format,
             ImGuiInputTextFlags flags) {
-            auto v_ = v;
-            const auto clicked = ImGui::InputFloat2(label, v_.data(), format, flags);
-            return std::make_tuple(clicked, v_);
+            const auto clicked = ImGui::InputFloat2(label, v.data(), format, flags);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -780,12 +920,11 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "InputFloat3",
         [](const char* label,
-            const std::array<float, 3>& v,
+            std::array<float, 3> v,
             const char* format,
             ImGuiInputTextFlags flags) {
-            auto v_ = v;
-            const auto clicked = ImGui::InputFloat3(label, v_.data(), format, flags);
-            return std::make_tuple(clicked, v_);
+            const auto clicked = ImGui::InputFloat3(label, v.data(), format, flags);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -794,12 +933,11 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "InputFloat4",
         [](const char* label,
-            const std::array<float, 4>& v,
+            std::array<float, 4> v,
             const char* format,
             ImGuiInputTextFlags flags) {
-            auto v_ = v;
-            const auto clicked = ImGui::InputFloat4(label, v_.data(), format, flags);
-            return std::make_tuple(clicked, v_);
+            const auto clicked = ImGui::InputFloat4(label, v.data(), format, flags);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -808,9 +946,8 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "InputInt",
         [](const char* label, int v, float step, float step_fast, ImGuiInputTextFlags flags) {
-            auto v_ = v;
-            const auto clicked = ImGui::InputInt(label, &v_, step, step_fast, flags);
-            return std::make_tuple(clicked, v_);
+            const auto clicked = ImGui::InputInt(label, &v, step, step_fast, flags);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
@@ -819,33 +956,48 @@ void bind_imgui_methods(py::module& m) {
         py::arg("flags") = 0);
     m.def(
         "InputInt2",
-        [](const char* label, const std::array<int, 2>& v, ImGuiInputTextFlags flags) {
-            auto v_ = v;
-            const auto clicked = ImGui::InputInt2(label, v_.data(), flags);
-            return std::make_tuple(clicked, v_);
+        [](const char* label, std::array<int, 2> v, ImGuiInputTextFlags flags) {
+            const auto clicked = ImGui::InputInt2(label, v.data(), flags);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
         py::arg("flags") = 0);
     m.def(
         "InputInt3",
-        [](const char* label, const std::array<int, 3>& v, ImGuiInputTextFlags flags) {
+        [](const char* label, std::array<int, 3> v, ImGuiInputTextFlags flags) {
             auto v_ = v;
-            const auto clicked = ImGui::InputInt3(label, v_.data(), flags);
-            return std::make_tuple(clicked, v_);
+            const auto clicked = ImGui::InputInt3(label, v.data(), flags);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
         py::arg("flags") = 0);
     m.def(
         "InputInt4",
-        [](const char* label, const std::array<int, 4>& v, ImGuiInputTextFlags flags) {
-            auto v_ = v;
-            const auto clicked = ImGui::InputInt4(label, v_.data(), flags);
-            return std::make_tuple(clicked, v_);
+        [](const char* label, std::array<int, 4> v, ImGuiInputTextFlags flags) {
+            const auto clicked = ImGui::InputInt4(label, v.data(), flags);
+            return std::make_tuple(clicked, v);
         },
         py::arg("label"),
         py::arg("v"),
+        py::arg("flags") = 0);
+    m.def(
+        "InputDouble",
+        [](const char* label,
+            double v,
+            double step,
+            double step_fast,
+            const char* format,
+            ImGuiInputTextFlags flags) {
+            const auto clicked = ImGui::InputDouble(label, &v, step, step_fast, format, flags);
+            return std::make_tuple(clicked, v);
+        },
+        py::arg("label"),
+        py::arg("v"),
+        py::arg("step") = 0.f,
+        py::arg("step_fast") = 0.f,
+        py::arg("format") = "%.6f",
         py::arg("flags") = 0);
 
     // Widgets: Color Editor/Picker
@@ -927,9 +1079,8 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "CollapsingHeader",
         [](const char* label, bool open, ImGuiTreeNodeFlags flags) {
-            auto open_ = open;
-            const auto clicked = ImGui::CollapsingHeader(label, &open_, flags);
-            return std::make_tuple(clicked, open_);
+            const auto clicked = ImGui::CollapsingHeader(label, &open, flags);
+            return std::make_tuple(clicked, open);
         },
         py::arg("label"),
         py::arg("open"),
@@ -944,9 +1095,8 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "Selectable",
         [](const char* label, bool selected, ImGuiSelectableFlags flags, const Vec2T& size) {
-            auto selected_ = selected;
             const auto clicked = ImGui::Selectable(label, &selected, flags, to_vec2(size));
-            return std::make_tuple(clicked, selected_);
+            return std::make_tuple(clicked, selected);
         },
         py::arg("label"),
         py::arg("selected"),
@@ -960,15 +1110,79 @@ void bind_imgui_methods(py::module& m) {
             int current_item,
             const std::vector<const char*>& items,
             int height_in_items) {
-            auto current_item_ = current_item;
             const auto clicked =
-                ImGui::ListBox(label, &current_item_, items.data(), items.size(), height_in_items);
-            return std::make_tuple(clicked, current_item_);
+                ImGui::ListBox(label, &current_item, items.data(), items.size(), height_in_items);
+            return std::make_tuple(clicked, current_item);
         },
         py::arg("label"),
         py::arg("current_item"),
         py::arg("items"),
         py::arg("height_in_items") = -1);
+    m.def(
+        "ListBoxHeader",
+        [](const char *label, const Vec2T& size) {
+            return ImGui::ListBoxHeader(label, to_vec2(size));
+        },
+        py::arg("label"),
+        py::arg("size") = std::make_tuple(0.f, 0.f));
+    m.def("ListBoxFooter", [](){ ImGui::ListBoxFooter(); });
+
+    // Widgets: Data Plotting
+    m.def(
+        "PlotLines",
+        [](
+            const char *label,
+            const std::vector<float>& values,
+            int values_offset,
+            const char *overlay_text,
+            float scale_min,
+            float scale_max,
+            const Vec2T& graph_size
+        ) {
+            ImGui::PlotLines(label, values.data(), values.size(), values_offset, overlay_text, scale_min, scale_max, to_vec2(graph_size));
+        },
+        py::arg("label"),
+        py::arg("values"),
+        py::arg("values_offset") = 0,
+        py::arg("overlay_text") = nullptr,
+        py::arg("scale_min") = FLT_MAX,
+        py::arg("scale_max") = FLT_MAX,
+        py::arg("graph_size") = std::make_tuple(0.f, 0.f)
+    );
+    m.def(
+        "PlotHistogram",
+        [](
+            const char *label,
+            const std::vector<float>& values,
+            int values_offset,
+            const char *overlay_text,
+            float scale_min,
+            float scale_max,
+            const Vec2T& graph_size
+        ) {
+            ImGui::PlotHistogram(label, values.data(), values.size(), values_offset, overlay_text, scale_min, scale_max, to_vec2(graph_size));
+        },
+        py::arg("label"),
+        py::arg("values"),
+        py::arg("values_offset") = 0,
+        py::arg("overlay_text") = nullptr,
+        py::arg("scale_min") = FLT_MAX,
+        py::arg("scale_max") = FLT_MAX,
+        py::arg("graph_size") = std::make_tuple(0.f, 0.f)
+    );
+
+    // Widgets: Value() Helpers.
+    m.def("Value", [](const char *prefix, bool b){ ImGui::Value(prefix, b); }, py::arg("prefix"), py::arg("b"));
+    m.def("Value", [](const char *prefix, int v){ ImGui::Value(prefix, v); }, py::arg("prefix"), py::arg("v"));
+    m.def(
+        "Value",
+        [](const char *prefix, float v, const char * float_format) {
+            ImGui::Value(prefix, v, float_format);
+        },
+        py::arg("prefix"),
+        py::arg("b"),
+        py::arg("float_format") = nullptr
+    );
 
     // Widgets: Menus
     m.def("BeginMenuBar", []() { return ImGui::BeginMenuBar(); });
@@ -980,7 +1194,7 @@ void bind_imgui_methods(py::module& m) {
         [](const char* label, bool enabled) { return ImGui::BeginMenu(label, enabled); },
         py::arg("label"),
         py::arg("enabled") = true);
-    m.def("end_menu", []() { ImGui::EndMenu(); });
+    m.def("EndMenu", []() { ImGui::EndMenu(); });
     m.def(
         "MenuItem",
         [](const char* label, const char* shortcut, bool selected, bool enabled) {
@@ -990,6 +1204,11 @@ void bind_imgui_methods(py::module& m) {
         py::arg("shortcut") = nullptr,
         py::arg("selected") = false,
         py::arg("enabled") = true);
+
+    // Tooltips
+    m.def("BeginTooltip", []() { ImGui::BeginTooltip(); });
+    m.def("EndTooltip", []() { ImGui::EndTooltip(); });
+    m.def("SetTooltip", [](const char *value) { ImGui::SetTooltip("%s", value); });
 
     // Popups, Modals
     m.def(
@@ -1044,18 +1263,128 @@ void bind_imgui_methods(py::module& m) {
         py::arg("str_id"));
     m.def("CloseCurrentPopup", []() { ImGui::CloseCurrentPopup(); });
 
-    // Windows
+    // Columns
     m.def(
-        "Begin",
-        [](const char* name, bool open, ImGuiWindowFlags flags) {
-            auto open_ = open;
-            const auto clicked = ImGui::Begin(name, &open_, flags);
-            return std::make_tuple(clicked, open_);
+        "Columns",
+        [](int count, const char *id, bool border) {
+            ImGui::Columns(count, id, border);
         },
-        py::arg("name"),
+        py::arg("count") = 1,
+        py::arg("id") = nullptr,
+        py::arg("border") = true
+    );
+    m.def("NextColumn", []() { ImGui::NextColumn(); });
+    m.def("GetColumnIndex", []() { return ImGui::GetColumnIndex(); });
+    m.def(
+        "GetColumnWidth",
+        [](int column_index) {
+            return ImGui::GetColumnWidth(column_index);
+        },
+        py::arg("column_index") = -1
+    );
+    m.def(
+        "SetColumnWidth",
+        [](int column_index, float width) {
+            ImGui::SetColumnWidth(column_index, width);
+        },
+        py::arg("column_index"),
+        py::arg("width")
+    );
+    m.def(
+        "GetColumnOffset",
+        [](int column_index) {
+            return ImGui::GetColumnOffset(column_index);
+        },
+        py::arg("column_index") = -1
+    );
+    m.def(
+        "SetColumnOffset",
+        [](int column_index, float width) {
+            ImGui::SetColumnOffset(column_index, width);
+        },
+        py::arg("column_index"),
+        py::arg("offset_x")
+    );
+    m.def("GetColumnsCount", []() { return ImGui::GetColumnsCount(); });
+
+    // Tab Bars, Tabs
+    m.def(
+        "BeginTabBar",
+        [](const char *str_id, ImGuiTabBarFlags flags) {
+            return ImGui::BeginTabBar(str_id, flags);
+        },
+        py::arg("str_id"),
+        py::arg("flags") = 0
+    );
+    m.def("EndTabBar", []() { ImGui::EndTabBar(); });
+    m.def(
+        "BeginTabItem",
+        [](const char *str, bool open, ImGuiTabBarFlags flags) {
+            const auto clicked = ImGui::BeginTabItem(str, &open, flags);
+            return std::make_tuple(clicked, open);
+        },
+        py::arg("str"),
         py::arg("open"),
-        py::arg("flags") = 0);
-    m.def("end", []() { ImGui::End(); });
+        py::arg("flags") = 0
+    );
+    m.def("EndTabItem", []() { ImGui::EndTabItem(); });
+    m.def(
+        "SetTabItemClosed",
+        [](const char *tab_or_docked_window_label) {
+            ImGui::SetTabItemClosed(tab_or_docked_window_label);
+        },
+        py::arg("tab_or_docked_window_label")
+    );
+
+    // Logging/Capture
+    m.def(
+        "LogToTTY",
+        [](int auto_open_depth) {
+            ImGui::LogToTTY(auto_open_depth);
+        },
+        py::arg("auto_open_depth") = -1
+    );
+    m.def(
+        "LogToFile",
+        [](int auto_open_depth, const char *filename) {
+            ImGui::LogToFile(auto_open_depth, filename);
+        },
+        py::arg("auto_open_depth") = -1,
+        py::arg("filename") = nullptr
+    );
+    m.def(
+        "LogToClipboard",
+        [](int auto_open_depth) {
+            ImGui::LogToClipboard(auto_open_depth);
+        },
+        py::arg("auto_open_depth") = -1
+    );
+    m.def("LogFinish", []() { ImGui::LogFinish(); });
+    m.def("LogButtons", []() { ImGui::LogButtons(); });
+
+    // Clipping
+    m.def(
+        "PushClipRect",
+        [](
+            const Vec2T& clip_rect_min,
+            const Vec2T& clip_rect_max,
+            bool intersect_with_current_clip_rect
+        ) {
+            ImGui::PushClipRect(to_vec2(clip_rect_min), to_vec2(clip_rect_max), intersect_with_current_clip_rect);
+        },
+        py::arg("clip_rect_min"),
+        py::arg("clip_rect_max"),
+        py::arg("intersect_with_current_clip_rect")
+    );
+    m.def("PopClipRect", []() { ImGui::PopClipRect(); });
+
+    // Focus, Activation
+    m.def("SetItemDefaultFocus", []() { ImGui::SetItemDefaultFocus(); });
+    m.def(
+        "SetKeyboardFocusHere",
+        [](int offset) { ImGui::SetKeyboardFocusHere(offset); },
+        py::arg("offset")
+    );
 
     // Item/Widgets Utilities
     m.def(
@@ -1082,120 +1411,101 @@ void bind_imgui_methods(py::module& m) {
     m.def("GetItemRectSize", []() { return from_vec2(ImGui::GetItemRectSize()); });
     m.def("SetItemAllowOverlap", []() { ImGui::SetItemAllowOverlap(); });
 
-    // Child Windows
+    // Miscellaneous Utilities
     m.def(
-        "BeginChild",
-        [](const char* str_id, const Vec2T& size, bool border, ImGuiWindowFlags flags) {
-            return ImGui::BeginChild(str_id, to_vec2(size), border, flags);
+        "IsRectVisible",
+        [](const Vec2T& size) {
+            return ImGui::IsRectVisible(to_vec2(size));
         },
-        py::arg("str_id"),
-        py::arg("size") = std::make_tuple(0.f, 0.f),
-        py::arg("border") = false,
-        py::arg("flags") = 0);
+        py::arg("size")
+    );
     m.def(
-        "BeginChild",
-        [](ImGuiID id, const Vec2T& size, bool border, ImGuiWindowFlags flags) {
-            return ImGui::BeginChild(id, to_vec2(size), border, flags);
+        "IsRectVisible",
+        [](const Vec2T& rect_min, const Vec2T& rect_max) {
+            return ImGui::IsRectVisible(to_vec2(rect_min), to_vec2(rect_max));
+        },
+        py::arg("rect_min"),
+        py::arg("rect_max")
+    );
+    m.def("GetTime", []() { return ImGui::GetTime(); });
+    m.def("GetFrameCount", []() { return ImGui::GetFrameCount(); });
+    m.def("GetStyleColorName", [](ImGuiCol idx) { return ImGui::GetStyleColorName(idx); });
+    m.def(
+        "CalcListClipping",
+        [](int items_count, float items_height) {
+            int out_items_display_start;
+            int out_items_display_end;
+            ImGui::CalcListClipping(items_count, items_height, &out_items_display_start, &out_items_display_end);
+            return std::make_tuple(out_items_display_start, out_items_display_end);
+        },
+        py::arg("items_count"),
+        py::arg("items_height")
+    );
+    m.def(
+        "BeginChildFrame",
+        [](ImGuiID id, const Vec2T& size, ImGuiWindowFlags flags) {
+            return ImGui::BeginChildFrame(id, to_vec2(size), flags);
         },
         py::arg("id"),
-        py::arg("size") = std::make_tuple(0.f, 0.f),
-        py::arg("border") = false,
-        py::arg("flags") = 0);
-    m.def("EndChild", []() { ImGui::EndChild(); });
+        py::arg("size"),
+        py::arg("flags") = 0
+    );
+    m.def("EndChildFrame", []() { ImGui::EndChildFrame(); });
 
-    // Windows Utilities
-    m.def("IsWindowAppearing", []() { return ImGui::IsWindowAppearing(); });
-    m.def("IsWindowCollapsed", []() { return ImGui::IsWindowCollapsed(); });
+    // Text Utilities
     m.def(
-        "IsWindowFocused",
-        [](ImGuiFocusedFlags flags) { return ImGui::IsWindowFocused(flags); },
-        py::arg("flags") = 0);
-    m.def(
-        "IsWindowHovered",
-        [](ImGuiFocusedFlags flags) { return ImGui::IsWindowHovered(flags); },
-        py::arg("flags") = 0);
-    m.def("GetWindowPos", []() { return from_vec2(ImGui::GetWindowPos()); });
-    m.def("GetWindowSize", []() { return from_vec2(ImGui::GetWindowSize()); });
-    m.def("GetWindowWidth", []() { return ImGui::GetWindowWidth(); });
-    m.def("GetWindowHeight", []() { return ImGui::GetWindowHeight(); });
+        "CalcTextSize",
+        [](const char *text, const char *text_end, bool hide_text_after_double_hash, float wrap_width) {
+            return from_vec2(ImGui::CalcTextSize(text, text_end, hide_text_after_double_hash, wrap_width));
+        },
+        py::arg("text"),
+        py::arg("text_end") = nullptr,
+        py::arg("hide_text_after_double_hash") = false,
+        py::arg("wrap_width") = -1.f
+    );
 
+    // Utilities: Mouse
+    m.def("IsMouseDown", [](ImGuiMouseButton button) { return ImGui::IsMouseDown(button); }, py::arg("button"));
     m.def(
-        "SetNextWindowPos",
-        [](const Vec2T& pos, ImGuiCond cond, const Vec2T& pivot) {
-            ImGui::SetNextWindowPos(to_vec2(pos), cond, to_vec2(pivot));
+        "IsMouseClicked",
+        [](ImGuiMouseButton button, bool repeat) { return ImGui::IsMouseClicked(button, repeat); },
+        py::arg("button"),
+        py::arg("repeat") = false
+    );
+    m.def("IsMouseReleased", [](ImGuiMouseButton button) { return ImGui::IsMouseReleased(button); }, py::arg("button"));
+    m.def("IsMouseDoubleClicked", [](ImGuiMouseButton button) { return ImGui::IsMouseDoubleClicked(button); }, py::arg("button"));
+    m.def(
+        "IsMouseHoveringRect",
+        [](const Vec2T& r_min, const Vec2T& r_max, bool clip) {
+            return ImGui::IsMouseHoveringRect(to_vec2(r_min), to_vec2(r_max), clip);
         },
-        py::arg("pos"),
-        py::arg("cond") = 0,
-        py::arg("pivot") = std::make_tuple(0., 0.));
+        py::arg("r_min"),
+        py::arg("r_max"),
+        py::arg("clip") = true
+    );
+    m.def("IsAnyMouseDown", []() { return ImGui::IsAnyMouseDown(); });
+    m.def("GetMousePos", []() { return from_vec2(ImGui::GetMousePos()); });
+    m.def("GetMousePosOnOpeningCurrentPopup", []() { return from_vec2(ImGui::GetMousePosOnOpeningCurrentPopup()); });
     m.def(
-        "SetNextWindowSize",
-        [](const Vec2T& size, ImGuiCond cond) { ImGui::SetNextWindowSize(to_vec2(size), cond); },
-        py::arg("size"),
-        py::arg("cond") = 0);
-    m.def(
-        "SetNextWindowSizeConstraints",
-        [](const Vec2T& size_min, const Vec2T& size_max) {
-            ImGui::SetNextWindowSizeConstraints(to_vec2(size_min), to_vec2(size_max));
-        },
-        py::arg("size_min"),
-        py::arg("size_max"));
-    m.def(
-        "SetNextWindowContextSize",
-        [](const Vec2T& size) { ImGui::SetNextWindowContentSize(to_vec2(size)); },
-        py::arg("size"));
-    m.def(
-        "SetNextWindowCollapsed",
-        [](bool collapsed, ImGuiCond cond) { ImGui::SetNextWindowCollapsed(collapsed, cond); },
-        py::arg("collapsed"),
-        py::arg("cond") = 0);
-    m.def("SetNextWindowFocus", []() { ImGui::SetNextWindowFocus(); });
-    m.def("SetNextWindowBgAlpha", [](float alpha) { ImGui::SetNextWindowBgAlpha(alpha); });
-    m.def(
-        "SetWindowPos",
-        [](const Vec2T& pos, ImGuiCond cond) { ImGui::SetWindowPos(to_vec2(pos), cond); },
-        py::arg("pos"),
-        py::arg("cond") = 0);
-    m.def(
-        "SetWindowSize",
-        [](const Vec2T& size, ImGuiCond cond) { ImGui::SetWindowSize(to_vec2(size), cond); },
-        py::arg("size"),
-        py::arg("cond") = 0);
-    m.def(
-        "SetWindowCollapsed",
-        [](bool collapsed, ImGuiCond cond) { ImGui::SetWindowCollapsed(collapsed, cond); },
-        py::arg("collapsed"),
-        py::arg("cond") = 0);
-    m.def("set_window_focus", []() { ImGui::SetWindowFocus(); });
-    m.def(
-        "SetWindowFontScale",
-        [](float scale) { ImGui::SetWindowFontScale(scale); },
-        py::arg("scale"));
-    m.def(
-        "SetWindowPos",
-        [](const char* name, const Vec2T& pos, ImGuiCond cond) {
-            ImGui::SetWindowPos(name, to_vec2(pos), cond);
-        },
-        py::arg("name"),
-        py::arg("pos"),
-        py::arg("cond") = 0);
-    m.def(
-        "SetWindowSize",
-        [](const char* name, const Vec2T& size, ImGuiCond cond) {
-            ImGui::SetWindowSize(name, to_vec2(size), cond);
-        },
-        py::arg("name"),
-        py::arg("size"),
-        py::arg("cond") = 0);
-    m.def(
-        "SetWindowCollapsed",
-        [](const char* name, bool collapsed, ImGuiCond cond) {
-            ImGui::SetWindowCollapsed(name, collapsed, cond);
-        },
-        py::arg("name"),
-        py::arg("collapsed"),
-        py::arg("cond") = 0);
-    m.def(
-        "SetWindowFocus", [](const char* name) { ImGui::SetWindowFocus(name); }, py::arg("name"));
+        "IsMouseDragging",
+        [](ImGuiMouseButton button, float lock_threshold) { return ImGui::IsMouseDragging(button, lock_threshold); },
+        py::arg("button"),
+        py::arg("lock_threshold") = -1.f
+    );
+    m.def("ResetMouseDragDelta", [](ImGuiMouseButton button) { ImGui::ResetMouseDragDelta(button); }, py::arg("button"));
+    m.def("GetMouseCursor", []() { return ImGui::GetMouseCursor(); });
+    m.def("SetMouseCursor", [](ImGuiMouseCursor cursor_type) { ImGui::SetMouseCursor(cursor_type); }, py::arg("cursor_type"));
+    m.def("CaptureMouseFromApp", [](bool want_capture_mouse_value) { ImGui::CaptureMouseFromApp(want_capture_mouse_value); }, py::arg("want_capture_mouse_value"));
+
+    // Clipboard Utilities
+    m.def("GetClipboardText", []() { return ImGui::GetClipboardText(); });
+    m.def("SetClipboardText", [](const char *text) { ImGui::SetClipboardText(text); }, py::arg("text"));
+
+    // Settings/.Ini Utilities
+    m.def("LoadIniSettingsFromDisk", [](const char *ini_filename) { ImGui::LoadIniSettingsFromDisk(ini_filename); }, py::arg("ini_filename"));
+    m.def("LoadIniSettingsFromMemory", [](const char *ini_data) { ImGui::LoadIniSettingsFromMemory(ini_data); }, py::arg("ini_data"));
+    m.def("SaveIniSettingsToDisk", [](const char *ini_filename) { ImGui::SaveIniSettingsToDisk(ini_filename); }, py::arg("ini_filename"));
+    m.def("SaveIniSettingsToMemory", []() { return ImGui::SaveIniSettingsToMemory(); });
 }
 // clang-format on
 
