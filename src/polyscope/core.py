@@ -147,6 +147,16 @@ def set_user_callback(func):
 def clear_user_callback():
     psb.clear_user_callback()
 
+### Pick
+def have_selection():
+    return psb.have_selection()
+
+def get_selection():
+    return psb.get_selection()
+
+def set_selection(name, index):
+    psb.set_selection(name, index)
+
 ## Ground plane and shadows
 def set_ground_plane_mode(mode_str):
     psb.set_ground_plane_mode(str_to_ground_plane_mode(mode_str))
