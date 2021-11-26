@@ -1,4 +1,4 @@
-from typing import NewType, List, Optional, Tuple, Union, overload
+from typing import List, NewType, Optional, Tuple, Union, overload
 import numpy as np
 
 # Basic Types

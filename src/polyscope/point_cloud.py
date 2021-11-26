@@ -59,6 +59,24 @@ class PointCloud:
         self.bound_cloud.set_transparency(val)
     def get_transparency(self):
         return self.bound_cloud.get_transparency()
+   
+    # Transformation things
+    def center_bounding_box(self):
+        self.bound_cloud.center_bounding_box()
+    def rescale_to_unit(self):
+        self.bound_cloud.rescale_to_unit()
+    def reset_transform(self):
+        self.bound_cloud.reset_transform()
+    def set_transform(self, new_mat4x4):
+        self.bound_cloud.set_transform(new_mat4x4)
+    def set_position(self, new_vec3):
+        self.bound_cloud.set_position(new_vec3)
+    def translate(self, trans_vec3):
+        self.bound_cloud.translate(trans_vec3)
+    def get_transform(self):
+        return self.bound_cloud.get_transform()
+    def get_position(self):
+        return self.bound_cloud.get_position()
     
     # Point render mode
     def set_point_render_mode(self, val):

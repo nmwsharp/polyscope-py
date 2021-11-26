@@ -33,16 +33,9 @@ void bind_point_cloud(py::module& m) {
 
 
   // == Main class
-  py::class_<ps::PointCloud>(m, "PointCloud")
+  bindStructure<ps::PointCloud>(m, "PointCloud")
 
     // basics
-    .def("remove", &ps::PointCloud::remove, "Remove the structure")
-    .def("set_enabled", &ps::PointCloud::setEnabled, "Enable the structure")
-    .def("is_enabled", &ps::PointCloud::isEnabled, "Check if the structure is enabled")
-    .def("set_transparency", &ps::PointCloud::setTransparency, "Set transparency alpha")
-    .def("get_transparency", &ps::PointCloud::getTransparency, "Get transparency alpha")
-    .def("remove_all_quantities", &ps::PointCloud::removeAllQuantities, "Remove all quantities")
-    .def("remove_quantity", &ps::PointCloud::removeQuantity, "Remove a quantity")
     .def("update_point_positions", &ps::PointCloud::updatePointPositions<Eigen::MatrixXd>, "Update point positions")
     .def("update_point_positions2D", &ps::PointCloud::updatePointPositions2D<Eigen::MatrixXd>, "Update point positions")
     .def("n_points", &ps::PointCloud::nPoints, "# points")

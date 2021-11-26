@@ -57,16 +57,9 @@ void bind_surface_mesh(py::module& m) {
 
 
   // == Main class
-  py::class_<ps::SurfaceMesh>(m, "SurfaceMesh")
+  bindStructure<ps::SurfaceMesh>(m, "SurfaceMesh")
 
       // basics
-      .def("remove", &ps::SurfaceMesh::remove, "Remove the structure")
-      .def("set_enabled", &ps::SurfaceMesh::setEnabled, "Enable the structure")
-      .def("is_enabled", &ps::SurfaceMesh::isEnabled, "Check if the structure is enabled")
-      .def("set_transparency", &ps::SurfaceMesh::setTransparency, "Set transparency alpha")
-      .def("get_transparency", &ps::SurfaceMesh::getTransparency, "Get transparency alpha")
-      .def("remove_all_quantities", &ps::SurfaceMesh::removeAllQuantities, "Remove all quantities")
-      .def("remove_quantity", &ps::SurfaceMesh::removeQuantity, "Remove a quantity")
       .def("update_vertex_positions", &ps::SurfaceMesh::updateVertexPositions<Eigen::MatrixXd>,
            "Update vertex positions")
       .def("update_vertex_positions2D", &ps::SurfaceMesh::updateVertexPositions2D<Eigen::MatrixXd>,

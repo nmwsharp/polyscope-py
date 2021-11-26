@@ -90,8 +90,19 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_enable_render_error_checks", [](bool x) { ps::options::enableRenderErrorChecks = x; });
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
   m.def("set_autoscale_structures", [](bool x) { ps::options::autoscaleStructures = x; });
+  m.def("set_build_gui", [](bool x) { ps::options::buildGui = x; });
+  m.def("set_open_imgui_window_for_user_callback", [](bool x) { ps::options::openImGuiWindowForUserCallback= x; });
+  m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });
+  m.def("set_give_focus_on_show", [](bool x) { ps::options::giveFocusOnShow = x; });
   m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
   m.def("set_up_dir", [](ps::view::UpDir x) { ps::view::setUpDir(x); });
+
+  // === Scene extents
+  m.def("set_automatically_compute_scene_extents", [](bool x) { ps::options::automaticallyComputeSceneExtents = x; });
+  m.def("set_length_scale", [](float x) { ps::state::lengthScale = x; });
+  m.def("get_length_scale", []() { return ps::state::lengthScale; });
+  m.def("set_bounding_box", [](glm::vec3 low, glm::vec3 high) { ps::state::boundingBox = std::tuple<glm::vec3, glm::vec3>(low, high); });
+  m.def("get_bounding_box", []() { return ps::state::boundingBox; });
 
   // === Camera controls
   m.def("reset_camera_to_home_view", ps::view::resetCameraToHomeView);

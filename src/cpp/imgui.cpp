@@ -293,7 +293,7 @@ void bind_imgui_methods(py::module& m) {
     m.def("PopButtonRepeat", []() { ImGui::PopButtonRepeat(); });
 
     // Cursor / Layout
-    m.def("separator", []() { ImGui::Separator(); });
+    m.def("Separator", []() { ImGui::Separator(); });
     m.def(
         "SameLine",
         [](float offset_from_start_x, float spacing) { ImGui::SameLine(); },
@@ -1099,7 +1099,7 @@ void bind_imgui_methods(py::module& m) {
             return std::make_tuple(clicked, selected);
         },
         py::arg("label"),
-        py::arg("selected"),
+        py::arg("selected") = false,
         py::arg("flags") = 0,
         py::arg("size") = std::make_tuple(0.f, 0.f));
 

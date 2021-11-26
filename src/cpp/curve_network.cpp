@@ -32,16 +32,9 @@ void bind_curve_network(py::module& m) {
 
 
   // == Main class
-  py::class_<ps::CurveNetwork>(m, "CurveNetwork")
+  bindStructure<ps::CurveNetwork>(m, "CurveNetwork")
 
     // basics
-    .def("remove", &ps::CurveNetwork::remove, "Remove the structure")
-    .def("set_enabled", &ps::CurveNetwork::setEnabled, "Enable the structure")
-    .def("is_enabled", &ps::CurveNetwork::isEnabled, "Check if the structure is enabled")
-    .def("set_transparency", &ps::CurveNetwork::setTransparency, "Set transparency alpha")
-    .def("get_transparency", &ps::CurveNetwork::getTransparency, "Get transparency alpha")
-    .def("remove_all_quantities", &ps::CurveNetwork::removeAllQuantities, "Remove all quantities")
-    .def("remove_quantity", &ps::CurveNetwork::removeQuantity, "Remove a quantity")
     .def("update_node_positions", &ps::CurveNetwork::updateNodePositions<Eigen::MatrixXd>, "Update node positions")
     .def("update_node_positions2D", &ps::CurveNetwork::updateNodePositions2D<Eigen::MatrixXd>, "Update node positions")
     .def("n_nodes", &ps::CurveNetwork::nNodes, "# nodes")
