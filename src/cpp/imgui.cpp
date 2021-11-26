@@ -345,6 +345,8 @@ void bind_imgui_methods(py::module& m) {
 
     // Widgets: Text
     m.def(
+        "TextUnformatted", [](const char* text) { ImGui::TextUnformatted(text); }, py::arg("text"));
+    m.def(
         "Text", [](const char* text) { ImGui::Text("%s", text); }, py::arg("text"));
     m.def(
         "TextColored",
