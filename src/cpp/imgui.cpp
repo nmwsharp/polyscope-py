@@ -1498,6 +1498,28 @@ void bind_imgui_methods(py::module& m) {
     m.def("SetMouseCursor", [](ImGuiMouseCursor cursor_type) { ImGui::SetMouseCursor(cursor_type); }, py::arg("cursor_type"));
     m.def("CaptureMouseFromApp", [](bool want_capture_mouse_value) { ImGui::CaptureMouseFromApp(want_capture_mouse_value); }, py::arg("want_capture_mouse_value"));
 
+    // Inputs Utilities: Keyboard
+    m.def("GetKeyIndex", [](ImGuiKey imgui_key) { return ImGui::GetKeyIndex(imgui_key); }, py::arg("imgui_key"));
+    m.def("IsKeyDown", [](ImGuiKey user_key_index) { return ImGui::IsKeyDown(user_key_index); }, py::arg("user_key_index"));
+    m.def("IsKeyPressed", [](ImGuiKey user_key_index) { return ImGui::IsKeyPressed(user_key_index); }, py::arg("user_key_index"));
+    m.def("IsKeyReleased", [](ImGuiKey user_key_index) { return ImGui::IsKeyReleased(user_key_index); }, py::arg("user_key_index"));
+    m.def(
+        "GetKeyPressedAmount",
+        [](ImGuiKey key_index, float repeat_delay, float rate) {
+            return ImGui::GetKeyPressedAmount(key_index, repeat_delay, rate);
+        },
+        py::arg("key_index"),
+        py::arg("repeat_delay"),
+        py::arg("rate")
+    );
+    m.def(
+        "CaptureKeyboardFromApp",
+        [](bool want_capture_keyboard_value) {
+            ImGui::CaptureKeyboardFromApp(want_capture_keyboard_value);
+        },
+        py::arg("want_capture_keyboard_value") = true
+    );
+
     // Clipboard Utilities
     m.def("GetClipboardText", []() { return ImGui::GetClipboardText(); });
     m.def("SetClipboardText", [](const char *text) { ImGui::SetClipboardText(text); }, py::arg("text"));
