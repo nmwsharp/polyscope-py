@@ -65,7 +65,7 @@ void bind_surface_mesh(py::module& m) {
       .def("update_vertex_positions2D", &ps::SurfaceMesh::updateVertexPositions2D<Eigen::MatrixXd>,
            "Update vertex positions")
       .def("n_vertices", &ps::SurfaceMesh::nVertices, "# vertices")
-      .def("n_faces", &ps::SurfaceMesh::nFaces, "# edges")
+      .def("n_faces", &ps::SurfaceMesh::nFaces, "# faces")
       .def("n_edges", &ps::SurfaceMesh::nEdges, "# edges")
       .def("n_corners", &ps::SurfaceMesh::nCorners, "# corners")
       .def("n_halfedges", &ps::SurfaceMesh::nHalfedges, "# halfedges")
@@ -91,7 +91,7 @@ void bind_surface_mesh(py::module& m) {
       .def("get_ignore_slice_plane", &ps::SurfaceMesh::getIgnoreSlicePlane, "Get ignore slice plane")
       .def("set_cull_whole_elements", &ps::SurfaceMesh::setCullWholeElements, "Set cull whole elements")
       .def("get_cull_whole_elements", &ps::SurfaceMesh::getCullWholeElements, "Get cull whole elements")
-     
+
 
       // permutations & bases
       .def("set_vertex_permutation", &ps::SurfaceMesh::setVertexPermutation<Eigen::VectorXi>, "Set vertex permutation")

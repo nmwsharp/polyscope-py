@@ -7,9 +7,14 @@
 #include "Eigen/Dense"
 
 #include "polyscope/affine_remapper.h"
+#include "polyscope/curve_network.h"
+#include "polyscope/pick.h"
+#include "polyscope/point_cloud.h"
 #include "polyscope/polyscope.h"
+#include "polyscope/surface_mesh.h"
 #include "polyscope/surface_parameterization_enums.h"
 #include "polyscope/view.h"
+#include "polyscope/volume_mesh.h"
 
 namespace py = pybind11;
 namespace ps = polyscope;
@@ -134,7 +139,37 @@ PYBIND11_MODULE(polyscope_bindings, m) {
       ps::state::userCallback = wrapperFunc;
   });
   m.def("clear_user_callback", []() {ps::state::userCallback = nullptr;});
-  
+
+  // === Pick
+  m.def("have_selection", [](){ return ps::pick::haveSelection();});
+  m.def("get_selection", [](){
+    const auto selection = ps::pick::getSelection();
+    const auto * structure = std::get<0>(selection);
+    if (structure == nullptr) {
+      return std::make_tuple(std::string(), size_t{0});
+    }
+    return std::make_tuple(structure->name, std::get<1>(selection));
+  });
+  m.def(
+    "set_selection",
+    [](const std::string &name, size_t index){
+      for(const auto &structureTypeName : std::array<std::string, 4>{
+        ps::PointCloud::structureTypeName,
+        ps::CurveNetwork::structureTypeName,
+        ps::SurfaceMesh::structureTypeName,
+        ps::VolumeMesh::structureTypeName
+      }) {
+        if (ps::hasStructure(structureTypeName, name)) {
+          auto * structure = ps::getStructure(structureTypeName, name);
+          ps::pick::setSelection(std::make_pair(structure, index));
+          break;
+        }
+      }
+    },
+    py::arg("name"),
+    py::arg("index")
+  );
+
   // === Ground plane and shadows
   m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });
   m.def("set_ground_plane_height_factor", [](float x, bool isRelative) { ps::options::groundPlaneHeightFactor.set(x, isRelative); });
@@ -156,7 +191,6 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("load_color_map", ps::loadColorMap, "Load a color map from file");
   
   // === Rendering
-  m.def("load_color_map", ps::loadColorMap, "Load a color map from file");
   m.def("set_SSAA_factor", [](int n) { ps::options::ssaaFactor = n; });
 
   // === Slice planes
