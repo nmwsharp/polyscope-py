@@ -215,6 +215,12 @@ class SlicePlane:
     
     def get_draw_widget(self):
         return self.bound_slice_plane.get_draw_widget()
+    
+    def set_volume_mesh_to_inspect(self, val):
+        return self.bound_slice_plane.set_volume_mesh_to_inspect(val)
+
+    def get_volume_mesh_to_inspect(self):
+        return self.bound_slice_plane.get_volume_mesh_to_inspect()
 
 def add_scene_slice_plane():
     instance = psb.add_scene_slice_plane(False)

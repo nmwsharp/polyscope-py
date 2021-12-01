@@ -19,7 +19,7 @@ void bind_volume_mesh(py::module& m) {
   // == Helper quantity classes
 
   // Scalar quantities
-  bindScalarQuantity<ps::VolumeMeshVertexScalarQuantity>(m, "VolumeMeshVertexScalarQuantity");
+  bindVMVScalarQuantity<ps::VolumeMeshVertexScalarQuantity>(m, "VolumeMeshVertexScalarQuantity");
   bindScalarQuantity<ps::VolumeMeshCellScalarQuantity>(m, "VolumeMeshCellScalarQuantity");
 
   // Color quantities

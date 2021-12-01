@@ -1407,6 +1407,11 @@ class TestVolumeMesh(unittest.TestCase):
         p.set_ignore_slice_plane(plane.get_name(), False)
         self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
 
+        plane.set_volume_mesh_to_inspect("test_mesh")
+        self.assertEqual("test_mesh", plane.get_volume_mesh_to_inspect())
+        
+        ps.show(3)
+
         ps.remove_all_structures()
         ps.remove_last_scene_slice_plane()
 
