@@ -2,6 +2,8 @@ import polyscope_bindings as psb
 
 import os
 
+import numpy as np
+
 ### Basic setup and teardown 
 
 def init(backend=""):
@@ -12,7 +14,7 @@ def init(backend=""):
     psb.init(backend)
    
     # NOTE: For some reason I do not understand, calling psb.init() changes the working directory, causing e.g. writes to relative file paths to write to unexpected locations afterwards.
-    # As a simple workaround, we restore the CWD from before the call. Of course, this does not address the underlying cause, so there may be other subtle problems lurking.
+    # As a simple workaround, we restore the CWD from before the call. Of course, this does not address the underlying cause, so there may be other subtle problems lurking.  
     os.chdir(cwd_before)
 
 
@@ -74,11 +76,41 @@ def set_autocenter_structures(b):
 def set_autoscale_structures(b):
     psb.set_autoscale_structures(b)
 
+def set_build_gui(b):
+    psb.set_build_gui(b)
+
+def set_open_imgui_window_for_user_callback(b):
+    psb.set_open_imgui_window_for_user_callback(b)
+
+def set_invoke_user_callback_for_nested_show(b):
+    psb.set_invoke_user_callback_for_nested_show(b)
+
+def set_give_focus_on_show(b):
+    psb.set_give_focus_on_show(b)
+
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))
 
 def set_up_dir(d):
     psb.set_up_dir(str_to_updir(d))
+
+### Scene extents
+
+def set_automatically_compute_scene_extents(b):
+    psb.set_automatically_compute_scene_extents(b)
+
+def set_length_scale(s):
+    psb.set_length_scale(s)
+
+def get_length_scale():
+    return psb.get_length_scale()
+
+def set_bounding_box(low, high):
+    psb.set_bounding_box(glm3(low), glm3(high))
+
+def get_bounding_box():
+    low, high = psb.get_bounding_box()
+    return np.array(low.as_tuple()), np.array(high.as_tuple())
 
 ### Camera controls
 
@@ -90,6 +122,9 @@ def look_at(camera_location, target, fly_to=False):
 
 def look_at_dir(camera_location, target, up_dir, fly_to=False):
     psb.look_at_dir(glm3(camera_location), glm3(target), glm3(up_dir), fly_to)
+
+def set_view_projection_mode(s):
+    psb.set_view_projection_mode(str_to_projection_mode(s))
 
 ### Messages
 
@@ -104,6 +139,23 @@ def error(message):
 
 def terminating_error(message):
     psb.terminating_error(message)
+
+### Callback
+def set_user_callback(func):
+    psb.set_user_callback(func)
+
+def clear_user_callback():
+    psb.clear_user_callback()
+
+### Pick
+def have_selection():
+    return psb.have_selection()
+
+def get_selection():
+    return psb.get_selection()
+
+def set_selection(name, index):
+    psb.set_selection(name, index)
 
 ## Ground plane and shadows
 def set_ground_plane_mode(mode_str):
@@ -181,6 +233,8 @@ def remove_last_scene_slice_plane():
 ## Small utilities
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])
+def glm4(vals):
+    return psb.glm_vec4(vals[0], vals[1], vals[2], vals[3])
 
 ### Materials
 
@@ -220,6 +274,18 @@ def str_to_navigate_style(s):
 
     if s not in d:
         raise ValueError("Bad navigate style specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def str_to_projection_mode(s):
+    d = {
+        "perspective" : psb.ProjectionMode.perspective,
+        "orthographic" : psb.ProjectionMode.orthographic,
+    }
+
+    if s not in d:
+        raise ValueError("Bad projection mode specifier '{}', should be one of [{}]".format(s, 
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]
@@ -291,31 +357,30 @@ def str_to_param_viz_style(s):
 
     return d[s]
 
+# Back face policy to/from string
+d_back_face_policy = {
+    "identical" : psb.BackFacePolicy.identical,
+    "different" : psb.BackFacePolicy.different,
+    "custom" : psb.BackFacePolicy.custom,
+    "cull" : psb.BackFacePolicy.cull,
+}
+
 def str_to_back_face_policy(s):
-    d = {
-        "identical" : psb.BackFacePolicy.identical,
-        "different" : psb.BackFacePolicy.different,
-        "cull" : psb.BackFacePolicy.cull,
-    }
 
-    if s not in d:
+    if s not in d_back_face_policy:
         raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(s, 
-            ",".join(["'{}'".format(x) for x in d.keys()])))
+            ",".join(["'{}'".format(x) for x in d_back_face_policy.keys()])))
 
-    return d[s]
+    return d_back_face_policy[s]
 
-def back_face_policy_to_str(s):
-    d = {
-        psb.BackFacePolicy.identical : "identical" ,
-        psb.BackFacePolicy.different : "different" ,
-        psb.BackFacePolicy.cull : "cull" 
-    }
+def back_face_policy_to_str(val):
 
-    if s not in d:
-        raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(s, 
-            ",".join(["'{}'".format(x) for x in d.keys()])))
+    for k,v in d_back_face_policy.items():
+        if v == val:
+            return k
 
-    return d[s]
+    raise ValueError("Bad back face policy specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_back_face_policy.values()])))
   
 
 def str_to_ground_plane_mode(s):
@@ -344,3 +409,26 @@ def str_to_transparency_mode(s):
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]
+
+# Point render mode to/from string
+d_point_render_mode = {
+        "sphere" : psb.PointRenderMode.sphere,
+        "quad" : psb.PointRenderMode.quad,
+    }
+
+def str_to_point_render_mode(s):
+
+    if s not in d_point_render_mode:
+        raise ValueError("Bad point render mode specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_point_render_mode.keys()])))
+
+    return d_point_render_mode[s]
+
+def point_render_mode_to_str(val):
+
+    for k,v in d_point_render_mode.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad point render mode specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_point_render_mode.values()])))

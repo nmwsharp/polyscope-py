@@ -17,6 +17,7 @@ else:
 
 
 import polyscope as ps
+import polyscope.imgui as psim
 
 # Path to test assets
 assets_prefix = path.join(path.dirname(__file__), "assets/")
@@ -43,8 +44,36 @@ class TestCore(unittest.TestCase):
         
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
+
+        ps.set_build_gui(True)
+        ps.set_open_imgui_window_for_user_callback(True)
+        ps.set_invoke_user_callback_for_nested_show(False)
+        ps.set_give_focus_on_show(True)
         
         ps.show(3)
+
+    def test_callbacks(self):
+
+        # Simple callback function
+        # (we use 'counts' to ensure it gets called)
+        counts = [0]
+        def sample_callback():
+            counts[0] = counts[0] + 1
+
+        ps.set_user_callback(sample_callback)
+        ps.show(3)
+       
+        # Make sure the callback got called
+        self.assertEqual(3, counts[0])
+
+        ps.clear_user_callback()
+        ps.show(3)
+        
+        # Make sure the callback didn't get called any more
+        self.assertEqual(3, counts[0])
+        
+        # Make sure clearing twice is ok
+        ps.clear_user_callback()
     
     def test_view_options(self):
 
@@ -58,6 +87,9 @@ class TestCore(unittest.TestCase):
         ps.set_up_dir("neg_y_up")
         ps.set_up_dir("z_up")
         ps.set_up_dir("neg_z_up")
+        
+        ps.set_view_projection_mode("orthographic")
+        ps.set_view_projection_mode("perspective")
         
         ps.show(3)
     
@@ -159,10 +191,200 @@ class TestCore(unittest.TestCase):
         ps.load_color_map("test_cmap", path.join(assets_prefix, "test_colormap.png"))
     
 
+    def test_scene_extents(self):
+
+        ps.set_automatically_compute_scene_extents(False)
+
+        ps.set_length_scale(3.)
+        self.assertAlmostEqual(ps.get_length_scale(), 3.)
+
+        low = np.array((-1, -2., -3.)) 
+        high = np.array((1., 2., 3.))
+        ps.set_bounding_box(low, high)
+        plow, phigh = ps.get_bounding_box()
+        self.assertTrue(np.abs(plow-low).sum() < 0.0001)
+        self.assertTrue(np.abs(phigh-high).sum() < 0.0001)
+        
+        ps.set_automatically_compute_scene_extents(True)
+   
+
+class TestImGuiBindings(unittest.TestCase):
+
+    def test_ui_calls(self):
+
+        # (this is the example from the demo and the docs)
+    
+        # A bunch of parameters which we will maniuplate via the UI defined below.
+        # There is nothing special about these variables, you could manipulate any other 
+        # kind of Python values the same way, such as entries in a dict, or class members.
+        is_true1 = False
+        is_true2 = True
+        ui_int = 7
+        ui_float1 = -3.2
+        ui_float2 = 0.8
+        ui_color3 = (1., 0.5, 0.5)
+        ui_color4 = (0.3, 0.5, 0.5, 0.8)
+        ui_angle_rad = 0.2
+        ui_text = "some input text"
+        ui_options = ["option A", "option B", "option C"]
+        ui_options_selected = ui_options[1]
+
+        def my_function():
+            # ... do something important here ...
+            print("executing function")
+
+        # Define our callback function, which Polyscope will repeatedly execute while running the UI.
+        # We can write any code we want here, but in particular it is an opportunity to create ImGui 
+        # interface elements and define a custom UI.
+        def imgui_callback():
+
+            # If we want to use local variables & assign to them in the UI code below, we need to mark them as nonlocal. This is because of how Python scoping rules work, not anything particular about Polyscope or ImGui.
+            # Of course, you can also use any other kind of python variable as a controllable value in the UI, such as a value from a dictionary, or a class member. Just be sure to assign the result of the ImGui call to the value, as in the examples below.
+            nonlocal is_true1, is_true2, ui_int, ui_float1, ui_float2, ui_color3, ui_color4, ui_text, ui_options_selected, ui_angle_rad
+            
+
+            # == Settings
+           
+            # Use settings like this to change the UI appearance.
+            # Note that it is a push/pop pair, with the matching pop() below.
+            psim.PushItemWidth(150)
+
+
+            # == Show text in the UI
+
+            psim.TextUnformatted("Some sample text")
+            psim.TextUnformatted("An important value: {}".format(42))
+            psim.Separator()
+            
+
+            # == Buttons
+
+            if(psim.Button("A button")):
+                # This code is executed when the button is pressed
+                print("Hello")
+
+            # By default, each element goes on a new line. Use this 
+            # to put the next element on the _same_ line.
+            psim.SameLine() 
+            
+            if(psim.Button("Another button")):
+                # This code is executed when the button is pressed
+                my_function()
+         
+
+            # == Set parameters
+        
+            # These commands allow the user to adjust the value of variables.
+            # It is important that we assign the return result to the variable to
+            # update it. 
+            # For most elements, the return is actually a tuple `(changed, newval)`, 
+            # where `changed` indicates whether the setting was modified on this 
+            # frame, and `newval` gives the new value of the variable (or the same 
+            # old value if unchanged).
+            #
+            # For numeric inputs, ctrl-click on the box to type in a value.
+           
+            # Checkbox
+            changed, is_true1 = psim.Checkbox("flag1", is_true1) 
+            if(changed): # optionally, use this conditional to take action on the new value
+                pass 
+            psim.SameLine() 
+            changed, is_true2 = psim.Checkbox("flag2", is_true2) 
+            
+            # Input ints
+            changed, ui_int = psim.InputInt("ui_int", ui_int, step=1, step_fast=10) 
+
+            # Input floats using two different styles of widget
+            changed, ui_float1 = psim.InputFloat("ui_float1", ui_float1) 
+            psim.SameLine() 
+            changed, ui_float2 = psim.SliderFloat("ui_float2", ui_float2, v_min=-5, v_max=5)
+
+            # Input colors
+            changed, ui_color3 = psim.ColorEdit3("ui_color3", ui_color3)
+            psim.SameLine() 
+            changed, ui_color4 = psim.ColorEdit4("ui_color4", ui_color4)
+
+            # Input text
+            changed, ui_text = psim.InputText("enter text", ui_text)
+
+            # Combo box to choose from options
+            # There, the options are a list of strings in `ui_options`,
+            # and the currently selected element is stored in `ui_options_selected`.
+            psim.PushItemWidth(200)
+            changed = psim.BeginCombo("Pick one", ui_options_selected)
+            if changed:
+                for val in ui_options:
+                    if psim.Selectable(val, ui_options_selected==val):
+                        ui_options_selected = val
+                psim.EndCombo()
+            psim.PopItemWidth()
+            
+
+            # Use tree headers to logically group options
+
+            # This a stateful option to set the tree node below to be open initially.
+            # The second argument is a flag, which works like a bitmask.
+            # Many ImGui elements accept flags to modify their behavior.
+            psim.SetNextItemOpen(True, psim.ImGuiCond_FirstUseEver)
+           
+            # The body is executed only when the sub-menu is open. Note the push/pop pair!
+            if(psim.TreeNode("Collapsible sub-menu")):
+                
+                psim.TextUnformatted("Detailed information")
+                
+                if(psim.Button("sub-button")):
+                    print("hello")
+
+                # There are many different UI elements offered by ImGui, many of which
+                # are bound in python by Polyscope. See ImGui's documentation in `imgui.h`,
+                # or the polyscope bindings in `polyscope/src/cpp/imgui.cpp`.
+                changed, ui_angle_rad = psim.SliderAngle("ui_float2", ui_angle_rad, 
+                        v_degrees_min=-90, v_degrees_max=90)
+                
+                psim.TreePop()
+
+            psim.PopItemWidth()
+
+
+        ps.set_user_callback(imgui_callback)
+        ps.show(3)
+        
+        ps.clear_user_callback()
+
+
 class TestStructureManagement(unittest.TestCase):
 
     def test_remove_all(self):
         pass
+
+def test_transforms(t,s):
+
+    T = np.array([
+        [1., 0., 0., 3.],
+        [0., 0., -1., -2.],
+        [0., 1., 0., 5.],
+        [0., 0., 0., 1.]
+        ])
+    v = np.array([1., 2., 3.])
+
+    s.get_transform()
+    s.get_position()
+    s.center_bounding_box()
+    s.rescale_to_unit()
+
+    s.reset_transform()
+    t.assertTrue(np.abs(s.get_transform()-np.eye(4)).sum() < 1e-4)
+    t.assertTrue(np.abs(s.get_position()).sum() < 1e-4)
+    
+    s.set_transform(T)
+    t.assertTrue(np.abs(s.get_transform()-T).sum() < 1e-4)
+
+    s.reset_transform()
+    s.set_position(v)
+    t.assertTrue(np.abs(s.get_position()-v).sum() < 1e-4)
+
+    s.translate(v)
+    t.assertTrue(np.abs(s.get_position()-2.*v).sum() < 1e-4)
 
 
 class TestPointCloud(unittest.TestCase):
@@ -218,6 +440,12 @@ class TestPointCloud(unittest.TestCase):
         p.set_radius(0.01)
         p.set_radius(0.1, relative=False)
         self.assertAlmostEqual(0.1, p.get_radius())
+       
+        # Render mode
+        p.set_point_render_mode("sphere")
+        self.assertEqual("sphere", p.get_point_render_mode())
+        p.set_point_render_mode("quad")
+        self.assertEqual("quad", p.get_point_render_mode())
         
         # Color
         color = (0.3, 0.3, 0.5)
@@ -242,6 +470,12 @@ class TestPointCloud(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        ps_cloud = ps.register_point_cloud("test_cloud", self.generate_points())
+        test_transforms(self,ps_cloud)
+        ps.remove_all_structures()
     
     def test_update(self):
 
@@ -465,6 +699,12 @@ class TestCurveNetwork(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        p = ps.register_curve_network("test_network", self.generate_points(), self.generate_edges())
+        test_transforms(self,p)
+        ps.remove_all_structures()
     
     def test_slice_plane(self):
 
@@ -702,9 +942,13 @@ class TestSurfaceMesh(unittest.TestCase):
         self.assertEqual("candy", p.get_material())
         p.set_material("clay")
         
-        # Back face policy
+        # Back face 
         p.set_back_face_policy("different")
         self.assertEqual("different", p.get_back_face_policy())
+        p.set_back_face_policy("custom")
+        self.assertEqual("custom", p.get_back_face_policy())
+        p.set_back_face_color((0.25, 0.25, 0.25))
+        self.assertEqual((0.25, 0.25, 0.25), p.get_back_face_color())
         p.set_back_face_policy("cull")
         
         # Transparency
@@ -714,8 +958,7 @@ class TestSurfaceMesh(unittest.TestCase):
         # Set with optional arguments 
         p2 = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
-                    smooth_shade=True, edge_width=0.5, back_face_policy="cull",
-                    transparency=0.9)
+                    smooth_shade=True, edge_width=0.5, back_face_policy="cull", back_face_color=(0.1, 0.1, 0.1), transparency=0.9)
         
         # Make sure shadows work
         ps.set_ground_plane_mode("shadow_only")
@@ -723,6 +966,12 @@ class TestSurfaceMesh(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+        test_transforms(self,p)
+        ps.remove_all_structures()
     
     def test_slice_plane(self):
 
@@ -1136,6 +1385,12 @@ class TestVolumeMesh(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
+        test_transforms(self,p)
+        ps.remove_all_structures()
    
     def test_slice_plane(self):
 

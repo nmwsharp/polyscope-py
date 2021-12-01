@@ -1,6 +1,6 @@
 import polyscope_bindings as psb
 
-from polyscope.core import str_to_datatype, str_to_vectortype, glm3
+from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str
 
 class PointCloud:
 
@@ -59,6 +59,30 @@ class PointCloud:
         self.bound_cloud.set_transparency(val)
     def get_transparency(self):
         return self.bound_cloud.get_transparency()
+   
+    # Transformation things
+    def center_bounding_box(self):
+        self.bound_cloud.center_bounding_box()
+    def rescale_to_unit(self):
+        self.bound_cloud.rescale_to_unit()
+    def reset_transform(self):
+        self.bound_cloud.reset_transform()
+    def set_transform(self, new_mat4x4):
+        self.bound_cloud.set_transform(new_mat4x4)
+    def set_position(self, new_vec3):
+        self.bound_cloud.set_position(new_vec3)
+    def translate(self, trans_vec3):
+        self.bound_cloud.translate(trans_vec3)
+    def get_transform(self):
+        return self.bound_cloud.get_transform()
+    def get_position(self):
+        return self.bound_cloud.get_position()
+    
+    # Point render mode
+    def set_point_render_mode(self, val):
+        self.bound_cloud.set_point_render_mode(str_to_point_render_mode(val))
+    def get_point_render_mode(self):
+        return point_render_mode_to_str(self.bound_cloud.get_point_render_mode())
 
     # Slice planes
     def set_cull_whole_elements(self, val):
@@ -164,7 +188,7 @@ class PointCloud:
             q.set_color(glm3(color))
 
 
-def register_point_cloud(name, points, enabled=None, radius=None, color=None, material=None, transparency=None):
+def register_point_cloud(name, points, enabled=None, radius=None, point_render_mode=None, color=None, material=None, transparency=None):
     """Register a new point cloud"""
 
     p = PointCloud(name, points)
@@ -174,6 +198,8 @@ def register_point_cloud(name, points, enabled=None, radius=None, color=None, ma
         p.set_enabled(enabled)
     if radius is not None:
         p.set_radius(radius)
+    if point_render_mode is not None:
+        p.set_point_render_mode(point_render_mode)
     if color is not None:
         p.set_color(color)
     if material is not None:

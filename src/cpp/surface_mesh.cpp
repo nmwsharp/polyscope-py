@@ -57,22 +57,15 @@ void bind_surface_mesh(py::module& m) {
 
 
   // == Main class
-  py::class_<ps::SurfaceMesh>(m, "SurfaceMesh")
+  bindStructure<ps::SurfaceMesh>(m, "SurfaceMesh")
 
       // basics
-      .def("remove", &ps::SurfaceMesh::remove, "Remove the structure")
-      .def("set_enabled", &ps::SurfaceMesh::setEnabled, "Enable the structure")
-      .def("is_enabled", &ps::SurfaceMesh::isEnabled, "Check if the structure is enabled")
-      .def("set_transparency", &ps::SurfaceMesh::setTransparency, "Set transparency alpha")
-      .def("get_transparency", &ps::SurfaceMesh::getTransparency, "Get transparency alpha")
-      .def("remove_all_quantities", &ps::SurfaceMesh::removeAllQuantities, "Remove all quantities")
-      .def("remove_quantity", &ps::SurfaceMesh::removeQuantity, "Remove a quantity")
       .def("update_vertex_positions", &ps::SurfaceMesh::updateVertexPositions<Eigen::MatrixXd>,
            "Update vertex positions")
       .def("update_vertex_positions2D", &ps::SurfaceMesh::updateVertexPositions2D<Eigen::MatrixXd>,
            "Update vertex positions")
       .def("n_vertices", &ps::SurfaceMesh::nVertices, "# vertices")
-      .def("n_faces", &ps::SurfaceMesh::nFaces, "# edges")
+      .def("n_faces", &ps::SurfaceMesh::nFaces, "# faces")
       .def("n_edges", &ps::SurfaceMesh::nEdges, "# edges")
       .def("n_corners", &ps::SurfaceMesh::nCorners, "# corners")
       .def("n_halfedges", &ps::SurfaceMesh::nHalfedges, "# halfedges")
@@ -90,13 +83,15 @@ void bind_surface_mesh(py::module& m) {
       .def("get_material", &ps::SurfaceMesh::getMaterial, "Get material")
       .def("set_back_face_policy", &ps::SurfaceMesh::setBackFacePolicy, "Set back face policy")
       .def("get_back_face_policy", &ps::SurfaceMesh::getBackFacePolicy, "Get back face policy")
+      .def("set_back_face_color", &ps::SurfaceMesh::setBackFaceColor, "Set back face color")
+      .def("get_back_face_color", &ps::SurfaceMesh::getBackFaceColor, "Get back face color")
 
       // slice planes
       .def("set_ignore_slice_plane", &ps::SurfaceMesh::setIgnoreSlicePlane, "Set ignore slice plane")
       .def("get_ignore_slice_plane", &ps::SurfaceMesh::getIgnoreSlicePlane, "Get ignore slice plane")
       .def("set_cull_whole_elements", &ps::SurfaceMesh::setCullWholeElements, "Set cull whole elements")
       .def("get_cull_whole_elements", &ps::SurfaceMesh::getCullWholeElements, "Get cull whole elements")
-     
+
 
       // permutations & bases
       .def("set_vertex_permutation", &ps::SurfaceMesh::setVertexPermutation<Eigen::VectorXi>, "Set vertex permutation")

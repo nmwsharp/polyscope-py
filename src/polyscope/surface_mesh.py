@@ -84,6 +84,25 @@ class SurfaceMesh:
         self.bound_mesh.set_transparency(val)
     def get_transparency(self):
         return self.bound_mesh.get_transparency()
+
+    # Transformation things
+    def center_bounding_box(self):
+        self.bound_mesh.center_bounding_box()
+    def rescale_to_unit(self):
+        self.bound_mesh.rescale_to_unit()
+    def reset_transform(self):
+        self.bound_mesh.reset_transform()
+    def set_transform(self, new_mat4x4):
+        self.bound_mesh.set_transform(new_mat4x4)
+    def set_position(self, new_vec3):
+        self.bound_mesh.set_position(new_vec3)
+    def translate(self, trans_vec3):
+        self.bound_mesh.translate(trans_vec3)
+    def get_transform(self):
+        return self.bound_mesh.get_transform()
+    def get_position(self):
+        return self.bound_mesh.get_position()
+    
     
     # Slice planes
     def set_cull_whole_elements(self, val):
@@ -152,6 +171,12 @@ class SurfaceMesh:
         self.bound_mesh.set_back_face_policy(str_to_back_face_policy(val))
     def get_back_face_policy(self):
         return back_face_policy_to_str(self.bound_mesh.get_back_face_policy())
+    
+    # Back face color
+    def set_back_face_color(self, val):
+        self.bound_mesh.set_back_face_color(glm3(val))
+    def get_back_face_color(self):
+        return self.bound_mesh.get_back_face_color().as_tuple()
 
     ## Permutations and bases
 
@@ -412,7 +437,7 @@ class SurfaceMesh:
 
 
 def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_color=None, smooth_shade=None, 
-                          edge_width=None, material=None, back_face_policy=None, transparency=None):
+                          edge_width=None, material=None, back_face_policy=None, back_face_color=None, transparency=None):
     """Register a new surface mesh"""
 
     p = SurfaceMesh(name, vertices, faces)
@@ -432,6 +457,8 @@ def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_
         p.set_material(material)
     if back_face_policy is not None:
         p.set_back_face_policy(back_face_policy)
+    if back_face_color is not None:
+        p.set_back_face_color(back_face_color)
     if transparency is not None:
         p.set_transparency(transparency)
 
