@@ -39,4 +39,5 @@ This repo is configured with CI on github actions.
 - Watch the github actions builds to ensure all wheels build successfully. The resulting binaries will be saved as artifacts if you want try test with them.
 - While you're waiting, update the docs, including the changelog.
 - Tag the commit with a tag like `v1.2.3`, matching the version in `setup.py`. This will kick off a new github actions build which deploys the wheels to PyPI after compilation.
+- If we are still doing builds with multiple rounds of actions, it may be necessary to manually upload some of the generated wheels. Download from the github actions `Summary/Artifacs` pane, then upload with `twine upload * --skip-existing`
 - Update the conda builds by committing to the [feedstock repository](https://github.com/conda-forge/polyscope-feedstock). This generally just requires bumping the version number and updating the hash in `meta.yml`. Since `meta.yml` is configured to pull source from PyPi, you can't do this until after the source build has been uploaded from the github action.
