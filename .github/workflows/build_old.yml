@@ -7,13 +7,18 @@ on:
       - master
     tags:        
       - v*
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
 
     # Only run if the commit message contains '[ci build]' OR always run if it's a tag
-    if: "contains(toJSON(github.event.commits.*.message), '[ci build]') || contains(github.ref, 'refs/tags')"
+    # This will not respect the tag if it appears in a pull request commit message. Those builds always show up as 'synchronize' events, and there is no easy way to get the corresponding commit messages. We instead pull the PR title to check for tags.
+    # More info here: https://github.community/t/accessing-commit-message-in-pull-request-event/17158/13
+    if: "contains(toJSON(github.event.commits.*.message), '[ci build]') || contains(toJSON(github.event.pull_request.title), '[ci build]') || contains(github.ref, 'refs/tags')"
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -74,5 +79,6 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
+          skip_existing: true
           # To test: repository_url: https://test.pypi.org/legacy/
 
