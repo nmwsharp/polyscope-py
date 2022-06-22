@@ -22,6 +22,15 @@ struct InputTextCallback_UserData {
   void* chain_callback_user_data;
 };
 
+std::vector<const char*> convert_string_items(const std::vector<std::string>& items) {
+  auto _items = std::vector<const char*>();
+  _items.reserve(items.size());
+  for (const auto& item : items) {
+    _items.push_back(item.data());
+  }
+  return _items;
+}
+
 static int input_text_callback(ImGuiInputTextCallbackData* data) {
   auto* user_data = reinterpret_cast<InputTextCallback_UserData*>(data->UserData);
   if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
@@ -443,10 +452,11 @@ void bind_imgui_methods(py::module& m) {
         "Combo",
         [](const char* label,
             int current_item,
-            const std::vector<const char*>& items,
+            const std::vector<std::string>& items,
             int popup_max_height_in_items) {
+            const auto _items = convert_string_items(items);
             const auto clicked = ImGui::Combo(
-                label, &current_item, items.data(), items.size(), popup_max_height_in_items);
+                label, &current_item, _items.data(), _items.size(), popup_max_height_in_items);
             return std::make_tuple(clicked, current_item);
         },
         py::arg("label"),
@@ -1109,10 +1119,11 @@ void bind_imgui_methods(py::module& m) {
         "ListBox",
         [](const char* label,
             int current_item,
-            const std::vector<const char*>& items,
+            const std::vector<std::string>& items,
             int height_in_items) {
+            const auto _items = convert_string_items(items);
             const auto clicked =
-                ImGui::ListBox(label, &current_item, items.data(), items.size(), height_in_items);
+                ImGui::ListBox(label, &current_item, _items.data(), _items.size(), height_in_items);
             return std::make_tuple(clicked, current_item);
         },
         py::arg("label"),
