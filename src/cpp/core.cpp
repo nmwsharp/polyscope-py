@@ -58,6 +58,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Basic flow 
   m.def("init", &ps::init, py::arg("backend")="", "Initialize Polyscope");
+  m.def("checkInitialized", &ps::checkInitialized);
+  m.def("isInitialized", &ps::isInitialized);
   m.def("show", [](size_t forFrames) {
         if (ps::state::userCallback == nullptr) {
           bool oldVal = ps::options::openImGuiWindowForUserCallback;
