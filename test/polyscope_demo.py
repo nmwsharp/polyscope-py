@@ -26,6 +26,10 @@ def main():
 
     # Build arguments
     parser.add_argument('mesh', type=str, help='path to a mesh')
+    parser.add_argument('--surfacemesh', default=True, action='store_true')
+    parser.add_argument('--no-surfacemesh', dest='surfacemesh', action='store_false')
+    parser.add_argument('--pointcloud', default=False, action='store_true')
+    parser.add_argument('--volumemesh', default=False, action='store_true')
 
     # Parse arguments
     args = parser.parse_args()
@@ -53,7 +57,7 @@ def main():
     polyscope.set_ground_plane_mode("shadow_only")
 
     ## Examples with a mesh
-    if True:
+    if args.surfacemesh:
         ps_mesh = polyscope.register_surface_mesh("test mesh", verts, faces, enabled=True)
 
         # Scalar functions
@@ -76,7 +80,7 @@ def main():
 
 
     ## Examples with a point cloud
-    if False:
+    if args.pointcloud:
         ps_points = polyscope.register_point_cloud("test points", verts, point_render_mode='sphere')
 
         # Scalar functions
@@ -110,7 +114,7 @@ def main():
 
 
     # Volume mesh examples
-    if False:
+    if args.volumemesh:
         verts = np.array([
             [0, 0, 0],
             [1, 0, 0],
