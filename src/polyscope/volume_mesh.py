@@ -242,7 +242,9 @@ class VolumeMesh:
 def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None, enabled=None, color=None, interior_color=None, edge_color=None, edge_width=None, material=None, transparency=None):
 
     """Register a new surface mesh"""
-
+    if not psb.isInitialized():
+        raise RuntimeError("Polyscope has not been initialized")
+    
     p = VolumeMesh(name, vertices=vertices, tets=tets, hexes=hexes, mixed_cells=mixed_cells)
 
     # == Apply options

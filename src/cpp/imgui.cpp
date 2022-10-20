@@ -1595,8 +1595,6 @@ void bind_imgui_enums(py::module& m) {
   m.attr("ImGuiInputTextFlags_NoUndoRedo") = static_cast<int>(ImGuiInputTextFlags_NoUndoRedo);
   m.attr("ImGuiInputTextFlags_CharsScientific") = static_cast<int>(ImGuiInputTextFlags_CharsScientific);
   m.attr("ImGuiInputTextFlags_CallbackResize") = static_cast<int>(ImGuiInputTextFlags_CallbackResize);
-  m.attr("ImGuiInputTextFlags_Multiline") = static_cast<int>(ImGuiInputTextFlags_Multiline);
-  m.attr("ImGuiInputTextFlags_NoMarkEdited") = static_cast<int>(ImGuiInputTextFlags_NoMarkEdited);
 
   m.attr("ImGuiTreeNodeFlags_None") = static_cast<int>(ImGuiTreeNodeFlags_None);
   m.attr("ImGuiTreeNodeFlags_Selected") = static_cast<int>(ImGuiTreeNodeFlags_Selected);
@@ -1747,13 +1745,6 @@ void bind_imgui_enums(py::module& m) {
   m.attr("ImGuiNavInput_FocusNext") = static_cast<int>(ImGuiNavInput_FocusNext);
   m.attr("ImGuiNavInput_TweakSlow") = static_cast<int>(ImGuiNavInput_TweakSlow);
   m.attr("ImGuiNavInput_TweakFast") = static_cast<int>(ImGuiNavInput_TweakFast);
-  m.attr("ImGuiNavInput_KeyMenu_") = static_cast<int>(ImGuiNavInput_KeyMenu_);
-  m.attr("ImGuiNavInput_KeyLeft_") = static_cast<int>(ImGuiNavInput_KeyLeft_);
-  m.attr("ImGuiNavInput_KeyRight_") = static_cast<int>(ImGuiNavInput_KeyRight_);
-  m.attr("ImGuiNavInput_KeyUp_") = static_cast<int>(ImGuiNavInput_KeyUp_);
-  m.attr("ImGuiNavInput_KeyDown_") = static_cast<int>(ImGuiNavInput_KeyDown_);
-  m.attr("ImGuiNavInput_COUNT") = static_cast<int>(ImGuiNavInput_COUNT);
-  m.attr("ImGuiNavInput_InternalStart_") = static_cast<int>(ImGuiNavInput_InternalStart_);
 
   m.attr("ImGuiConfigFlags_None") = static_cast<int>(ImGuiConfigFlags_None);
   m.attr("ImGuiConfigFlags_NavEnableKeyboard") = static_cast<int>(ImGuiConfigFlags_NavEnableKeyboard);
@@ -1870,11 +1861,6 @@ void bind_imgui_enums(py::module& m) {
   m.attr("ImGuiColorEditFlags_PickerHueWheel") = static_cast<int>(ImGuiColorEditFlags_PickerHueWheel);
   m.attr("ImGuiColorEditFlags_InputRGB") = static_cast<int>(ImGuiColorEditFlags_InputRGB);
   m.attr("ImGuiColorEditFlags_InputHSV") = static_cast<int>(ImGuiColorEditFlags_InputHSV);
-  m.attr("ImGuiColorEditFlags__OptionsDefault") = static_cast<int>(ImGuiColorEditFlags__OptionsDefault);
-  m.attr("ImGuiColorEditFlags__DisplayMask") = static_cast<int>(ImGuiColorEditFlags__DisplayMask);
-  m.attr("ImGuiColorEditFlags__DataTypeMask") = static_cast<int>(ImGuiColorEditFlags__DataTypeMask);
-  m.attr("ImGuiColorEditFlags__PickerMask") = static_cast<int>(ImGuiColorEditFlags__PickerMask);
-  m.attr("ImGuiColorEditFlags__InputMask") = static_cast<int>(ImGuiColorEditFlags__InputMask);
 
   m.attr("ImGuiMouseButton_Left") = static_cast<int>(ImGuiMouseButton_Left);
   m.attr("ImGuiMouseButton_Right") = static_cast<int>(ImGuiMouseButton_Right);

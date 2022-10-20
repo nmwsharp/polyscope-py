@@ -440,6 +440,9 @@ def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_
                           edge_width=None, material=None, back_face_policy=None, back_face_color=None, transparency=None):
     """Register a new surface mesh"""
 
+    if not psb.isInitialized():
+        raise RuntimeError("Polyscope has not been initialized")
+    
     p = SurfaceMesh(name, vertices, faces)
 
     # == Apply options
