@@ -8,7 +8,7 @@ class PointCloud:
 
     # End users should not call this constrctor, use register_point_cloud instead
     def __init__(self, name=None, points=None, instance=None):
-
+        
         if instance is not None:
             # Wrap an existing instance
             self.bound_cloud = instance

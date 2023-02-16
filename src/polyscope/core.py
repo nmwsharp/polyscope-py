@@ -31,6 +31,37 @@ def remove_all_structures():
     """Remove all structures from Polyscope"""
     psb.remove_all_structures()
 
+### Group management
+
+class Group(object):
+    def __init__(self, name):
+        self.name = name
+
+def register_group(name):
+    """Register a new group with the given name"""
+    psb.register_group(name)
+    return Group(name)
+
+def set_parent_group(structure, group):
+    """Set the parent group of a structure"""
+    from .curve_network import CurveNetwork
+    from .point_cloud import PointCloud
+    from .surface_mesh import SurfaceMesh
+    from .volume_mesh import VolumeMesh
+    if isinstance(group, Group):
+        group = group.name
+    if isinstance(structure, Group):
+        psb.set_parent_group_of_group(structure.name, group)
+    elif isinstance(structure, CurveNetwork):
+        psb.set_parent_group_of_structure(structure.get_typename(), structure.name, group)
+    elif isinstance(structure, PointCloud):
+        psb.set_parent_group_of_structure(structure.get_typename(), structure.name, group)
+    elif isinstance(structure, SurfaceMesh):
+        psb.set_parent_group_of_structure(structure.get_typename(), structure.name, group)
+    elif isinstance(structure, VolumeMesh):
+        psb.set_parent_group_of_structure(structure.get_typename(), structure.name, group)
+    else:
+        raise NotImplementedError("set_parent_group not implemented for structure type {}".format(type(structure)))
 
 ### Screenshots
 def screenshot(filename=None, transparent_bg=True):

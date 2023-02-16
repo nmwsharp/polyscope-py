@@ -8,6 +8,7 @@ class CurveNetwork:
 
     # End users should not call this constrctor, use register_curve_network instead
     def __init__(self, name=None, nodes=None, edges=None, instance=None):
+        self.name = name # TODO: what if it's None? -> add a get_name function to structure.h
 
         if instance is not None:
             # Wrap an existing instance
@@ -43,6 +44,9 @@ class CurveNetwork:
                 elif nodes.shape[1] == 2:
                     self.bound_network = psb.register_curve_network2D(name, nodes, edges) 
 
+    def get_typename(self):
+        return self.bound_network.get_typename()
+    
     def check_shape(self, points):
         # Helper to validate arrays
         if (len(points.shape) != 2) or (points.shape[1] not in (2,3)):
