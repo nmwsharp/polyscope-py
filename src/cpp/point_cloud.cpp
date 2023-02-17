@@ -40,6 +40,9 @@ void bind_point_cloud(py::module& m) {
     .def("update_point_positions2D", &ps::PointCloud::updatePointPositions2D<Eigen::MatrixXd>, "Update point positions")
     .def("n_points", &ps::PointCloud::nPoints, "# points")
 
+    .def("get_typename", &ps::PointCloud::typeName, "Get typename")
+    .def("get_name", &ps::PointCloud::getName, "Get name")
+
     // options
     .def("set_radius", &ps::PointCloud::setPointRadius, "Set radius")
     .def("get_radius", &ps::PointCloud::getPointRadius, "Get radius")

@@ -53,13 +53,13 @@ def set_parent_group(structure, group):
     if isinstance(structure, Group):
         psb.set_parent_group_of_group(structure.name, group)
     elif isinstance(structure, CurveNetwork):
-        psb.set_parent_group_of_structure(structure.get_typename(), structure.name, group)
+        psb.set_parent_group_of_structure(structure.get_typename(), structure.get_name(), group)
     elif isinstance(structure, PointCloud):
-        psb.set_parent_group_of_structure(structure.get_typename(), structure.name, group)
+        psb.set_parent_group_of_structure(structure.get_typename(), structure.get_name(), group)
     elif isinstance(structure, SurfaceMesh):
-        psb.set_parent_group_of_structure(structure.get_typename(), structure.name, group)
+        psb.set_parent_group_of_structure(structure.get_typename(), structure.get_name(), group)
     elif isinstance(structure, VolumeMesh):
-        psb.set_parent_group_of_structure(structure.get_typename(), structure.name, group)
+        psb.set_parent_group_of_structure(structure.get_typename(), structure.get_name(), group)
     else:
         raise NotImplementedError("set_parent_group not implemented for structure type {}".format(type(structure)))
 

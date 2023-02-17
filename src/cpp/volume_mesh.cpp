@@ -40,6 +40,9 @@ void bind_volume_mesh(py::module& m) {
       .def("n_faces", &ps::VolumeMesh::nFaces, "# faces")
       .def("n_cells", &ps::VolumeMesh::nCells, "# cells")
 
+      .def("get_typename", &ps::VolumeMesh::typeName, "Get typename")
+      .def("get_name", &ps::VolumeMesh::getName, "Get name")
+
       // options
       .def("set_color", &ps::VolumeMesh::setColor, "Set mesh color")
       .def("get_color", &ps::VolumeMesh::getColor, "Get mesh color")

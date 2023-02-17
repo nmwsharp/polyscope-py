@@ -8,7 +8,6 @@ class CurveNetwork:
 
     # End users should not call this constrctor, use register_curve_network instead
     def __init__(self, name=None, nodes=None, edges=None, instance=None):
-        self.name = name # TODO: what if it's None? -> add a get_name function to structure.h
 
         if instance is not None:
             # Wrap an existing instance
@@ -46,6 +45,9 @@ class CurveNetwork:
 
     def get_typename(self):
         return self.bound_network.get_typename()
+    
+    def get_name(self):
+        return self.bound_network.get_name()
     
     def check_shape(self, points):
         # Helper to validate arrays

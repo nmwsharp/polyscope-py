@@ -37,6 +37,12 @@ class VolumeMesh:
                     self.bound_mesh = psb.register_tet_hex_mesh(name, vertices, tets, hexes)
 
 
+    def get_typename(self):
+        return self.bound_mesh.get_typename()
+    
+    def get_name(self):
+        return self.bound_mesh.get_name()  
+    
     def check_shape(self, points):
         # Helper to validate arrays
         

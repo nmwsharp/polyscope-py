@@ -70,6 +70,9 @@ void bind_surface_mesh(py::module& m) {
       .def("n_corners", &ps::SurfaceMesh::nCorners, "# corners")
       .def("n_halfedges", &ps::SurfaceMesh::nHalfedges, "# halfedges")
 
+      .def("get_typename", &ps::SurfaceMesh::typeName, "Get typename")
+      .def("get_name", &ps::SurfaceMesh::getName, "Get name")
+
       // options
       .def("set_color", &ps::SurfaceMesh::setSurfaceColor, "Set surface color")
       .def("get_color", &ps::SurfaceMesh::getSurfaceColor, "Get surface color")

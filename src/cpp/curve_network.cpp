@@ -41,6 +41,8 @@ void bind_curve_network(py::module& m) {
     .def("n_edges", &ps::CurveNetwork::nEdges, "# edges")
 
     .def("get_typename", &ps::CurveNetwork::typeName, "Get typename")
+    .def("get_name", &ps::CurveNetwork::getName, "Get name")
+    
 
     // options
     .def("set_radius", &ps::CurveNetwork::setRadius, "Set radius")

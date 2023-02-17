@@ -26,6 +26,12 @@ class PointCloud:
                 raise ValueError("bad point cloud shape")
 
 
+    def get_typename(self):
+        return self.bound_cloud.get_typename()
+    
+    def get_name(self):
+        return self.bound_cloud.get_name()
+    
     def check_shape(self, points):
         # Helper to validate arrays
 

@@ -42,7 +42,12 @@ class SurfaceMesh:
                 elif vertices.shape[1] == 2:
                     self.bound_mesh = psb.register_surface_mesh_list2D(name, vertices, faces) 
 
-                        
+               
+    def get_typename(self):
+        return self.bound_mesh.get_typename()
+    
+    def get_name(self):
+        return self.bound_mesh.get_name()         
 
     def check_shape(self, points):
         # Helper to validate arrays
