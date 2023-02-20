@@ -85,6 +85,9 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("register_group", &ps::registerGroup, "Register a new group");
   m.def("set_parent_group_of_group", &ps::setParentGroupOfGroup, "Set the parent group of a group");
   m.def("set_parent_group_of_structure", &ps::setParentGroupOfStructure, "Set the parent group of a stucture");
+  m.def("set_group_enabled", &ps::setGroupEnabled, "Set whether a group is enabled");
+  m.def("remove_group", &ps::removeGroup, "Remove a group");
+
   // === Screenshots
   m.def("screenshot", overload_cast_<bool>()(&ps::screenshot), "Take a screenshot");
   m.def("named_screenshot", overload_cast_<std::string, bool>()(&ps::screenshot), "Take a screenshot");

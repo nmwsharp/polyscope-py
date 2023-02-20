@@ -42,26 +42,45 @@ def register_group(name):
     psb.register_group(name)
     return Group(name)
 
-def set_parent_group(structure, group):
-    """Set the parent group of a structure"""
+def set_parent_group(child, group):
+    """Set the parent group of a group or structure 
+    child: Structure (CurveNetwork, PointCloud, SurfaceMesh, or VolumeMesh) or Group object
+    group: Group object or group name (string) """
+    # Note (Daniel): the interface could be a little cleaner by defining whether args are strings (group or structure name) or objects (Group or Structure),
+    # but the class design of existing structures doesn't lend itself so nicely to it. This way, I try to keep to the existing API as much as possible.
     from .curve_network import CurveNetwork
     from .point_cloud import PointCloud
     from .surface_mesh import SurfaceMesh
     from .volume_mesh import VolumeMesh
     if isinstance(group, Group):
         group = group.name
-    if isinstance(structure, Group):
-        psb.set_parent_group_of_group(structure.name, group)
-    elif isinstance(structure, CurveNetwork):
-        psb.set_parent_group_of_structure(structure.get_typename(), structure.get_name(), group)
-    elif isinstance(structure, PointCloud):
-        psb.set_parent_group_of_structure(structure.get_typename(), structure.get_name(), group)
-    elif isinstance(structure, SurfaceMesh):
-        psb.set_parent_group_of_structure(structure.get_typename(), structure.get_name(), group)
-    elif isinstance(structure, VolumeMesh):
-        psb.set_parent_group_of_structure(structure.get_typename(), structure.get_name(), group)
+    if isinstance(child, Group):
+        psb.set_parent_group_of_group(child.name, group)
+    elif isinstance(child, CurveNetwork):
+        psb.set_parent_group_of_structure(child.get_typename(), child.get_name(), group)
+    elif isinstance(child, PointCloud):
+        psb.set_parent_group_of_structure(child.get_typename(), child.get_name(), group)
+    elif isinstance(child, SurfaceMesh):
+        psb.set_parent_group_of_structure(child.get_typename(), child.get_name(), group)
+    elif isinstance(child, VolumeMesh):
+        psb.set_parent_group_of_structure(child.get_typename(), child.get_name(), group)
     else:
-        raise NotImplementedError("set_parent_group not implemented for structure type {}".format(type(structure)))
+        raise NotImplementedError("set_parent_group not implemented for structure type {}".format(type(child)))
+    
+def set_group_enabled(group, enabled):
+    """Set whether a group is enabled
+    group: a Group object or a group name (string) """
+    if isinstance(group, Group):
+        group = group.name
+    psb.set_group_enabled(group, enabled)
+
+def remove_group(group, error_if_absent=True):
+    """Remove a group
+    group: a Group object or a group name (string)
+    error_if_absent: if True, raise an error if the group does not exist """
+    if isinstance(group, Group):
+        group = group.name
+    psb.remove_group(group, error_if_absent)
 
 ### Screenshots
 def screenshot(filename=None, transparent_bg=True):
