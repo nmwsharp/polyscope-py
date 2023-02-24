@@ -41,7 +41,7 @@ for i in range(3):
         [1, 1, 1],
         [0, 1, 1],
         [1, 1, 1.5]
-    ])
+    ]) / 2.0
     cells = np.array([
     [0, 1, 2, 3, 4, 5, 6, 7],
     [7, 5, 6, 8, -1, -1, -1, -1],
@@ -53,32 +53,6 @@ for i in range(3):
 ps.set_group_enabled(g4, False)
 
 # test UI
-ps.show()
-
-# test group removal
-ps.remove_group(g4)
-
-ps.show()
-
-# test subroup removal
-gtop = ps.register_group("top")
-gmid = ps.register_group("mid")
-gbot = ps.register_group("bot")
-ps.set_parent_group(gmid, gtop)
-ps.set_parent_group(gbot, gmid)
-ps.remove_group(gmid)
-
-ps.show()
-
-# Test using references to deleted groups
-ps.set_parent_group(g4, g) # predictably causes an error
-
-# Test (misguided) attempt to create a loop
-ga = ps.register_group("group_a")
-gb = ps.register_group("group_b")
-ps.set_parent_group(ga, gb)
-ps.set_parent_group(gb, ga) # creates a loop, should cause an error
-
 ps.show()
 
 

@@ -82,6 +82,10 @@ def remove_group(group, error_if_absent=True):
         group = group.name
     psb.remove_group(group, error_if_absent)
 
+def remove_all_groups():
+    """Remove all groups"""
+    psb.remove_all_groups()
+
 ### Screenshots
 def screenshot(filename=None, transparent_bg=True):
 
