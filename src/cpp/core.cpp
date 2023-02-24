@@ -84,7 +84,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   // === Group management
   m.def("register_group", &ps::registerGroup, "Register a new group");
   m.def("set_parent_group_of_group", &ps::setParentGroupOfGroup, "Set the parent group of a group");
-  m.def("set_parent_group_of_structure", &ps::setParentGroupOfStructure, "Set the parent group of a stucture");
+  m.def("set_parent_group_of_structure", overload_cast_<std::string, std::string, std::string>()(&ps::setParentGroupOfStructure), "Set the parent group of a stucture");
   m.def("set_group_enabled", &ps::setGroupEnabled, "Set whether a group is enabled");
   m.def("remove_group", &ps::removeGroup, "Remove a group");
 

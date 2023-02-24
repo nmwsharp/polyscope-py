@@ -1,8 +1,12 @@
 import polyscope as ps
 import numpy as np
 
-# test group creation, hierarchy and structure assignment
 ps.init()
+
+# test that UI doesn't show groups until they're added
+ps.show()
+
+# test group creation, hierarchy and structure assignment
 g = ps.register_group("pretty shapes")
 g1 = ps.register_group("curves")
 ps.set_parent_group(g1, g)
