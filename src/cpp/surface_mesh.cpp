@@ -48,12 +48,9 @@ void bind_surface_mesh(py::module& m) {
   // Vector quantities
   bindVectorQuantity<ps::SurfaceVertexVectorQuantity>(m, "SurfaceVertexVectorQuantity");
   bindVectorQuantity<ps::SurfaceFaceVectorQuantity>(m, "SurfaceFaceVectorQuantity");
-  bindVectorQuantity<ps::SurfaceVertexIntrinsicVectorQuantity>(m, "SurfaceVertexIntrinsicVectorQuantity")
-      .def("set_ribbon_enabled", &ps::SurfaceVertexIntrinsicVectorQuantity::setEnabled, "Set ribbon enabled");
-  bindVectorQuantity<ps::SurfaceFaceIntrinsicVectorQuantity>(m, "SurfaceFaceIntrinsicVectorQuantity")
-      .def("set_ribbon_enabled", &ps::SurfaceFaceIntrinsicVectorQuantity::setEnabled, "Set ribbon enabled");
-  bindVectorQuantity<ps::SurfaceOneFormIntrinsicVectorQuantity>(m, "SurfaceOneFormIntrinsicVectorQuantity")
-      .def("set_ribbon_enabled", &ps::SurfaceOneFormIntrinsicVectorQuantity::setEnabled, "Set ribbon enabled");
+  bindVectorQuantity<ps::SurfaceVertexTangentVectorQuantity>(m, "SurfaceVertexTangentVectorQuantity");
+  bindVectorQuantity<ps::SurfaceFaceTangentVectorQuantity>(m, "SurfaceFaceTangentVectorQuantity");
+  bindVectorQuantity<ps::SurfaceOneFormTangentVectorQuantity>(m, "SurfaceOneFormTangentVectorQuantity");
 
 
   // == Main class
@@ -94,19 +91,10 @@ void bind_surface_mesh(py::module& m) {
 
 
       // permutations & bases
-      .def("set_vertex_permutation", &ps::SurfaceMesh::setVertexPermutation<Eigen::VectorXi>, "Set vertex permutation")
-      .def("set_face_permutation", &ps::SurfaceMesh::setFacePermutation<Eigen::VectorXi>, "Set face permutation")
       .def("set_edge_permutation", &ps::SurfaceMesh::setEdgePermutation<Eigen::VectorXi>, "Set edge permutation")
       .def("set_halfedge_permutation", &ps::SurfaceMesh::setHalfedgePermutation<Eigen::VectorXi>,
            "Set halfedge permutation")
       .def("set_corner_permutation", &ps::SurfaceMesh::setCornerPermutation<Eigen::VectorXi>, "Set corner permutation")
-      .def("set_vertex_tangent_basisX", &ps::SurfaceMesh::setVertexTangentBasisX<Eigen::MatrixXd>,
-           "Set vertex tangent bases")
-      .def("set_vertex_tangent_basisX2D", &ps::SurfaceMesh::setVertexTangentBasisX2D<Eigen::MatrixXd>,
-           "Set vertex tangent bases")
-      .def("set_face_tangent_basisX", &ps::SurfaceMesh::setFaceTangentBasisX<Eigen::MatrixXd>, "Set face tangent bases")
-      .def("set_face_tangent_basisX2D", &ps::SurfaceMesh::setFaceTangentBasisX2D<Eigen::MatrixXd>,
-           "Set face tangent bases")
 
       // = quantities
 
@@ -151,13 +139,13 @@ void bind_surface_mesh(py::module& m) {
            "Add a vertex 2D vector quantity", py::return_value_policy::reference)
       .def("add_face_vector_quantity2D", &ps::SurfaceMesh::addFaceVectorQuantity2D<Eigen::MatrixXd>,
            "Add a face 2D vector quantity", py::return_value_policy::reference)
-      .def("add_vertex_intrinsic_vector_quantity", &ps::SurfaceMesh::addVertexIntrinsicVectorQuantity<Eigen::MatrixXd>,
-           "Add a vertex intrinsic vector quantity", py::return_value_policy::reference)
-      .def("add_face_intrinsic_vector_quantity", &ps::SurfaceMesh::addFaceIntrinsicVectorQuantity<Eigen::MatrixXd>,
-           "Add a face intrinsic vector quantity", py::return_value_policy::reference)
-      .def("add_one_form_intrinsic_vector_quantity",
-           &ps::SurfaceMesh::addOneFormIntrinsicVectorQuantity<Eigen::VectorXd, Eigen::Matrix<bool, Eigen::Dynamic, 1>>,
-           "Add a one form intrinsic vector quantity", py::return_value_policy::reference);
+      .def("add_vertex_tangent_vector_quantity", &ps::SurfaceMesh::addVertexTangentVectorQuantity<Eigen::MatrixXd,Eigen::MatrixXd,Eigen::MatrixXd>,
+           "Add a vertex tangent vector quantity", py::return_value_policy::reference)
+      .def("add_face_tangent_vector_quantity", &ps::SurfaceMesh::addFaceTangentVectorQuantity<Eigen::MatrixXd,Eigen::MatrixXd,Eigen::MatrixXd>,
+           "Add a face tangent vector quantity", py::return_value_policy::reference)
+      .def("add_one_form_tangent_vector_quantity",
+           &ps::SurfaceMesh::addOneFormTangentVectorQuantity<Eigen::VectorXd, Eigen::Matrix<bool, Eigen::Dynamic, 1>>,
+           "Add a one form tangent vector quantity", py::return_value_policy::reference);
 
 
   // Static adders and getters

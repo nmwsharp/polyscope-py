@@ -1017,28 +1017,18 @@ class TestSurfaceMesh(unittest.TestCase):
     
     
     def test_permutation(self):
+
         p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
 
-        p.set_vertex_permutation(np.random.permutation(p.n_vertices()))
-        p.set_vertex_permutation(np.random.permutation(p.n_vertices()), 3*p.n_vertices())
-
-        p.set_face_permutation(np.random.permutation(p.n_faces()))
-        p.set_face_permutation(np.random.permutation(p.n_faces()), 3*p.n_faces())
-        
         p.set_edge_permutation(np.random.permutation(p.n_edges()))
-        p.set_edge_permutation(np.random.permutation(p.n_edges()), 3*p.n_edges())
         
         p.set_corner_permutation(np.random.permutation(p.n_corners()))
-        p.set_corner_permutation(np.random.permutation(p.n_corners()), 3*p.n_corners())
         
         p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()))
-        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()), 3*p.n_halfedges())
 
         p = ps.register_surface_mesh("test_mesh2", self.generate_verts(), self.generate_faces())
 
         p.set_all_permutations(
-            vertex_perm=np.random.permutation(p.n_vertices()),
-            face_perm=np.random.permutation(p.n_faces()),
             edge_perm=np.random.permutation(p.n_edges()),
             corner_perm=np.random.permutation(p.n_corners()),
             halfedge_perm=np.random.permutation(p.n_halfedges()),
@@ -1046,25 +1036,38 @@ class TestSurfaceMesh(unittest.TestCase):
 
         ps.show(3)
         ps.remove_all_structures()
+    
+    def test_permutation_with_size(self):
 
-
-    def test_tangent_basis(self):
         p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
 
-        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3))
-        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 2))
+        p.set_edge_permutation(np.random.permutation(p.n_edges()), 3*p.n_edges())
+        
+        p.set_corner_permutation(np.random.permutation(p.n_corners()), 3*p.n_corners())
+        
+        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()), 3*p.n_halfedges())
 
-        p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 3))
-        p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 2))
+        p = ps.register_surface_mesh("test_mesh2", self.generate_verts(), self.generate_faces())
+
+        p.set_all_permutations(
+            edge_perm=np.random.permutation(p.n_edges()),
+            edge_perm_size=3*p.n_edges(),
+            corner_perm=np.random.permutation(p.n_corners()),
+            corner_perm_size=3*p.n_corners(),
+            halfedge_perm=np.random.permutation(p.n_halfedges()),
+            halfedge_perm_size=p.n_halfedges(),
+        )
 
         ps.show(3)
         ps.remove_all_structures()
+
     
     def test_scalar(self):
-        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
-        p = ps.get_surface_mesh("test_mesh")
 
         for on in ['vertices', 'faces', 'edges', 'halfedges']:
+        
+            ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+            p = ps.get_surface_mesh("test_mesh")
        
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices())
@@ -1072,6 +1075,7 @@ class TestSurfaceMesh(unittest.TestCase):
                 vals = np.random.rand(p.n_faces())
             elif on  == 'edges':
                 vals = np.random.rand(p.n_edges())
+                p.set_edge_permutation(np.random.permutation(p.n_edges()))
             elif on  == 'halfedges':
                 vals = np.random.rand(p.n_halfedges())
 
@@ -1089,7 +1093,7 @@ class TestSurfaceMesh(unittest.TestCase):
             p.remove_all_quantities()
             p.remove_all_quantities()
 
-        ps.remove_all_structures()
+            ps.remove_all_structures()
     
     def test_color(self):
         ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
@@ -1200,7 +1204,7 @@ class TestSurfaceMesh(unittest.TestCase):
         ps.remove_all_structures()
    
 
-    def test_intrinsic_vector(self):
+    def test_tangent_vector(self):
 
         ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
         p = ps.get_surface_mesh("test_mesh")
@@ -1208,31 +1212,34 @@ class TestSurfaceMesh(unittest.TestCase):
         for on in ['vertices', 'faces']:
        
             if on == 'vertices':
-                vals = np.random.rand(p.n_vertices(),2)
-                p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3));
+                vals = np.random.rand(p.n_vertices(), 2)
+                basisX = np.random.rand(p.n_vertices(), 3)
+                basisY = np.random.rand(p.n_vertices(), 3)
             elif on  == 'faces':
                 vals = np.random.rand(p.n_faces(), 2)
-                p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 3));
+                basisX = np.random.rand(p.n_faces(), 3)
+                basisY = np.random.rand(p.n_faces(), 3)
 
-            p.add_intrinsic_vector_quantity("test_vals1", vals, defined_on=on)
-            p.add_intrinsic_vector_quantity("test_vals2", vals, defined_on=on, enabled=True)
-            p.add_intrinsic_vector_quantity("test_vals3", vals, defined_on=on, enabled=True, vectortype='ambient')
-            p.add_intrinsic_vector_quantity("test_vals4", vals, defined_on=on, enabled=True, length=0.005)
-            p.add_intrinsic_vector_quantity("test_vals5", vals, defined_on=on, enabled=True, radius=0.001)
-            p.add_intrinsic_vector_quantity("test_vals6", vals, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
-            p.add_intrinsic_vector_quantity("test_vals7", vals, defined_on=on, enabled=True, radius=0.001, ribbon=True)
-            p.add_intrinsic_vector_quantity("test_vals8", vals, n_sym=4, defined_on=on, enabled=True)
+            p.add_tangent_vector_quantity("test_vals1", vals, basisX, basisY, defined_on=on)
+            p.add_tangent_vector_quantity("test_vals2", vals, basisX, basisY, defined_on=on, enabled=True)
+            p.add_tangent_vector_quantity("test_vals3", vals, basisX, basisY, defined_on=on, enabled=True, vectortype='ambient')
+            p.add_tangent_vector_quantity("test_vals4", vals, basisX, basisY, defined_on=on, enabled=True, length=0.005)
+            p.add_tangent_vector_quantity("test_vals5", vals, basisX, basisY, defined_on=on, enabled=True, radius=0.001)
+            p.add_tangent_vector_quantity("test_vals6", vals, basisX, basisY, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
+            p.add_tangent_vector_quantity("test_vals7", vals, basisX, basisY, defined_on=on, enabled=True, radius=0.001)
+            p.add_tangent_vector_quantity("test_vals8", vals, basisX, basisY, n_sym=4, defined_on=on, enabled=True)
 
             ps.show(3)
             p.remove_all_quantities()
         
         ps.remove_all_structures()
     
-    def test_one_form_intrinsic_vector(self):
+    def test_one_form_tangent_vector(self):
 
         ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
         p = ps.get_surface_mesh("test_mesh")
-        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3));
+        
+        p.set_edge_permutation(np.random.permutation(p.n_edges()))
         
         vals = np.random.rand(p.n_edges())
         orients = np.random.rand(p.n_edges()) > 0.5
@@ -1243,7 +1250,7 @@ class TestSurfaceMesh(unittest.TestCase):
         p.add_one_form_vector_quantity("test_vals4", vals, orients, enabled=True, length=0.005)
         p.add_one_form_vector_quantity("test_vals5", vals, orients, enabled=True, radius=0.001)
         p.add_one_form_vector_quantity("test_vals6", vals, orients, enabled=True, color=(0.2, 0.5, 0.5))
-        p.add_one_form_vector_quantity("test_vals7", vals, orients, enabled=True, radius=0.001, ribbon=True)
+        p.add_one_form_vector_quantity("test_vals7", vals, orients, enabled=True, radius=0.001)
 
         ps.show(3)
         p.remove_all_quantities()

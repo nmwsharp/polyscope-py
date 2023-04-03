@@ -63,7 +63,7 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
 
       // quantites
       .def("remove_all_quantities", &StructureT::removeAllQuantities, "Remove all quantities")
-      .def("remove_quantity", &StructureT::removeQuantity, "Remove a quantity")
+      .def("remove_quantity", &StructureT::removeQuantity, py::arg("name"), py::arg("errorIfAbsent") = false, "Remove a quantity")
 
       // transform management
       // clang-format off

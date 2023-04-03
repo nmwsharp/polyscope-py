@@ -180,16 +180,6 @@ class SurfaceMesh:
 
     ## Permutations and bases
 
-    def set_vertex_permutation(self, perm, expected_size=None):
-        if len(perm.shape) != 1 or perm.shape[0] != self.n_vertices(): raise ValueError("'perm' should be an array with one entry per vertex")
-        if expected_size is None: expected_size = 0
-        self.bound_mesh.set_vertex_permutation(perm, expected_size)
-
-    def set_face_permutation(self, perm, expected_size=None):
-        if len(perm.shape) != 1 or perm.shape[0] != self.n_faces(): raise ValueError("'perm' should be an array with one entry per face")
-        if expected_size is None: expected_size = 0
-        self.bound_mesh.set_face_permutation(perm, expected_size)
-    
     def set_edge_permutation(self, perm, expected_size=None):
         if len(perm.shape) != 1 or perm.shape[0] != self.n_edges(): raise ValueError("'perm' should be an array with one entry per edge")
         if expected_size is None: expected_size = 0
@@ -206,37 +196,16 @@ class SurfaceMesh:
         self.bound_mesh.set_halfedge_permutation(perm, expected_size)
     
     def set_all_permutations(self, 
-            vertex_perm=None, vertex_perm_size=None,
-            face_perm=None, face_perm_size=None,
+            vertex_perm=None, vertex_perm_size=None, # now ignored 
+            face_perm=None, face_perm_size=None,     # now ignored
             edge_perm=None, edge_perm_size=None,
             corner_perm=None, corner_perm_size=None,
             halfedge_perm=None, halfedge_perm_size=None):
 
-        if vertex_perm is not None: self.set_vertex_permutation(vertex_perm, vertex_perm_size)
-        if face_perm is not None: self.set_face_permutation(face_perm, face_perm_size)
         if edge_perm is not None: self.set_edge_permutation(edge_perm, edge_perm_size)
         if corner_perm is not None: self.set_corner_permutation(corner_perm, corner_perm_size)
         if halfedge_perm is not None: self.set_halfedge_permutation(halfedge_perm, halfedge_perm_size)
     
-    def set_vertex_tangent_basisX(self, vectors):
-        if len(vectors.shape) != 2 or vectors.shape[0] != self.n_vertices() or vectors.shape[1] not in (2,3): 
-            raise ValueError("'vectors' should be an array with one entry per vertex")
-
-        if vectors.shape[1] == 2:
-            self.bound_mesh.set_vertex_tangent_basisX2D(vectors)
-        elif vectors.shape[1] == 3:
-            self.bound_mesh.set_vertex_tangent_basisX(vectors)
-    
-    def set_face_tangent_basisX(self, vectors):
-        if len(vectors.shape) != 2 or vectors.shape[0] != self.n_faces() or vectors.shape[1] not in (2,3): 
-            raise ValueError("'vectors' should be an array with one entry per face")
-
-        if vectors.shape[1] == 2:
-            self.bound_mesh.set_face_tangent_basisX2D(vectors)
-        elif vectors.shape[1] == 3:
-            self.bound_mesh.set_face_tangent_basisX(vectors)
-    
-         
 
 
     ## Quantities
@@ -385,20 +354,26 @@ class SurfaceMesh:
             q.set_color(glm3(color))
     
     
-    def add_intrinsic_vector_quantity(self, name, values, n_sym=1, defined_on='vertices', enabled=None, vectortype="standard", length=None, radius=None, color=None, ribbon=None):
+    def add_tangent_vector_quantity(self, name, values, basisX, basisY, n_sym=1, defined_on='vertices', enabled=None, vectortype="standard", length=None, radius=None, color=None):
 
         if len(values.shape) != 2 or values.shape[1] != 2: raise ValueError("'values' should be an Nx2 array")
+        if len(basisX.shape) != 2 or basisX.shape[1] != 3: raise ValueError("'basisX' should be an Nx3 array")
+        if len(basisY.shape) != 2 or basisY.shape[1] != 3: raise ValueError("'basisY' should be an Nx3 array")
         
         
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
+            if basisX.shape[0] != self.n_vertices(): raise ValueError("'basisX' should be a length n_vertices array")
+            if basisY.shape[0] != self.n_vertices(): raise ValueError("'basisY' should be a length n_vertices array")
 
-            q = self.bound_mesh.add_vertex_intrinsic_vector_quantity(name, values, n_sym, str_to_vectortype(vectortype))
+            q = self.bound_mesh.add_vertex_tangent_vector_quantity(name, values, basisX, basisY, n_sym, str_to_vectortype(vectortype))
 
         elif defined_on == 'faces':
             if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
+            if basisX.shape[0] != self.n_faces(): raise ValueError("'basisX' should be a length n_faces array")
+            if basisY.shape[0] != self.n_faces(): raise ValueError("'basisY' should be a length n_faces array")
             
-            q = self.bound_mesh.add_face_intrinsic_vector_quantity(name, values, n_sym, str_to_vectortype(vectortype))
+            q = self.bound_mesh.add_face_tangent_vector_quantity(name, values, basisX, basisY, n_sym, str_to_vectortype(vectortype))
 
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
@@ -412,16 +387,14 @@ class SurfaceMesh:
             q.set_radius(radius, True)
         if color is not None:
             q.set_color(glm3(color))
-        if ribbon is not None:
-            q.set_ribbon_enabled(ribbon)
     
     
-    def add_one_form_vector_quantity(self, name, values, orientations, enabled=None, length=None, radius=None, color=None, ribbon=None):
+    def add_one_form_vector_quantity(self, name, values, orientations, enabled=None, length=None, radius=None, color=None):
 
         if len(values.shape) != 1 or values.shape[0] != self.n_edges(): raise ValueError("'values' should be length n_edges array")
         if len(orientations.shape) != 1 or orientations.shape[0] != self.n_edges(): raise ValueError("'orientations' should be length n_edges array")
 
-        q = self.bound_mesh.add_one_form_intrinsic_vector_quantity(name, values, orientations)
+        q = self.bound_mesh.add_one_form_tangent_vector_quantity(name, values, orientations)
 
         # Support optional params
         if enabled is not None:
@@ -432,8 +405,6 @@ class SurfaceMesh:
             q.set_radius(radius, True)
         if color is not None:
             q.set_color(glm3(color))
-        if ribbon is not None:
-            q.set_ribbon_enabled(ribbon)
 
 
 def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_color=None, smooth_shade=None, 

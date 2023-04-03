@@ -8,11 +8,11 @@
 
 #include "polyscope/affine_remapper.h"
 #include "polyscope/curve_network.h"
+#include "polyscope/messages.h"
 #include "polyscope/pick.h"
 #include "polyscope/point_cloud.h"
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
-#include "polyscope/surface_parameterization_enums.h"
 #include "polyscope/view.h"
 #include "polyscope/volume_mesh.h"
 
