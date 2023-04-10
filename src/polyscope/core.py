@@ -135,6 +135,12 @@ def look_at_dir(camera_location, target, up_dir, fly_to=False):
 def set_view_projection_mode(s):
     psb.set_view_projection_mode(str_to_projection_mode(s))
 
+def set_view_from_json(s):
+    psb.view_from_json(s)
+
+def get_view_as_json():
+    return psb.get_view_as_json()
+
 ### Messages
 
 def info(message):

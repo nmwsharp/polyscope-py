@@ -124,6 +124,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
       ps::view::lookAt(location, target, upDir, flyTo); 
   });
   m.def("set_view_projection_mode", [](ps::ProjectionMode x) { ps::view::projectionMode = x; });
+  m.def("set_view_from_json", ps::view::setViewFromJson);
+  m.def("get_view_as_json", ps::view::getViewAsJson);
   
   // === Messages
   m.def("info", ps::info, "Send an info message");

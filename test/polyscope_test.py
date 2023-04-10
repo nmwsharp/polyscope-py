@@ -117,6 +117,9 @@ class TestCore(unittest.TestCase):
         
         ps.show(3)
     
+    def test_view_json(self):
+        ps.set_view_from_json(ps.get_view_as_json())
+
     def test_ground_options(self):
 
         ps.set_ground_plane_mode("none")
