@@ -102,8 +102,11 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });
   m.def("set_give_focus_on_show", [](bool x) { ps::options::giveFocusOnShow = x; });
   m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
+  m.def("get_navigation_style", ps::view::getNavigateStyle);
   m.def("set_up_dir", [](ps::UpDir x) { ps::view::setUpDir(x); });
+  m.def("get_up_dir", ps::view::getUpDir);
   m.def("set_front_dir", [](ps::FrontDir x) { ps::view::setFrontDir(x); });
+  m.def("get_front_dir", ps::view::getFrontDir);
 
   // === Scene extents
   m.def("set_automatically_compute_scene_extents", [](bool x) { ps::options::automaticallyComputeSceneExtents = x; });

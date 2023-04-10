@@ -90,12 +90,18 @@ def set_give_focus_on_show(b):
 
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))
+def get_navigation_style():
+    return navigate_style_to_str(psb.get_navigation_style());
 
 def set_up_dir(d):
     psb.set_up_dir(str_to_updir(d))
+def get_up_dir():
+    return updir_to_str(psb.get_up_dir())
 
 def set_front_dir(d):
     psb.set_front_dir(str_to_frontdir(d))
+def get_front_dir():
+    return frontdir_to_str(psb.get_front_dir())
 
 ### Scene extents
 
@@ -268,18 +274,26 @@ def load_color_map(cmap_name, filename):
 
 ## String-to-enum translation
 
+d_navigate = {
+    "turntable" : psb.NavigateStyle.turntable,
+    "free" : psb.NavigateStyle.free,
+    "planar" : psb.NavigateStyle.planar,
+}
 def str_to_navigate_style(s):
-    d = {
-        "turntable" : psb.NavigateStyle.turntable,
-        "free" : psb.NavigateStyle.free,
-        "planar" : psb.NavigateStyle.planar,
-    }
 
-    if s not in d:
+    if s not in d_navigate:
         raise ValueError("Bad navigate style specifier '{}', should be one of [{}]".format(s, 
-            ",".join(["'{}'".format(x) for x in d.keys()])))
+            ",".join(["'{}'".format(x) for x in d_navigate.keys()])))
 
-    return d[s]
+    return d_navigate[s]
+def navigate_style_to_str(val):
+    for k,v in d_navigate.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad navigate style specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_navigate.values()])))
+
 
 def str_to_projection_mode(s):
     d = {
@@ -293,37 +307,53 @@ def str_to_projection_mode(s):
 
     return d[s]
 
+
+d_updir = {
+    "x_up" : psb.UpDir.x_up,
+    "neg_x_up" : psb.UpDir.neg_x_up,
+    "y_up" : psb.UpDir.y_up,
+    "neg_y_up" : psb.UpDir.neg_y_up,
+    "z_up" : psb.UpDir.z_up,
+    "neg_z_up" : psb.UpDir.neg_z_up,
+}
 def str_to_updir(s):
-    d = {
-        "x_up" : psb.UpDir.x_up,
-        "neg_x_up" : psb.UpDir.neg_x_up,
-        "y_up" : psb.UpDir.y_up,
-        "neg_y_up" : psb.UpDir.neg_y_up,
-        "z_up" : psb.UpDir.z_up,
-        "neg_z_up" : psb.UpDir.neg_z_up,
-    }
-
-    if s not in d:
+    if s not in d_updir:
         raise ValueError("Bad up direction specifier '{}', should be one of [{}]".format(s, 
-            ",".join(["'{}'".format(x) for x in d.keys()])))
+            ",".join(["'{}'".format(x) for x in d_updir.keys()])))
 
-    return d[s]
+    return d_updir[s]
 
+def updir_to_str(val):
+    for k,v in d_updir.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad up direction specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_updir.values()])))
+
+
+d_frontdir = {
+    "x_front" : psb.FrontDir.x_front,
+    "neg_x_front" : psb.FrontDir.neg_x_front,
+    "y_front" : psb.FrontDir.y_front,
+    "neg_y_front" : psb.FrontDir.neg_y_front,
+    "z_front" : psb.FrontDir.z_front,
+    "neg_z_front" : psb.FrontDir.neg_z_front,
+}
 def str_to_frontdir(s):
-    d = {
-        "x_front" : psb.FrontDir.x_front,
-        "neg_x_front" : psb.FrontDir.neg_x_front,
-        "y_front" : psb.FrontDir.y_front,
-        "neg_y_front" : psb.FrontDir.neg_y_front,
-        "z_front" : psb.FrontDir.z_front,
-        "neg_z_front" : psb.FrontDir.neg_z_front,
-    }
 
-    if s not in d:
+    if s not in d_frontdir:
         raise ValueError("Bad front direction specifier '{}', should be one of [{}]".format(s, 
-            ",".join(["'{}'".format(x) for x in d.keys()])))
+            ",".join(["'{}'".format(x) for x in d_frontdir.keys()])))
 
-    return d[s]
+    return d_frontdir[s]
+def frontdir_to_str(val):
+    for k,v in d_frontdir.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad front direction specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_frontdir.values()])))
 
 def str_to_datatype(s):
     d = {
