@@ -94,6 +94,9 @@ def set_navigation_style(s):
 def set_up_dir(d):
     psb.set_up_dir(str_to_updir(d))
 
+def set_front_dir(d):
+    psb.set_front_dir(str_to_frontdir(d))
+
 ### Scene extents
 
 def set_automatically_compute_scene_extents(b):
@@ -302,6 +305,22 @@ def str_to_updir(s):
 
     if s not in d:
         raise ValueError("Bad up direction specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def str_to_frontdir(s):
+    d = {
+        "x_front" : psb.FrontDir.x_front,
+        "neg_x_front" : psb.FrontDir.neg_x_front,
+        "y_front" : psb.FrontDir.y_front,
+        "neg_y_front" : psb.FrontDir.neg_y_front,
+        "z_front" : psb.FrontDir.z_front,
+        "neg_z_front" : psb.FrontDir.neg_z_front,
+    }
+
+    if s not in d:
+        raise ValueError("Bad front direction specifier '{}', should be one of [{}]".format(s, 
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]

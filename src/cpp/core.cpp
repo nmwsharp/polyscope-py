@@ -102,7 +102,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });
   m.def("set_give_focus_on_show", [](bool x) { ps::options::giveFocusOnShow = x; });
   m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
-  m.def("set_up_dir", [](ps::view::UpDir x) { ps::view::setUpDir(x); });
+  m.def("set_up_dir", [](ps::UpDir x) { ps::view::setUpDir(x); });
+  m.def("set_front_dir", [](ps::FrontDir x) { ps::view::setFrontDir(x); });
 
   // === Scene extents
   m.def("set_automatically_compute_scene_extents", [](bool x) { ps::options::automaticallyComputeSceneExtents = x; });
@@ -226,13 +227,22 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("orthographic", ps::ProjectionMode::Orthographic)
     .export_values(); 
   
-  py::enum_<ps::view::UpDir>(m, "UpDir")
-    .value("x_up", ps::view::UpDir::XUp)
-    .value("y_up", ps::view::UpDir::YUp)
-    .value("z_up", ps::view::UpDir::ZUp)
-    .value("neg_x_up", ps::view::UpDir::NegXUp)
-    .value("neg_y_up", ps::view::UpDir::NegYUp)
-    .value("neg_z_up", ps::view::UpDir::NegZUp)
+  py::enum_<ps::UpDir>(m, "UpDir")
+    .value("x_up", ps::UpDir::XUp)
+    .value("y_up", ps::UpDir::YUp)
+    .value("z_up", ps::UpDir::ZUp)
+    .value("neg_x_up", ps::UpDir::NegXUp)
+    .value("neg_y_up", ps::UpDir::NegYUp)
+    .value("neg_z_up", ps::UpDir::NegZUp)
+    .export_values(); 
+  
+  py::enum_<ps::FrontDir>(m, "FrontDir")
+    .value("x_front", ps::FrontDir::XFront)
+    .value("y_front", ps::FrontDir::YFront)
+    .value("z_front", ps::FrontDir::ZFront)
+    .value("neg_x_front", ps::FrontDir::NegXFront)
+    .value("neg_y_front", ps::FrontDir::NegYFront)
+    .value("neg_z_front", ps::FrontDir::NegZFront)
     .export_values(); 
 
   py::enum_<ps::DataType>(m, "DataType")

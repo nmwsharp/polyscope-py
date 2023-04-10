@@ -88,6 +88,13 @@ class TestCore(unittest.TestCase):
         ps.set_up_dir("z_up")
         ps.set_up_dir("neg_z_up")
         
+        ps.set_front_dir("x_front")
+        ps.set_front_dir("neg_x_front")
+        ps.set_front_dir("y_front")
+        ps.set_front_dir("neg_y_front")
+        ps.set_front_dir("z_front")
+        ps.set_front_dir("neg_z_front")
+        
         ps.set_view_projection_mode("orthographic")
         ps.set_view_projection_mode("perspective")
         
