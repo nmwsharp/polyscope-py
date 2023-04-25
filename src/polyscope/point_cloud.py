@@ -2,6 +2,8 @@ import polyscope_bindings as psb
 
 from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str
 
+from polyscope.common import process_color_args, process_scalar_args, process_vector_args, process_parameterization_args
+
 class PointCloud:
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
@@ -143,49 +145,33 @@ class PointCloud:
     ## Quantities
        
     # Scalar
-    def add_scalar_quantity(self, name, values, enabled=None, datatype="standard", vminmax=None, cmap=None):
+    def add_scalar_quantity(self, name, values, datatype="standard", **scalar_args):
         if len(values.shape) != 1 or values.shape[0] != self.n_points(): raise ValueError("'values' should be a length-N array")
             
         q = self.bound_cloud.add_scalar_quantity(name, values, str_to_datatype(datatype))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if vminmax is not None:
-            q.set_map_range(vminmax)
-        if cmap is not None:
-            q.set_color_map(cmap)
+        process_scalar_args(self, q, scalar_args)
     
     
     # Color
-    def add_color_quantity(self, name, values, enabled=None):
+    def add_color_quantity(self, name, values, **color_args):
         if len(values.shape) != 2 or values.shape[0] != self.n_points() or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
             
         q = self.bound_cloud.add_color_quantity(name, values)
-
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
+        
+        process_color_args(self, q, color_args)
     
     
     # Vector
-    def add_vector_quantity(self, name, values, enabled=None, vectortype="standard", length=None, radius=None, color=None):
+    def add_vector_quantity(self, name, values, vectortype="standard", **vector_args):
         if len(values.shape) != 2 or values.shape[0] != self.n_points() or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
         
         if values.shape[1] == 2:
             q = self.bound_cloud.add_vector_quantity2D(name, values, str_to_vectortype(vectortype))
         elif values.shape[1] == 3:
             q = self.bound_cloud.add_vector_quantity(name, values, str_to_vectortype(vectortype))
-
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if length is not None:
-            q.set_length(length, True)
-        if radius is not None:
-            q.set_radius(radius, True)
-        if color is not None:
-            q.set_color(glm3(color))
+        
+        process_vector_args(self, q, vector_args)
 
 
 def register_point_cloud(name, points, enabled=None, radius=None, point_render_mode=None, color=None, material=None, transparency=None):

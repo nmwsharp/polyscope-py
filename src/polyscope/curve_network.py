@@ -2,6 +2,8 @@ import polyscope_bindings as psb
 
 from polyscope.core import str_to_datatype, str_to_vectortype, glm3
 
+from polyscope.common import process_color_args, process_scalar_args, process_vector_args, process_parameterization_args
+
 class CurveNetwork:
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
@@ -149,7 +151,7 @@ class CurveNetwork:
     ## Quantities
        
     # Scalar
-    def add_scalar_quantity(self, name, values, defined_on='nodes', enabled=None, datatype="standard", vminmax=None, cmap=None):
+    def add_scalar_quantity(self, name, values, defined_on='nodes', datatype="standard", **scalar_args):
 
         if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
 
@@ -161,19 +163,13 @@ class CurveNetwork:
             q = self.bound_network.add_edge_scalar_quantity(name, values, str_to_datatype(datatype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
-            
+   
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if vminmax is not None:
-            q.set_map_range(vminmax)
-        if cmap is not None:
-            q.set_color_map(cmap)
+        process_scalar_args(self, q, scalar_args)
     
     
     # Color
-    def add_color_quantity(self, name, values, defined_on='nodes', enabled=None):
+    def add_color_quantity(self, name, values, defined_on='nodes', **color_args):
         if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
             
         
@@ -186,13 +182,12 @@ class CurveNetwork:
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
+
+        process_color_args(self, q, color_args)
     
     
     # Vector
-    def add_vector_quantity(self, name, values, defined_on='nodes', enabled=None, vectortype="standard", length=None, radius=None, color=None):
+    def add_vector_quantity(self, name, values, defined_on='nodes', vectortype="standard", **vector_args):
         if len(values.shape) != 2 or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
         
         
@@ -215,15 +210,8 @@ class CurveNetwork:
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if length is not None:
-            q.set_length(length, True)
-        if radius is not None:
-            q.set_radius(radius, True)
-        if color is not None:
-            q.set_color(glm3(color))
+
+        process_vector_args(self, q, vector_args)
 
 
 def register_curve_network(name, nodes, edges, enabled=None, radius=None, color=None, material=None, transparency=None):

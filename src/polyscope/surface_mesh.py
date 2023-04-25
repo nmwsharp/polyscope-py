@@ -5,6 +5,8 @@ from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coor
                            str_to_param_viz_style, str_to_back_face_policy, back_face_policy_to_str,\
                            glm3
 
+from polyscope.common import process_color_args, process_scalar_args, process_vector_args, process_parameterization_args
+
 class SurfaceMesh:
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
@@ -211,7 +213,7 @@ class SurfaceMesh:
     ## Quantities
 
     # Scalar
-    def add_scalar_quantity(self, name, values, defined_on='vertices', enabled=None, datatype="standard", vminmax=None, cmap=None):
+    def add_scalar_quantity(self, name, values, defined_on='vertices', datatype="standard", **scalar_args):
 
         if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
 
@@ -231,17 +233,11 @@ class SurfaceMesh:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces', 'edges', 'halfedges']".format(defined_on))
             
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if vminmax is not None:
-            q.set_map_range(vminmax)
-        if cmap is not None:
-            q.set_color_map(cmap)
-    
+        process_scalar_args(self, q, scalar_args)
+
     
     # Color
-    def add_color_quantity(self, name, values, defined_on='vertices', enabled=None):
+    def add_color_quantity(self, name, values, defined_on='vertices', **color_args):
         if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
         
         if defined_on == 'vertices':
@@ -253,9 +249,8 @@ class SurfaceMesh:
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
+
+        process_color_args(self, q, color_args)
     
     
     # Distance
@@ -286,7 +281,7 @@ class SurfaceMesh:
     
     
     # Parameterization
-    def add_parameterization_quantity(self, name, values, defined_on='vertices', coords_type='unit', enabled=None, viz_style=None, grid_colors=None, checker_colors=None, checker_size=None, cmap=None):
+    def add_parameterization_quantity(self, name, values, defined_on='vertices', coords_type='unit', **parameterization_args):
 
         if len(values.shape) != 2 or values.shape[1] != 2: raise ValueError("'values' should be an (Nx2) array")
 
@@ -302,25 +297,11 @@ class SurfaceMesh:
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'corners']".format(defined_on))
             
-
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if viz_style is not None:
-            viz_style_enum = str_to_param_viz_style(viz_style)
-            q.set_style(viz_style_enum)
-        if grid_colors is not None:
-            q.set_grid_colors((glm3(grid_colors[0]), glm3(grid_colors[1])))
-        if checker_colors is not None:
-            q.set_checker_colors((glm3(checker_colors[0]), glm3(checker_colors[1])))
-        if checker_size is not None:
-            q.set_checker_size(checker_size)
-        if cmap is not None:
-            q.set_color_map(cmap)
+        process_parameterization_args(self, q, parameterization_args)
     
     
     # Vector
-    def add_vector_quantity(self, name, values, defined_on='vertices', enabled=None, vectortype="standard", length=None, radius=None, color=None):
+    def add_vector_quantity(self, name, values, defined_on='vertices', vectortype="standard", **vector_args):
         if len(values.shape) != 2 or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
         
         
@@ -343,18 +324,11 @@ class SurfaceMesh:
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if length is not None:
-            q.set_length(length, True)
-        if radius is not None:
-            q.set_radius(radius, True)
-        if color is not None:
-            q.set_color(glm3(color))
+        
+        process_vector_args(self, q, vector_args)
     
     
-    def add_tangent_vector_quantity(self, name, values, basisX, basisY, n_sym=1, defined_on='vertices', enabled=None, vectortype="standard", length=None, radius=None, color=None):
+    def add_tangent_vector_quantity(self, name, values, basisX, basisY, n_sym=1, defined_on='vertices', vectortype="standard", **vector_args):
 
         if len(values.shape) != 2 or values.shape[1] != 2: raise ValueError("'values' should be an Nx2 array")
         if len(basisX.shape) != 2 or basisX.shape[1] != 3: raise ValueError("'basisX' should be an Nx3 array")
@@ -378,33 +352,19 @@ class SurfaceMesh:
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if length is not None:
-            q.set_length(length, True)
-        if radius is not None:
-            q.set_radius(radius, True)
-        if color is not None:
-            q.set_color(glm3(color))
+        
+        process_vector_args(self, q, vector_args)
     
     
-    def add_one_form_vector_quantity(self, name, values, orientations, enabled=None, length=None, radius=None, color=None):
+    def add_one_form_vector_quantity(self, name, values, orientations, **vector_args):
 
         if len(values.shape) != 1 or values.shape[0] != self.n_edges(): raise ValueError("'values' should be length n_edges array")
         if len(orientations.shape) != 1 or orientations.shape[0] != self.n_edges(): raise ValueError("'orientations' should be length n_edges array")
 
         q = self.bound_mesh.add_one_form_tangent_vector_quantity(name, values, orientations)
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if length is not None:
-            q.set_length(length, True)
-        if radius is not None:
-            q.set_radius(radius, True)
-        if color is not None:
-            q.set_color(glm3(color))
+        process_vector_args(self, q, vector_args)
+
 
 
 def register_surface_mesh(name, vertices, faces, enabled=None, color=None, edge_color=None, smooth_shade=None, 

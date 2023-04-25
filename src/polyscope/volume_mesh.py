@@ -3,6 +3,8 @@ import numpy as np
 
 from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3
 
+from polyscope.common import process_color_args, process_scalar_args, process_vector_args, process_parameterization_args
+
 class VolumeMesh:
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
@@ -172,7 +174,7 @@ class VolumeMesh:
     ## Quantities
 
     # Scalar
-    def add_scalar_quantity(self, name, values, defined_on='vertices', enabled=None, datatype="standard", vminmax=None, cmap=None):
+    def add_scalar_quantity(self, name, values, defined_on='vertices', datatype="standard", **scalar_args):
 
         if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
 
@@ -184,19 +186,14 @@ class VolumeMesh:
             q = self.bound_mesh.add_cell_scalar_quantity(name, values, str_to_datatype(datatype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
-            
+  
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if vminmax is not None:
-            q.set_map_range(vminmax)
-        if cmap is not None:
-            q.set_color_map(cmap)
+        process_scalar_args(self, q, scalar_args)
+
     
     
     # Color
-    def add_color_quantity(self, name, values, defined_on='vertices', enabled=None):
+    def add_color_quantity(self, name, values, defined_on='vertices', **color_args):
         if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
         
         if defined_on == 'vertices':
@@ -208,13 +205,12 @@ class VolumeMesh:
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
+
+        process_color_args(self, q, color_args)
     
     
     # Vector
-    def add_vector_quantity(self, name, values, defined_on='vertices', enabled=None, vectortype="standard", length=None, radius=None, color=None):
+    def add_vector_quantity(self, name, values, defined_on='vertices', vectortype="standard", **vector_args):
         if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
         
         
@@ -227,15 +223,8 @@ class VolumeMesh:
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if length is not None:
-            q.set_length(length, True)
-        if radius is not None:
-            q.set_radius(radius, True)
-        if color is not None:
-            q.set_color(glm3(color))
+
+        process_vector_args(self, q, vector_args)
     
     
 
