@@ -8,7 +8,10 @@
 
 #include "Eigen/Dense"
 
+#include "polyscope/image_quantity.h"
+
 namespace py = pybind11;
+namespace ps = polyscope;
 
 // Some conversion helpers
 template <typename T, int m, int n>
@@ -63,7 +66,8 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
 
       // quantites
       .def("remove_all_quantities", &StructureT::removeAllQuantities, "Remove all quantities")
-      .def("remove_quantity", &StructureT::removeQuantity, py::arg("name"), py::arg("errorIfAbsent") = false, "Remove a quantity")
+      .def("remove_quantity", &StructureT::removeQuantity, py::arg("name"), py::arg("errorIfAbsent") = false,
+           "Remove a quantity")
 
       // transform management
       // clang-format off
@@ -74,7 +78,18 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("set_position", [](StructureT& s, Eigen::Vector3f T) { s.setPosition(eigen2glm(T)); }, "set the translation component of the transform to the given position")
       .def("translate", [](StructureT& s, Eigen::Vector3f T) { s.translate(eigen2glm(T)); }, "apply the given translation to the shape, updating its position")
       .def("get_transform", [](StructureT& s) { return glm2eigen(s.getTransform()); }, "get the current 4x4 transform matrix")
-      .def("get_position", [](StructureT& s) { return glm2eigen(s.getPosition()); }, "get the position of the shape origin after transform");
+      .def("get_position", [](StructureT& s) { return glm2eigen(s.getPosition()); }, "get the position of the shape origin after transform")
+      
+      // floating quantites
+      .def("add_scalar_image_quantity", &StructureT::template addScalarImageQuantity<Eigen::VectorXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::arg("type")=ps::DataType::STANDARD)
+      .def("add_color_image_quantity", &StructureT::template addColorImageQuantity<Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values_rgb"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft)
+      .def("add_color_alpha_image_quantity", &StructureT::template addColorAlphaImageQuantity<Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values_rgba"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft)
+      .def("add_depth_render_image_quantity", &StructureT::template addDepthRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft)
+      .def("add_color_render_image_quantity", &StructureT::template addColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("colorData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft)
+      .def("add_scalar_render_image_quantity", &StructureT::template addScalarRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::VectorXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("scalarData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::arg("type")=ps::DataType::STANDARD)
+
+      ;
+
   // clang-format on
 }
 
@@ -89,16 +104,18 @@ py::class_<ScalarQ> bindScalarQuantity(py::module& m, std::string name) {
       .def("set_isoline_width", &ScalarQ::setIsolineWidth, "Set isoline width");
 }
 
-template<typename VolumeMeshVertexScalarQuantity>
+template <typename VolumeMeshVertexScalarQuantity>
 py::class_<VolumeMeshVertexScalarQuantity> bindVMVScalarQuantity(py::module& m, std::string name) {
   return py::class_<VolumeMeshVertexScalarQuantity>(m, name.c_str())
-    .def("set_enabled", &VolumeMeshVertexScalarQuantity::setEnabled, "Set enabled")
-    .def("set_color_map", &VolumeMeshVertexScalarQuantity::setColorMap, "Set color map")
-    .def("set_map_range", &VolumeMeshVertexScalarQuantity::setMapRange, "Set map range")
-    .def("set_isoline_width", &VolumeMeshVertexScalarQuantity::setIsolineWidth, "Set isoline width")
-    .def("set_level_set_enable", &VolumeMeshVertexScalarQuantity::setEnabledLevelSet, "Set level set rendering enabled")
-    .def("set_level_set_value", &VolumeMeshVertexScalarQuantity::setLevelSetValue, "Set level set value")
-    .def("set_level_set_visible_quantity", &VolumeMeshVertexScalarQuantity::setLevelSetVisibleQuantity, "Set quantity to show on level set");
+      .def("set_enabled", &VolumeMeshVertexScalarQuantity::setEnabled, "Set enabled")
+      .def("set_color_map", &VolumeMeshVertexScalarQuantity::setColorMap, "Set color map")
+      .def("set_map_range", &VolumeMeshVertexScalarQuantity::setMapRange, "Set map range")
+      .def("set_isoline_width", &VolumeMeshVertexScalarQuantity::setIsolineWidth, "Set isoline width")
+      .def("set_level_set_enable", &VolumeMeshVertexScalarQuantity::setEnabledLevelSet,
+           "Set level set rendering enabled")
+      .def("set_level_set_value", &VolumeMeshVertexScalarQuantity::setLevelSetValue, "Set level set value")
+      .def("set_level_set_visible_quantity", &VolumeMeshVertexScalarQuantity::setLevelSetVisibleQuantity,
+           "Set quantity to show on level set");
 }
 
 // Add common bindings for all color quantities
