@@ -25,6 +25,9 @@ def show(forFrames=None):
     else:
         psb.show(forFrames)
 
+def shutdown():
+    psb.shutdown()
+
 ### Structure management
 
 def remove_all_structures():

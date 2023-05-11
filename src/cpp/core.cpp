@@ -77,6 +77,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
       },
       py::arg("forFrames")=std::numeric_limits<size_t>::max()
   );
+  m.def("shutdown", &ps::shutdown);
 
   // === Structure management
   m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
