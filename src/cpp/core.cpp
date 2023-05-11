@@ -298,6 +298,17 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("sphere", ps::PointRenderMode::Sphere)
     .value("quad", ps::PointRenderMode::Quad)
     .export_values(); 
+  
+  py::enum_<ps::ImageOrigin>(m, "ImageOrigin")
+    .value("lower_left", ps::ImageOrigin::LowerLeft)
+    .value("upper_left", ps::ImageOrigin::UpperLeft)
+    .export_values(); 
+  
+  py::enum_<ps::MeshShadeStyle>(m, "MeshShadeStyle")
+    .value("smooth", ps::MeshShadeStyle::Smooth)
+    .value("flat", ps::MeshShadeStyle::Flat)
+    .value("tri_flat", ps::MeshShadeStyle::TriFlat)
+    .export_values(); 
 
   // === Mini bindings for a little bit of glm
   py::class_<glm::vec3>(m, "glm_vec3").
@@ -319,7 +330,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   bind_point_cloud(m);
   bind_curve_network(m);
   bind_volume_mesh(m);
-  bind_floating_quantities(m);
+  // bind_floating_quantities(m);
   bind_imgui(m);
 
 }
