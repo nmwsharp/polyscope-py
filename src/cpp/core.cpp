@@ -330,7 +330,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   bind_point_cloud(m);
   bind_curve_network(m);
   bind_volume_mesh(m);
-  // bind_floating_quantities(m);
+  bind_floating_quantities(m);
   bind_imgui(m);
 
 }

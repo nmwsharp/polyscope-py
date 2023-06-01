@@ -93,12 +93,18 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
   // clang-format on
 }
 
+// Common bindings for quantities that do not fall in to a more specific quantity below
+template <typename Q>
+py::class_<Q> bindQuantity(py::module& m, std::string name) {
+  return py::class_<Q>(m, name.c_str())
+      .def("set_enabled", &Q::setEnabled, "Set enabled");
+}
+
 
 // Add common bindings for all scalar quantities
 template <typename ScalarQ>
 py::class_<ScalarQ> bindScalarQuantity(py::module& m, std::string name) {
-  return py::class_<ScalarQ>(m, name.c_str())
-      .def("set_enabled", &ScalarQ::setEnabled, "Set enabled")
+  return bindQuantity<ScalarQ>(m, name.c_str())
       .def("set_color_map", &ScalarQ::setColorMap, "Set color map")
       .def("set_map_range", &ScalarQ::setMapRange, "Set map range")
       .def("set_isoline_width", &ScalarQ::setIsolineWidth, "Set isoline width");
@@ -106,8 +112,7 @@ py::class_<ScalarQ> bindScalarQuantity(py::module& m, std::string name) {
 
 template <typename VolumeMeshVertexScalarQuantity>
 py::class_<VolumeMeshVertexScalarQuantity> bindVMVScalarQuantity(py::module& m, std::string name) {
-  return py::class_<VolumeMeshVertexScalarQuantity>(m, name.c_str())
-      .def("set_enabled", &VolumeMeshVertexScalarQuantity::setEnabled, "Set enabled")
+  return bindQuantity<VolumeMeshVertexScalarQuantity>(m, name.c_str())
       .def("set_color_map", &VolumeMeshVertexScalarQuantity::setColorMap, "Set color map")
       .def("set_map_range", &VolumeMeshVertexScalarQuantity::setMapRange, "Set map range")
       .def("set_isoline_width", &VolumeMeshVertexScalarQuantity::setIsolineWidth, "Set isoline width")
@@ -121,14 +126,13 @@ py::class_<VolumeMeshVertexScalarQuantity> bindVMVScalarQuantity(py::module& m, 
 // Add common bindings for all color quantities
 template <typename ColorQ>
 py::class_<ColorQ> bindColorQuantity(py::module& m, std::string name) {
-  return py::class_<ColorQ>(m, name.c_str()).def("set_enabled", &ColorQ::setEnabled, "Set enabled");
+  return bindQuantity<ColorQ>(m, name.c_str());
 }
 
 // Add common bindings for all vector quantities
 template <typename VectorQ>
 py::class_<VectorQ> bindVectorQuantity(py::module& m, std::string name) {
-  return py::class_<VectorQ>(m, name.c_str())
-      .def("set_enabled", &VectorQ::setEnabled, "Set enabled")
+  return bindQuantity<VectorQ>(m, name.c_str())
       .def("set_length", &VectorQ::setVectorLengthScale, "Set length")
       .def("set_radius", &VectorQ::setVectorRadius, "Set radius")
       .def("set_color", &VectorQ::setVectorColor, "Set color");
