@@ -141,6 +141,13 @@ def set_view_from_json(s, fly_to=False):
 def get_view_as_json():
     return psb.get_view_as_json()
 
+def get_view_camera_parameters():
+    return CameraParameters(instance=psb.get_view_camera_parameters())
+
+def set_view_camera_parameters(params):
+    if not isinstance(params, CameraParameters): raise ValueError("must pass CameraParameters")
+    return set_view_camera_parameters(params.instance)
+
 ### Messages
 
 def info(message):
@@ -244,12 +251,73 @@ def add_scene_slice_plane():
 def remove_last_scene_slice_plane():
     psb.remove_last_scene_slice_plane()
 
+### Camera Parameters
+
+class CameraIntrinsics:
+
+    def __init__(self, fov_vertical_deg=None, fov_horizontal_deg=None, aspect=None):
+
+        if fov_vertical_deg is not None and fov_aspect is not None:
+            self.instance = psb.CameraIntrinsics.fromFoVDegVerticalAndAspect(float(fov_vertical_deg), float(aspect))
+        elif fov_horizontal_deg is not None and fov_aspect is not None:
+            self.instance = psb.CameraIntrinsics.fromFoVDegHorizontalAndAspect(float(fov_horizontal_deg), float(aspect))
+        elif fov_vertical_deg is not None and fov_horizontal_deg is not None:
+            self.instance = psb.CameraIntrinsics.fromFoVDegHorizontalAndVertical(float(fov_horizontal_deg), float(fov_vertical_deg))
+        else:
+            raise ValueError("bad arguments, at least two of (fov_vertical_deg,fov_horizontal_deg,aspect) must be given and non-None")
+
+class CameraExtrinsics:
+
+    def __init__(self,  mat=None):
+
+        if mat is not None:
+            mat = np.array(mat)
+            if mat.shape != (4,4): raise ValueError("mat should be a 4x4 numpy matrix")
+            self.instance = psb.CameraExtrinsics.fromMatrix(mat)
+
+        elif (root is not None) and (look_dir is not None) and (up_dir is not None):
+
+            root = glm3(root)
+            look_dir = glm3(look_dir)
+            up_dir = glm3(up_dir)
+            self.instance = psb.CameraExtrinsics.from_vectors(root, look_dir, up_dir)
+        
+        else:
+            raise ValueError("bad arguments, must pass non-None (root,look_dir,up_dir) or non-None mat")
+
+
+class CameraParameters:
+
+    def __init__(self, intrinsics=None, extrinsics=None, instance=None):
+        if instance is not None:
+            self.instance = instance
+        else:
+            self.instance = psb.CameraParameters(intrinsics.instance, extrinsics.instance)
+
+    # getters
+    def get_T(self): return self.instance.get_T()
+    def get_R(self): return self.instance.get_R()
+    def get_view_mat(self): return self.instance.get_view_mat()
+    def get_E(self): return self.instance.get_E()
+    def get_position(self): return self.instance.get_position()
+    def get_look_dir(self): return self.instance.get_look_dir()
+    def get_up_dir(self): return self.instance.get_up_dir()
+    def get_right_dir(self): return self.instance.get_right_dir()
+    def get_camera_frame(self): return self.instance.get_camera_frame()
+    def get_fov_vertical_deg(self): return self.instance.get_fov_vertical_deg()
+    def get_aspect(self): return self.instance.get_aspect()
+
+
 
 ## Small utilities
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])
 def glm4(vals):
     return psb.glm_vec4(vals[0], vals[1], vals[2], vals[3])
+def degrees(val):
+    return 180.*val / np.PI
+def radians(val):
+    return np.PI * val / 180.
 
 ### Materials
 

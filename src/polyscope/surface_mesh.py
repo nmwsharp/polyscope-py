@@ -4,19 +4,21 @@ import numpy as np
 from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type,            \
                            str_to_param_viz_style, str_to_back_face_policy, back_face_policy_to_str,\
                            glm3
-
+from polyscope.structure import Structure
 from polyscope.common import process_color_args, process_scalar_args, process_vector_args, process_parameterization_args
 
-class SurfaceMesh:
+class SurfaceMesh(Structure):
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
 
     # End users should not call this constrctor, use register_surface_mesh instead
     def __init__(self, name=None, vertices=None, faces=None, instance=None):
+        
+        super().__init__()
 
         if instance is not None:
             # Wrap an existing instance
-            self.bound_mesh = instance
+            self.bound_instance = instance
 
         else:
             # Create a new instance
@@ -28,9 +30,9 @@ class SurfaceMesh:
                 if (len(faces.shape) != 2): raise ValueError("surface mesh face array should have shape (F,D) for some D; shape is " + str(faces.shape))
 
                 if vertices.shape[1] == 3:
-                    self.bound_mesh = psb.register_surface_mesh(name, vertices, faces) 
+                    self.bound_instance = psb.register_surface_mesh(name, vertices, faces) 
                 elif vertices.shape[1] == 2:
-                    self.bound_mesh = psb.register_surface_mesh2D(name, vertices, faces) 
+                    self.bound_instance = psb.register_surface_mesh2D(name, vertices, faces) 
 
             else:
                 # Faces is something else, try to iterate through it to build a list of lists
@@ -40,9 +42,9 @@ class SurfaceMesh:
                     faces_copy.append(f_copy)
 
                 if vertices.shape[1] == 3:
-                    self.bound_mesh = psb.register_surface_mesh_list(name, vertices, faces) 
+                    self.bound_instance = psb.register_surface_mesh_list(name, vertices, faces) 
                 elif vertices.shape[1] == 2:
-                    self.bound_mesh = psb.register_surface_mesh_list2D(name, vertices, faces) 
+                    self.bound_instance = psb.register_surface_mesh_list2D(name, vertices, faces) 
 
                         
 
@@ -53,85 +55,25 @@ class SurfaceMesh:
       
 
     def n_vertices(self):
-        return self.bound_mesh.n_vertices()
+        return self.bound_instance.n_vertices()
     def n_faces(self):
-        return self.bound_mesh.n_faces()
+        return self.bound_instance.n_faces()
     def n_edges(self):
-        return self.bound_mesh.n_edges()
+        return self.bound_instance.n_edges()
     def n_halfedges(self):
-        return self.bound_mesh.n_halfedges()
+        return self.bound_instance.n_halfedges()
     def n_corners(self):
-        return self.bound_mesh.n_corners()
+        return self.bound_instance.n_corners()
 
-    ## Structure management
-    
-    def remove(self):
-        '''Remove the structure itself'''
-        self.bound_mesh.remove()
-    def remove_all_quantities(self):
-        '''Remove all quantities on the structure'''
-        self.bound_mesh.remove_all_quantities()
-    def remove_quantity(self, name):
-        '''Remove a single quantity on the structure'''
-        self.bound_mesh.remove_quantity(name)
-
-    # Enable/disable
-    def set_enabled(self, val=True):
-        self.bound_mesh.set_enabled(val)
-    def is_enabled(self):
-        return self.bound_mesh.is_enabled()
-    
-    # Transparency
-    def set_transparency(self, val):
-        self.bound_mesh.set_transparency(val)
-    def get_transparency(self):
-        return self.bound_mesh.get_transparency()
-
-    # Transformation things
-    def center_bounding_box(self):
-        self.bound_mesh.center_bounding_box()
-    def rescale_to_unit(self):
-        self.bound_mesh.rescale_to_unit()
-    def reset_transform(self):
-        self.bound_mesh.reset_transform()
-    def set_transform(self, new_mat4x4):
-        self.bound_mesh.set_transform(new_mat4x4)
-    def set_position(self, new_vec3):
-        self.bound_mesh.set_position(new_vec3)
-    def translate(self, trans_vec3):
-        self.bound_mesh.translate(trans_vec3)
-    def get_transform(self):
-        return self.bound_mesh.get_transform()
-    def get_position(self):
-        return self.bound_mesh.get_position()
-    
-    
-    # Slice planes
-    def set_cull_whole_elements(self, val):
-        self.bound_mesh.set_cull_whole_elements(val)
-    def get_cull_whole_elements(self):
-        return self.bound_mesh.get_cull_whole_elements()
-    def set_ignore_slice_plane(self, plane, val):
-        # take either a string or a slice plane object as input
-        if isinstance(plane, str):
-            self.bound_mesh.set_ignore_slice_plane(plane, val)
-        else:
-            self.bound_mesh.set_ignore_slice_plane(plane.get_name(), val)
-    def get_ignore_slice_plane(self, plane):
-        # take either a string or a slice plane object as input
-        if isinstance(plane, str):
-            return self.bound_mesh.get_ignore_slice_plane(plane)
-        else:
-            return self.bound_mesh.get_ignore_slice_plane(plane.get_name())
 
     # Update
     def update_vertex_positions(self, vertices):
         self.check_shape(vertices)
         
         if vertices.shape[1] == 3:
-            self.bound_mesh.update_vertex_positions(vertices)
+            self.bound_instance.update_vertex_positions(vertices)
         elif vertices.shape[1] == 2:
-            self.bound_mesh.update_vertex_positions2D(vertices)
+            self.bound_instance.update_vertex_positions2D(vertices)
         else:
             raise ValueError("bad vertex shape")
 
@@ -140,62 +82,62 @@ class SurfaceMesh:
     
     # Color
     def set_color(self, val):
-        self.bound_mesh.set_color(glm3(val))
+        self.bound_instance.set_color(glm3(val))
     def get_color(self):
-        return self.bound_mesh.get_color().as_tuple()
+        return self.bound_instance.get_color().as_tuple()
     
     # Edge Color
     def set_edge_color(self, val):
-        self.bound_mesh.set_edge_color(glm3(val))
+        self.bound_instance.set_edge_color(glm3(val))
     def get_edge_color(self):
-        return self.bound_mesh.get_edge_color().as_tuple()
+        return self.bound_instance.get_edge_color().as_tuple()
     
     # Edge width
     def set_edge_width(self, val):
-        self.bound_mesh.set_edge_width(val)
+        self.bound_instance.set_edge_width(val)
     def get_edge_width(self):
-        return self.bound_mesh.get_edge_width()
+        return self.bound_instance.get_edge_width()
     
     # Smooth shade
     def set_smooth_shade(self, val):
-        self.bound_mesh.set_smooth_shade(val)
+        self.bound_instance.set_smooth_shade(val)
     def get_smooth_shade(self):
-        return self.bound_mesh.get_smooth_shade()
+        return self.bound_instance.get_smooth_shade()
     
     # Material
     def set_material(self, mat):
-        self.bound_mesh.set_material(mat)
+        self.bound_instance.set_material(mat)
     def get_material(self):
-        return self.bound_mesh.get_material()
+        return self.bound_instance.get_material()
 
     # Color
     def set_back_face_policy(self, val):
-        self.bound_mesh.set_back_face_policy(str_to_back_face_policy(val))
+        self.bound_instance.set_back_face_policy(str_to_back_face_policy(val))
     def get_back_face_policy(self):
-        return back_face_policy_to_str(self.bound_mesh.get_back_face_policy())
+        return back_face_policy_to_str(self.bound_instance.get_back_face_policy())
     
     # Back face color
     def set_back_face_color(self, val):
-        self.bound_mesh.set_back_face_color(glm3(val))
+        self.bound_instance.set_back_face_color(glm3(val))
     def get_back_face_color(self):
-        return self.bound_mesh.get_back_face_color().as_tuple()
+        return self.bound_instance.get_back_face_color().as_tuple()
 
     ## Permutations and bases
 
     def set_edge_permutation(self, perm, expected_size=None):
         if len(perm.shape) != 1 or perm.shape[0] != self.n_edges(): raise ValueError("'perm' should be an array with one entry per edge")
         if expected_size is None: expected_size = 0
-        self.bound_mesh.set_edge_permutation(perm, expected_size)
+        self.bound_instance.set_edge_permutation(perm, expected_size)
     
     def set_corner_permutation(self, perm, expected_size=None):
         if len(perm.shape) != 1 or perm.shape[0] != self.n_corners(): raise ValueError("'perm' should be an array with one entry per corner")
         if expected_size is None: expected_size = 0
-        self.bound_mesh.set_corner_permutation(perm, expected_size)
+        self.bound_instance.set_corner_permutation(perm, expected_size)
     
     def set_halfedge_permutation(self, perm, expected_size=None):
         if len(perm.shape) != 1 or perm.shape[0] != self.n_halfedges(): raise ValueError("'perm' should be an array with one entry per halfedge")
         if expected_size is None: expected_size = 0
-        self.bound_mesh.set_halfedge_permutation(perm, expected_size)
+        self.bound_instance.set_halfedge_permutation(perm, expected_size)
     
     def set_all_permutations(self, 
             vertex_perm=None, vertex_perm_size=None, # now ignored 
@@ -219,16 +161,16 @@ class SurfaceMesh:
 
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_mesh.add_vertex_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_vertex_scalar_quantity(name, values, str_to_datatype(datatype))
         elif defined_on == 'faces':
             if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
-            q = self.bound_mesh.add_face_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_face_scalar_quantity(name, values, str_to_datatype(datatype))
         elif defined_on == 'edges':
             if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
-            q = self.bound_mesh.add_edge_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_edge_scalar_quantity(name, values, str_to_datatype(datatype))
         elif defined_on == 'halfedges':
             if values.shape[0] != self.n_halfedges(): raise ValueError("'values' should be a length n_halfedges array")
-            q = self.bound_mesh.add_halfedge_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_halfedge_scalar_quantity(name, values, str_to_datatype(datatype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces', 'edges', 'halfedges']".format(defined_on))
             
@@ -242,10 +184,10 @@ class SurfaceMesh:
         
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_mesh.add_vertex_color_quantity(name, values)
+            q = self.bound_instance.add_vertex_color_quantity(name, values)
         elif defined_on == 'faces':
             if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
-            q = self.bound_mesh.add_face_color_quantity(name, values)
+            q = self.bound_instance.add_face_color_quantity(name, values)
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
@@ -262,9 +204,9 @@ class SurfaceMesh:
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
 
             if signed:
-                q = self.bound_mesh.add_vertex_signed_distance_quantity(name, values)
+                q = self.bound_instance.add_vertex_signed_distance_quantity(name, values)
             else:
-                q = self.bound_mesh.add_vertex_distance_quantity(name, values)
+                q = self.bound_instance.add_vertex_distance_quantity(name, values)
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices']".format(defined_on))
             
@@ -290,10 +232,10 @@ class SurfaceMesh:
 
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_mesh.add_vertex_parameterization_quantity(name, values, coords_type_enum)
+            q = self.bound_instance.add_vertex_parameterization_quantity(name, values, coords_type_enum)
         elif defined_on == 'corners':
             if values.shape[0] != self.n_corners(): raise ValueError("'values' should be a length n_faces array")
-            q = self.bound_mesh.add_corner_parameterization_quantity(name, values, coords_type_enum)
+            q = self.bound_instance.add_corner_parameterization_quantity(name, values, coords_type_enum)
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'corners']".format(defined_on))
             
@@ -309,17 +251,17 @@ class SurfaceMesh:
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
 
             if values.shape[1] == 2:
-                q = self.bound_mesh.add_vertex_vector_quantity2D(name, values, str_to_vectortype(vectortype))
+                q = self.bound_instance.add_vertex_vector_quantity2D(name, values, str_to_vectortype(vectortype))
             elif values.shape[1] == 3:
-                q = self.bound_mesh.add_vertex_vector_quantity(name, values, str_to_vectortype(vectortype))
+                q = self.bound_instance.add_vertex_vector_quantity(name, values, str_to_vectortype(vectortype))
 
         elif defined_on == 'faces':
             if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
             
             if values.shape[1] == 2:
-                q = self.bound_mesh.add_face_vector_quantity2D(name, values, str_to_vectortype(vectortype))
+                q = self.bound_instance.add_face_vector_quantity2D(name, values, str_to_vectortype(vectortype))
             elif values.shape[1] == 3:
-                q = self.bound_mesh.add_face_vector_quantity(name, values, str_to_vectortype(vectortype))
+                q = self.bound_instance.add_face_vector_quantity(name, values, str_to_vectortype(vectortype))
 
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
@@ -340,14 +282,14 @@ class SurfaceMesh:
             if basisX.shape[0] != self.n_vertices(): raise ValueError("'basisX' should be a length n_vertices array")
             if basisY.shape[0] != self.n_vertices(): raise ValueError("'basisY' should be a length n_vertices array")
 
-            q = self.bound_mesh.add_vertex_tangent_vector_quantity(name, values, basisX, basisY, n_sym, str_to_vectortype(vectortype))
+            q = self.bound_instance.add_vertex_tangent_vector_quantity(name, values, basisX, basisY, n_sym, str_to_vectortype(vectortype))
 
         elif defined_on == 'faces':
             if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
             if basisX.shape[0] != self.n_faces(): raise ValueError("'basisX' should be a length n_faces array")
             if basisY.shape[0] != self.n_faces(): raise ValueError("'basisY' should be a length n_faces array")
             
-            q = self.bound_mesh.add_face_tangent_vector_quantity(name, values, basisX, basisY, n_sym, str_to_vectortype(vectortype))
+            q = self.bound_instance.add_face_tangent_vector_quantity(name, values, basisX, basisY, n_sym, str_to_vectortype(vectortype))
 
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
@@ -361,7 +303,7 @@ class SurfaceMesh:
         if len(values.shape) != 1 or values.shape[0] != self.n_edges(): raise ValueError("'values' should be length n_edges array")
         if len(orientations.shape) != 1 or orientations.shape[0] != self.n_edges(): raise ValueError("'orientations' should be length n_edges array")
 
-        q = self.bound_mesh.add_one_form_tangent_vector_quantity(name, values, orientations)
+        q = self.bound_instance.add_one_form_tangent_vector_quantity(name, values, orientations)
 
         process_vector_args(self, q, vector_args)
 

@@ -7,6 +7,7 @@
 #include "Eigen/Dense"
 
 #include "polyscope/affine_remapper.h"
+#include "polyscope/camera_parameters.h"
 #include "polyscope/curve_network.h"
 #include "polyscope/messages.h"
 #include "polyscope/pick.h"
@@ -29,6 +30,7 @@ void bind_surface_mesh(py::module& m);
 void bind_point_cloud(py::module& m);
 void bind_curve_network(py::module& m);
 void bind_volume_mesh(py::module& m);
+void bind_camera_view(py::module& m);
 void bind_floating_quantities(py::module& m);
 void bind_imgui(py::module& m);
 
@@ -102,12 +104,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_open_imgui_window_for_user_callback", [](bool x) { ps::options::openImGuiWindowForUserCallback= x; });
   m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });
   m.def("set_give_focus_on_show", [](bool x) { ps::options::giveFocusOnShow = x; });
-  m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
-  m.def("get_navigation_style", ps::view::getNavigateStyle);
-  m.def("set_up_dir", [](ps::UpDir x) { ps::view::setUpDir(x); });
-  m.def("get_up_dir", ps::view::getUpDir);
-  m.def("set_front_dir", [](ps::FrontDir x) { ps::view::setFrontDir(x); });
-  m.def("get_front_dir", ps::view::getFrontDir);
+
 
   // === Scene extents
   m.def("set_automatically_compute_scene_extents", [](bool x) { ps::options::automaticallyComputeSceneExtents = x; });
@@ -116,7 +113,14 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_bounding_box", [](glm::vec3 low, glm::vec3 high) { ps::state::boundingBox = std::tuple<glm::vec3, glm::vec3>(low, high); });
   m.def("get_bounding_box", []() { return ps::state::boundingBox; });
 
-  // === Camera controls
+  // === Camera controls & View
+  m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
+  m.def("get_navigation_style", ps::view::getNavigateStyle);
+  m.def("set_up_dir", [](ps::UpDir x) { ps::view::setUpDir(x); });
+  m.def("get_up_dir", ps::view::getUpDir);
+  m.def("set_front_dir", [](ps::FrontDir x) { ps::view::setFrontDir(x); });
+  m.def("get_front_dir", ps::view::getFrontDir);
+
   m.def("reset_camera_to_home_view", ps::view::resetCameraToHomeView);
   m.def("look_at", [](glm::vec3 location, glm::vec3 target, bool flyTo) { 
       ps::view::lookAt(location, target, flyTo); 
@@ -125,6 +129,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
       ps::view::lookAt(location, target, upDir, flyTo); 
   });
   m.def("set_view_projection_mode", [](ps::ProjectionMode x) { ps::view::projectionMode = x; });
+  m.def("get_view_camera_parameters", &ps::view::getCameraParametersForCurrentView);
+  m.def("set_view_camera_parameters", &ps::view::setViewToCamera);
   m.def("set_view_from_json", ps::view::setViewFromJson);
   m.def("get_view_as_json", ps::view::getViewAsJson);
   
@@ -218,6 +224,33 @@ PYBIND11_MODULE(polyscope_bindings, m) {
 
   m.def("add_scene_slice_plane", ps::addSceneSlicePlane, "add a slice plane", py::return_value_policy::reference);
   m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene plane");
+  
+  // === Camera Parameters
+  py::class_<ps::CameraIntrinsics>(m, "CameraIntrinsics")
+   .def(py::init<>())
+   .def_static("from_FoV_deg_vertical_and_aspect", &ps::CameraIntrinsics::fromFoVDegVerticalAndAspect)
+   .def_static("from_FoV_deg_horizontal_and_aspect", &ps::CameraIntrinsics::fromFoVDegHorizontalAndAspect)
+   .def_static("from_FoV_deg_horizontal_and_vertical", &ps::CameraIntrinsics::fromFoVDegHorizontalAndVertical)
+  ;
+  py::class_<ps::CameraExtrinsics>(m, "CameraExtrinsics")
+   .def(py::init<>())
+   .def_static("from_vectors", &ps::CameraExtrinsics::fromVectors<glm::vec3,glm::vec3,glm::vec3>)
+   .def_static("from_matrix", &ps::CameraExtrinsics::fromMatrix)
+  ;
+  py::class_<ps::CameraParameters>(m, "CameraParameters")
+   .def(py::init<ps::CameraIntrinsics, ps::CameraExtrinsics>())
+   .def("get_T", &ps::CameraParameters::getT)
+   .def("get_R", &ps::CameraParameters::getR)
+   .def("get_view_mat", &ps::CameraParameters::getViewMat)
+   .def("get_E", &ps::CameraParameters::getE)
+   .def("get_position", &ps::CameraParameters::getPosition)
+   .def("get_look_dir", &ps::CameraParameters::getLookDir)
+   .def("get_up_dir", &ps::CameraParameters::getUpDir)
+   .def("get_right_dir", &ps::CameraParameters::getRightDir)
+   .def("get_camera_frame", &ps::CameraParameters::getCameraFrame)
+   .def("get_fov_vertical_deg", &ps::CameraParameters::getFoVVerticalDegrees)
+   .def("get_aspect", &ps::CameraParameters::getAspectRatioWidthOverHeight)
+  ;
   
   // === Enums
   
@@ -330,6 +363,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   bind_point_cloud(m);
   bind_curve_network(m);
   bind_volume_mesh(m);
+  bind_camera_view(m);
   bind_floating_quantities(m);
   bind_imgui(m);
 

@@ -85,13 +85,6 @@ void bind_surface_mesh(py::module& m) {
       .def("set_back_face_color", &ps::SurfaceMesh::setBackFaceColor, "Set back face color")
       .def("get_back_face_color", &ps::SurfaceMesh::getBackFaceColor, "Get back face color")
 
-      // slice planes
-      .def("set_ignore_slice_plane", &ps::SurfaceMesh::setIgnoreSlicePlane, "Set ignore slice plane")
-      .def("get_ignore_slice_plane", &ps::SurfaceMesh::getIgnoreSlicePlane, "Get ignore slice plane")
-      .def("set_cull_whole_elements", &ps::SurfaceMesh::setCullWholeElements, "Set cull whole elements")
-      .def("get_cull_whole_elements", &ps::SurfaceMesh::getCullWholeElements, "Get cull whole elements")
-
-
       // permutations & bases
       .def("set_edge_permutation", &ps::SurfaceMesh::setEdgePermutation<Eigen::VectorXi>, "Set edge permutation")
       .def("set_halfedge_permutation", &ps::SurfaceMesh::setHalfedgePermutation<Eigen::VectorXi>,

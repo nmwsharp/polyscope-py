@@ -13,6 +13,10 @@
 namespace py = pybind11;
 namespace ps = polyscope;
 
+// For overloaded functions, with C++11 compiler only
+template <typename... Args>
+using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
+
 // Some conversion helpers
 template <typename T, int m, int n>
 inline glm::mat<m, n, T> eigen2glm(const Eigen::Matrix<T, m, n>& mat_eigen) {
@@ -64,6 +68,12 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("set_transparency", &StructureT::setTransparency, "Set transparency alpha")
       .def("get_transparency", &StructureT::getTransparency, "Get transparency alpha")
 
+      // slice plane things
+      .def("set_ignore_slice_plane", &StructureT::setIgnoreSlicePlane, "Set ignore slice plane")
+      .def("get_ignore_slice_plane", &StructureT::getIgnoreSlicePlane, "Get ignore slice plane")
+      .def("set_cull_whole_elements", &StructureT::setCullWholeElements, "Set cull whole elements")
+      .def("get_cull_whole_elements", &StructureT::getCullWholeElements, "Get cull whole elememts")
+    
       // quantites
       .def("remove_all_quantities", &StructureT::removeAllQuantities, "Remove all quantities")
       .def("remove_quantity", &StructureT::removeQuantity, py::arg("name"), py::arg("errorIfAbsent") = false,
