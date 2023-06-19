@@ -257,18 +257,18 @@ class CameraIntrinsics:
 
     def __init__(self, fov_vertical_deg=None, fov_horizontal_deg=None, aspect=None):
 
-        if fov_vertical_deg is not None and fov_aspect is not None:
-            self.instance = psb.CameraIntrinsics.fromFoVDegVerticalAndAspect(float(fov_vertical_deg), float(aspect))
-        elif fov_horizontal_deg is not None and fov_aspect is not None:
-            self.instance = psb.CameraIntrinsics.fromFoVDegHorizontalAndAspect(float(fov_horizontal_deg), float(aspect))
+        if fov_vertical_deg is not None and aspect is not None:
+            self.instance = psb.CameraIntrinsics.from_FoV_deg_vertical_and_aspect(float(fov_vertical_deg), float(aspect))
+        elif fov_horizontal_deg is not None and aspect is not None:
+            self.instance = psb.CameraIntrinsics.from_FoV_deg_horizontal_and_aspect(float(fov_horizontal_deg), float(aspect))
         elif fov_vertical_deg is not None and fov_horizontal_deg is not None:
-            self.instance = psb.CameraIntrinsics.fromFoVDegHorizontalAndVertical(float(fov_horizontal_deg), float(fov_vertical_deg))
+            self.instance = psb.CameraIntrinsics.from_FoV_deg_horizontal_and_vertical(float(fov_horizontal_deg), float(fov_vertical_deg))
         else:
             raise ValueError("bad arguments, at least two of (fov_vertical_deg,fov_horizontal_deg,aspect) must be given and non-None")
 
 class CameraExtrinsics:
 
-    def __init__(self,  mat=None):
+    def __init__(self, root=None, look_dir=None, up_dir=None, mat=None):
 
         if mat is not None:
             mat = np.array(mat)

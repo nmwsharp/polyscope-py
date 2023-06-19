@@ -38,7 +38,7 @@ void bind_camera_view(py::module& m) {
 
 
   // Static adders and getters
-  m.def("register_camera_view_vec", &ps::registerCameraView,
+  m.def("register_camera_view", &ps::registerCameraView,
       py::arg("name"), py::arg("parameters"), "Register a camera view", py::return_value_policy::reference);
   m.def("remove_camera_view", &ps::removeCameraView, "Remove a camera view by name");
   m.def("get_camera_view", &ps::getCameraView, "Get a camera view by name", py::return_value_policy::reference);

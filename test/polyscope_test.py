@@ -1519,6 +1519,91 @@ class TestVolumeMesh(unittest.TestCase):
         
         ps.remove_all_structures()
 
+class TestCameraView(unittest.TestCase):
+
+    def generate_parameters(self):
+        intrinsics = ps.CameraIntrinsics(fov_vertical_deg=60, aspect=2)
+        extrinsics = ps.CameraExtrinsics(root=(2., 2., 2.), look_dir=(-1., -1.,-1.), up_dir=(0.,1.,0.))
+        return ps.CameraParameters(intrinsics, extrinsics)
+    
+    def test_add_remove(self):
+
+        # add
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        self.assertTrue(ps.has_camera_view("cam1"))
+        self.assertFalse(ps.has_camera_view("nope"))
+      
+        # remove by name
+        ps.register_camera_view("cam2", self.generate_parameters())
+        ps.remove_camera_view("cam2")
+        self.assertTrue(ps.has_camera_view("cam1"))
+        self.assertFalse(ps.has_camera_view("cam2"))
+
+        # remove by ref
+        c = ps.register_camera_view("cam3", self.generate_parameters())
+        c.remove()
+        self.assertTrue(ps.has_camera_view("cam1"))
+        self.assertFalse(ps.has_camera_view("cam3"))
+
+        # get by name
+        ps.register_camera_view("cam3", self.generate_parameters())
+        p = ps.get_camera_view("cam3") # should be wrapped instance, not underlying PSB instance
+        self.assertTrue(isinstance(p, ps.CameraView))
+
+        ps.remove_all_structures()
+    
+    def test_render(self):
+
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        ps.show(3)
+        ps.remove_all_structures()
+   
+    def test_transform(self):
+
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        test_transforms(self, cam)
+        ps.remove_all_structures()
+
+    def test_options(self):
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        
+        # widget color
+        color = (0.3, 0.3, 0.5)
+        cam.set_widget_color(color)
+        ret_color = cam.get_widget_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+
+        # widget thickness
+        cam.set_widget_thickness(0.03)
+        self.assertAlmostEqual(0.03, cam.get_widget_thickness())
+        
+        # widget focal length
+        cam.set_widget_focal_length(0.03, False)
+        self.assertAlmostEqual(0.03, cam.get_widget_focal_length())
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_update(self):
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        cam.update_camera_parameters(self.generate_parameters())
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_camera_things(self):
+
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        cam.set_view_to_this_camera()
+        ps.show(3)
+        cam.set_view_to_this_camera(with_flight=True)
+        ps.show(3)
+        
+        ps.remove_all_structures()
+
 if __name__ == '__main__':
 
     # Parse out test-specific args (this is kinda poor design, but very useful)
