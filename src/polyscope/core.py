@@ -555,3 +555,26 @@ def point_render_mode_to_str(val):
 
     raise ValueError("Bad point render mode specifier '{}', should be one of [{}]".format(val, 
         ",".join(["'{}'".format(x) for x in d_point_render_mode.values()])))
+
+# Image origin to/from string
+d_image_origin = {
+        "lower_left" : psb.ImageOrigin.lower_left,
+        "upper_left" : psb.ImageOrigin.upper_left,
+    }
+
+def str_to_image_origin(s):
+
+    if s not in d_image_origin:
+        raise ValueError("Bad image origin specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_image_origin.keys()])))
+
+    return d_image_origin[s]
+
+def image_origin_to_str(val):
+
+    for k,v in d_image_origin.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad image origin specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_image_origin.values()])))

@@ -1603,6 +1603,20 @@ class TestCameraView(unittest.TestCase):
         ps.show(3)
         
         ps.remove_all_structures()
+    
+    def test_floating_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        cam.add_scalar_image_quantity("scalar_img", dimX, dimY, np.zeros((dimX, dimY)))
+        cam.add_scalar_image_quantity("scalar_img2", dimX, dimY, np.zeros((dimX, dimY)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds')
+
+        ps.show(3)
 
 if __name__ == '__main__':
 

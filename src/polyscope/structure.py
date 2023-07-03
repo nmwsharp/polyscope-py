@@ -1,5 +1,8 @@
 import polyscope_bindings as psb
 
+from polyscope.common import check_is_scalar_image, check_is_color_image, check_is_coloralpha_image, process_scalar_args, process_color_args
+from polyscope.core import image_origin_to_str, str_to_image_origin, str_to_datatype
+
 # Base class for common properties and methods on structures
 class Structure:
 
@@ -71,3 +74,21 @@ class Structure:
             return self.bound_instance.get_ignore_slice_plane(plane)
         else:
             return self.bound_instance.get_ignore_slice_plane(plane.get_name())
+
+
+    ## Image Floating Quantities
+
+    def add_scalar_image_quantity(self, name, dimX, dimY, values, image_origin="upper_left", datatype="standard", **scalar_args):
+
+        dimX = int(dimX)
+        dimY = int(dimY)
+        check_is_scalar_image(values, dimX, dimY)
+
+        values_flat = values.reshape(dimX*dimY)
+
+        q = self.bound_instance.add_scalar_image_quantity(name, dimX, dimY, values_flat, 
+                                                    str_to_image_origin(image_origin), str_to_datatype(datatype))
+
+        process_scalar_args(self, q, scalar_args)
+
+

@@ -3,6 +3,18 @@ import polyscope_bindings as psb
 from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str, str_to_param_viz_style
 
 
+def check_is_scalar_image(values, dimX, dimY):
+    if len(values.shape) != 2 or values.shape[0] != dimX or values.shape[1] != dimY: 
+        raise ValueError(f"'values' should be a ({dimX},{dimY}) array")
+
+def check_is_color_image(values, dimX, dimY):
+    if len(values.shape) != 3 or values.shape[0] != dimX or values.shape[1] != dimY or values.shape[2] != 3: 
+        raise ValueError(f"'values' should be a ({dimX},{dimY},3) array")
+
+def check_is_coloralpha_image(values, dimX, dimY):
+    if len(values.shape) != 3 or values.shape[0] != dimX or values.shape[1] != dimY or values.shape[2] != 4: 
+        raise ValueError(f"'values' should be a ({dimX},{dimY},4) array")
+
 def process_color_args(structure, quantity, color_args):
 
     for arg,val in color_args.items():

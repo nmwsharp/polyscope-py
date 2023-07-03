@@ -17,6 +17,8 @@
 #include "polyscope/view.h"
 #include "polyscope/volume_mesh.h"
 
+#include "utils.h"
+
 namespace py = pybind11;
 namespace ps = polyscope;
 
@@ -359,12 +361,12 @@ PYBIND11_MODULE(polyscope_bindings, m) {
         });
 
   // === Bind structures defined in other files
+  bind_floating_quantities(m);
   bind_surface_mesh(m);
   bind_point_cloud(m);
   bind_curve_network(m);
   bind_volume_mesh(m);
   bind_camera_view(m);
-  bind_floating_quantities(m);
   bind_imgui(m);
 
 }
