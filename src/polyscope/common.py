@@ -5,15 +5,15 @@ from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_poin
 
 def check_is_scalar_image(values, dimX, dimY):
     if len(values.shape) != 2 or values.shape[0] != dimX or values.shape[1] != dimY: 
-        raise ValueError(f"'values' should be a ({dimX},{dimY}) array")
+        raise ValueError(f"'values' should be a ({dimX},{dimY}) array. Shape is {values.shape}.")
 
 def check_is_color_image(values, dimX, dimY):
     if len(values.shape) != 3 or values.shape[0] != dimX or values.shape[1] != dimY or values.shape[2] != 3: 
-        raise ValueError(f"'values' should be a ({dimX},{dimY},3) array")
+        raise ValueError(f"'values' should be a ({dimX},{dimY},3) array. Shape is {values.shape}.")
 
 def check_is_coloralpha_image(values, dimX, dimY):
     if len(values.shape) != 3 or values.shape[0] != dimX or values.shape[1] != dimY or values.shape[2] != 4: 
-        raise ValueError(f"'values' should be a ({dimX},{dimY},4) array")
+        raise ValueError(f"'values' should be a ({dimX},{dimY},4) array. Shape is {values.shape}.")
 
 def process_color_args(structure, quantity, color_args):
 

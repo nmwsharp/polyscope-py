@@ -79,16 +79,34 @@ class Structure:
     ## Image Floating Quantities
 
     def add_scalar_image_quantity(self, name, dimX, dimY, values, image_origin="upper_left", datatype="standard", **scalar_args):
+        """
+        Add a "floating" image quantity to the structure
+        """
 
-        dimX = int(dimX)
-        dimY = int(dimY)
-        check_is_scalar_image(values, dimX, dimY)
+        # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
+        return add_scalar_image_quantity(name, dimX, dimY, values, image_origin="upper_left", datatype="standard", struct_ref=self, **scalar_args)
 
-        values_flat = values.reshape(dimX*dimY)
 
-        q = self.bound_instance.add_scalar_image_quantity(name, dimX, dimY, values_flat, 
-                                                    str_to_image_origin(image_origin), str_to_datatype(datatype))
 
-        process_scalar_args(self, q, scalar_args)
+def _resolve_floating_struct_instance(struct_ref):
+    if struct_ref is None:
+        return psb.get_global_floating_quantity_structure()
+    else:
+        return struct_ref.bound_instance
 
+  
+def add_scalar_image_quantity(name, dimX, dimY, values, image_origin, datatype, struct_ref=None, **scalar_args):
+    
+    struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
+
+    dimX = int(dimX)
+    dimY = int(dimY)
+    check_is_scalar_image(values, dimX, dimY)
+
+    values_flat = values.reshape(dimX*dimY)
+        
+    q = struct_instance_ref.add_scalar_image_quantity(name, dimX, dimY, values_flat,              
+                                             str_to_image_origin(image_origin), str_to_datatype(datatype))
+
+    process_scalar_args(struct_ref, q, scalar_args)
 

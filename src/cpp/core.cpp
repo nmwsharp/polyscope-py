@@ -133,6 +133,11 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_view_projection_mode", [](ps::ProjectionMode x) { ps::view::projectionMode = x; });
   m.def("get_view_camera_parameters", &ps::view::getCameraParametersForCurrentView);
   m.def("set_view_camera_parameters", &ps::view::setViewToCamera);
+  m.def("set_window_size", &ps::view::setWindowSize);
+  m.def("get_window_size", &ps::view::getWindowSize);
+  m.def("get_buffer_size", &ps::view::getBufferSize);
+  m.def("set_window_resizable", &ps::view::setWindowResizable);
+  m.def("get_window_resizable", &ps::view::getWindowResizable);
   m.def("set_view_from_json", ps::view::setViewFromJson);
   m.def("get_view_as_json", ps::view::getViewAsJson);
   
@@ -362,9 +367,9 @@ PYBIND11_MODULE(polyscope_bindings, m) {
 
   // === Bind structures defined in other files
   bind_floating_quantities(m);
-  bind_surface_mesh(m);
   bind_point_cloud(m);
   bind_curve_network(m);
+  bind_surface_mesh(m);
   bind_volume_mesh(m);
   bind_camera_view(m);
   bind_imgui(m);

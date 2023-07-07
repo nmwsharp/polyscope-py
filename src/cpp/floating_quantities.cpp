@@ -23,7 +23,11 @@ using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
 void bind_floating_quantities(py::module& m) {
 
   // == Global floating quantity management
-  
+
+  // global floating quantity structure
+  bindStructure<ps::FloatingQuantityStructure >(m, "FloatingQuantityStructure");
+  m.def("get_global_floating_quantity_structure", &ps::getGlobalFloatingQuantityStructure, py::return_value_policy::reference);
+
   m.def("remove_floating_quantity", &ps::removeFloatingQuantity);
   m.def("remove_all_floating_quantities", &ps::removeAllFloatingQuantities);
 

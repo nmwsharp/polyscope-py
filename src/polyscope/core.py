@@ -135,8 +135,25 @@ def look_at_dir(camera_location, target, up_dir, fly_to=False):
 def set_view_projection_mode(s):
     psb.set_view_projection_mode(str_to_projection_mode(s))
 
-def set_view_from_json(s, fly_to=False):
-    psb.set_view_from_json(s, fly_to)
+def set_window_size(width, height):
+    width = int(width)
+    height = int(height)
+    psb.set_window_size(width, height)
+
+def get_window_size():
+    return psb.get_window_size()
+
+def get_buffer_size():
+    return psb.get_buffer_size()
+
+def set_window_resizable(is_resizable):
+    psb.set_window_resizable(is_resizable)
+
+def get_window_resizable():
+    return psb.get_window_resizable()
+
+def set_view_from_json(json_str, fly_to=False):
+    psb.set_view_from_json(json_str, fly_to)
 
 def get_view_as_json():
     return psb.get_view_as_json()
@@ -146,7 +163,10 @@ def get_view_camera_parameters():
 
 def set_view_camera_parameters(params):
     if not isinstance(params, CameraParameters): raise ValueError("must pass CameraParameters")
-    return set_view_camera_parameters(params.instance)
+    set_view_camera_parameters(params.instance)
+
+def get_view_buffer_resolution():
+    return CameraParameters(instance=psb.get_view_camera_parameters())
 
 ### Messages
 

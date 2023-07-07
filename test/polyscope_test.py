@@ -100,6 +100,15 @@ class TestCore(unittest.TestCase):
         
         ps.set_view_projection_mode("orthographic")
         ps.set_view_projection_mode("perspective")
+
+        ps.set_window_size(800, 600)
+        self.assertEqual(ps.get_window_size(), (800,600))
+
+        tup = ps.get_buffer_size()
+        w, h = int(tup[0]), int(tup[1])
+
+        ps.set_window_resizable(True)
+        self.assertEqual(ps.get_window_resizable(), True)
         
         ps.show(3)
     
