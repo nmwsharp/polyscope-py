@@ -22,6 +22,7 @@ void bind_camera_view(py::module& m) {
   bindStructure<ps::CameraView>(m, "CameraView")
 
     // basics
+    .def("get_camera_parameters", &ps::CameraView::getCameraParameters, "Get camera parameters")
     .def("update_camera_parameters", &ps::CameraView::updateCameraParameters, "Update camera parameters")
 
     // options

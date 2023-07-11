@@ -1,10 +1,7 @@
 import polyscope_bindings as psb
 
-from polyscope.core import glm3, radians, degrees
+from polyscope.core import glm3, CameraParameters
 from polyscope.structure import Structure
-from polyscope.common import process_color_args, process_scalar_args, process_vector_args
-
-from math import tan, atan
 
 import numpy as np
 
@@ -36,8 +33,8 @@ class CameraView(Structure):
     def set_view_to_this_camera(self, with_flight=False):
         self.bound_instance.set_view_to_this_camera(with_flight)
     
-    def get_parameters(self):
-        return CameraParameters(instance=self.bound_instance.get_parameters())
+    def get_camera_parameters(self):
+        return CameraParameters(instance=self.bound_instance.get_camera_parameters())
 
     ## Options
     

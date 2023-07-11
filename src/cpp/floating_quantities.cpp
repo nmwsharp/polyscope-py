@@ -33,8 +33,11 @@ void bind_floating_quantities(py::module& m) {
 
   // == Image floating quantities
   
-  bindScalarQuantity<ps::ScalarImageQuantity>(m, "ScalarImageQuantity");
-  bindColorQuantity<ps::ColorImageQuantity>(m, "ColorImageQuantity");
+  auto qScalarImage = bindScalarQuantity<ps::ScalarImageQuantity>(m, "ScalarImageQuantity");
+  addImageQuantityBindings(qScalarImage);
+
+  auto qColorImage = bindColorQuantity<ps::ColorImageQuantity>(m, "ColorImageQuantity");
+  addImageQuantityBindings(qColorImage);
 
   m.def("add_scalar_image_quantity", &ps::addScalarImageQuantity<Eigen::VectorXd>);
   m.def("add_color_image_quantity", &ps::addColorImageQuantity<Eigen::MatrixXd>);
@@ -42,9 +45,14 @@ void bind_floating_quantities(py::module& m) {
 
   // == Render image floating quantities
  
-  bindQuantity<ps::DepthRenderImageQuantity>(m, "DepthRenderImageQuantity");
-  bindScalarQuantity<ps::ScalarRenderImageQuantity>(m, "ScalarRenderImageQuantity");
-  bindColorQuantity<ps::ColorRenderImageQuantity>(m, "ColorRenderImageQuantity");
+  auto qDepthRenderImage = bindQuantity<ps::DepthRenderImageQuantity>(m, "DepthRenderImageQuantity"); 
+  // addImageQuantityBindings(qDepthRenderImage); // TODO need to make render images inherit from image quantity base
+
+  auto qScalarRenderImage = bindScalarQuantity<ps::ScalarRenderImageQuantity>(m, "ScalarRenderImageQuantity");
+  // addImageQuantityBindings(qScalarRenderImage);
+
+  auto qColorRenderImage = bindColorQuantity<ps::ColorRenderImageQuantity>(m, "ColorRenderImageQuantity");
+  // addImageQuantityBindings(qColorRenderImage);
   
   m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>);
   m.def("add_color_render_image_quantity", &ps::addColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd>);

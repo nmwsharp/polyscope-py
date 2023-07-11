@@ -275,9 +275,11 @@ def remove_last_scene_slice_plane():
 
 class CameraIntrinsics:
 
-    def __init__(self, fov_vertical_deg=None, fov_horizontal_deg=None, aspect=None):
+    def __init__(self, fov_vertical_deg=None, fov_horizontal_deg=None, aspect=None, instance=None):
 
-        if fov_vertical_deg is not None and aspect is not None:
+        if instance is not None:
+            self.instance = instance
+        elif fov_vertical_deg is not None and aspect is not None:
             self.instance = psb.CameraIntrinsics.from_FoV_deg_vertical_and_aspect(float(fov_vertical_deg), float(aspect))
         elif fov_horizontal_deg is not None and aspect is not None:
             self.instance = psb.CameraIntrinsics.from_FoV_deg_horizontal_and_aspect(float(fov_horizontal_deg), float(aspect))
@@ -288,24 +290,27 @@ class CameraIntrinsics:
 
 class CameraExtrinsics:
 
-    def __init__(self, root=None, look_dir=None, up_dir=None, mat=None):
+    def __init__(self, root=None, look_dir=None, up_dir=None, mat=None, instance=None):
+        
+        if instance is not None:
+            self.instance = instance
 
-        if mat is not None:
-            mat = np.array(mat)
+        elif mat is not None:
+            mat = np.asarray(mat)
             if mat.shape != (4,4): raise ValueError("mat should be a 4x4 numpy matrix")
-            self.instance = psb.CameraExtrinsics.fromMatrix(mat)
+            self.instance = psb.CameraExtrinsics.from_matrix(mat)
 
         elif (root is not None) and (look_dir is not None) and (up_dir is not None):
 
-            root = glm3(root)
-            look_dir = glm3(look_dir)
-            up_dir = glm3(up_dir)
+            root = np.asarray(root)
+            look_dir = np.asarray(look_dir)
+            up_dir = np.asarray(up_dir)
             self.instance = psb.CameraExtrinsics.from_vectors(root, look_dir, up_dir)
         
         else:
             raise ValueError("bad arguments, must pass non-None (root,look_dir,up_dir) or non-None mat")
 
-
+# TODO still needs tests
 class CameraParameters:
 
     def __init__(self, intrinsics=None, extrinsics=None, instance=None):
@@ -315,9 +320,11 @@ class CameraParameters:
             self.instance = psb.CameraParameters(intrinsics.instance, extrinsics.instance)
 
     # getters
+    def get_intrinsics(self): return CameraIntrinsics(instance=self.instance.get_intrinsics())
+    def get_extrinsics(self): return CameraExtrinsics(instance=self.instance.get_extrinsics())
     def get_T(self): return self.instance.get_T()
     def get_R(self): return self.instance.get_R()
-    def get_view_mat(self): return self.instance.get_view_mat()
+    def get_view_mat(self): return self.instance.get_view_mat() # same as get_E()
     def get_E(self): return self.instance.get_E()
     def get_position(self): return self.instance.get_position()
     def get_look_dir(self): return self.instance.get_look_dir()

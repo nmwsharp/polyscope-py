@@ -147,3 +147,22 @@ py::class_<VectorQ> bindVectorQuantity(py::module& m, std::string name) {
       .def("set_radius", &VectorQ::setVectorRadius, "Set radius")
       .def("set_color", &VectorQ::setVectorColor, "Set color");
 }
+
+// Add common image options
+// Note: unlike the others above, this adds methods to an existing quantity rather than binding a new one.
+template <typename ImageQ>
+void addImageQuantityBindings(py::class_<ImageQ>& imageQ) {
+
+  imageQ.def("set_show_fullscreen", &ImageQ::setShowFullscreen);
+  imageQ.def("get_show_fullscreen", &ImageQ::getShowFullscreen);
+
+  imageQ.def("set_show_in_imgui_window", &ImageQ::setShowInImGuiWindow);
+  imageQ.def("get_show_in_imgui_window", &ImageQ::getShowInImGuiWindow);
+  
+  imageQ.def("set_show_in_camera_billboard", &ImageQ::setShowInCameraBillboard);
+  imageQ.def("get_show_in_camera_billboard", &ImageQ::getShowInCameraBillboard);
+  
+  imageQ.def("set_transparency", &ImageQ::setTransparency);
+  imageQ.def("get_transparency", &ImageQ::getTransparency);
+
+}

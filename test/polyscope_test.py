@@ -22,6 +22,10 @@ import polyscope.imgui as psim
 # Path to test assets
 assets_prefix = path.join(path.dirname(__file__), "assets/")
 
+def assertArrayWithShape(self, arr, shape):
+    self.assertTrue(isinstance(arr, np.ndarray))
+    self.assertEqual(tuple(arr.shape), tuple(shape))
+
 class TestCore(unittest.TestCase):
 
 
@@ -1612,8 +1616,31 @@ class TestCameraView(unittest.TestCase):
         ps.show(3)
         
         ps.remove_all_structures()
+
+    def test_camera_parameters(self):
+
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        params = cam.get_camera_parameters() 
+
+        self.assertTrue(isinstance(params.get_intrinsics(), ps.CameraIntrinsics))
+        self.assertTrue(isinstance(params.get_extrinsics(), ps.CameraExtrinsics))
+
+        assertArrayWithShape(self, params.get_R(), [3,3])
+        assertArrayWithShape(self, params.get_T(), [3])
+        assertArrayWithShape(self, params.get_view_mat(), [4,4])
+        assertArrayWithShape(self, params.get_E(), [4,4])
+        assertArrayWithShape(self, params.get_position(), [3])
+        assertArrayWithShape(self, params.get_look_dir(), [3])
+        assertArrayWithShape(self, params.get_up_dir(), [3])
+        assertArrayWithShape(self, params.get_right_dir(), [3])
+        assertArrayWithShape(self, params.get_camera_frame()[0], [3])
+        assertArrayWithShape(self, params.get_camera_frame()[1], [3])
+        assertArrayWithShape(self, params.get_camera_frame()[2], [3])
+
+        self.assertTrue(isinstance(params.get_fov_vertical_deg(), float))
+        self.assertTrue(isinstance(params.get_aspect(), float))
     
-    def test_floating_images(self):
+    def test_floating_scalar_images(self):
 
         # technically these can be added to any structure, but we will test them here
         
@@ -1622,10 +1649,47 @@ class TestCameraView(unittest.TestCase):
         dimX = 300
         dimY = 600
 
-        cam.add_scalar_image_quantity("scalar_img", dimX, dimY, np.zeros((dimX, dimY)))
-        cam.add_scalar_image_quantity("scalar_img2", dimX, dimY, np.zeros((dimX, dimY)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds')
+        cam.add_scalar_image_quantity("scalar_img", np.zeros((dimX, dimY)))
+        cam.add_scalar_image_quantity("scalar_img2", np.zeros((dimX, dimY)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds', show_in_camera_billboard=True)
+        cam.add_scalar_image_quantity("scalar_img3", np.zeros((dimX, dimY)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+        cam.add_scalar_image_quantity("scalar_img4", np.zeros((dimX, dimY)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_color_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        cam.add_color_image_quantity("color_img", np.zeros((dimX, dimY, 3)))
+        cam.add_color_image_quantity("color_img2", np.zeros((dimX, dimY, 3)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
+        cam.add_color_image_quantity("color_img3", np.zeros((dimX, dimY, 3)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+        cam.add_color_image_quantity("color_img4", np.zeros((dimX, dimY, 3)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
 
         ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_color_alpha_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        cam.add_color_alpha_image_quantity("color_alpha_img", np.zeros((dimX, dimY, 4)))
+        cam.add_color_alpha_image_quantity("color_alpha_img2", np.zeros((dimX, dimY, 4)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
+        cam.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimX, dimY, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+        cam.add_color_alpha_image_quantity("color_alpha_img4", np.zeros((dimX, dimY, 4)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False)
+
+        ps.show(3)
+        ps.remove_all_structures()
 
 if __name__ == '__main__':
 

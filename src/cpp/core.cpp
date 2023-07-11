@@ -241,24 +241,29 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   ;
   py::class_<ps::CameraExtrinsics>(m, "CameraExtrinsics")
    .def(py::init<>())
-   .def_static("from_vectors", &ps::CameraExtrinsics::fromVectors<glm::vec3,glm::vec3,glm::vec3>)
-   .def_static("from_matrix", &ps::CameraExtrinsics::fromMatrix)
+   .def_static("from_vectors", &ps::CameraExtrinsics::fromVectors<Eigen::Vector3f,Eigen::Vector3f,Eigen::Vector3f>)
+   .def_static("from_matrix", [](Eigen::Matrix4f mat) { return ps::CameraExtrinsics::fromMatrix(eigen2glm(mat)); })
   ;
   py::class_<ps::CameraParameters>(m, "CameraParameters")
    .def(py::init<ps::CameraIntrinsics, ps::CameraExtrinsics>())
-   .def("get_T", &ps::CameraParameters::getT)
-   .def("get_R", &ps::CameraParameters::getR)
-   .def("get_view_mat", &ps::CameraParameters::getViewMat)
-   .def("get_E", &ps::CameraParameters::getE)
-   .def("get_position", &ps::CameraParameters::getPosition)
-   .def("get_look_dir", &ps::CameraParameters::getLookDir)
-   .def("get_up_dir", &ps::CameraParameters::getUpDir)
-   .def("get_right_dir", &ps::CameraParameters::getRightDir)
-   .def("get_camera_frame", &ps::CameraParameters::getCameraFrame)
+   .def("get_intrinsics", [](ps::CameraParameters& c) { return c.intrinsics; })
+   .def("get_extrinsics", [](ps::CameraParameters& c) { return c.extrinsics; })
+   .def("get_T", [](ps::CameraParameters& c) { return glm2eigen(c.getT()); })
+   .def("get_R", [](ps::CameraParameters& c) { return glm2eigen(c.getR()); })
+   .def("get_view_mat", [](ps::CameraParameters& c) { return glm2eigen(c.getViewMat()); })
+   .def("get_E", [](ps::CameraParameters& c) { return glm2eigen(c.getE()); })
+   .def("get_position", [](ps::CameraParameters& c) { return glm2eigen(c.getPosition()); })
+   .def("get_look_dir", [](ps::CameraParameters& c) { return glm2eigen(c.getLookDir()); })
+   .def("get_up_dir", [](ps::CameraParameters& c) { return glm2eigen(c.getUpDir()); })
+   .def("get_right_dir", [](ps::CameraParameters& c) { return glm2eigen(c.getRightDir()); })
+   .def("get_camera_frame", [](ps::CameraParameters& c) { 
+       return std::make_tuple(glm2eigen(c.getLookDir()), glm2eigen(c.getUpDir()), glm2eigen(c.getRightDir()));
+    })
    .def("get_fov_vertical_deg", &ps::CameraParameters::getFoVVerticalDegrees)
    .def("get_aspect", &ps::CameraParameters::getAspectRatioWidthOverHeight)
   ;
-  
+  // TODO test 
+
   // === Enums
   
   py::enum_<ps::view::NavigateStyle>(m, "NavigateStyle")
@@ -364,6 +369,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
         [](const glm::vec4& x) {
         return std::tuple<float, float, float, float>(x[0], x[1], x[2], x[3]);
         });
+
 
   // === Bind structures defined in other files
   bind_floating_quantities(m);

@@ -1,6 +1,6 @@
 import polyscope_bindings as psb
 
-from polyscope.common import check_is_scalar_image, check_is_color_image, check_is_coloralpha_image, process_scalar_args, process_color_args
+from polyscope.common import check_is_scalar_image, check_is_color_image, check_is_color_alpha_image, process_scalar_args, process_color_args, process_image_args, process_quantity_args, check_all_args_processed
 from polyscope.core import image_origin_to_str, str_to_image_origin, str_to_datatype
 
 # Base class for common properties and methods on structures
@@ -78,13 +78,29 @@ class Structure:
 
     ## Image Floating Quantities
 
-    def add_scalar_image_quantity(self, name, dimX, dimY, values, image_origin="upper_left", datatype="standard", **scalar_args):
+    def add_scalar_image_quantity(self, name, values, image_origin="upper_left", datatype="standard", **option_args):
         """
         Add a "floating" image quantity to the structure
         """
 
         # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
-        return add_scalar_image_quantity(name, dimX, dimY, values, image_origin="upper_left", datatype="standard", struct_ref=self, **scalar_args)
+        return add_scalar_image_quantity(name, values, image_origin="upper_left", datatype="standard", struct_ref=self, **option_args)
+    
+    def add_color_image_quantity(self, name, values, image_origin="upper_left", **option_args):
+        """
+        Add a "floating" image quantity to the structure
+        """
+
+        # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
+        return add_color_image_quantity(name, values, image_origin="upper_left", struct_ref=self, **option_args)
+
+    def add_color_alpha_image_quantity(self, name, values, image_origin="upper_left", **option_args):
+        """
+        Add a "floating" image quantity to the structure
+        """
+
+        # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
+        return add_color_alpha_image_quantity(name, values, image_origin="upper_left", struct_ref=self, **option_args)
 
 
 
@@ -95,18 +111,64 @@ def _resolve_floating_struct_instance(struct_ref):
         return struct_ref.bound_instance
 
   
-def add_scalar_image_quantity(name, dimX, dimY, values, image_origin, datatype, struct_ref=None, **scalar_args):
+def add_scalar_image_quantity(name, values, image_origin="upper_left", datatype="standard", struct_ref=None, **option_args):
     
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
-    dimX = int(dimX)
-    dimY = int(dimY)
-    check_is_scalar_image(values, dimX, dimY)
+    check_is_scalar_image(values)
+    dimY = values.shape[0]
+    dimX = values.shape[1]
 
-    values_flat = values.reshape(dimX*dimY)
+    values_flat = values.flatten()
         
     q = struct_instance_ref.add_scalar_image_quantity(name, dimX, dimY, values_flat,              
                                              str_to_image_origin(image_origin), str_to_datatype(datatype))
 
-    process_scalar_args(struct_ref, q, scalar_args)
+    # process and act on additional arguments
+    # note: each step modifies the option_args dict and removes processed args
+    process_quantity_args(struct_ref, q, option_args)
+    process_image_args(struct_ref, q, option_args)
+    process_scalar_args(struct_ref, q, option_args)
+    check_all_args_processed(struct_ref, q, option_args)
+
+def add_color_image_quantity(name, values, image_origin="upper_left", struct_ref=None, **option_args):
+    
+    struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
+
+    check_is_color_image(values)
+    dimY = values.shape[0]
+    dimX = values.shape[1]
+
+    values_flat = values.reshape(-1,3)
+        
+    q = struct_instance_ref.add_color_image_quantity(name, dimX, dimY, values_flat,              
+                                             str_to_image_origin(image_origin))
+
+    # process and act on additional arguments
+    # note: each step modifies the option_args dict and removes processed args
+    process_quantity_args(struct_ref, q, option_args)
+    process_image_args(struct_ref, q, option_args)
+    process_color_args(struct_ref, q, option_args)
+    check_all_args_processed(struct_ref, q, option_args)
+
+
+def add_color_alpha_image_quantity(name, values, image_origin="upper_left", struct_ref=None, **option_args):
+    
+    struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
+
+    check_is_color_alpha_image(values)
+    dimY = values.shape[0]
+    dimX = values.shape[1]
+
+    values_flat = values.reshape(-1,4)
+        
+    q = struct_instance_ref.add_color_alpha_image_quantity(name, dimX, dimY, values_flat,              
+                                             str_to_image_origin(image_origin))
+
+    # process and act on additional arguments
+    # note: each step modifies the option_args dict and removes processed args
+    process_quantity_args(struct_ref, q, option_args)
+    process_image_args(struct_ref, q, option_args)
+    process_color_args(struct_ref, q, option_args)
+    check_all_args_processed(struct_ref, q, option_args)
 
