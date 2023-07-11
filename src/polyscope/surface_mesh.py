@@ -5,7 +5,7 @@ from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coor
                            str_to_param_viz_style, str_to_back_face_policy, back_face_policy_to_str,\
                            glm3
 from polyscope.structure import Structure
-from polyscope.common import process_color_args, process_scalar_args, process_vector_args, process_parameterization_args
+from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, process_parameterization_args, check_all_args_processed
 
 class SurfaceMesh(Structure):
 
@@ -175,7 +175,11 @@ class SurfaceMesh(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces', 'edges', 'halfedges']".format(defined_on))
             
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, scalar_args)
         process_scalar_args(self, q, scalar_args)
+        check_all_args_processed(self, q, scalar_args)
 
     
     # Color
@@ -192,10 +196,15 @@ class SurfaceMesh(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, color_args)
         process_color_args(self, q, color_args)
+        check_all_args_processed(self, q, color_args)
     
     
     # Distance
+    # [deprecated], this is just a special set of options for a scalar quantity now
     def add_distance_quantity(self, name, values, defined_on='vertices', enabled=None, signed=False, vminmax=None, stripe_size=None, stripe_size_relative=True, cmap=None):
 
         if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
@@ -239,7 +248,11 @@ class SurfaceMesh(Structure):
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'corners']".format(defined_on))
             
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, parameterization_args)
         process_parameterization_args(self, q, parameterization_args)
+        check_all_args_processed(self, q, parameterization_args)
     
     
     # Vector
@@ -267,7 +280,11 @@ class SurfaceMesh(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
         
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, vector_args)
         process_vector_args(self, q, vector_args)
+        check_all_args_processed(self, q, vector_args)
     
     
     def add_tangent_vector_quantity(self, name, values, basisX, basisY, n_sym=1, defined_on='vertices', vectortype="standard", **vector_args):
@@ -295,7 +312,11 @@ class SurfaceMesh(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
         
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, vector_args)
         process_vector_args(self, q, vector_args)
+        check_all_args_processed(self, q, vector_args)
     
     
     def add_one_form_vector_quantity(self, name, values, orientations, **vector_args):
@@ -305,7 +326,11 @@ class SurfaceMesh(Structure):
 
         q = self.bound_instance.add_one_form_tangent_vector_quantity(name, values, orientations)
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, vector_args)
         process_vector_args(self, q, vector_args)
+        check_all_args_processed(self, q, vector_args)
 
 
 

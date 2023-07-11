@@ -2,7 +2,7 @@ import polyscope_bindings as psb
 
 from polyscope.core import str_to_datatype, str_to_vectortype, glm3
 from polyscope.structure import Structure
-from polyscope.common import process_color_args, process_scalar_args, process_vector_args, process_parameterization_args
+from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed
 
 class CurveNetwork(Structure):
 
@@ -107,7 +107,11 @@ class CurveNetwork(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
    
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, scalar_args)
         process_scalar_args(self, q, scalar_args)
+        check_all_args_processed(self, q, scalar_args)
     
     
     # Color
@@ -125,7 +129,11 @@ class CurveNetwork(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
 
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, color_args)
         process_color_args(self, q, color_args)
+        check_all_args_processed(self, q, color_args)
     
     
     # Vector
@@ -153,7 +161,11 @@ class CurveNetwork(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
 
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, vector_args)
         process_vector_args(self, q, vector_args)
+        check_all_args_processed(self, q, vector_args)
 
 
 def register_curve_network(name, nodes, edges, enabled=None, radius=None, color=None, material=None, transparency=None):

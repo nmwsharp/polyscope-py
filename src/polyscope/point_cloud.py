@@ -2,7 +2,7 @@ import polyscope_bindings as psb
 
 from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str
 from polyscope.structure import Structure
-from polyscope.common import process_color_args, process_scalar_args, process_vector_args, process_parameterization_args
+from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, process_parameterization_args, check_all_args_processed
 
 class PointCloud(Structure):
 
@@ -92,7 +92,11 @@ class PointCloud(Structure):
             
         q = self.bound_instance.add_scalar_quantity(name, values, str_to_datatype(datatype))
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, scalar_args)
         process_scalar_args(self, q, scalar_args)
+        check_all_args_processed(self, q, scalar_args)
     
     
     # Color
@@ -101,7 +105,11 @@ class PointCloud(Structure):
             
         q = self.bound_instance.add_color_quantity(name, values)
         
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, color_args)
         process_color_args(self, q, color_args)
+        check_all_args_processed(self, q, color_args)
     
     
     # Vector
@@ -113,7 +121,11 @@ class PointCloud(Structure):
         elif values.shape[1] == 3:
             q = self.bound_instance.add_vector_quantity(name, values, str_to_vectortype(vectortype))
         
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, vector_args)
         process_vector_args(self, q, vector_args)
+        check_all_args_processed(self, q, vector_args)
 
 
 def register_point_cloud(name, points, enabled=None, radius=None, point_render_mode=None, color=None, material=None, transparency=None):

@@ -3,7 +3,7 @@ import numpy as np
 
 from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3
 from polyscope.structure import Structure
-from polyscope.common import process_color_args, process_scalar_args, process_vector_args, process_parameterization_args
+from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed
 
 class VolumeMesh(Structure):
 
@@ -131,7 +131,11 @@ class VolumeMesh(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
   
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, scalar_args)
         process_scalar_args(self, q, scalar_args)
+        check_all_args_processed(self, q, scalar_args)
 
     
     
@@ -149,7 +153,11 @@ class VolumeMesh(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
 
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, color_args)
         process_color_args(self, q, color_args)
+        check_all_args_processed(self, q, color_args)
     
     
     # Vector
@@ -167,13 +175,18 @@ class VolumeMesh(Structure):
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
 
 
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, vector_args)
         process_vector_args(self, q, vector_args)
+        check_all_args_processed(self, q, vector_args)
     
     
 
 def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None, enabled=None, color=None, interior_color=None, edge_color=None, edge_width=None, material=None, transparency=None):
 
-    """Register a new surface mesh"""
+    """Register a new volume mesh"""
+
     if not psb.isInitialized():
         raise RuntimeError("Polyscope has not been initialized")
     
