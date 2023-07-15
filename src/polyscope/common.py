@@ -7,13 +7,30 @@ def check_is_scalar_image(values):
     if len(values.shape) != 2:
         raise ValueError(f"'values' should be a (height,width) array. Shape is {values.shape}.")
 
-def check_is_color_image(values):
+def check_is_image3(values):
     if len(values.shape) != 3 or values.shape[2] != 3: 
         raise ValueError(f"'values' should be a (height,width,3) array. Shape is {values.shape}.")
 
-def check_is_color_alpha_image(values):
+def check_is_image4(values):
     if len(values.shape) != 3 or values.shape[2] != 4: 
         raise ValueError(f"'values' should be a (height,width,4) array. Shape is {values.shape}.")
+
+def check_image_dims_compatible(images):
+
+    dimX = None
+    dimY = None
+
+    for img in images:
+
+        if dimX is None:
+            dimX = img.shape[0]
+            dimY = img.shape[1]
+        else:
+            new_dimX = img.shape[0]
+            new_dimY = img.shape[1]
+
+            if (dimX, dimY) != (new_dimX, new_dimY):
+                raise ValueError(f"image inputs must have same resolution. One is {(dimX,dimY)} but another is {(new_dimX, new_dimY)}.")
 
 def check_and_pop_arg(d, argname):
     if argname in d:
@@ -105,6 +122,16 @@ def process_image_args(structure, quantity, image_args):
     if val is not None:
         quantity.set_transparency(val)
 
+# Process args, removing them from the dict if they are present
+def process_render_image_args(structure, quantity, image_args):
+
+    val = check_and_pop_arg(image_args, 'transparency')
+    if val is not None:
+        quantity.set_transparency(val)
+    
+    val = check_and_pop_arg(image_args, 'material')
+    if val is not None:
+        quantity.set_material(val)
     
 
 def check_all_args_processed(structure, quantity, args):

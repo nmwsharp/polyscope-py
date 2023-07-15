@@ -1654,6 +1654,9 @@ class TestCameraView(unittest.TestCase):
         cam.add_scalar_image_quantity("scalar_img3", np.zeros((dimX, dimY)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
         cam.add_scalar_image_quantity("scalar_img4", np.zeros((dimX, dimY)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
         
+        # true floating adder
+        ps.add_scalar_image_quantity("scalar_img2", np.zeros((dimX, dimY)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds')
+        
         ps.show(3)
         ps.remove_all_structures()
     
@@ -1670,6 +1673,9 @@ class TestCameraView(unittest.TestCase):
         cam.add_color_image_quantity("color_img2", np.zeros((dimX, dimY, 3)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
         cam.add_color_image_quantity("color_img3", np.zeros((dimX, dimY, 3)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
         cam.add_color_image_quantity("color_img4", np.zeros((dimX, dimY, 3)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
+       
+        # true floating adder
+        ps.add_color_image_quantity("color_img2", np.zeros((dimX, dimY, 3)), enabled=True, image_origin='lower_left', show_in_camera_billboard=False)
 
         ps.show(3)
         ps.remove_all_structures()
@@ -1688,8 +1694,78 @@ class TestCameraView(unittest.TestCase):
         cam.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimX, dimY, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
         cam.add_color_alpha_image_quantity("color_alpha_img4", np.zeros((dimX, dimY, 4)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False)
 
+        # true floating adder
+        ps.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimX, dimY, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+
         ps.show(3)
         ps.remove_all_structures()
+   
+    def test_floating_depth_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        normals = np.ones((dimX, dimY, 3))
+
+        cam.add_depth_render_image_quantity("render_img", depths, normals)
+        cam.add_depth_render_image_quantity("render_img2", depths, normals, enabled=True, image_origin='lower_left', color=(0., 1., 0.), material='wax', transparency=0.7)
+        
+        # true floating adder
+        ps.add_depth_render_image_quantity("render_img3", depths, normals, enabled=True, image_origin='lower_left', color=(0., 1., 0.), material='wax', transparency=0.7, )
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_color_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        normals = np.ones((dimX, dimY, 3))
+        colors = np.ones((dimX, dimY, 3))
+
+        cam.add_color_render_image_quantity("render_img", depths, normals, colors)
+        cam.add_color_render_image_quantity("render_img2", depths, normals, colors, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
+        
+        # true floating adder
+        ps.add_color_render_image_quantity("render_img3", depths, normals, colors, enabled=True, image_origin='lower_left', material='wax', transparency=0.7, )
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_scalar_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        normals = np.ones((dimX, dimY, 3))
+        scalars = np.ones((dimX, dimY))
+
+        cam.add_scalar_render_image_quantity("render_img", depths, normals, scalars)
+        cam.add_scalar_render_image_quantity("render_img2", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
+        
+        # true floating adder
+        ps.add_scalar_render_image_quantity("render_img3", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7, )
+        
+        ps.show(3)
+        ps.remove_all_structures()
+
+
 
 if __name__ == '__main__':
 

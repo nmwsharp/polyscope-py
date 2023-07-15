@@ -46,13 +46,17 @@ void bind_floating_quantities(py::module& m) {
   // == Render image floating quantities
  
   auto qDepthRenderImage = bindQuantity<ps::DepthRenderImageQuantity>(m, "DepthRenderImageQuantity"); 
-  // addImageQuantityBindings(qDepthRenderImage); // TODO need to make render images inherit from image quantity base
-
-  auto qScalarRenderImage = bindScalarQuantity<ps::ScalarRenderImageQuantity>(m, "ScalarRenderImageQuantity");
-  // addImageQuantityBindings(qScalarRenderImage);
+  qDepthRenderImage.def("set_material", &ps::DepthRenderImageQuantity::setMaterial, "Set material");
+  qDepthRenderImage.def("set_color", &ps::DepthRenderImageQuantity::setColor, "Set color");
+  qDepthRenderImage.def("set_transparency", &ps::DepthRenderImageQuantity::setTransparency, "Set transparency");
 
   auto qColorRenderImage = bindColorQuantity<ps::ColorRenderImageQuantity>(m, "ColorRenderImageQuantity");
-  // addImageQuantityBindings(qColorRenderImage);
+  qColorRenderImage.def("set_material", &ps::ColorRenderImageQuantity::setMaterial, "Set material");
+  qColorRenderImage.def("set_transparency", &ps::ColorRenderImageQuantity::setTransparency, "Set transparency");
+
+  auto qScalarRenderImage = bindScalarQuantity<ps::ScalarRenderImageQuantity>(m, "ScalarRenderImageQuantity");
+  qScalarRenderImage.def("set_material", &ps::ScalarRenderImageQuantity::setMaterial, "Set material");
+  qScalarRenderImage.def("set_transparency", &ps::ScalarRenderImageQuantity::setTransparency, "Set transparency");
   
   m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>);
   m.def("add_color_render_image_quantity", &ps::addColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd>);
