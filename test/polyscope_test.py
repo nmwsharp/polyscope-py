@@ -1764,6 +1764,99 @@ class TestCameraView(unittest.TestCase):
         
         ps.show(3)
         ps.remove_all_structures()
+    
+    def test_floating_implicit_surface_render(self):
+
+        # this can be called free-floating or on a camera view, but we will test them here
+    
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+       
+        # basic
+        ps.render_implicit_surface("sphere sdf", sphere_sdf, 'fixed_step', subsample_factor=10, n_max_steps=10, enabled=True)
+
+        # with some args
+        ps.render_implicit_surface("sphere sdf", sphere_sdf, 'sphere_march', enabled=True, 
+                                        camera_parameters=self.generate_parameters(),
+                                        dim=(50,75),
+                                        miss_dist=20.5, miss_dist_relative=True,
+                                        hit_dist=0.001, hit_dist_relative=False,
+                                        step_factor=0.98,
+                                        normal_sample_eps=0.02,
+                                        step_size=0.01, step_size_relative=True,
+                                        n_max_steps=50,
+                                        material='wax',
+                                        color=(0.5,0.5,0.5)
+                                   )
+
+        # from this camera view
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        ps.render_implicit_surface("sphere sdf", sphere_sdf, 'sphere_march', dim=(50,75), n_max_steps=10, camera_view=cam, enabled=True)
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_implicit_surface_color_render(self):
+
+        # this can be called free-floating or on a camera view, but we will test them here
+    
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+        def color_func(pts): return np.zeros_like(pts)
+       
+        # basic
+        ps.render_implicit_surface_color("sphere sdf", sphere_sdf, color_func, 'fixed_step', subsample_factor=10, n_max_steps=10, enabled=True)
+
+        # with some args
+        ps.render_implicit_surface_color("sphere sdf", sphere_sdf, color_func, 'sphere_march', enabled=True, 
+                                        camera_parameters=self.generate_parameters(),
+                                        dim=(50,75),
+                                        miss_dist=20.5, miss_dist_relative=True,
+                                        hit_dist=0.001, hit_dist_relative=False,
+                                        step_factor=0.98,
+                                        normal_sample_eps=0.02,
+                                        step_size=0.01, step_size_relative=True,
+                                        n_max_steps=50,
+                                        material='wax',
+                                   )
+
+        # from this camera view
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        ps.render_implicit_surface_color("sphere sdf", sphere_sdf, color_func, 'sphere_march', dim=(50,75), n_max_steps=10, camera_view=cam, enabled=True)
+
+        ps.show(3)
+        ps.remove_all_structures()
+
+
+    def test_floating_implicit_surface_scalar_render(self):
+
+        # this can be called free-floating or on a camera view, but we will test them here
+    
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+        def scalar_func(pts): return np.ones_like(pts[:,0])
+       
+        # basic
+        ps.render_implicit_surface_scalar("sphere sdf", sphere_sdf, scalar_func, 'fixed_step', subsample_factor=10, n_max_steps=10, enabled=True)
+
+        # with some args
+        ps.render_implicit_surface_scalar("sphere sdf", sphere_sdf, scalar_func, 'sphere_march', enabled=True, 
+                                        camera_parameters=self.generate_parameters(),
+                                        dim=(50,75),
+                                        miss_dist=20.5, miss_dist_relative=True,
+                                        hit_dist=0.001, hit_dist_relative=False,
+                                        step_factor=0.98,
+                                        normal_sample_eps=0.02,
+                                        step_size=0.01, step_size_relative=True,
+                                        n_max_steps=50,
+                                        material='wax',
+                                        cmap='blues',
+                                        vminmax=(0.,1.)
+                                   )
+
+        # from this camera view
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        ps.render_implicit_surface_scalar("sphere sdf", sphere_sdf, scalar_func, 'sphere_march', dim=(50,75), n_max_steps=10, camera_view=cam, enabled=True)
+
+        ps.show(3)
+        ps.remove_all_structures()
 
 
 

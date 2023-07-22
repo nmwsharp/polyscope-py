@@ -605,3 +605,50 @@ def image_origin_to_str(val):
 
     raise ValueError("Bad image origin specifier '{}', should be one of [{}]".format(val, 
         ",".join(["'{}'".format(x) for x in d_image_origin.values()])))
+
+# Shade style to/from string
+d_mesh_shade_style = {
+        "smooth" : psb.MeshShadeStyle.smooth,
+        "flat" : psb.MeshShadeStyle.flat,
+        "tri_flat" : psb.MeshShadeStyle.tri_flat,
+    }
+
+def str_to_mesh_shade_style(s):
+
+    if s not in d_mesh_shade_style:
+        raise ValueError("Bad specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_mesh_shade_style.keys()])))
+
+    return d_mesh_shade_style[s]
+
+def mesh_shade_style_to_str(val):
+
+    for k,v in d_mesh_shade_style.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_mesh_shade_style.values()])))
+
+# Implicit render mode to/from string
+d_implicit_render_mode = {
+        "fixed_step" : psb.ImplicitRenderMode.fixed_step,
+        "sphere_march" : psb.ImplicitRenderMode.sphere_march,
+    }
+
+def str_to_implicit_render_mode(s):
+
+    if s not in d_implicit_render_mode:
+        raise ValueError("Bad specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_implicit_render_mode.keys()])))
+
+    return d_implicit_render_mode[s]
+
+def implicit_render_mode_to_str(val):
+
+    for k,v in d_implicit_render_mode.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_implicit_render_mode.values()])))

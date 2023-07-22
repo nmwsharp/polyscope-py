@@ -39,9 +39,13 @@ void bind_floating_quantities(py::module& m) {
   auto qColorImage = bindColorQuantity<ps::ColorImageQuantity>(m, "ColorImageQuantity");
   addImageQuantityBindings(qColorImage);
 
-  m.def("add_scalar_image_quantity", &ps::addScalarImageQuantity<Eigen::VectorXd>);
-  m.def("add_color_image_quantity", &ps::addColorImageQuantity<Eigen::MatrixXd>);
-  m.def("add_color_alpha_image_quantity", &ps::addColorAlphaImageQuantity<Eigen::MatrixXd>);
+  // global / free-floating adders
+  m.def("add_scalar_image_quantity", &ps::addScalarImageQuantity<Eigen::VectorXd>, 
+        py::return_value_policy::reference);
+  m.def("add_color_image_quantity", &ps::addColorImageQuantity<Eigen::MatrixXd>, 
+        py::return_value_policy::reference);
+  m.def("add_color_alpha_image_quantity", &ps::addColorAlphaImageQuantity<Eigen::MatrixXd>,
+        py::return_value_policy::reference);
 
   // == Render image floating quantities
  
@@ -58,9 +62,13 @@ void bind_floating_quantities(py::module& m) {
   qScalarRenderImage.def("set_material", &ps::ScalarRenderImageQuantity::setMaterial, "Set material");
   qScalarRenderImage.def("set_transparency", &ps::ScalarRenderImageQuantity::setTransparency, "Set transparency");
   
-  m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>);
-  m.def("add_color_render_image_quantity", &ps::addColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd>);
-  m.def("add_scalar_render_image_quantity", &ps::addScalarRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::VectorXd>);
+  // global / free-floating adders
+  m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, 
+      py::return_value_policy::reference);
+  m.def("add_color_render_image_quantity", &ps::addColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd>, 
+      py::return_value_policy::reference);
+  m.def("add_scalar_render_image_quantity", &ps::addScalarRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::VectorXd>, 
+      py::return_value_policy::reference);
 
 }
 

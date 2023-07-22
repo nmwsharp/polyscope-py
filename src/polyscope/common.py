@@ -133,7 +133,57 @@ def process_render_image_args(structure, quantity, image_args):
     if val is not None:
         quantity.set_material(val)
     
+# Process args, removing them from the dict if they are present
+def process_implicit_render_args(opts, implicit_args):
 
+    val = check_and_pop_arg(implicit_args, 'camera_parameters')
+    if val is not None:
+        opts.cameraParameters = val.instance
+    
+    val = check_and_pop_arg(implicit_args, 'dim')
+    if val is not None:
+        opts.dimX = int(val[0])
+        opts.dimY = int(val[1])
+    
+    val = check_and_pop_arg(implicit_args, 'subsample_factor')
+    if val is not None:
+        opts.subsampleFactor = int(val)
+    
+    val = check_and_pop_arg(implicit_args, 'miss_dist')
+    val_relative = check_and_pop_arg(implicit_args, 'miss_dist_relative')
+    if val is not None:
+        if val_relative is None: 
+            val_relative = True
+        opts.set_missDist(float(val), val_relative)
+    
+    val = check_and_pop_arg(implicit_args, 'hit_dist')
+    val_relative = check_and_pop_arg(implicit_args, 'hit_dist_relative')
+    if val is not None:
+        if val_relative is None: 
+            val_relative = True
+        opts.set_hitDist(float(val), val_relative)
+    
+    val = check_and_pop_arg(implicit_args, 'step_factor')
+    if val is not None:
+        opts.stepFactor = float(val)
+    
+    val = check_and_pop_arg(implicit_args, 'normal_sample_eps')
+    if val is not None:
+        opts.normalSampleEps = float(val)
+    
+    val = check_and_pop_arg(implicit_args, 'step_size')
+    val_relative = check_and_pop_arg(implicit_args, 'step_size_relative')
+    if val is not None:
+        if val_relative is None: 
+            val_relative = True
+        opts.set_stepSize(float(val), val_relative)
+    
+    val = check_and_pop_arg(implicit_args, 'n_max_steps')
+    if val is not None:
+        opts.nMaxSteps= int(val)
+
+    return opts
+    
 def check_all_args_processed(structure, quantity, args):
     for arg,val in args.items():
         raise ValueError(f"Polyscope: Unrecognized quantity keyword argument {arg}: {val}")

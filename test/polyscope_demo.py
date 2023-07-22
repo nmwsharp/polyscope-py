@@ -44,8 +44,12 @@ def main():
 
     def callback():
         # Executed every frame
+
         if(psim.Button("Test button")):
             my_function()
+
+        implicit_ui()
+
     polyscope.set_user_callback(callback)
    
 
@@ -189,11 +193,30 @@ def main():
         
         # Remove the whole mesh structure
         polyscope.remove_all_structures()
+        
 
     # Back to empty
     polyscope.show() 
 
     # polyscope.clear_user_callback()
+
+def sphere_sdf(pts):
+    res = np.linalg.norm(pts, axis=-1) - 1.
+    return res
+
+def color_func(pts):
+    # return np.cos(3*pts)**2
+    A = np.ones_like(pts) * 0.3
+    A[:,0] = np.cos(3*pts[:,0])**2
+    return A
+
+def implicit_ui():
+
+    if(psim.Button("Render sphere SDF")):
+        # polyscope.render_implicit_surface("sphere sdf", sphere_sdf, 'sphere_march', enabled=True)
+        polyscope.render_implicit_surface_color("sphere sdf", sphere_sdf, color_func, 'sphere_march', enabled=True)
+
+
 
 if __name__ == '__main__':
     main()

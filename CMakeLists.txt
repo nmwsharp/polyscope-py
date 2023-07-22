@@ -19,6 +19,7 @@ pybind11_add_module(polyscope_bindings
   src/cpp/volume_mesh.cpp
   src/cpp/camera_view.cpp
   src/cpp/floating_quantities.cpp
+  src/cpp/implicit_helpers.cpp
   src/cpp/imgui.cpp
 )
 

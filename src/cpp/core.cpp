@@ -14,6 +14,7 @@
 #include "polyscope/point_cloud.h"
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
+#include "polyscope/types.h"
 #include "polyscope/view.h"
 #include "polyscope/volume_mesh.h"
 
@@ -34,6 +35,7 @@ void bind_curve_network(py::module& m);
 void bind_volume_mesh(py::module& m);
 void bind_camera_view(py::module& m);
 void bind_floating_quantities(py::module& m);
+void bind_implicit_helpers(py::module& m);
 void bind_imgui(py::module& m);
 
 // Signal handler (makes ctrl-c work, etc)
@@ -246,6 +248,16 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   ;
   py::class_<ps::CameraParameters>(m, "CameraParameters")
    .def(py::init<ps::CameraIntrinsics, ps::CameraExtrinsics>())
+   .def("generate_camera_rays", [](ps::CameraParameters& c, size_t dimX, size_t dimY, ps::ImageOrigin origin) { 
+        std::vector<glm::vec3> rays = c.generateCameraRays(dimX, dimY, origin);
+        Eigen::MatrixXf raysOut(rays.size(), 3);
+        for(size_t i = 0; i < rays.size(); i++) {
+          raysOut(i,0) = rays[i].x;
+          raysOut(i,1) = rays[i].y;
+          raysOut(i,2) = rays[i].z;
+        }
+       return raysOut;
+     })
    .def("get_intrinsics", [](ps::CameraParameters& c) { return c.intrinsics; })
    .def("get_extrinsics", [](ps::CameraParameters& c) { return c.extrinsics; })
    .def("get_T", [](ps::CameraParameters& c) { return glm2eigen(c.getT()); })
@@ -354,6 +366,11 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("flat", ps::MeshShadeStyle::Flat)
     .value("tri_flat", ps::MeshShadeStyle::TriFlat)
     .export_values(); 
+  
+  py::enum_<ps::ImplicitRenderMode>(m, "ImplicitRenderMode")
+    .value("sphere_march", ps::ImplicitRenderMode::SphereMarch)
+    .value("fixed_step", ps::ImplicitRenderMode::FixedStep)
+    .export_values(); 
 
   // === Mini bindings for a little bit of glm
   py::class_<glm::vec3>(m, "glm_vec3").
@@ -373,6 +390,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
 
   // === Bind structures defined in other files
   bind_floating_quantities(m);
+  bind_implicit_helpers(m);
   bind_point_cloud(m);
   bind_curve_network(m);
   bind_surface_mesh(m);
