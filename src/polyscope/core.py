@@ -25,6 +25,9 @@ def show(forFrames=None):
     else:
         psb.show(forFrames)
 
+def frame_tick():
+    psb.frame_tick()
+
 ### Structure management
 
 def remove_all_structures():
@@ -333,6 +336,8 @@ class CameraParameters:
     def get_camera_frame(self): return self.instance.get_camera_frame()
     def get_fov_vertical_deg(self): return self.instance.get_fov_vertical_deg()
     def get_aspect(self): return self.instance.get_aspect()
+    def generate_camera_rays(self): return self.instance.generate_camera_rays()
+    def generate_camera_ray_corners(self): return self.instance.generate_camera_ray_corners()
 
 
 
