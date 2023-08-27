@@ -36,6 +36,7 @@ void bind_volume_mesh(py::module& m);
 void bind_camera_view(py::module& m);
 void bind_floating_quantities(py::module& m);
 void bind_implicit_helpers(py::module& m);
+void bind_managed_buffer(py::module& m);
 void bind_imgui(py::module& m);
 
 // Signal handler (makes ctrl-c work, etc)
@@ -84,6 +85,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
       },
       py::arg("forFrames")=std::numeric_limits<size_t>::max()
   );
+  m.def("frame_tick", &ps::frameTick);
+
 
   // === Structure management
   m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
@@ -142,6 +145,12 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("get_window_resizable", &ps::view::getWindowResizable);
   m.def("set_view_from_json", ps::view::setViewFromJson);
   m.def("get_view_as_json", ps::view::getViewAsJson);
+  
+  // === "Advanced" UI management
+  m.def("build_polyscope_gui", &ps::buildPolyscopeGui);
+  m.def("build_structure_gui", &ps::buildStructureGui);
+  m.def("build_pick_gui", &ps::buildPickGui);
+  m.def("build_user_gui_and_invoke_callback", &ps::buildUserGuiAndInvokeCallback);
   
   // === Messages
   m.def("info", ps::info, "Send an info message");
@@ -248,16 +257,6 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   ;
   py::class_<ps::CameraParameters>(m, "CameraParameters")
    .def(py::init<ps::CameraIntrinsics, ps::CameraExtrinsics>())
-   .def("generate_camera_rays", [](ps::CameraParameters& c, size_t dimX, size_t dimY, ps::ImageOrigin origin) { 
-        std::vector<glm::vec3> rays = c.generateCameraRays(dimX, dimY, origin);
-        Eigen::MatrixXf raysOut(rays.size(), 3);
-        for(size_t i = 0; i < rays.size(); i++) {
-          raysOut(i,0) = rays[i].x;
-          raysOut(i,1) = rays[i].y;
-          raysOut(i,2) = rays[i].z;
-        }
-       return raysOut;
-     })
    .def("get_intrinsics", [](ps::CameraParameters& c) { return c.intrinsics; })
    .def("get_extrinsics", [](ps::CameraParameters& c) { return c.extrinsics; })
    .def("get_T", [](ps::CameraParameters& c) { return glm2eigen(c.getT()); })
@@ -273,6 +272,26 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     })
    .def("get_fov_vertical_deg", &ps::CameraParameters::getFoVVerticalDegrees)
    .def("get_aspect", &ps::CameraParameters::getAspectRatioWidthOverHeight)
+   .def("generate_camera_rays", [](ps::CameraParameters& c, size_t dimX, size_t dimY, ps::ImageOrigin origin) { 
+        std::vector<glm::vec3> rays = c.generateCameraRays(dimX, dimY, origin);
+        Eigen::MatrixXf raysOut(rays.size(), 3);
+        for(size_t i = 0; i < rays.size(); i++) {
+          raysOut(i,0) = rays[i].x;
+          raysOut(i,1) = rays[i].y;
+          raysOut(i,2) = rays[i].z;
+        }
+       return raysOut;
+     })
+   .def("generate_camera_ray_corners", [](ps::CameraParameters& c) { 
+        std::array<glm::vec3,4> rays = c.generateCameraRayCorners();
+        Eigen::MatrixXf raysOut(4, 3);
+        for(size_t i = 0; i < rays.size(); i++) {
+          raysOut(i,0) = rays[i].x;
+          raysOut(i,1) = rays[i].y;
+          raysOut(i,2) = rays[i].z;
+        }
+       return raysOut;
+     })
   ;
   // TODO test 
 
@@ -371,6 +390,22 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("sphere_march", ps::ImplicitRenderMode::SphereMarch)
     .value("fixed_step", ps::ImplicitRenderMode::FixedStep)
     .export_values(); 
+  
+  py::enum_<ps::ManagedBufferType>(m, "ManagedBufferType")
+    .value(ps::typeName(ps::ManagedBufferType::Float   ).c_str(),   ps::ManagedBufferType::Float   )
+    .value(ps::typeName(ps::ManagedBufferType::Double  ).c_str(),   ps::ManagedBufferType::Double  )
+    .value(ps::typeName(ps::ManagedBufferType::Vec2    ).c_str(),   ps::ManagedBufferType::Vec2    )
+    .value(ps::typeName(ps::ManagedBufferType::Vec3    ).c_str(),   ps::ManagedBufferType::Vec3    )
+    .value(ps::typeName(ps::ManagedBufferType::Vec4    ).c_str(),   ps::ManagedBufferType::Vec4    )
+    .value(ps::typeName(ps::ManagedBufferType::Arr2Vec3).c_str(),   ps::ManagedBufferType::Arr2Vec3)
+    .value(ps::typeName(ps::ManagedBufferType::Arr3Vec3).c_str(),   ps::ManagedBufferType::Arr3Vec3)
+    .value(ps::typeName(ps::ManagedBufferType::Arr4Vec3).c_str(),   ps::ManagedBufferType::Arr4Vec3)
+    .value(ps::typeName(ps::ManagedBufferType::UInt32  ).c_str(),   ps::ManagedBufferType::UInt32  )
+    .value(ps::typeName(ps::ManagedBufferType::Int32   ).c_str(),   ps::ManagedBufferType::Int32   )
+    .value(ps::typeName(ps::ManagedBufferType::UVec2   ).c_str(),   ps::ManagedBufferType::UVec2   )
+    .value(ps::typeName(ps::ManagedBufferType::UVec3   ).c_str(),   ps::ManagedBufferType::UVec3   )
+    .value(ps::typeName(ps::ManagedBufferType::UVec4   ).c_str(),   ps::ManagedBufferType::UVec4   )
+    .export_values(); 
 
   // === Mini bindings for a little bit of glm
   py::class_<glm::vec3>(m, "glm_vec3").
@@ -396,6 +431,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   bind_surface_mesh(m);
   bind_volume_mesh(m);
   bind_camera_view(m);
+  bind_managed_buffer(m);
   bind_imgui(m);
 
 }

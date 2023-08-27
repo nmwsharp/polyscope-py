@@ -1858,6 +1858,57 @@ class TestCameraView(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
 
+class TestManagedBuffers(unittest.TestCase):
+
+    def test_managed_buffer_basics(self):
+
+        # NOTE: this only tests the float & vec3 versions, really there are variant methods for each type 
+    
+        def generate_points(n_pts=10):
+            np.random.seed(777)        
+            return np.random.rand(n_pts, 3)
+
+        def generate_scalar(n_pts=10):
+            np.random.seed(777)        
+            return np.random.rand(n_pts)
+
+
+        # create a dummy point cloud;
+        ps_cloud = ps.register_point_cloud("test_cloud", generate_points())
+        ps_scalar = ps_cloud.add_scalar_quantity("test_vals", generate_scalar())
+        ps.show(3)
+
+        # test a structure buffer of vec3
+        pos_buf = ps_cloud.get_buffer("points")
+        self.assertEqual(pos_buf.size(), 10)
+        self.assertTrue(pos_buf.has_data())
+        pos_buf.summary_string()
+        pos_buf.get_value(3)
+        pos_buf.update_data(generate_points())
+        
+        # test a quantity buffer of float
+        scalar_buf = ps_cloud.get_quantity_buffer("test_vals", "values")
+        self.assertEqual(scalar_buf.size(), 10)
+        self.assertTrue(scalar_buf.has_data())
+        scalar_buf.summary_string()
+        scalar_buf.get_value(3)
+        scalar_buf.update_data(generate_scalar())
+
+        ps.show(3)
+
+        # test a free-floating quantity buffer
+        dimX = 200
+        dimY = 300
+        ps.add_scalar_image_quantity("test_float_img", np.zeros((dimX, dimY)))
+        img_buf = ps.get_quantity_buffer("test_float_img", "values")
+        self.assertEqual(img_buf.size(), dimX*dimY)
+        self.assertTrue(img_buf.has_data())
+        img_buf.summary_string()
+        img_buf.get_value(3)
+        img_buf.update_data(np.zeros(dimX*dimY))
+
+
+        ps.show(3)
 
 
 if __name__ == '__main__':

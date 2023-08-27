@@ -55,13 +55,49 @@ inline Eigen::Matrix<T, m, 1> glm2eigen(const glm::vec<m, T>& vec_glm) {
   return vec_eigen;
 }
 
+template <typename StructureT, typename T, typename C>
+void def_get_managed_buffer(C& c, std::string postfix) {
+  c.def(("get_buffer_" + postfix).c_str(),
+        [](StructureT& s, std::string buffer_name) -> ps::render::ManagedBuffer<T>& {
+          return s.template getManagedBuffer<T>(buffer_name);
+        },
+        "get managed buffer", py::return_value_policy::reference);
+}
+
+template <typename StructureT, typename T, typename C>
+void def_get_quantity_managed_buffer(C& c, std::string postfix) {
+  c.def(("get_quantity_buffer_" + postfix).c_str(),
+        [](StructureT& s, std::string quantity_name, std::string buffer_name) -> ps::render::ManagedBuffer<T>& {
+          ps::Quantity* qPtr = s.getQuantity(quantity_name);
+          if (qPtr) {
+            return qPtr->template getManagedBuffer<T>(buffer_name);
+          }
+          ps::FloatingQuantity* fqPtr = s.getFloatingQuantity(quantity_name);
+          if (fqPtr) {
+            return fqPtr->template getManagedBuffer<T>(buffer_name);
+          }
+          ps::exception("structure " + s.name + " has no quantity " + quantity_name);
+          return *static_cast<ps::render::ManagedBuffer<T>*>(nullptr); // invalid, never executed
+        },
+        "get quantity managed buffer", py::return_value_policy::reference);
+}
+
+
+template <typename StructureT, typename T, typename C>
+void def_all_managed_buffer_funcs(C& c, ps::ManagedBufferType t) {
+  def_get_managed_buffer<StructureT, T>(c, ps::typeName(t));
+  def_get_quantity_managed_buffer<StructureT, T>(c, ps::typeName(t));
+}
+
+
 // Add common bindings for structures
 template <typename StructureT>
 py::class_<StructureT> bindStructure(py::module& m, std::string name) {
-  return py::class_<StructureT>(m, name.c_str())
 
-      // structure basics
-      .def("remove", &StructureT::remove, "Remove the structure")
+  py::class_<StructureT> s(m, name.c_str());
+
+  // structure basics
+  s.def("remove", &StructureT::remove, "Remove the structure")
       .def("set_enabled", &StructureT::setEnabled, "Enable the structure")
       .def("enable_isolate", &StructureT::enableIsolate, "Enable the structure, disable all of same type")
       .def("is_enabled", &StructureT::isEnabled, "Check if the structure is enabled")
@@ -73,7 +109,7 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("get_ignore_slice_plane", &StructureT::getIgnoreSlicePlane, "Get ignore slice plane")
       .def("set_cull_whole_elements", &StructureT::setCullWholeElements, "Set cull whole elements")
       .def("get_cull_whole_elements", &StructureT::getCullWholeElements, "Get cull whole elememts")
-    
+
       // quantites
       .def("remove_all_quantities", &StructureT::removeAllQuantities, "Remove all quantities")
       .def("remove_quantity", &StructureT::removeQuantity, py::arg("name"), py::arg("errorIfAbsent") = false,
@@ -90,6 +126,13 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("get_transform", [](StructureT& s) { return glm2eigen(s.getTransform()); }, "get the current 4x4 transform matrix")
       .def("get_position", [](StructureT& s) { return glm2eigen(s.getPosition()); }, "get the position of the shape origin after transform")
       
+      // managed buffers
+      .def("get_buffer", [](StructureT& s, std::string name) { 
+
+         
+
+        }, "Get a buffer by name")
+      
       // floating quantites
       .def("add_scalar_image_quantity", &StructureT::template addScalarImageQuantity<Eigen::VectorXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::arg("type")=ps::DataType::STANDARD, py::return_value_policy::reference)
       .def("add_color_image_quantity", &StructureT::template addColorImageQuantity<Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values_rgb"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
@@ -97,17 +140,52 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("add_depth_render_image_quantity", &StructureT::template addDepthRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
       .def("add_color_render_image_quantity", &StructureT::template addColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("colorData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
       .def("add_scalar_render_image_quantity", &StructureT::template addScalarRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::VectorXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("scalarData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::arg("type")=ps::DataType::STANDARD, py::return_value_policy::reference)
+      .def("add_raw_color_render_image_quantity", &StructureT::template addRawColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("colorData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
 
       ;
 
+      // managed buffer things
+      def_all_managed_buffer_funcs<StructureT, float> (s, ps::ManagedBufferType::Float);
+      def_all_managed_buffer_funcs<StructureT, double>(s, ps::ManagedBufferType::Double);
+      
+      def_all_managed_buffer_funcs<StructureT, glm::vec2>(s, ps::ManagedBufferType::Vec2);
+      def_all_managed_buffer_funcs<StructureT, glm::vec3>(s, ps::ManagedBufferType::Vec3);
+      def_all_managed_buffer_funcs<StructureT, glm::vec4>(s, ps::ManagedBufferType::Vec4);
+      
+      def_all_managed_buffer_funcs<StructureT, std::array<glm::vec3,2>>(s, ps::ManagedBufferType::Arr2Vec3);
+      def_all_managed_buffer_funcs<StructureT, std::array<glm::vec3,3>>(s, ps::ManagedBufferType::Arr3Vec3);
+      def_all_managed_buffer_funcs<StructureT, std::array<glm::vec3,4>>(s, ps::ManagedBufferType::Arr4Vec3);
+      
+      def_all_managed_buffer_funcs<StructureT, uint32_t> (s, ps::ManagedBufferType::UInt32);
+      def_all_managed_buffer_funcs<StructureT, int32_t>  (s, ps::ManagedBufferType::Int32);
+      
+      def_all_managed_buffer_funcs<StructureT, glm::uvec2>(s, ps::ManagedBufferType::UVec2);
+      def_all_managed_buffer_funcs<StructureT, glm::uvec3>(s, ps::ManagedBufferType::UVec3);
+      def_all_managed_buffer_funcs<StructureT, glm::uvec4>(s, ps::ManagedBufferType::UVec4);
+
+      s.def("has_buffer_type", &StructureT::hasManagedBufferType, "has managed buffer type");
+      s.def("has_quantity_buffer_type", [](StructureT& s, std::string quantity_name, std::string buffer_name) {
+          ps::Quantity* qPtr = s.getQuantity(quantity_name);
+          if (qPtr) {
+            return qPtr->hasManagedBufferType(buffer_name);
+          }
+          ps::FloatingQuantity* fqPtr = s.getFloatingQuantity(quantity_name);
+          if (fqPtr) {
+            return fqPtr->hasManagedBufferType(buffer_name);
+          }
+          ps::exception("structure " + s.name + " has no quantity " + quantity_name);
+          return std::make_tuple(false, ps::ManagedBufferType::Float); // invalid, never executed
+        }, "has quantity managed buffer type");
+
+
   // clang-format on
+  return s;
 }
 
 // Common bindings for quantities that do not fall in to a more specific quantity below
 template <typename Q>
 py::class_<Q> bindQuantity(py::module& m, std::string name) {
-  return py::class_<Q>(m, name.c_str())
-      .def("set_enabled", &Q::setEnabled, "Set enabled");
+  return py::class_<Q>(m, name.c_str()).def("set_enabled", &Q::setEnabled, "Set enabled");
 }
 
 
@@ -158,11 +236,10 @@ void addImageQuantityBindings(py::class_<ImageQ>& imageQ) {
 
   imageQ.def("set_show_in_imgui_window", &ImageQ::setShowInImGuiWindow);
   imageQ.def("get_show_in_imgui_window", &ImageQ::getShowInImGuiWindow);
-  
+
   imageQ.def("set_show_in_camera_billboard", &ImageQ::setShowInCameraBillboard);
   imageQ.def("get_show_in_camera_billboard", &ImageQ::getShowInCameraBillboard);
-  
+
   imageQ.def("set_transparency", &ImageQ::setTransparency);
   imageQ.def("get_transparency", &ImageQ::getTransparency);
-
 }

@@ -1,6 +1,7 @@
 import polyscope_bindings as psb
 
-from polyscope.floating_quantities import add_scalar_image_quantity, add_color_image_quantity, add_color_alpha_image_quantity, add_depth_render_image_quantity, add_color_render_image_quantity, add_scalar_render_image_quantity
+from polyscope.floating_quantities import add_scalar_image_quantity, add_color_image_quantity, add_color_alpha_image_quantity, add_depth_render_image_quantity, add_color_render_image_quantity, add_scalar_render_image_quantity, add_raw_color_render_image_quantity
+from polyscope.managed_buffer import ManagedBuffer
 
 # Base class for common properties and methods on structures
 class Structure:
@@ -54,6 +55,58 @@ class Structure:
         return self.bound_instance.get_transform()
     def get_position(self):
         return self.bound_instance.get_position()
+    
+    ## Managed Buffers
+    
+    def get_buffer(self, buffer_name):
+
+        present, buffer_type = self.bound_instance.has_buffer_type(buffer_name)
+
+        if not present: raise ValueError("structure has no buffer named " + name)
+
+        return {
+            psb.ManagedBufferType.Float     :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Float   (n), t),
+            psb.ManagedBufferType.Double    :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Double  (n), t),
+            psb.ManagedBufferType.Vec2      :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Vec2    (n), t),
+            psb.ManagedBufferType.Vec3      :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Vec3    (n), t),
+            psb.ManagedBufferType.Vec4      :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Vec4    (n), t),
+            psb.ManagedBufferType.Arr2Vec3  :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Arr2Vec4(n), t),
+            psb.ManagedBufferType.Arr3Vec3  :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Arr3Vec4(n), t),
+            psb.ManagedBufferType.Arr4Vec3  :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Arr4Vec4(n), t),
+            psb.ManagedBufferType.UInt32    :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_UInt32  (n), t),
+            psb.ManagedBufferType.Int32     :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Int32   (n), t),
+            psb.ManagedBufferType.UVec2     :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_UVec2   (n), t),
+            psb.ManagedBufferType.UVec3     :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_UVec3   (n), t),
+            psb.ManagedBufferType.UVec4     :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_UVec4   (n), t),
+        }[buffer_type](buffer_name, buffer_type)
+    
+    def get_quantity_buffer(self, quantity_name, buffer_name):
+    
+        present, buffer_type = self.bound_instance.has_quantity_buffer_type(quantity_name, buffer_name)
+
+        if not present: 
+            if self == psb.get_global_floating_quantity_structure():
+                # give a more informative error if this was called on the global floating quantity, becuase it is particularly easy for users to get confused and call this function at the global scope rather than on a quantity
+                raise ValueError("Quantity has no buffer named " + name + ". NOTE: calling polyscope.get_quantity_buffer() is for global floating quantities only, call structure.get_quantity_buffer() to get buffers for a quantity added to some structure.")
+            else:
+                raise ValueError("quantity has no buffer named " + name)
+        
+        return {
+            psb.ManagedBufferType.Float     :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Float   (q,n), t),
+            psb.ManagedBufferType.Double    :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Double  (q,n), t),
+            psb.ManagedBufferType.Vec2      :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Vec2    (q,n), t),
+            psb.ManagedBufferType.Vec3      :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Vec3    (q,n), t),
+            psb.ManagedBufferType.Vec4      :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Vec4    (q,n), t),
+            psb.ManagedBufferType.Arr2Vec3  :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Arr2Vec4(q,n), t),
+            psb.ManagedBufferType.Arr3Vec3  :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Arr3Vec4(q,n), t),
+            psb.ManagedBufferType.Arr4Vec3  :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Arr4Vec4(q,n), t),
+            psb.ManagedBufferType.UInt32    :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_UInt32  (q,n), t),
+            psb.ManagedBufferType.Int32     :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Int32   (q,n), t),
+            psb.ManagedBufferType.UVec2     :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_UVec2   (q,n), t),
+            psb.ManagedBufferType.UVec3     :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_UVec3   (q,n), t),
+            psb.ManagedBufferType.UVec4     :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_UVec4   (q,n), t),
+        }[buffer_type](quantity_name, buffer_name, buffer_type)
+
     
     ## Slice planes
 
@@ -126,4 +179,12 @@ class Structure:
 
         # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
         return add_scalar_render_image_quantity(name, depth_values, normal_values, scalar_values, image_origin=image_origin, struct_ref=self, **option_args)
+    
+    def add_raw_color_render_image_quantity(self, name, depth_values, color_values, image_origin="upper_left", **option_args):
+        """
+        Add a "floating" render image quantity to the structure
+        """
+
+        # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
+        return add_raw_color_render_image_quantity(name, depth_values, color_values, image_origin=image_origin, struct_ref=self, **option_args)
 

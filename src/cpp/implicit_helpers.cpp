@@ -122,6 +122,33 @@ void bind_implicit_helpers(py::module& m) {
         return ps::renderImplicitSurfaceScalarBatch(cameraView, name, wrapped_func, wrapped_func_scalar, mode, opts);
       }
   }, py::return_value_policy::reference);
+  
+  m.def("render_implicit_surface_raw_color_batch", [](
+        std::string name, 
+        const std::function<Eigen::VectorXf(const Eigen::Ref<const Eigen::MatrixXf>)>& func,
+        const std::function<Eigen::MatrixXf(const Eigen::Ref<const Eigen::MatrixXf>)>& func_color,
+        ps::ImplicitRenderMode mode, ps::ImplicitRenderOpts opts, ps::CameraView* cameraView
+      ) { 
+
+      // Polyscope's API uses raw buffer pointers, but we use Eigen mats for pybind11.
+      // Create a wrapper function that goes to/from the Eigen mats
+      auto wrapped_func = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
+        Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);
+        Eigen::Map<Eigen::VectorXf> mapped_result(result_ptr, size);
+        mapped_result = func(mapped_pos);
+      };
+      auto wrapped_func_color = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
+        Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);
+        Eigen::Map<Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_result(result_ptr, size, 3);
+        mapped_result = func_color(mapped_pos);
+      };
+
+      if(cameraView == nullptr) {
+        return ps::renderImplicitSurfaceRawColorBatch(name, wrapped_func, wrapped_func_color, mode, opts);
+      } else {
+        return ps::renderImplicitSurfaceRawColorBatch(cameraView, name, wrapped_func, wrapped_func_color, mode, opts);
+      }
+  }, py::return_value_policy::reference);
 
 }
 

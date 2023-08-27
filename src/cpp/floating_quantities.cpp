@@ -14,11 +14,6 @@
 namespace py = pybind11;
 namespace ps = polyscope;
 
-// For overloaded functions, with C++11 compiler only
-template <typename... Args>
-using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
-
-
 // clang-format off
 void bind_floating_quantities(py::module& m) {
 
@@ -62,12 +57,17 @@ void bind_floating_quantities(py::module& m) {
   qScalarRenderImage.def("set_material", &ps::ScalarRenderImageQuantity::setMaterial, "Set material");
   qScalarRenderImage.def("set_transparency", &ps::ScalarRenderImageQuantity::setTransparency, "Set transparency");
   
+  auto qRawColorRenderImage = bindColorQuantity<ps::RawColorRenderImageQuantity>(m, "RawColorRenderImageQuantity");
+  qRawColorRenderImage.def("set_transparency", &ps::RawColorRenderImageQuantity::setTransparency, "Set transparency");
+  
   // global / free-floating adders
   m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, 
       py::return_value_policy::reference);
   m.def("add_color_render_image_quantity", &ps::addColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd>, 
       py::return_value_policy::reference);
   m.def("add_scalar_render_image_quantity", &ps::addScalarRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::VectorXd>, 
+      py::return_value_policy::reference);
+  m.def("add_raw_color_render_image_quantity", &ps::addRawColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, 
       py::return_value_policy::reference);
 
 }
