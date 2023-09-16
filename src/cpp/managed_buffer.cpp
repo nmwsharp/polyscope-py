@@ -1,6 +1,7 @@
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "Eigen/Dense"
 
@@ -22,21 +23,21 @@ py::class_<ps::render::ManagedBuffer<T>> bind_managed_buffer_T(py::module& m, ps
       .def("get_texture_size", &ps::render::ManagedBuffer<T>::getTextureSize)
       .def("has_data", &ps::render::ManagedBuffer<T>::hasData)
       .def("summary_string", &ps::render::ManagedBuffer<T>::summaryString)
+      .def("get_device_buffer_type", &ps::render::ManagedBuffer<T>::getDeviceBufferType)
+      .def("get_generic_weak_handle",
+           [](ps::render::ManagedBuffer<T>& s) {
+             return s.getGenericWeakHandle();
+           } /* intentionally let Python manage ownership */)
       .def("get_value", overload_cast_<size_t>()(&ps::render::ManagedBuffer<T>::getValue))
       .def("get_value", overload_cast_<size_t, size_t>()(&ps::render::ManagedBuffer<T>::getValue))
       .def("get_value", overload_cast_<size_t, size_t, size_t>()(&ps::render::ManagedBuffer<T>::getValue))
       .def("mark_host_buffer_updated", &ps::render::ManagedBuffer<T>::markHostBufferUpdated)
       .def("get_native_render_attribute_buffer_ID",
-          [](ps::render::ManagedBuffer<float>& s) {
-          return s.getRenderAttributeBuffer()->getNativeBufferID();
-        })
+           [](ps::render::ManagedBuffer<T>& s) { return s.getRenderAttributeBuffer()->getNativeBufferID(); })
       .def("mark_render_attribute_buffer_updated", &ps::render::ManagedBuffer<T>::markRenderAttributeBufferUpdated)
       .def("get_native_render_texture_buffer_ID",
-          [](ps::render::ManagedBuffer<float>& s) {
-          return s.getRenderTextureBuffer()->getNativeBufferID();
-        })
-      .def("mark_render_texture_buffer_updated", &ps::render::ManagedBuffer<T>::markRenderTextureBufferUpdated)
-  ;
+           [](ps::render::ManagedBuffer<T>& s) { return s.getRenderTextureBuffer()->getNativeBufferID(); })
+      .def("mark_render_texture_buffer_updated", &ps::render::ManagedBuffer<T>::markRenderTextureBufferUpdated);
 }
 
 // clang-format off

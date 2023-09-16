@@ -28,6 +28,12 @@ def show(forFrames=None):
 def frame_tick():
     psb.frame_tick()
 
+### Render engine
+
+def get_render_engine_backend_name():
+    return psb.get_render_engine_backend_name()
+
+
 ### Structure management
 
 def remove_all_structures():
@@ -338,7 +344,6 @@ class CameraParameters:
     def get_aspect(self): return self.instance.get_aspect()
     def generate_camera_rays(self): return self.instance.generate_camera_rays()
     def generate_camera_ray_corners(self): return self.instance.generate_camera_ray_corners()
-
 
 
 ## Small utilities

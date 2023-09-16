@@ -87,6 +87,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   );
   m.def("frame_tick", &ps::frameTick);
 
+  // === Render engine related things
+  m.def("get_render_engine_backend_name", &ps::render::getRenderEngineBackendName);
 
   // === Structure management
   m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
@@ -293,7 +295,14 @@ PYBIND11_MODULE(polyscope_bindings, m) {
        return raysOut;
      })
   ;
-  // TODO test 
+  
+  // === Weak Handles
+  // (used for lifetime tracking tricks)
+  py::class_<ps::GenericWeakHandle>(m, "GenericWeakHandle")
+   .def(py::init<>())
+   .def("is_valid", &ps::GenericWeakHandle::isValid)
+   .def("get_unique_ID", &ps::GenericWeakHandle::getUniqueID)
+  ;
 
   // === Enums
   
@@ -405,6 +414,13 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value(ps::typeName(ps::ManagedBufferType::UVec2   ).c_str(),   ps::ManagedBufferType::UVec2   )
     .value(ps::typeName(ps::ManagedBufferType::UVec3   ).c_str(),   ps::ManagedBufferType::UVec3   )
     .value(ps::typeName(ps::ManagedBufferType::UVec4   ).c_str(),   ps::ManagedBufferType::UVec4   )
+    .export_values(); 
+  
+  py::enum_<ps::DeviceBufferType>(m, "DeviceBufferType")
+    .value("attribute", ps::DeviceBufferType::Attribute)
+    .value("texture1d", ps::DeviceBufferType::Texture1d)
+    .value("texture2d", ps::DeviceBufferType::Texture2d)
+    .value("texture3d", ps::DeviceBufferType::Texture3d)
     .export_values(); 
 
   // === Mini bindings for a little bit of glm

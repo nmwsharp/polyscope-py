@@ -98,6 +98,7 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
 
   // structure basics
   s.def("remove", &StructureT::remove, "Remove the structure")
+      .def("get_unique_prefix", &StructureT::uniquePrefix, "Get unique prefix")
       .def("set_enabled", &StructureT::setEnabled, "Enable the structure")
       .def("enable_isolate", &StructureT::enableIsolate, "Enable the structure, disable all of same type")
       .def("is_enabled", &StructureT::isEnabled, "Check if the structure is enabled")
