@@ -1,7 +1,9 @@
 #include "imgui.h"
+
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 
@@ -50,17 +52,106 @@ static int input_text_callback(ImGuiInputTextCallbackData* data) {
 }
 
 
+void bind_imgui_structs(py::module& m);
 void bind_imgui_methods(py::module& m);
 void bind_imgui_enums(py::module& m);
 
 void bind_imgui(py::module& m) {
   auto imgui_module = m.def_submodule("imgui", "ImGui bindings");
+  bind_imgui_structs(imgui_module);
   bind_imgui_methods(imgui_module);
   bind_imgui_enums(imgui_module);
 }
 
 // clang-format off
+
+
+// clang-format off
+void bind_imgui_structs(py::module& m) {
+
+    // ImGuiIO
+    py::class_<ImGuiIO>(m, "ImGuiIO")
+     // .def(py::init<std::string>())
+    .def_readwrite("DisplaySize"  				,&ImGuiIO::DisplaySize					      )
+    .def_readwrite("DeltaTime"                                  ,&ImGuiIO::DeltaTime                                          ) 
+    .def_readwrite("IniSavingRate"                              ,&ImGuiIO::IniSavingRate                                      )     
+    .def_readwrite("IniFilename"                                ,&ImGuiIO::IniFilename                                        )   
+    .def_readwrite("MouseDoubleClickTime"                       ,&ImGuiIO::MouseDoubleClickTime                               )            
+    .def_readwrite("MouseDoubleClickMaxDist"                    ,&ImGuiIO::MouseDoubleClickMaxDist                            )               
+    .def_readwrite("MouseDragThreshold"                         ,&ImGuiIO::MouseDragThreshold                                 )          
+    .def_property_readonly("KeyMap"             		, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{ImGuiKey_COUNT, o.KeyMap, ob};})
+    .def_readwrite("KeyRepeatDelay"                             ,&ImGuiIO::KeyRepeatDelay                                     )      
+    .def_readwrite("KeyRepeatRate"                              ,&ImGuiIO::KeyRepeatRate                                      )     
+    .def_readwrite("Fonts"                                      ,&ImGuiIO::Fonts                                              )
+    .def_readwrite("FontGlobalScale"                            ,&ImGuiIO::FontGlobalScale                                    )       
+    .def_readwrite("FontAllowUserScaling"                       ,&ImGuiIO::FontAllowUserScaling                               )            
+    .def_readwrite("FontDefault"                                ,&ImGuiIO::FontDefault                                        )   
+    .def_readwrite("DisplayFramebufferScale"                    ,&ImGuiIO::DisplayFramebufferScale                            )               
+    .def_readwrite("MouseDrawCursor"                            ,&ImGuiIO::MouseDrawCursor                                    )       
+    .def_readwrite("ConfigMacOSXBehaviors"                      ,&ImGuiIO::ConfigMacOSXBehaviors                              )             
+    .def_readwrite("ConfigInputTextCursorBlink"                 ,&ImGuiIO::ConfigInputTextCursorBlink                         )                  
+    .def_readwrite("ConfigDragClickToInputText"                 ,&ImGuiIO::ConfigDragClickToInputText                         )                  
+    .def_readwrite("ConfigWindowsResizeFromEdges"               ,&ImGuiIO::ConfigWindowsResizeFromEdges                       )                    
+    .def_readwrite("ConfigWindowsMoveFromTitleBarOnly"          ,&ImGuiIO::ConfigWindowsMoveFromTitleBarOnly                  )                         
+    .def_readwrite("ConfigMemoryCompactTimer"                   ,&ImGuiIO::ConfigMemoryCompactTimer                           )                
+    .def_readwrite("MousePos"                                   ,&ImGuiIO::MousePos                                           ) 
+    .def_property_readonly("MouseDown"             		, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseDown , ob};})
+    .def_readwrite("MouseWheel"                                 ,&ImGuiIO::MouseWheel                                         )  
+    .def_readwrite("MouseWheelH"                                ,&ImGuiIO::MouseWheelH                                        )   
+    .def_readwrite("KeyCtrl"                                    ,&ImGuiIO::KeyCtrl                                            )  
+    .def_readwrite("KeyShift"                                   ,&ImGuiIO::KeyShift                                           ) 
+    .def_readwrite("KeyAlt"                                     ,&ImGuiIO::KeyAlt                                             )
+    .def_readwrite("KeySuper"                                   ,&ImGuiIO::KeySuper                                           )
+    .def_property_readonly("KeysDown"             		, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{512, o.KeysDown , ob};})
+    .def_property_readonly("NavInputs"             		, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{ImGuiNavInput_COUNT, o.NavInputs , ob};})
+    .def_readwrite("WantCaptureMouse"                           ,&ImGuiIO::WantCaptureMouse                                   )        
+    .def_readwrite("WantCaptureKeyboard"                        ,&ImGuiIO::WantCaptureKeyboard                                )           
+    .def_readwrite("WantTextInput"                              ,&ImGuiIO::WantTextInput                                      )     
+    .def_readwrite("WantSetMousePos"                            ,&ImGuiIO::WantSetMousePos                                    )       
+    .def_readwrite("WantSaveIniSettings"                        ,&ImGuiIO::WantSaveIniSettings                                )           
+    .def_readwrite("NavActive"                                  ,&ImGuiIO::NavActive                                          ) 
+    .def_readwrite("NavVisible"                                 ,&ImGuiIO::NavVisible                                         )  
+    .def_readwrite("Framerate"                                  ,&ImGuiIO::Framerate                                          ) 
+    .def_readwrite("MetricsRenderVertices"                      ,&ImGuiIO::MetricsRenderVertices                              )             
+    .def_readwrite("MetricsRenderIndices"                       ,&ImGuiIO::MetricsRenderIndices                               )            
+    .def_readwrite("MetricsRenderWindows"                       ,&ImGuiIO::MetricsRenderWindows                               )            
+    .def_readwrite("MetricsActiveWindows"                       ,&ImGuiIO::MetricsActiveWindows                               )            
+    .def_readwrite("MetricsActiveAllocations"                   ,&ImGuiIO::MetricsActiveAllocations                           )                
+    .def_readwrite("MouseDelta"                                 ,&ImGuiIO::MouseDelta                                         )  
+    .def_readwrite("WantCaptureMouseUnlessPopupClose"           ,&ImGuiIO::WantCaptureMouseUnlessPopupClose                   )                        
+    .def_readwrite("KeyMods"                                    ,&ImGuiIO::KeyMods                                            ) 
+    .def_readwrite("KeyModsPrev"                                ,&ImGuiIO::KeyModsPrev                                        )   
+    .def_readwrite("MousePosPrev"                               ,&ImGuiIO::MousePosPrev                                       )    
+    .def_property_readonly("MouseClickedPos"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseClickedPos, ob};})
+    .def_property_readonly("MouseClickedTime"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseClickedTime, ob};})
+    .def_property_readonly("MouseClicked"             		, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseClicked, ob};})
+    .def_property_readonly("MouseDoubleClicked"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseDoubleClicked, ob};})
+    .def_property_readonly("MouseClickedCount"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseClickedCount, ob};})
+    .def_property_readonly("MouseClickedLastCount"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseClickedLastCount, ob};})
+    .def_property_readonly("MouseReleased"             		, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseReleased, ob};})
+    .def_property_readonly("MouseDownOwned"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseDownOwned, ob};})
+    .def_property_readonly("MouseDownOwnedUnlessPopupClose"     , [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseDownOwnedUnlessPopupClose, ob};})
+    .def_property_readonly("MouseDownDuration"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseDownDuration, ob};})
+    .def_property_readonly("MouseDownDurationPrev"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseDownDurationPrev, ob};})
+    .def_property_readonly("MouseDragMaxDistanceAbs"            , [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseDragMaxDistanceAbs, ob};})
+    .def_property_readonly("MouseDragMaxDistanceSqr"            , [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{5, o.MouseDragMaxDistanceSqr, ob};})
+    .def_property_readonly("KeysDownDuration"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{512, o.KeysDownDuration, ob};})
+    .def_property_readonly("KeysDownDurationPrev"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{512, o.KeysDownDurationPrev, ob};})
+    .def_property_readonly("NavInputsDownDuration"             	, [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{ImGuiNavInput_COUNT, o.NavInputsDownDuration, ob};})
+    .def_property_readonly("NavInputsDownDurationPrev"          , [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{ImGuiNavInput_COUNT, o.NavInputsDownDurationPrev, ob};})
+    .def_readwrite("PenPressure"                                ,&ImGuiIO::PenPressure                                        )   
+    .def_readwrite("AppFocusLost"                               ,&ImGuiIO::AppFocusLost                                       )    
+    .def_readwrite("InputQueueSurrogate"                        ,&ImGuiIO::InputQueueSurrogate                                )           
+    .def_readwrite("InputQueueCharacters"                       ,&ImGuiIO::InputQueueCharacters                               )            
+
+    ;
+}
+
 void bind_imgui_methods(py::module& m) {
+
+    // Main
+    m.def("GetIO", &ImGui::GetIO, py::return_value_policy::reference);
+
     // Windows
     m.def(
         "Begin",
@@ -1512,7 +1603,7 @@ void bind_imgui_methods(py::module& m) {
     // Inputs Utilities: Keyboard
     m.def("GetKeyIndex", [](ImGuiKey imgui_key) { return ImGui::GetKeyIndex(imgui_key); }, py::arg("imgui_key"));
     m.def("IsKeyDown", [](ImGuiKey user_key_index) { return ImGui::IsKeyDown(user_key_index); }, py::arg("user_key_index"));
-    m.def("IsKeyPressed", [](ImGuiKey user_key_index) { return ImGui::IsKeyPressed(user_key_index); }, py::arg("user_key_index"));
+    m.def("IsKeyPressed", [](ImGuiKey user_key_index, bool repeat) { return ImGui::IsKeyPressed(user_key_index, repeat); }, py::arg("user_key_index"), py::arg("repeat")=true);
     m.def("IsKeyReleased", [](ImGuiKey user_key_index) { return ImGui::IsKeyReleased(user_key_index); }, py::arg("user_key_index"));
     m.def(
         "GetKeyPressedAmount",
