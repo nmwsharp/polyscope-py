@@ -70,6 +70,9 @@ def set_errors_throw_exceptions(val):
 def set_max_fps(f):
     psb.set_max_fps(f)
 
+def set_enable_vsync(b):
+    psb.set_enable_vsync(b)
+
 def set_use_prefs_file(v):
     psb.set_use_prefs_file(v)
 
@@ -87,6 +90,9 @@ def set_autoscale_structures(b):
 
 def set_build_gui(b):
     psb.set_build_gui(b)
+
+def set_render_scene(b):
+    psb.set_render_scene(b)
 
 def set_open_imgui_window_for_user_callback(b):
     psb.set_open_imgui_window_for_user_callback(b)

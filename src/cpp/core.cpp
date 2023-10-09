@@ -102,14 +102,16 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_program_name", [](std::string x) { ps::options::programName = x; });
   m.def("set_verbosity", [](int x) { ps::options::verbosity = x; });
   m.def("set_print_prefix", [](std::string x) { ps::options::printPrefix = x; });
-  m.def("set_max_fps", [](int x) { ps::options::maxFPS = x; });
   m.def("set_errors_throw_exceptions", [](bool x) { ps::options::errorsThrowExceptions = x; });
+  m.def("set_max_fps", [](int x) { ps::options::maxFPS = x; });
+  m.def("set_enable_vsync", [](bool x) { ps::options::enableVSync = x; });
   m.def("set_use_prefs_file", [](bool x) { ps::options::usePrefsFile = x; });
   m.def("set_always_redraw", [](bool x) { ps::options::alwaysRedraw = x; });
   m.def("set_enable_render_error_checks", [](bool x) { ps::options::enableRenderErrorChecks = x; });
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
   m.def("set_autoscale_structures", [](bool x) { ps::options::autoscaleStructures = x; });
   m.def("set_build_gui", [](bool x) { ps::options::buildGui = x; });
+  m.def("set_render_scene", [](bool x) { ps::options::renderScene = x; });
   m.def("set_open_imgui_window_for_user_callback", [](bool x) { ps::options::openImGuiWindowForUserCallback= x; });
   m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });
   m.def("set_give_focus_on_show", [](bool x) { ps::options::giveFocusOnShow = x; });

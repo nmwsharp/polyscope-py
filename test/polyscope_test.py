@@ -41,6 +41,7 @@ class TestCore(unittest.TestCase):
         ps.set_print_prefix("polyscope test")
         ps.set_errors_throw_exceptions(True)
         ps.set_max_fps(60)
+        ps.set_enable_vsync(True)
         ps.set_use_prefs_file(True)
         ps.set_always_redraw(False)
         
@@ -50,6 +51,7 @@ class TestCore(unittest.TestCase):
         ps.set_autoscale_structures(False)
 
         ps.set_build_gui(True)
+        ps.set_render_scene(True)
         ps.set_open_imgui_window_for_user_callback(True)
         ps.set_invoke_user_callback_for_nested_show(False)
         ps.set_give_focus_on_show(True)
