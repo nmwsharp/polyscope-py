@@ -142,6 +142,7 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("add_color_render_image_quantity", &StructureT::template addColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("colorData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
       .def("add_scalar_render_image_quantity", &StructureT::template addScalarRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::VectorXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("scalarData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::arg("type")=ps::DataType::STANDARD, py::return_value_policy::reference)
       .def("add_raw_color_render_image_quantity", &StructureT::template addRawColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("colorData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
+      .def("add_raw_color_alpha_render_image_quantity", &StructureT::template addRawColorAlphaRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("colorData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
 
       ;
 

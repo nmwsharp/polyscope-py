@@ -1,6 +1,6 @@
 import polyscope_bindings as psb
 
-from polyscope.floating_quantities import add_scalar_image_quantity, add_color_image_quantity, add_color_alpha_image_quantity, add_depth_render_image_quantity, add_color_render_image_quantity, add_scalar_render_image_quantity, add_raw_color_render_image_quantity
+from polyscope.floating_quantities import add_scalar_image_quantity, add_color_image_quantity, add_color_alpha_image_quantity, add_depth_render_image_quantity, add_color_render_image_quantity, add_scalar_render_image_quantity, add_raw_color_render_image_quantity, add_raw_color_alpha_render_image_quantity
 from polyscope.managed_buffer import ManagedBuffer
 
 # Base class for common properties and methods on structures
@@ -187,4 +187,12 @@ class Structure:
 
         # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
         return add_raw_color_render_image_quantity(name, depth_values, color_values, image_origin=image_origin, struct_ref=self, **option_args)
+
+    def add_raw_color_alpha_render_image_quantity(self, name, depth_values, color_values, image_origin="upper_left", **option_args):
+        """
+        Add a "floating" render image quantity to the structure
+        """
+
+        # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
+        return add_raw_color_alpha_render_image_quantity(name, depth_values, color_values, image_origin=image_origin, struct_ref=self, **option_args)
 

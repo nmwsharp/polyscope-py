@@ -1766,7 +1766,49 @@ class TestCameraView(unittest.TestCase):
         cam.add_scalar_render_image_quantity("render_img2", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
         
         # true floating adder
-        ps.add_scalar_render_image_quantity("render_img3", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7, )
+        ps.add_scalar_render_image_quantity("render_img3", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_raw_color_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        colors = np.ones((dimX, dimY, 3))
+
+        cam.add_raw_color_render_image_quantity("render_img", depths, colors)
+        cam.add_raw_color_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
+        
+        # true floating adder
+        ps.add_raw_color_render_image_quantity("render_img3", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_raw_color_alpha_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        colors = np.ones((dimX, dimY, 4))
+
+        cam.add_raw_color_alpha_render_image_quantity("render_img", depths, colors)
+        cam.add_raw_color_alpha_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
+        
+        # true floating adder
+        ps.add_raw_color_alpha_render_image_quantity("render_img3", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
         
         ps.show(3)
         ps.remove_all_structures()

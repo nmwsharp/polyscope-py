@@ -187,3 +187,28 @@ def add_raw_color_render_image_quantity(name, depth_values, color_values, image_
     process_color_args(struct_ref, q, option_args)
     process_render_image_args(struct_ref, q, option_args)
     check_all_args_processed(struct_ref, q, option_args)
+
+def add_raw_color_alpha_render_image_quantity(name, depth_values, color_values, image_origin="upper_left", struct_ref=None, **option_args):
+
+    struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
+
+    check_is_scalar_image(depth_values)
+    check_is_image4(color_values)
+    check_image_dims_compatible([depth_values, color_values])
+    dimY = depth_values.shape[0]
+    dimX = depth_values.shape[1]
+
+    depth_values_flat = depth_values.flatten()
+    color_values_flat = color_values.reshape(-1,4)
+        
+    q = struct_instance_ref.add_raw_color_alpha_render_image_quantity(name, dimX, dimY, 
+                                                                depth_values_flat, color_values_flat,
+                                                                str_to_image_origin(image_origin))
+    
+
+    # process and act on additional arguments
+    # note: each step modifies the option_args dict and removes processed args
+    process_quantity_args(struct_ref, q, option_args)
+    process_color_args(struct_ref, q, option_args)
+    process_render_image_args(struct_ref, q, option_args)
+    check_all_args_processed(struct_ref, q, option_args)
