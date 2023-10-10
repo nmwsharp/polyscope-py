@@ -56,6 +56,10 @@ class TestCore(unittest.TestCase):
         ps.set_invoke_user_callback_for_nested_show(False)
         ps.set_give_focus_on_show(True)
         
+        ps.set_background_color((0.7, 0.8, 0.9))
+        ps.set_background_color((0.7, 0.8, 0.9, 0.9))
+        ps.get_background_color()
+        
         ps.show(3)
 
     def test_callbacks(self):

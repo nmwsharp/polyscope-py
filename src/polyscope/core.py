@@ -173,6 +173,13 @@ def set_view_from_json(json_str, fly_to=False):
 def get_view_as_json():
     return psb.get_view_as_json()
 
+def set_background_color(c):
+    if len(c) == 3: c = (c[0], c[1], c[2], 1.0)
+    psb.set_background_color(glm4(c))
+
+def get_background_color():
+    return psb.get_background_color()
+
 def get_view_camera_parameters():
     return CameraParameters(instance=psb.get_view_camera_parameters())
 
