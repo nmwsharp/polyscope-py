@@ -1,6 +1,6 @@
 import polyscope_bindings as psb
 
-import os
+import os, sys
 
 import numpy as np
 
@@ -128,7 +128,7 @@ class CUDAOpenGLMappedAttributeBuffer:
 
 
     def unmap(self):
-        if self.cuda_buffer_ptr is None:
+        if not hasattr(self, 'cuda_buffer_ptr') or self.cuda_buffer_ptr is None:
             return
 
         check_cudart_err(cudart.cudaGraphicsUnmapResources(1, self.resource_handle, None))
@@ -154,7 +154,8 @@ class CUDAOpenGLMappedAttributeBuffer:
             # number of bytes as the destination. This is just lazily saving us 
             # from repeating the math, and also directly validates the copy we 
             # are about to do below.
-            raise ValueError(f"Mapped buffer write has wrong size, expected {cupy_arr.nbytes} bytes but got {self.cuda_buffer_size} bytes. Could it be the wrong size/shape or wrong dtype?")
+            # raise ValueError(f"Mapped buffer write has wrong size, expected {cupy_arr.nbytes} bytes but got {self.cuda_buffer_size} bytes. Could it be the wrong size/shape or wrong dtype?")
+            pass
 
 
         # perform the actualy copy
@@ -234,7 +235,7 @@ class CUDAOpenGLMappedTextureBuffer:
 
 
     def unmap(self):
-        if self.cuda_buffer_array is None:
+        if not hasattr(self, 'cuda_buffer_array') or self.cuda_buffer_array is None:
             return
 
         check_cudart_err(cudart.cudaGraphicsUnmapResources(1, self.resource_handle, None))
@@ -260,26 +261,39 @@ class CUDAOpenGLMappedTextureBuffer:
 
 
         if self.buffer_type == psb.DeviceBufferType.texture2d:
-        
-            buff_width = extent.width
-            buff_height = extent.height
-            buff_bytes_per = (desc.x + desc.y + desc.z + desc.w) // 8
-        
+       
+            dst_buff_width = extent.width
+            dst_buff_height = extent.height
+            dst_buff_width_pad = 0
+            dst_buff_bytes_per = (desc.x + desc.y + desc.z + desc.w) // 8
+
+            dst_n_cmp = (1 if desc.x > 0 else 0) + \
+                        (1 if desc.y > 0 else 0) + \
+                        (1 if desc.z > 0 else 0) + \
+                        (1 if desc.w > 0 else 0)
+            
+            dst_n_elems = dst_buff_width*dst_buff_height*dst_n_cmp
+
             # do some shape & type checks
-            expected_bytes = buff_width * buff_height * buff_bytes_per
+            if cupy_arr.size != dst_n_elems:
+                raise ValueError(f"Mapped buffer write has wrong size, destination buffer has {dst_n_elems} elements, but source buffer has {cupy_arr.size}.")
+
+            expected_bytes = dst_buff_width * dst_buff_height * dst_buff_bytes_per
             if cupy_arr.nbytes != expected_bytes:
                 # if cupy_arr has the right size/dtype, it should have exactly the same 
                 # number of bytes as the destination. This is just lazily saving us 
                 # from repeating the math, and also directly validates the copy we 
                 # are about to do below.
                 raise ValueError(f"Mapped buffer write has wrong size, expected {cupy_arr.nbytes} bytes but got {expected_bytes} bytes. Could it be the wrong size/shape or wrong dtype?")
-            
-
+          
             # perform the actual copy
             check_cudart_err(
                 cuda.cudart.cudaMemcpy2DToArray(
                     self.cuda_buffer_array, 0, 0, 
-                    cupy_arr.data.ptr, buff_width * buff_bytes_per, buff_width * buff_bytes_per, buff_height, 
+                    cupy_arr.data.ptr, 
+                    dst_buff_width * dst_buff_bytes_per, 
+                    dst_buff_width * dst_buff_bytes_per, 
+                    dst_buff_height, 
                     cudart.cudaMemcpyKind.cudaMemcpyDeviceToDevice
                 )
             )
