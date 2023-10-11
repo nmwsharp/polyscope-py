@@ -76,6 +76,12 @@ def set_enable_vsync(b):
 def set_use_prefs_file(v):
     psb.set_use_prefs_file(v)
 
+def request_redraw():
+    psb.request_redraw()
+
+def get_redraw_requested():
+    return psb.get_redraw_requested()
+
 def set_always_redraw(v):
     psb.set_always_redraw(v)
 
@@ -185,7 +191,7 @@ def get_view_camera_parameters():
 
 def set_view_camera_parameters(params):
     if not isinstance(params, CameraParameters): raise ValueError("must pass CameraParameters")
-    set_view_camera_parameters(params.instance)
+    psb.set_view_camera_parameters(params.instance)
 
 def get_view_buffer_resolution():
     return CameraParameters(instance=psb.get_view_camera_parameters())
@@ -244,6 +250,11 @@ def set_transparency_render_passes(n):
 ## Rendering
 def set_SSAA_factor(n):
     psb.set_SSAA_factor(n)
+  
+## Low-level internals access
+# (warning, 'advanced' users only, may change)
+def get_final_scene_color_texture_native_handle():
+    return psb.get_final_scene_color_texture_native_handle()
 
 ## Slice planes
 
