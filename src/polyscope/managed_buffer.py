@@ -110,3 +110,23 @@ class ManagedBuffer:
     def release_mapped_buffer_CUDAOpenGL(self):
         if self.uniqueID in _mapped_buffer_cache_CUDAOpenGL:
             del _mapped_buffer_cache_CUDAOpenGL[self.uniqueID]
+    
+    def get_texture_native_id(self):
+        if self.device_buffer_type == psb.DeviceBufferType.attribute:
+            raise ValueError("buffer is not a texture (perhaps try the 'attribute' variant?)")
+
+        return self.bound_buffer.get_native_render_texture_buffer_ID()
+    
+    def get_attribute_native_id(self):
+        if self.device_buffer_type != psb.DeviceBufferType.attribute:
+            raise ValueError("buffer is not an attribute (perhaps try the 'texture' variant?)")
+
+        return self.bound_buffer.get_native_render_attribute_buffer_ID()
+
+
+    def mark_device_buffer_updated(self):
+
+        if self.device_buffer_type == psb.DeviceBufferType.attribute:
+            self.bound_buffer.mark_render_attribute_buffer_updated()
+        else: # texture
+            self.bound_buffer.mark_render_texture_buffer_updated()
