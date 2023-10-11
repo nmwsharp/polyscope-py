@@ -50,6 +50,10 @@ class TestCore(unittest.TestCase):
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
 
+        ps.request_redraw()
+        self.assertTrue(ps.get_redraw_requested())
+        ps.set_always_redraw(False)
+
         ps.set_build_gui(True)
         ps.set_render_scene(True)
         ps.set_open_imgui_window_for_user_callback(True)
@@ -59,6 +63,8 @@ class TestCore(unittest.TestCase):
         ps.set_background_color((0.7, 0.8, 0.9))
         ps.set_background_color((0.7, 0.8, 0.9, 0.9))
         ps.get_background_color()
+
+        ps.get_final_scene_color_texture_native_handle()
         
         ps.show(3)
 
