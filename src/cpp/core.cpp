@@ -106,6 +106,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_max_fps", [](int x) { ps::options::maxFPS = x; });
   m.def("set_enable_vsync", [](bool x) { ps::options::enableVSync = x; });
   m.def("set_use_prefs_file", [](bool x) { ps::options::usePrefsFile = x; });
+  m.def("request_redraw", []() { ps::requestRedraw(); });
+  m.def("get_redraw_requested", []() { return ps::redrawRequested(); });
   m.def("set_always_redraw", [](bool x) { ps::options::alwaysRedraw = x; });
   m.def("set_enable_render_error_checks", [](bool x) { ps::options::enableRenderErrorChecks = x; });
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
@@ -234,6 +236,10 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Rendering
   m.def("set_SSAA_factor", [](int n) { ps::options::ssaaFactor = n; });
+
+  // === Low-level internals access
+  // (warning, 'advanced' users only, may change)
+  m.def("get_final_scene_color_texture_native_handle", []() { ps::render::engine->getFinalSceneColorTexture().getNativeBufferID(); });
 
   // === Slice planes
   py::class_<ps::SlicePlane>(m, "SlicePlane")
