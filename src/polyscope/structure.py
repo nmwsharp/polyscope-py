@@ -62,7 +62,7 @@ class Structure:
 
         present, buffer_type = self.bound_instance.has_buffer_type(buffer_name)
 
-        if not present: raise ValueError("structure has no buffer named " + name)
+        if not present: raise ValueError("structure has no buffer named " + buffer_name)
 
         return {
             psb.ManagedBufferType.Float     :  lambda n,t : ManagedBuffer(self.bound_instance.get_buffer_Float   (n), t),
@@ -89,7 +89,7 @@ class Structure:
                 # give a more informative error if this was called on the global floating quantity, becuase it is particularly easy for users to get confused and call this function at the global scope rather than on a quantity
                 raise ValueError("Quantity has no buffer named " + name + ". NOTE: calling polyscope.get_quantity_buffer() is for global floating quantities only, call structure.get_quantity_buffer() to get buffers for a quantity added to some structure.")
             else:
-                raise ValueError("quantity has no buffer named " + name)
+                raise ValueError(f"quantity {quantity_name} has no buffer named {buffer_name}")
         
         return {
             psb.ManagedBufferType.Float     :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_Float   (q,n), t),
