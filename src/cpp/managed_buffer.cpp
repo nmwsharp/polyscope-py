@@ -32,12 +32,33 @@ py::class_<ps::render::ManagedBuffer<T>> bind_managed_buffer_T(py::module& m, ps
       .def("get_value", overload_cast_<size_t, size_t>()(&ps::render::ManagedBuffer<T>::getValue))
       .def("get_value", overload_cast_<size_t, size_t, size_t>()(&ps::render::ManagedBuffer<T>::getValue))
       .def("mark_host_buffer_updated", &ps::render::ManagedBuffer<T>::markHostBufferUpdated)
+      .def("get_device_buffer_size_in_bytes", [](ps::render::ManagedBuffer<T>& s) {
+            // NOTE: this could cause the underlying device buffer to be allocatred if it wasn't already
+            if (s.getDeviceBufferType() == polyscope::DeviceBufferType::Attribute) {
+              return s.getRenderAttributeBuffer()->getDataSizeInBytes();
+            } else {
+              return s.getRenderTextureBuffer()->getSizeInBytes();
+            }
+          })
+      .def("get_device_buffer_element_size_in_bytes", [](ps::render::ManagedBuffer<T>& s) {
+            // NOTE: this could cause the underlying device buffer to be allocatred if it wasn't already
+            if (s.getDeviceBufferType() == polyscope::DeviceBufferType::Attribute) {
+              std::shared_ptr<polyscope::render::AttributeBuffer> buff = s.getRenderAttributeBuffer();
+              return polyscope::sizeInBytes(buff->getType()) * buff->getArrayCount();
+            } else {
+              std::shared_ptr<polyscope::render::TextureBuffer> buff = s.getRenderTextureBuffer();
+              return polyscope::sizeInBytes(buff->getFormat());
+            }
+          })
       .def("get_native_render_attribute_buffer_ID",
            [](ps::render::ManagedBuffer<T>& s) { return s.getRenderAttributeBuffer()->getNativeBufferID(); })
       .def("mark_render_attribute_buffer_updated", &ps::render::ManagedBuffer<T>::markRenderAttributeBufferUpdated)
       .def("get_native_render_texture_buffer_ID",
            [](ps::render::ManagedBuffer<T>& s) { return s.getRenderTextureBuffer()->getNativeBufferID(); })
-      .def("mark_render_texture_buffer_updated", &ps::render::ManagedBuffer<T>::markRenderTextureBufferUpdated);
+      .def("mark_render_texture_buffer_updated", &ps::render::ManagedBuffer<T>::markRenderTextureBufferUpdated)
+
+
+  ;
 }
 
 // clang-format off

@@ -74,11 +74,18 @@ class ManagedBuffer:
         self.check_ref_still_valid()
 
         mapped_buffer = self.get_mapped_buffer_CUDAOpenGL()
-        mapped_buffer.set_data_from_array(new_vals_device)
 
         if self.device_buffer_type == psb.DeviceBufferType.attribute:
+
+            mapped_buffer.set_data_from_array(new_vals_device, self.bound_buffer.get_device_buffer_size_in_bytes())
+
             self.bound_buffer.mark_render_attribute_buffer_updated()
+
         else: # texture
+
+            mapped_buffer.set_data_from_array(new_vals_device, self.bound_buffer.get_texture_size(),
+                                              self.bound_buffer.get_device_buffer_element_size_in_bytes())
+
             self.bound_buffer.mark_render_texture_buffer_updated()
 
     def get_mapped_buffer_CUDAOpenGL(self):

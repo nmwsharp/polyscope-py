@@ -4,6 +4,7 @@ from polyscope.structure import *
 from polyscope.floating_quantities import *
 from polyscope.managed_buffer import *
 from polyscope.implicit_helpers import *
+from polyscope.device_interop import *
 
 from polyscope.surface_mesh import *
 from polyscope.point_cloud import *
