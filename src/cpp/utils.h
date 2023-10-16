@@ -77,7 +77,10 @@ void def_get_quantity_managed_buffer(C& c, std::string postfix) {
             return fqPtr->template getManagedBuffer<T>(buffer_name);
           }
           ps::exception("structure " + s.name + " has no quantity " + quantity_name);
-          return *static_cast<ps::render::ManagedBuffer<T>*>(nullptr); // invalid, never executed
+
+          // this line should be unreachable, it is here to convince the compiler that we don't need a return value
+          // here, to silence warnings
+          throw std::logic_error("structure has no such quantity");
         },
         "get quantity managed buffer", py::return_value_policy::reference);
 }
