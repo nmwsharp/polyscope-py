@@ -23,6 +23,7 @@ pybind11_add_module(polyscope_bindings
   src/cpp/managed_buffer.cpp
   src/cpp/imgui.cpp
 )
+set_target_properties(polyscope_bindings PROPERTIES CXX_VISIBILITY_PRESET "default")
 
 target_include_directories(polyscope_bindings PUBLIC "${EIGEN3_INCLUDE_DIR}")
 target_link_libraries(polyscope_bindings PRIVATE polyscope)
