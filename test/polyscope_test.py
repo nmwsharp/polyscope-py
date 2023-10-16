@@ -1102,11 +1102,13 @@ class TestSurfaceMesh(unittest.TestCase):
     
     def test_scalar(self):
 
-        for on in ['vertices', 'faces', 'edges', 'halfedges']:
+        for on in ['vertices', 'faces', 'edges', 'halfedges', 'texture']:
         
             ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
             p = ps.get_surface_mesh("test_mesh")
-       
+      
+            param_name = None  # used for texture case only
+
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices())
             elif on == 'faces':
@@ -1116,12 +1118,18 @@ class TestSurfaceMesh(unittest.TestCase):
                 p.set_edge_permutation(np.random.permutation(p.n_edges()))
             elif on  == 'halfedges':
                 vals = np.random.rand(p.n_halfedges())
+            elif on == 'texture':
+                param_vals = np.random.rand(p.n_vertices(), 2)
+                param_name = "test_param"
+                p.add_parameterization_quantity(param_name, param_vals, defined_on='vertices', enabled=True)
+                vals = np.random.rand(20,30)
 
-            p.add_scalar_quantity("test_vals", vals, defined_on=on)
-            p.add_scalar_quantity("test_vals2", vals, defined_on=on, enabled=True)
-            p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
-            p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, enabled=True, datatype='symmetric')
-            p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, enabled=True, cmap='blues')
+
+            p.add_scalar_quantity("test_vals", vals, defined_on=on, param_name=param_name)
+            p.add_scalar_quantity("test_vals2", vals, defined_on=on, param_name=param_name, enabled=True)
+            p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, param_name=param_name, vminmax=(-5., 5.), enabled=True)
+            p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, param_name=param_name, enabled=True, datatype='symmetric')
+            p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, param_name=param_name, enabled=True, cmap='blues')
 
             ps.show(3)
 
@@ -1137,16 +1145,23 @@ class TestSurfaceMesh(unittest.TestCase):
         ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
         p = ps.get_surface_mesh("test_mesh")
 
-        for on in ['vertices', 'faces']:
-       
+        for on in ['vertices', 'faces', 'texture']:
+      
+            param_name = None  # used for texture case only
+
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices(), 3)
             elif on == 'faces':
                 vals = np.random.rand(p.n_faces(), 3)
+            elif on == 'texture':
+                param_vals = np.random.rand(p.n_vertices(), 2)
+                param_name = "test_param"
+                p.add_parameterization_quantity(param_name, param_vals, defined_on='vertices', enabled=True)
+                vals = np.random.rand(20,30,3)
        
 
-            p.add_color_quantity("test_vals", vals, defined_on=on)
-            p.add_color_quantity("test_vals", vals, defined_on=on, enabled=True)
+            p.add_color_quantity("test_vals", vals, defined_on=on, param_name=param_name)
+            p.add_color_quantity("test_vals", vals, defined_on=on, param_name=param_name, enabled=True)
 
             ps.show(3)
             p.remove_all_quantities()

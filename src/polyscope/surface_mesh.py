@@ -3,9 +3,9 @@ import numpy as np
 
 from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type,            \
                            str_to_param_viz_style, str_to_back_face_policy, back_face_policy_to_str,\
-                           glm3
+                           str_to_image_origin, glm3
 from polyscope.structure import Structure
-from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, process_parameterization_args, check_all_args_processed
+from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, process_parameterization_args, check_all_args_processed, check_is_scalar_image, check_is_image3
 
 class SurfaceMesh(Structure):
 
@@ -155,9 +155,9 @@ class SurfaceMesh(Structure):
     ## Quantities
 
     # Scalar
-    def add_scalar_quantity(self, name, values, defined_on='vertices', datatype="standard", **scalar_args):
+    def add_scalar_quantity(self, name, values, defined_on='vertices', datatype="standard", param_name=None, image_origin="upper_left", **scalar_args):
 
-        if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
+        if defined_on != 'texture' and len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
 
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
@@ -171,8 +171,15 @@ class SurfaceMesh(Structure):
         elif defined_on == 'halfedges':
             if values.shape[0] != self.n_halfedges(): raise ValueError("'values' should be a length n_halfedges array")
             q = self.bound_instance.add_halfedge_scalar_quantity(name, values, str_to_datatype(datatype))
+        elif defined_on == 'texture':
+            check_is_scalar_image(values)
+            dimY = values.shape[0]
+            dimX = values.shape[1]
+            if not isinstance(param_name, str): 
+                raise ValueError("when adding a quantity defined in a texture, you must pass 'param_name' as a string giving the name of a parameterization quantity on this structure, which provides the UV coords")
+            q = self.bound_instance.add_texture_scalar_quantity(name, param_name, dimX, dimY, values.flatten(), str_to_image_origin(image_origin), str_to_datatype(datatype))
         else:
-            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces', 'edges', 'halfedges']".format(defined_on))
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces', 'edges', 'halfedges', 'texture']".format(defined_on))
             
 
         # process and act on additional arguments
@@ -183,8 +190,8 @@ class SurfaceMesh(Structure):
 
     
     # Color
-    def add_color_quantity(self, name, values, defined_on='vertices', **color_args):
-        if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
+    def add_color_quantity(self, name, values, defined_on='vertices', param_name=None, image_origin="upper_left", **color_args):
+        if defined_on != 'texture' and (len(values.shape) != 2 or values.shape[1] != 3): raise ValueError("'values' should be an Nx3 array")
         
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
@@ -192,8 +199,15 @@ class SurfaceMesh(Structure):
         elif defined_on == 'faces':
             if values.shape[0] != self.n_faces(): raise ValueError("'values' should be a length n_faces array")
             q = self.bound_instance.add_face_color_quantity(name, values)
+        elif defined_on == 'texture':
+            check_is_image3(values)
+            dimY = values.shape[0]
+            dimX = values.shape[1]
+            if not isinstance(param_name, str): 
+                raise ValueError("when adding a quantity defined in a texture, you must pass 'param_name' as a string giving the name of a parameterization quantity on this structure, which provides the UV coords")
+            q = self.bound_instance.add_texture_color_quantity(name, param_name, dimX, dimY, values.reshape(-1,3), str_to_image_origin(image_origin))
         else:
-            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces', 'texture']".format(defined_on))
 
 
         # process and act on additional arguments

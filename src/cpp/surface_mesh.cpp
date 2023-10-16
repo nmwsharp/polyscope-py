@@ -24,10 +24,12 @@ void bind_surface_mesh(py::module& m) {
   bindScalarQuantity<ps::SurfaceFaceScalarQuantity>(m, "SurfaceFaceScalarQuantity");
   bindScalarQuantity<ps::SurfaceEdgeScalarQuantity>(m, "SurfaceEdgeScalarQuantity");
   bindScalarQuantity<ps::SurfaceHalfedgeScalarQuantity>(m, "SurfaceHalfedgeScalarQuantity");
+  bindScalarQuantity<ps::SurfaceTextureScalarQuantity>(m, "SurfaceTextureScalarQuantity");
 
   // Color quantities
   bindColorQuantity<ps::SurfaceVertexColorQuantity>(m, "SurfaceVertexColorQuantity");
   bindColorQuantity<ps::SurfaceFaceColorQuantity>(m, "SurfaceFaceColorQuantity");
+  bindColorQuantity<ps::SurfaceTextureColorQuantity>(m, "SurfaceTextureColorQuantity");
 
   // Parameterization quantities
   py::class_<ps::SurfaceCornerParameterizationQuantity>(m, "SurfaceCornerParameterizationQuantity")
@@ -106,12 +108,23 @@ void bind_surface_mesh(py::module& m) {
       .def("add_halfedge_scalar_quantity", &ps::SurfaceMesh::addHalfedgeScalarQuantity<Eigen::VectorXd>,
            "Add a scalar function at halfedges", py::arg("name"), py::arg("values"),
            py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
+      .def("add_texture_scalar_quantity",
+           overload_cast_<std::string, std::string, size_t, size_t, const Eigen::VectorXd&, ps::ImageOrigin,
+                          polyscope::DataType>()(&ps::SurfaceMesh::addTextureScalarQuantity<Eigen::VectorXd>),
+           "Add a scalar function from a texture map", py::arg("name"), py::arg("param_name"), py::arg("dimX"),
+           py::arg("dimY"), py::arg("values"), py::arg("image_origin"), py::arg("data_type") = ps::DataType::STANDARD,
+           py::return_value_policy::reference)
 
       // Colors
       .def("add_vertex_color_quantity", &ps::SurfaceMesh::addVertexColorQuantity<Eigen::MatrixXd>,
            "Add a color value at vertices", py::return_value_policy::reference)
       .def("add_face_color_quantity", &ps::SurfaceMesh::addFaceColorQuantity<Eigen::MatrixXd>,
            "Add a color value at faces", py::return_value_policy::reference)
+      .def("add_texture_color_quantity",
+           overload_cast_<std::string, std::string, size_t, size_t, const Eigen::MatrixXd&, ps::ImageOrigin>()(
+               &ps::SurfaceMesh::addTextureColorQuantity<Eigen::MatrixXd>),
+           "Add a color function from a texture map", py::arg("name"), py::arg("param_name"), py::arg("dimX"),
+           py::arg("dimY"), py::arg("colors"), py::arg("image_origin"), py::return_value_policy::reference)
 
       // Distance
       .def("add_vertex_distance_quantity", &ps::SurfaceMesh::addVertexDistanceQuantity<Eigen::VectorXd>,
@@ -134,9 +147,11 @@ void bind_surface_mesh(py::module& m) {
            "Add a vertex 2D vector quantity", py::return_value_policy::reference)
       .def("add_face_vector_quantity2D", &ps::SurfaceMesh::addFaceVectorQuantity2D<Eigen::MatrixXd>,
            "Add a face 2D vector quantity", py::return_value_policy::reference)
-      .def("add_vertex_tangent_vector_quantity", &ps::SurfaceMesh::addVertexTangentVectorQuantity<Eigen::MatrixXd,Eigen::MatrixXd,Eigen::MatrixXd>,
+      .def("add_vertex_tangent_vector_quantity",
+           &ps::SurfaceMesh::addVertexTangentVectorQuantity<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd>,
            "Add a vertex tangent vector quantity", py::return_value_policy::reference)
-      .def("add_face_tangent_vector_quantity", &ps::SurfaceMesh::addFaceTangentVectorQuantity<Eigen::MatrixXd,Eigen::MatrixXd,Eigen::MatrixXd>,
+      .def("add_face_tangent_vector_quantity",
+           &ps::SurfaceMesh::addFaceTangentVectorQuantity<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd>,
            "Add a face tangent vector quantity", py::return_value_policy::reference)
       .def("add_one_form_tangent_vector_quantity",
            &ps::SurfaceMesh::addOneFormTangentVectorQuantity<Eigen::VectorXd, Eigen::Matrix<bool, Eigen::Dynamic, 1>>,
