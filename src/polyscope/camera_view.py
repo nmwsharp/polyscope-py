@@ -65,7 +65,7 @@ def register_camera_view(name, camera_parameters,
                          widget_color=None, widget_thickness=None, widget_focal_length=None,
                          ):
     """Register a new camera view"""
-    if not psb.isInitialized():
+    if not psb.is_initialized():
         raise RuntimeError("Polyscope has not been initialized")
 
     p = CameraView(name, camera_parameters)

@@ -66,8 +66,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Basic flow 
   m.def("init", &ps::init, py::arg("backend")="", "Initialize Polyscope");
-  m.def("checkInitialized", &ps::checkInitialized);
-  m.def("isInitialized", &ps::isInitialized);
+  m.def("check_initialized", &ps::checkInitialized);
+  m.def("is_initialized", &ps::isInitialized);
   m.def("show", [](size_t forFrames) {
         if (ps::state::userCallback == nullptr) {
           bool oldVal = ps::options::openImGuiWindowForUserCallback;
@@ -85,10 +85,15 @@ PYBIND11_MODULE(polyscope_bindings, m) {
       },
       py::arg("forFrames")=std::numeric_limits<size_t>::max()
   );
+  m.def("unshow", &ps::unshow);
   m.def("frame_tick", &ps::frameTick);
 
   // === Render engine related things
   m.def("get_render_engine_backend_name", &ps::render::getRenderEngineBackendName);
+  m.def("get_key_code", [](char c) { 
+      ps::checkInitialized();
+      return ps::render::engine->getKeyCode(c); 
+  });
 
   // === Structure management
   m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
@@ -113,6 +118,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
   m.def("set_autoscale_structures", [](bool x) { ps::options::autoscaleStructures = x; });
   m.def("set_build_gui", [](bool x) { ps::options::buildGui = x; });
+  m.def("set_user_gui_is_on_right_side", [](bool x) { ps::options::userGuiIsOnRightSide = x; });
+  m.def("set_build_default_gui_panels", [](bool x) { ps::options::buildDefaultGuiPanels = x; });
   m.def("set_render_scene", [](bool x) { ps::options::renderScene = x; });
   m.def("set_open_imgui_window_for_user_callback", [](bool x) { ps::options::openImGuiWindowForUserCallback= x; });
   m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });

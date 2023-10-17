@@ -25,6 +25,15 @@ def show(forFrames=None):
     else:
         psb.show(forFrames)
 
+def unshow():
+    psb.unshow()
+
+def check_initialized():
+    psb.check_initialized()
+
+def is_initialized():
+    return psb.is_initialized()
+
 def frame_tick():
     psb.frame_tick()
 
@@ -33,6 +42,8 @@ def frame_tick():
 def get_render_engine_backend_name():
     return psb.get_render_engine_backend_name()
 
+def get_key_code(c):
+    return psb.get_key_code(c)
 
 ### Structure management
 
@@ -96,6 +107,12 @@ def set_autoscale_structures(b):
 
 def set_build_gui(b):
     psb.set_build_gui(b)
+
+def set_user_gui_is_on_right_side(b):
+    psb.set_user_gui_is_on_right_side(b)
+
+def set_build_default_gui_panels(b):
+    psb.set_build_default_gui_panels(b)
 
 def set_render_scene(b):
     psb.set_render_scene(b)

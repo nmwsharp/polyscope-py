@@ -130,7 +130,7 @@ class PointCloud(Structure):
 
 def register_point_cloud(name, points, enabled=None, radius=None, point_render_mode=None, color=None, material=None, transparency=None):
     """Register a new point cloud"""
-    if not psb.isInitialized():
+    if not psb.is_initialized():
         raise RuntimeError("Polyscope has not been initialized")
 
     p = PointCloud(name, points)

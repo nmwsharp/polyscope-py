@@ -96,6 +96,8 @@ class TestCore(unittest.TestCase):
         ps.set_navigation_style("turntable")
         ps.set_navigation_style("free")
         ps.set_navigation_style("planar")
+        ps.set_navigation_style("none")
+        ps.set_navigation_style("first_person")
         ps.set_navigation_style(ps.get_navigation_style())
 
         ps.set_up_dir("x_up")
@@ -116,6 +118,8 @@ class TestCore(unittest.TestCase):
         
         ps.set_view_projection_mode("orthographic")
         ps.set_view_projection_mode("perspective")
+        
+        ps.set_camera_view_matrix(ps.get_camera_view_matrix())
 
         ps.set_window_size(800, 600)
         self.assertEqual(ps.get_window_size(), (800,600))

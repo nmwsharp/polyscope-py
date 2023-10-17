@@ -187,7 +187,7 @@ def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None
 
     """Register a new volume mesh"""
 
-    if not psb.isInitialized():
+    if not psb.is_initialized():
         raise RuntimeError("Polyscope has not been initialized")
     
     p = VolumeMesh(name, vertices=vertices, tets=tets, hexes=hexes, mixed_cells=mixed_cells)

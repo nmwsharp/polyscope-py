@@ -170,7 +170,7 @@ class CurveNetwork(Structure):
 
 def register_curve_network(name, nodes, edges, enabled=None, radius=None, color=None, material=None, transparency=None):
     """Register a new curve network"""
-    if not psb.isInitialized():
+    if not psb.is_initialized():
         raise RuntimeError("Polyscope has not been initialized")
     
     p = CurveNetwork(name, nodes, edges)
