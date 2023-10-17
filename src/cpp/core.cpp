@@ -144,6 +144,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_view_projection_mode", [](ps::ProjectionMode x) { ps::view::projectionMode = x; });
   m.def("get_view_camera_parameters", &ps::view::getCameraParametersForCurrentView);
   m.def("set_view_camera_parameters", &ps::view::setViewToCamera);
+  m.def("set_camera_view_matrix", [](Eigen::Matrix4f mat) { ps::view::setCameraViewMatrix(eigen2glm(mat)); });
+  m.def("get_camera_view_matrix", []() { return glm2eigen(ps::view::getCameraViewMatrix()); });
   m.def("set_window_size", &ps::view::setWindowSize);
   m.def("get_window_size", &ps::view::getWindowSize);
   m.def("get_buffer_size", &ps::view::getBufferSize);
@@ -324,6 +326,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("free", ps::view::NavigateStyle::Free)
     .value("planar", ps::view::NavigateStyle::Planar)
     .value("arcball", ps::view::NavigateStyle::Arcball)
+    .value("none", ps::view::NavigateStyle::None)
+    .value("first_person", ps::view::NavigateStyle::FirstPerson)
     .export_values(); 
   
   py::enum_<ps::ProjectionMode>(m, "ProjectionMode")

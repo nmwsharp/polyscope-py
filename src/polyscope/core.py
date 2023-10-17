@@ -196,6 +196,14 @@ def set_view_camera_parameters(params):
 def get_view_buffer_resolution():
     return CameraParameters(instance=psb.get_view_camera_parameters())
 
+def set_camera_view_matrix(mat):
+    mat = np.asarray(mat)
+    if mat.shape != (4,4): raise ValueError("mat should be a 4x4 numpy matrix")
+    psb.set_camera_view_matrix(mat)
+
+def get_camera_view_matrix():
+    return psb.get_camera_view_matrix()
+
 ### Messages
 
 def info(message):
@@ -413,6 +421,8 @@ d_navigate = {
     "turntable" : psb.NavigateStyle.turntable,
     "free" : psb.NavigateStyle.free,
     "planar" : psb.NavigateStyle.planar,
+    "none" : psb.NavigateStyle.none,
+    "first_person" : psb.NavigateStyle.first_person,
 }
 def str_to_navigate_style(s):
 

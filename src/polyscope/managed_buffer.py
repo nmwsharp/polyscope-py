@@ -42,8 +42,6 @@ class ManagedBuffer:
     
     def summary_string(self):
         self.check_ref_still_valid()
-
-
         return self.bound_buffer.summary_string()
     
     def get_value(self, ind, indY=None, indZ=None):
