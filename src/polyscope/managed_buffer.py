@@ -57,6 +57,8 @@ class ManagedBuffer:
     def update_data(self, new_vals):
         self.check_ref_still_valid()
 
+        new_vals = new_vals.reshape((self.size(),-1))
+
         self.update_data_from_host(new_vals)
 
     def update_data_from_host(self, new_vals):
