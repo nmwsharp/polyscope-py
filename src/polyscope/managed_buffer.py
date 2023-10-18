@@ -57,7 +57,7 @@ class ManagedBuffer:
     def update_data(self, new_vals):
         self.check_ref_still_valid()
 
-        self.update_data_from_host(new_vals);
+        self.update_data_from_host(new_vals)
 
     def update_data_from_host(self, new_vals):
         self.check_ref_still_valid()
@@ -66,7 +66,7 @@ class ManagedBuffer:
         # what the underlying kind of buffer is. We should probably document it
         # better or provide some error checking at the Python level.
         # NOTE: this method calls mark_host_buffer_updated() internally, so there is no need to call it again
-        self.bound_buffer.update_data(new_vals);
+        self.bound_buffer.update_data(new_vals)
     
     def update_data_from_device(self, new_vals_device):
         self.check_ref_still_valid()
