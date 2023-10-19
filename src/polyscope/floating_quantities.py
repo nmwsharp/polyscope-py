@@ -3,6 +3,7 @@ import polyscope_bindings as psb
 from polyscope.common import check_is_scalar_image, check_is_image3, check_is_image4, check_image_dims_compatible, process_scalar_args, process_color_args, process_image_args, process_render_image_args, process_quantity_args, check_all_args_processed
 from polyscope.core import str_to_image_origin, str_to_datatype, glm3
 
+import numpy as np
 
 def _resolve_floating_struct_instance(struct_ref):
     if struct_ref is None:
@@ -85,8 +86,11 @@ def add_depth_render_image_quantity(name, depth_values, normal_values, image_ori
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
     check_is_scalar_image(depth_values)
-    check_is_image3(normal_values)
-    check_image_dims_compatible([depth_values, normal_values])
+    if normal_values is None:
+        normal_values = np.zeros((0,0,3))
+    else:
+        check_is_image3(normal_values)
+        check_image_dims_compatible([depth_values, normal_values])
     dimY = depth_values.shape[0]
     dimX = depth_values.shape[1]
 
@@ -112,9 +116,13 @@ def add_color_render_image_quantity(name, depth_values, normal_values, color_val
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
     check_is_scalar_image(depth_values)
-    check_is_image3(normal_values)
     check_is_image3(color_values)
-    check_image_dims_compatible([depth_values, normal_values, color_values])
+    if normal_values is None:
+        normal_values = np.zeros((0,0,3))
+        check_image_dims_compatible([depth_values, color_values])
+    else:
+        check_is_image3(normal_values)
+        check_image_dims_compatible([depth_values, normal_values, color_values])
     dimY = depth_values.shape[0]
     dimX = depth_values.shape[1]
 
@@ -140,9 +148,13 @@ def add_scalar_render_image_quantity(name, depth_values, normal_values, scalar_v
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
     check_is_scalar_image(depth_values)
-    check_is_image3(normal_values)
     check_is_scalar_image(scalar_values)
-    check_image_dims_compatible([depth_values, normal_values, scalar_values])
+    if normal_values is None:
+        normal_values = np.zeros((0,0,3))
+        check_image_dims_compatible([depth_values, scalar_values])
+    else:
+        check_is_image3(normal_values)
+        check_image_dims_compatible([depth_values, normal_values, scalar_values])
     dimY = depth_values.shape[0]
     dimX = depth_values.shape[1]
 
