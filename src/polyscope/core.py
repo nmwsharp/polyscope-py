@@ -126,6 +126,9 @@ def set_invoke_user_callback_for_nested_show(b):
 def set_give_focus_on_show(b):
     psb.set_give_focus_on_show(b)
 
+def set_hide_window_after_show(b):
+    psb.set_hide_window_after_show(b)
+
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))
 def get_navigation_style():

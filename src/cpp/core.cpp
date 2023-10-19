@@ -124,6 +124,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_open_imgui_window_for_user_callback", [](bool x) { ps::options::openImGuiWindowForUserCallback= x; });
   m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });
   m.def("set_give_focus_on_show", [](bool x) { ps::options::giveFocusOnShow = x; });
+  m.def("set_hide_window_after_show", [](bool x) { ps::options::hideWindowAfterShow = x; });
 
 
   // === Scene extents
