@@ -1563,6 +1563,210 @@ class TestVolumeMesh(unittest.TestCase):
         
         ps.remove_all_structures()
 
+class TestVolumeGrid(unittest.TestCase):
+
+    def test_add_remove(self):
+
+        # add
+        n = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        self.assertTrue(ps.has_volume_grid("test_grid"))
+        self.assertFalse(ps.has_volume_grid("nope"))
+        self.assertEqual(n.n_nodes(), 10*12*14)
+        self.assertEqual(n.n_cells(), (10-1)*(12-1)*(14-1))
+      
+        # remove by name
+        ps.register_volume_grid("test_grid2", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        ps.remove_volume_grid("test_grid2")
+        self.assertTrue(ps.has_volume_grid("test_grid"))
+        self.assertFalse(ps.has_volume_grid("test_grid2"))
+
+        # remove by ref
+        c = ps.register_volume_grid("test_grid2", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        c.remove()
+        self.assertTrue(ps.has_volume_grid("test_grid"))
+        self.assertFalse(ps.has_volume_grid("test_grid2"))
+
+        # get by name
+        ps.register_volume_grid("test_grid3",  (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        p = ps.get_volume_grid("test_grid3") # should be wrapped instance, not underlying PSB instance
+        self.assertTrue(isinstance(p, ps.VolumeGrid))
+
+        ps.remove_all_structures()
+    
+    def test_render(self):
+
+        ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        ps.show(3)
+        ps.remove_all_structures()
+
+    def test_options(self):
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+
+        # misc getters
+        p.n_nodes()
+        p.n_cells()
+        p.grid_spacing()
+        self.assertEqual(p.get_grid_node_dim(), 10*12*14)
+        self.assertEqual(p.get_grid_cell_dim(), (10-1)*(12-1)*(14-1))
+        self.assertEqual(p.get_bound_min(), np.array((0., 0., 0.)))
+        self.assertEqual(p.get_bound_max(), np.array((1., 1., 1.)))
+
+        # Set enabled
+        p.set_enabled()
+        p.set_enabled(False)
+        p.set_enabled(True)
+        self.assertTrue(p.is_enabled())
+    
+        # Color
+        color = (0.3, 0.3, 0.5)
+        p.set_color(color)
+        ret_color = p.get_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+        
+        # Edge color
+        color = (0.1, 0.5, 0.5)
+        p.set_edge_color(color)
+        ret_color = p.get_edge_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+        
+        ps.show(3)
+
+        # Edge width 
+        p.set_edge_width(1.5)
+        ps.show(3)
+        self.assertAlmostEqual(p.get_edge_width(), 1.5)
+        
+        # Material
+        p.set_material("candy")
+        self.assertEqual("candy", p.get_material())
+        p.set_material("clay")
+        
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
+      
+        # Set with optional arguments 
+        p2 = ps.register_volume_mesh("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14),
+                    enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), edge_width=0.5, transparency=0.9)
+
+        ps.show(3)
+
+        ps.remove_all_structures()
+        ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        test_transforms(self,p)
+        ps.remove_all_structures()
+   
+    def test_slice_plane(self):
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+        
+        ps.show(3)
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
+
+
+    def test_scalar(self):
+        node_dim = (10,12,14)
+        cell_dim = (10-1,12-1,14-1)
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+
+        for on in ['nodes', 'cells']:
+       
+            if on == 'nodes':
+                vals = np.random.rand(node_dim)
+            elif on  == 'cells':
+                vals = np.random.rand(cell_dim)
+
+            p.add_scalar_quantity("test_vals", vals, defined_on=on)
+            p.add_scalar_quantity("test_vals2", vals, defined_on=on, enabled=True)
+            p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
+            p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, enabled=True, datatype='symmetric')
+            p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, enabled=True, cmap='blues', enable_gridcube_viz=False)
+
+            ps.show(3)
+
+            # test some additions/removal while we're at it
+            p.remove_quantity("test_vals")
+            p.remove_quantity("not_here") # should not error
+            p.remove_all_quantities()
+            p.remove_all_quantities()
+
+        ps.remove_all_structures()
+    
+    def test_scalar_from_callable(self):
+        node_dim = (10,12,14)
+        cell_dim = (10-1,12-1,14-1)
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+
+        for on in ['nodes', 'cells']:
+       
+            p.add_scalar_quantity_from_callable("test_vals", sphere_sdf, defined_on=on)
+            p.add_scalar_quantity_from_callable("test_vals2", sphere_sdf, defined_on=on, enabled=True)
+            p.add_scalar_quantity_from_callable("test_vals_with_range", sphere_sdf, defined_on=on, vminmax=(-5., 5.), enabled=True)
+            p.add_scalar_quantity_from_callable("test_vals_with_datatype", sphere_sdf, defined_on=on, enabled=True, datatype='symmetric')
+            p.add_scalar_quantity_from_callable("test_vals_with_cmap", sphere_sdf, defined_on=on, enabled=True, cmap='blues', enable_gridcube_viz=False)
+
+            ps.show(3)
+
+            # test some additions/removal while we're at it
+            p.remove_quantity("test_vals")
+            p.remove_quantity("not_here") # should not error
+            p.remove_all_quantities()
+            p.remove_all_quantities()
+
+        ps.remove_all_structures()
+    
+    def test_scalar_isosurface_array(self):
+        node_dim = (10,12,14)
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        vals = np.random.rand(node_dim)
+
+        p.add_scalar_quantity("test_vals", vals, defined_on='nodes', enabled=True,
+                              enable_gridcube_viz=False, enable_isosurface_viz=True,
+                              isosurface_level=-0.2, isosurface_color=(0.5,0.6,0.7),
+                              slice_planes_affect_isosurface=False,
+                              register_isosurface_as_mesh_with_name="isomesh")
+
+        ps.remove_all_structures()
+             
+    def test_scalar_isosurface_callable(self):
+        node_dim = (10,12,14)
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+
+        p.add_scalar_quantity_from_callable("test_vals", sphere_sdf, defined_on='nodes', enabled=True,
+                              enable_gridcube_viz=False, enable_isosurface_viz=True,
+                              isosurface_level=-0.2, isosurface_color=(0.5,0.6,0.7),
+                              slice_planes_affect_isosurface=False,
+                              register_isosurface_as_mesh_with_name="isomesh")
+
+        ps.remove_all_structures()
+             
+    
+
 class TestCameraView(unittest.TestCase):
 
     def generate_parameters(self):

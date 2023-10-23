@@ -399,6 +399,8 @@ class CameraParameters:
 
 
 ## Small utilities
+def glm3u(vals):
+    return psb.glm_uvec3(vals[0], vals[1], vals[2])
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])
 def glm4(vals):

@@ -33,6 +33,7 @@ void bind_surface_mesh(py::module& m);
 void bind_point_cloud(py::module& m);
 void bind_curve_network(py::module& m);
 void bind_volume_mesh(py::module& m);
+void bind_volume_grid(py::module& m);
 void bind_camera_view(py::module& m);
 void bind_floating_quantities(py::module& m);
 void bind_implicit_helpers(py::module& m);
@@ -462,6 +463,13 @@ PYBIND11_MODULE(polyscope_bindings, m) {
         [](const glm::vec4& x) {
         return std::tuple<float, float, float, float>(x[0], x[1], x[2], x[3]);
         });
+  
+  py::class_<glm::uvec3>(m, "glm_uvec3").
+    def(py::init<uint32_t, uint32_t, uint32_t>())
+   .def("as_tuple",
+        [](const glm::uvec3& x) {
+        return std::tuple<uint32_t, uint32_t, uint32_t>(x[0], x[1], x[2]); 
+        });
 
 
   // === Bind structures defined in other files
@@ -471,6 +479,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   bind_curve_network(m);
   bind_surface_mesh(m);
   bind_volume_mesh(m);
+  bind_volume_grid(m);
   bind_camera_view(m);
   bind_managed_buffer(m);
   bind_imgui(m);
