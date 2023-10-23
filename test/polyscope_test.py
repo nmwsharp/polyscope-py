@@ -1607,10 +1607,10 @@ class TestVolumeGrid(unittest.TestCase):
         p.n_nodes()
         p.n_cells()
         p.grid_spacing()
-        self.assertEqual(p.get_grid_node_dim(), 10*12*14)
-        self.assertEqual(p.get_grid_cell_dim(), (10-1)*(12-1)*(14-1))
-        self.assertEqual(p.get_bound_min(), np.array((0., 0., 0.)))
-        self.assertEqual(p.get_bound_max(), np.array((1., 1., 1.)))
+        self.assertTrue((p.get_grid_node_dim() == (10,12,14)))
+        self.assertTrue((p.get_grid_cell_dim() == ((10-1),(12-1),(14-1))))
+        self.assertTrue((p.get_bound_min() == np.array((0., 0., 0.))).all())
+        self.assertTrue((p.get_bound_max() == np.array((1., 1., 1.))).all())
 
         # Set enabled
         p.set_enabled()
@@ -1649,7 +1649,7 @@ class TestVolumeGrid(unittest.TestCase):
         self.assertAlmostEqual(0.8, p.get_transparency())
       
         # Set with optional arguments 
-        p2 = ps.register_volume_mesh("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14),
+        p2 = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14),
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), edge_width=0.5, transparency=0.9)
 
         ps.show(3)
@@ -1692,9 +1692,9 @@ class TestVolumeGrid(unittest.TestCase):
         for on in ['nodes', 'cells']:
        
             if on == 'nodes':
-                vals = np.random.rand(node_dim)
+                vals = np.random.rand(*node_dim)
             elif on  == 'cells':
-                vals = np.random.rand(cell_dim)
+                vals = np.random.rand(*cell_dim)
 
             p.add_scalar_quantity("test_vals", vals, defined_on=on)
             p.add_scalar_quantity("test_vals2", vals, defined_on=on, enabled=True)
@@ -1741,7 +1741,7 @@ class TestVolumeGrid(unittest.TestCase):
         node_dim = (10,12,14)
 
         p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
-        vals = np.random.rand(node_dim)
+        vals = np.random.rand(*node_dim)
 
         p.add_scalar_quantity("test_vals", vals, defined_on='nodes', enabled=True,
                               enable_gridcube_viz=False, enable_isosurface_viz=True,

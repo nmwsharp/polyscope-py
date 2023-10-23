@@ -3,7 +3,7 @@ import numpy as np
 
 from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3, glm3u
 from polyscope.structure import Structure
-from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed
+from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed, check_and_pop_arg
 
 def process_volume_grid_scalar_args(structure, quantity, scalar_args, defined_on):
 
@@ -23,7 +23,7 @@ def process_volume_grid_scalar_args(structure, quantity, scalar_args, defined_on
         
         val = check_and_pop_arg(scalar_args, 'isosurface_color')
         if val is not None:
-            quantity.set_isosurface_color(val)
+            quantity.set_isosurface_color(glm3(val))
         
         val = check_and_pop_arg(scalar_args, 'slice_planes_affect_isosurface')
         if val is not None:
@@ -50,7 +50,7 @@ class VolumeGrid(Structure):
         else:
             # Create a new instance
 
-            node_dims = glm3(node_dims)
+            node_dims = glm3u(node_dims)
             bound_low = glm3(bound_low)
             bound_high = glm3(bound_high)
 
@@ -60,7 +60,7 @@ class VolumeGrid(Structure):
     def n_nodes(self):
         return self.bound_instance.n_nodes()
     def n_cells(self):
-        return self.bound_instance.n_cell()
+        return self.bound_instance.n_cells()
     def grid_spacing(self):
         return self.bound_instance.grid_spacing()
     def get_grid_node_dim(self):
@@ -116,13 +116,13 @@ class VolumeGrid(Structure):
 
         if defined_on == 'nodes':
 
-            if len(values.shape) != self.get_grid_node_dim(): raise ValueError(f"'values' should be a {self.get_grid_node_dim()} array")
+            if values.shape != self.get_grid_node_dim(): raise ValueError(f"'values' should be a {self.get_grid_node_dim()} array")
 
             q = self.bound_instance.add_node_scalar_quantity(name, values.flatten(), str_to_datatype(datatype))
 
         elif defined_on == 'cells':
             
-            if len(values.shape) != self.get_grid_cell_dim(): raise ValueError(f"'values' should be a {self.get_grid_cell_dim()} array")
+            if values.shape != self.get_grid_cell_dim(): raise ValueError(f"'values' should be a {self.get_grid_cell_dim()} array")
 
             q = self.bound_instance.add_cell_scalar_quantity(name, values.flatten(), str_to_datatype(datatype))
 

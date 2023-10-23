@@ -2,6 +2,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 
 #include "Eigen/Dense"
 
@@ -26,7 +27,8 @@ void bind_volume_grid(py::module& m) {
     .def("set_isosurface_color", &ps::VolumeGridNodeScalarQuantity::setIsosurfaceColor)
     .def("set_slice_planes_affect_isosurface", &ps::VolumeGridNodeScalarQuantity::setSlicePlanesAffectIsosurface)
     .def("register_isosurface_as_mesh_with_name", 
-        [](ps::VolumeGridNodeScalarQuantity& x, std::string name) { return x.registerIsosurfaceAsMesh(name); })
+        [](ps::VolumeGridNodeScalarQuantity& x, std::string name) { return x.registerIsosurfaceAsMesh(name); }, 
+        py::return_value_policy::reference)
     ;
 
   bindScalarQuantity<ps::VolumeGridCellScalarQuantity>(m, "VolumeGridCellScalarQuantity")
