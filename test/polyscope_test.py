@@ -1926,7 +1926,7 @@ class TestCameraView(unittest.TestCase):
 
         cam.add_color_alpha_image_quantity("color_alpha_img", np.zeros((dimX, dimY, 4)))
         cam.add_color_alpha_image_quantity("color_alpha_img2", np.zeros((dimX, dimY, 4)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
-        cam.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimX, dimY, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+        cam.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimX, dimY, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False, is_premultiplied=True)
         cam.add_color_alpha_image_quantity("color_alpha_img4", np.zeros((dimX, dimY, 4)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False)
 
         # true floating adder
@@ -2034,7 +2034,7 @@ class TestCameraView(unittest.TestCase):
         colors = np.ones((dimX, dimY, 4))
 
         cam.add_raw_color_alpha_render_image_quantity("render_img", depths, colors)
-        cam.add_raw_color_alpha_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
+        cam.add_raw_color_alpha_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7, is_premultiplied=True)
         
         # true floating adder
         ps.add_raw_color_alpha_render_image_quantity("render_img3", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)

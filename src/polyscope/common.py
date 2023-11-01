@@ -46,8 +46,10 @@ def process_quantity_args(structure, quantity, quantity_args):
 
 # Process args, removing them from the dict if they are present
 def process_color_args(structure, quantity, color_args):
-
-    pass # none yet
+    
+    val = check_and_pop_arg(color_args, 'is_premultiplied')
+    if val is not None:
+        quantity.set_is_premultiplied(val)
 
 
 # Process args, removing them from the dict if they are present

@@ -33,6 +33,7 @@ void bind_floating_quantities(py::module& m) {
 
   auto qColorImage = bindColorQuantity<ps::ColorImageQuantity>(m, "ColorImageQuantity");
   addImageQuantityBindings(qColorImage);
+  qColorImage.def("set_is_premultiplied", &ps::ColorImageQuantity::setIsPremultiplied);
 
   // global / free-floating adders
   m.def("add_scalar_image_quantity", &ps::addScalarImageQuantity<Eigen::VectorXd>, 
@@ -62,6 +63,7 @@ void bind_floating_quantities(py::module& m) {
   
   auto qRawColorAlphaRenderImage = bindColorQuantity<ps::RawColorAlphaRenderImageQuantity>(m, "RawColorAlphaRenderImageQuantity");
   qRawColorAlphaRenderImage.def("set_transparency", &ps::RawColorAlphaRenderImageQuantity::setTransparency, "Set transparency");
+  qRawColorAlphaRenderImage.def("set_is_premultiplied", &ps::RawColorAlphaRenderImageQuantity::setIsPremultiplied);
   
   // global / free-floating adders
   m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, 
