@@ -1491,6 +1491,13 @@ void bind_imgui_methods(py::module& m) {
     m.def("LogFinish", []() { ImGui::LogFinish(); });
     m.def("LogButtons", []() { ImGui::LogButtons(); });
 
+    // Disabling
+    m.def("BeginDisabled", 
+        [](bool disable) { 
+          return ImGui::BeginDisabled(disable);
+        }, py::arg("disable"));
+    m.def("EndDisabled", []() { ImGui::EndDisabled(); });
+
     // Clipping
     m.def(
         "PushClipRect",
