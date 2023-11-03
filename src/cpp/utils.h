@@ -101,6 +101,7 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
 
   // structure basics
   s.def("remove", &StructureT::remove, "Remove the structure")
+      .def("get_name", [](StructureT& s) { return s.name; }, "Ge the name")
       .def("get_unique_prefix", &StructureT::uniquePrefix, "Get unique prefix")
       .def("set_enabled", &StructureT::setEnabled, "Enable the structure")
       .def("enable_isolate", &StructureT::enableIsolate, "Enable the structure, disable all of same type")
@@ -129,13 +130,6 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("translate", [](StructureT& s, Eigen::Vector3f T) { s.translate(eigen2glm(T)); }, "apply the given translation to the shape, updating its position")
       .def("get_transform", [](StructureT& s) { return glm2eigen(s.getTransform()); }, "get the current 4x4 transform matrix")
       .def("get_position", [](StructureT& s) { return glm2eigen(s.getPosition()); }, "get the position of the shape origin after transform")
-      
-      // managed buffers
-      .def("get_buffer", [](StructureT& s, std::string name) { 
-
-         
-
-        }, "Get a buffer by name")
       
       // floating quantites
       .def("add_scalar_image_quantity", &StructureT::template addScalarImageQuantity<Eigen::VectorXd>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::arg("type")=ps::DataType::STANDARD, py::return_value_policy::reference)
@@ -178,8 +172,7 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
           if (fqPtr) {
             return fqPtr->hasManagedBufferType(buffer_name);
           }
-          ps::exception("structure " + s.name + " has no quantity " + quantity_name);
-          return std::make_tuple(false, ps::ManagedBufferType::Float); // invalid, never executed
+          return std::make_tuple(false, ps::ManagedBufferType::Float);
         }, "has quantity managed buffer type");
 
 

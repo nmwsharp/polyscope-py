@@ -123,6 +123,11 @@ def resolve_default_device_interop_funcs():
     def map_resource_and_get_array(handle):
         check_cudart_err(cudart.cudaGraphicsMapResources(1, handle, None)),
         return check_cudart_err(cudart.cudaGraphicsSubResourceGetMappedArray(handle, 0, 0))
+    
+    def map_resource_and_get_pointer(handle):
+        check_cudart_err(cudart.cudaGraphicsMapResources(1, handle, None)),
+        raw_ptr, size = check_cudart_err(cudart.cudaGraphicsResourceGetMappedPointer(handle))
+        return raw_ptr, size
 
     func_dict = {
         
@@ -164,14 +169,23 @@ def resolve_default_device_interop_funcs():
 
         # returns array
         # as in cudaGraphicsMapResources() + cudaGraphicsSubResourceGetMappedArray()
-        'map_resource_and_get_array' : map_resource_and_get_array
-        ,
+        'map_resource_and_get_array' : map_resource_and_get_array,
+        
+        # returns ptr
+        # as in cudaGraphicsMapResources() + cudaGraphicsResourceGetMappedPointer()
+        'map_resource_and_get_pointer' : map_resource_and_get_pointer,
        
 
         # returns a tuple (arr_ptr, shape, dtype, nbytes)
         # The last three entries are all optional and can be None. If given they will be used for additional sanity checks.
         'get_array_ptr' : lambda input_array: 
             get_array_from_unknown_data(input_array),
+
+        # as in cudaMemcpy
+        'memcpy' : lambda dst_ptr, src_ptr, size : 
+            check_cudart_err(cuda.cudart.cudaMemcpy(
+                 dst_ptr, src_ptr, size, cudart.cudaMemcpyKind.cudaMemcpyDeviceToDevice
+            )),
 
 
         # as in cudaMemcpy2DToArray
@@ -209,37 +223,33 @@ class CUDAOpenGLMappedAttributeBuffer:
     # Roughly based on this, see for more goodies: https://gist.github.com/keckj/e37d312128eac8c5fca790ce1e7fc437
 
     def __init__(self, gl_attribute_native_id, buffer_type):
-        # FIXME TODO
-        raise NotImplementedError("these calls need to be updated to use the new dictionary setup")
-
-        ensure_device_interop_funcs_resolve()
 
         self.gl_attribute_native_id = gl_attribute_native_id
         self.buffer_type = buffer_type
         self.resource_handle = None
         self.cuda_buffer_ptr = None
         self.cuda_buffer_size = -1
+        self.finished_init = False
 
+        ensure_device_interop_funcs_resolve()
 
         # Sanity checks
         if self.buffer_type != psb.DeviceBufferType.attribute:
             raise ValueError("device buffer type should be attribute")
+        
 
         # Register the buffer 
-        self.resource_handle = check_cudart_err(
-            cudart.cudaGraphicsGLRegisterBuffer(
-                self.gl_attribute_native_id,
-                cudart.cudaGraphicsRegisterFlags.cudaGraphicsRegisterFlagsWriteDiscard
-            )
-        )
+        self.resource_handle = device_interop_funcs['register_gl_buffer'](self.gl_attribute_native_id)
+        
+        self.finished_init = True
         
     def __del__(self):
-        self.unregister()
+        if self.finished_init: 
+            self.unregister()
 
     def unregister(self):
         self.unmap()
-        self.resource_handle = check_cudart_err(
-            cudart.cudaGraphicsUnregisterResource(self.resource_handle))
+        device_interop_funcs['unregister_resource'](self.resource_handle)
 
     def map(self):
         """
@@ -249,20 +259,13 @@ class CUDAOpenGLMappedAttributeBuffer:
         if self.cuda_buffer_ptr is not None:
             return 
 
-        device_interop_funcs['cudaGraphicsMapResources'](self.resource_handle)
-        # check_cudart_err(cudart.cudaGraphicsMapResources(1, self.resource_handle, None))
-
-        ptr, size = check_cudart_err(cudart.cudaGraphicsResourceGetMappedPointer(self.resource_handle))
-
-        self.cuda_buffer_ptr = cupy.cuda.MemoryPointer(cupy.cuda.UnownedMemory(ptr, size, self), 0)
-        self.cuda_buffer_size = size
-
+        self.cuda_buffer_ptr, self.cuda_buffer_size = device_interop_funcs['map_resource_and_get_pointer'](self.resource_handle)
 
     def unmap(self):
         if not hasattr(self, 'cuda_buffer_ptr') or self.cuda_buffer_ptr is None:
             return
 
-        check_cudart_err(cudart.cudaGraphicsUnmapResources(1, self.resource_handle, None))
+        device_interop_funcs['unmap_resource'](self.resource_handle)
 
         self.cuda_buffer_ptr = None
         self.cuda_buffer_size = -1
@@ -271,26 +274,21 @@ class CUDAOpenGLMappedAttributeBuffer:
         
         self.map()
       
-        cupy_arr = self.get_array_from_unknown_data(arr)
+        # cupy_arr = self.get_array_from_unknown_data(arr)
+
+        # access the input array
+        arr_ptr, arr_shape, arr_dtype, arr_nbytes = device_interop_funcs['get_array_ptr'](arr)
         
-        # do some shape & type checks
-        if expected_dtype is not None and cupy_arr.dtype != expected_dtype:
-            raise ValueError(f"dlpack array has wrong dtype, expected {expected_dtype} but got {cupy_arr.dtype}")
-
-        if expected_shape is not None and cupy_arr.shape != expected_shape:
-            raise ValueError(f"dlpack array has wrong shape, expected {expected_shape} but got {cupy_arr.shape}")
-
-        if cupy_arr.nbytes != self.cuda_buffer_size: 
+        if arr_nbytes is not None and arr_nbytes != self.cuda_buffer_size: 
             # if cupy_arr has the right size/dtype, it should have exactly the same 
             # number of bytes as the destination. This is just lazily saving us 
             # from repeating the math, and also directly validates the copy we 
             # are about to do below.
-            # raise ValueError(f"Mapped buffer write has wrong size, expected {cupy_arr.nbytes} bytes but got {self.cuda_buffer_size} bytes. Could it be the wrong size/shape or wrong dtype?")
-            pass
+            raise ValueError(f"Mapped buffer write has wrong size, expected {arr_nbytes} bytes but got {self.cuda_buffer_size} bytes. Could it be the wrong size/shape or wrong dtype?")
 
 
-        # perform the actualy copy
-        self.cuda_buffer_ptr.copy_from_device(cupy_arr.data, self.cuda_buffer_size)
+        # perform the actual copy
+        device_interop_funcs['memcpy'](self.cuda_buffer_ptr, arr_ptr, self.cuda_buffer_size)
 
         self.unmap() 
 
@@ -299,12 +297,14 @@ class CUDAOpenGLMappedTextureBuffer:
 
 
     def __init__(self, gl_attribute_native_id, buffer_type):
-        ensure_device_interop_funcs_resolve()
 
         self.gl_attribute_native_id = gl_attribute_native_id
         self.buffer_type = buffer_type
         self.resource_handle = None
         self.cuda_buffer_array = None # NOTE: 'array' has a special cuda meaning here relating to texture memory
+        self.finished_init = False
+        
+        ensure_device_interop_funcs_resolve()
 
         # Register the buffer 
 
@@ -322,10 +322,13 @@ class CUDAOpenGLMappedTextureBuffer:
         elif self.buffer_type == psb.DeviceBufferType.texture3d:
             # TODO
             raise ValueError("3d texture writes are not implemented")
+        
 
+        self.finished_init = True
 
     def __del__(self):
-        self.unregister()
+        if self.finished_init: 
+            self.unregister()
 
     def unregister(self):
         self.unmap()
@@ -389,18 +392,20 @@ class CUDAOpenGLMappedTextureBuffer:
 
             # if we got shape info from the source array, use it to do sanity checks
             if arr_shape is not None:
+                # TODO this test is broken as-written, doesn't account for presence/asbsence of channel count
+                pass
 
-                # size of the input array
-                arr_size = 1
-                for s in arr_shape: arr_size *= s
-    
-                # size of the destination array
-                dst_size = 1
-                for s in texture_dims:
-                    if s > 0: dst_size *= s
-
-                if arr_size != dst_size:
-                    raise ValueError(f"Mapped buffer write has wrong size, destination buffer has {dst_size} elements, but source buffer has {arr_size}.")
+    #             # size of the input array
+    #             arr_size = 1
+    #             for s in arr_shape: arr_size *= s
+    # 
+    #             # size of the destination array
+    #             dst_size = 1
+    #             for s in texture_dims:
+    #                 if s > 0: dst_size *= s
+    #
+    #             if arr_size != dst_size:
+    #                 raise ValueError(f"Mapped buffer write has wrong size, destination buffer has {dst_size} elements, but source buffer has {arr_size}.")
 
 
             # if we got bytesize info from the source AND destination array, use it to do more sanity checks
