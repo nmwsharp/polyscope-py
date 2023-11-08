@@ -386,7 +386,7 @@ void bind_imgui_methods(py::module& m) {
         py::arg("idx"),
         py::arg("alpha_mul") = 1.0f);
     m.def(
-        "GetColorU32", [](const ImVec4& col) { return ImGui::GetColorU32(col); }, py::arg("col"));
+        "GetColorU32", [](const Vec4T& col) { return ImGui::GetColorU32(to_vec4(col)); }, py::arg("col"));
     m.def(
         "GetColorU32", [](ImU32 col) { return ImGui::GetColorU32(col); }, py::arg("col"));
 
@@ -1664,6 +1664,217 @@ void bind_imgui_methods(py::module& m) {
     m.def("LoadIniSettingsFromMemory", [](const char *ini_data) { ImGui::LoadIniSettingsFromMemory(ini_data); }, py::arg("ini_data"));
     m.def("SaveIniSettingsToDisk", [](const char *ini_filename) { ImGui::SaveIniSettingsToDisk(ini_filename); }, py::arg("ini_filename"));
     m.def("SaveIniSettingsToMemory", []() { return ImGui::SaveIniSettingsToMemory(); });
+
+    // Draw Commands 
+    m.def(
+        "AddLine", 
+        [](const Vec2T& p1, const Vec2T& p2, ImU32 col, float thickness) {
+            ImGui::GetWindowDrawList()->AddRect(to_vec2(p1), to_vec2(p2), col, thickness);
+        },
+        py::arg("p_min"),
+        py::arg("p_max"),
+        py::arg("col"),
+        py::arg("thickness") = 1.0f
+    );
+    m.def(
+        "AddRect", 
+        [](const Vec2T& p_min, const Vec2T& p_max, ImU32 col, float rounding, ImDrawFlags flags, float thickness) {
+            ImGui::GetWindowDrawList()->AddRect(to_vec2(p_min), to_vec2(p_max), col, rounding, flags, thickness);
+        },
+        py::arg("p_min"),
+        py::arg("p_max"),
+        py::arg("col"),
+        py::arg("rounding") = 0.0f,
+        py::arg("flags") = 0,
+        py::arg("thickness") = 1.0f
+    );
+    m.def(
+        "AddRectFilled", 
+        [](const Vec2T& p_min, const Vec2T& p_max, ImU32 col, float rounding, ImDrawFlags flags) {
+            ImGui::GetWindowDrawList()->AddRectFilled(to_vec2(p_min), to_vec2(p_max), col, rounding, flags);
+        },
+        py::arg("p_min"),
+        py::arg("p_max"),
+        py::arg("col"),
+        py::arg("rounding") = 0.0f,
+        py::arg("flags") = 0
+    );
+    m.def(
+        "AddRectFilledMultiColor", 
+        [](const Vec2T& p_min, const Vec2T& p_max, ImU32 col_upr_left, ImU32 col_upr_right, ImU32 col_bot_right, ImU32 col_bot_left) {
+            ImGui::GetWindowDrawList()->AddRectFilledMultiColor(to_vec2(p_min), to_vec2(p_max), col_upr_left, col_upr_right, col_bot_right, col_bot_left);
+        },
+        py::arg("p_min"),
+        py::arg("p_max"),
+        py::arg("col_upr_left"),
+        py::arg("col_upr_right"),
+        py::arg("col_bot_right"),
+        py::arg("col_bot_left")
+    );
+    m.def(
+        "AddQuad", 
+        [](const Vec2T& p1, const Vec2T& p2, const Vec2T& p3, const Vec2T& p4, ImU32 col, float thickness) {
+            ImGui::GetWindowDrawList()->AddQuad(to_vec2(p1), to_vec2(p2), to_vec2(p3), to_vec2(p4), col, thickness);
+        },
+        py::arg("p1"),
+        py::arg("p2"),
+        py::arg("p3"),
+        py::arg("p4"),
+        py::arg("col"),
+        py::arg("thickness") = 1.0f
+    );
+    m.def(
+        "AddQuadFilled", 
+        [](const Vec2T& p1, const Vec2T& p2, const Vec2T& p3, const Vec2T& p4, ImU32 col) {
+            ImGui::GetWindowDrawList()->AddQuadFilled(to_vec2(p1), to_vec2(p2), to_vec2(p3), to_vec2(p4), col);
+        },
+        py::arg("p1"),
+        py::arg("p2"),
+        py::arg("p3"),
+        py::arg("p4"),
+        py::arg("col")
+    );
+    m.def(
+        "AddTriangle", 
+        [](const Vec2T& p1, const Vec2T& p2, const Vec2T& p3, ImU32 col, float thickness) {
+            ImGui::GetWindowDrawList()->AddTriangle(to_vec2(p1), to_vec2(p2), to_vec2(p3), col, thickness);
+        },
+        py::arg("p1"),
+        py::arg("p2"),
+        py::arg("p3"),
+        py::arg("col"),
+        py::arg("thickness") = 1.0f
+    );
+    m.def(
+        "AddTriangleFilled", 
+        [](const Vec2T& p1, const Vec2T& p2, const Vec2T& p3, ImU32 col) {
+            ImGui::GetWindowDrawList()->AddTriangleFilled(to_vec2(p1), to_vec2(p2), to_vec2(p3), col);
+        },
+        py::arg("p1"),
+        py::arg("p2"),
+        py::arg("p3"),
+        py::arg("col")
+    );
+    m.def(
+        "AddCircle", 
+        [](const Vec2T& center, const float radius, ImU32 col, int num_segments, float thickness) {
+            ImGui::GetWindowDrawList()->AddCircle(to_vec2(center), radius, col, num_segments, thickness);
+        },
+        py::arg("center"),
+        py::arg("radius"),
+        py::arg("col"),
+        py::arg("num_segments") = 0,
+        py::arg("thickness") = 1.0f
+    );
+    m.def(
+        "AddCircleFilled", 
+        [](const Vec2T& center, const float radius, ImU32 col, int num_segments) {
+            ImGui::GetWindowDrawList()->AddCircleFilled(to_vec2(center), radius, col, num_segments);
+        },
+        py::arg("center"),
+        py::arg("radius"),
+        py::arg("col"),
+        py::arg("num_segments") = 0
+    );
+    m.def(
+        "AddNgon", 
+        [](const Vec2T& center, const float radius, ImU32 col, int num_segments, float thickness) {
+            ImGui::GetWindowDrawList()->AddNgon(to_vec2(center), radius, col, num_segments, thickness);
+        },
+        py::arg("center"),
+        py::arg("radius"),
+        py::arg("col"),
+        py::arg("num_segments") = 0,
+        py::arg("thickness") = 1.0f
+    );
+    m.def(
+        "AddNgonFilled", 
+        [](const Vec2T& center, const float radius, ImU32 col, int num_segments) {
+            ImGui::GetWindowDrawList()->AddNgonFilled(to_vec2(center), radius, col, num_segments);
+        },
+        py::arg("center"),
+        py::arg("radius"),
+        py::arg("col"),
+        py::arg("num_segments") = 0
+    );
+    m.def(
+        "AddText", 
+        [](const Vec2T& pos, ImU32 col, const char* text_begin, const char* text_end) {
+            ImGui::GetWindowDrawList()->AddText(to_vec2(pos), col, text_begin, text_end);
+        },
+        py::arg("pos"),
+        py::arg("col"),
+        py::arg("text_begin"),
+        py::arg("text_end") = nullptr
+    );
+    m.def(
+        "AddText", 
+        [](const ImFont* font, float font_size, const Vec2T& pos, ImU32 col, const char* text_begin, const char* text_end, float wrap_width) {
+            ImGui::GetWindowDrawList()->AddText(font, font_size, to_vec2(pos), col, text_begin, text_end, wrap_width);
+        },
+        py::arg("font"),
+        py::arg("font_size"),
+        py::arg("pos"),
+        py::arg("col"),
+        py::arg("text_begin"),
+        py::arg("text_end") = nullptr,
+        py::arg("wrap_width") = 0.0f
+    );
+    m.def(
+        "AddPolyline", 
+        [](const std::vector<Vec2T>& points, int num_points, ImU32 col, ImDrawFlags flags, float thickness) {
+            std::vector<ImVec2> points_vec2(points.size());
+            for (int i = 0; i < points.size(); i++) {
+                points_vec2[i] = to_vec2(points[i]);
+            } 
+            ImGui::GetWindowDrawList()->AddPolyline(points_vec2.data(), num_points, col, flags, thickness);
+        },
+        py::arg("points"),
+        py::arg("num_points"),
+        py::arg("col"),
+        py::arg("flags"),
+        py::arg("thickness")
+    );
+    m.def(
+        "AddConvexPolyFilled", 
+        [](const std::vector<Vec2T>& points, int num_points, ImU32 col) {
+            std::vector<ImVec2> points_vec2(points.size());
+            for (int i = 0; i < points.size(); i++) {
+                points_vec2[i] = to_vec2(points[i]);
+            } 
+            ImGui::GetWindowDrawList()->AddConvexPolyFilled(points_vec2.data(), num_points, col);
+        },
+        py::arg("points"),
+        py::arg("num_points"),
+        py::arg("col")
+    );
+    m.def(
+        "AddBezierCubic", 
+        [](const Vec2T& p1, const Vec2T& p2, const Vec2T& p3, const Vec2T& p4, ImU32 col, float thickness, int num_segments = 0) {
+            ImGui::GetWindowDrawList()->AddBezierCubic(to_vec2(p1), to_vec2(p2), to_vec2(p3), to_vec2(p4), col, thickness, num_segments);
+        },
+        py::arg("p1"),
+        py::arg("p2"),
+        py::arg("p3"),
+        py::arg("p4"),
+        py::arg("col"),
+        py::arg("thickness"),
+        py::arg("num_segments") = 0
+    );
+    m.def(
+        "AddBezierQuadratic", 
+        [](const Vec2T& p1, const Vec2T& p2, const Vec2T& p3, ImU32 col, float thickness, int num_segments = 0) {
+            ImGui::GetWindowDrawList()->AddBezierQuadratic(to_vec2(p1), to_vec2(p2), to_vec2(p3), col, thickness, num_segments);
+        },
+        py::arg("p1"),
+        py::arg("p2"),
+        py::arg("p3"),
+        py::arg("col"),
+        py::arg("thickness"),
+        py::arg("num_segments") = 0
+    );
+
+
 }
 // clang-format on
 
