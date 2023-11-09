@@ -462,10 +462,18 @@ void bind_imgui_methods(py::module& m) {
 
     // ID stack/scopes
     m.def(
+        "PushID", [](const char* str_id) { ImGui::PushID(str_id); }, py::arg("str_id"));
+    m.def(
+        "PushID", [](int int_id) { ImGui::PushID(int_id); }, py::arg("int_id"));
+    m.def("PopID", []() { ImGui::PopID(); });
+    m.def(
+        "GetID", [](const char* str_id) { return ImGui::GetID(str_id); }, py::arg("str_id"));
+    
+    // these are typos (bad capitalization). kept around to avoid needless breaking changes
+    m.def(
         "PushId", [](const char* str_id) { ImGui::PushID(str_id); }, py::arg("str_id"));
     m.def(
         "PushId", [](int int_id) { ImGui::PushID(int_id); }, py::arg("int_id"));
-    m.def("PopID", []() { ImGui::PopID(); });
     m.def(
         "GetId", [](const char* str_id) { return ImGui::GetID(str_id); }, py::arg("str_id"));
 
