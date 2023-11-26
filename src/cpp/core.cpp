@@ -267,7 +267,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
    .def("remove_child_structure", &ps::Group::removeChildStructure)
    .def("set_enabled", &ps::Group::setEnabled, py::return_value_policy::reference)
    .def("set_show_child_details", &ps::Group::setShowChildDetails)
-   .def("set_hide_descendents_from_structure_lists", &ps::Group::setHideDescendentsFromStructureLists)
+   .def("set_hide_descendants_from_structure_lists", &ps::Group::setHideDescendantsFromStructureLists)
   ;
 
   // create/get/delete

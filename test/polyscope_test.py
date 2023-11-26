@@ -270,7 +270,7 @@ class TestCore(unittest.TestCase):
 
         groupA.set_enabled(False)
         groupB.set_show_child_details(True)
-        groupC.set_hide_descendents_from_structure_lists(True)
+        groupC.set_hide_descendants_from_structure_lists(True)
 
         ps.show(3)
 
@@ -309,7 +309,7 @@ class TestCore(unittest.TestCase):
 
         # hide items in group from displaying in the UI
         # (useful if you are registering huge numbers of structures you don't always need to see)
-        group.set_hide_descendents_from_structure_lists(True)
+        group.set_hide_descendants_from_structure_lists(True)
         group.set_show_child_details(False)
 
         # nest groups inside of other groups

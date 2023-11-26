@@ -316,8 +316,8 @@ class Group:
     def set_show_child_details(self, new_val):
         self.bound_group.set_show_child_details(new_val)
     
-    def set_hide_descendents_from_structure_lists(self, new_val):
-        self.bound_group.set_hide_descendents_from_structure_lists(new_val)
+    def set_hide_descendants_from_structure_lists(self, new_val):
+        self.bound_group.set_hide_descendants_from_structure_lists(new_val)
 
 def create_group(name):
     return Group(psb.create_group(name))
