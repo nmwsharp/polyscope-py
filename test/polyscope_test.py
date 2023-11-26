@@ -250,6 +250,78 @@ class TestCore(unittest.TestCase):
         ps.set_automatically_compute_scene_extents(True)
    
 
+    def test_groups(self):
+
+        pts = np.zeros((10,3))
+        pt_cloud_0 = ps.register_point_cloud("cloud0", pts)
+        pt_cloud_1 = ps.register_point_cloud("cloud1", pts)
+        pt_cloud_2 = ps.register_point_cloud("cloud2", pts)
+
+        groupA = ps.create_group("group_A")
+        groupB = ps.create_group("group_B")
+        groupC = ps.create_group("group_C")
+
+        groupA.add_child_group(groupB)
+        groupA.add_child_group("group_C")
+
+        pt_cloud_0.add_to_group(groupA)
+        pt_cloud_1.add_to_group("group_A")
+        groupA.add_child_structure(pt_cloud_2)
+
+        groupA.set_enabled(False)
+        groupB.set_show_child_details(True)
+        groupC.set_hide_descendents_from_structure_lists(True)
+
+        ps.show(3)
+
+        groupA.remove_child_group(groupB)
+        groupA.remove_child_group("group_C")
+        groupA.remove_child_structure(pt_cloud_0)
+
+        ps.remove_group(groupB, True)
+        ps.remove_group("group_C", False)
+        
+        ps.show(3)
+
+        ps.remove_all_groups()
+        
+        ps.remove_all_structures()
+
+
+    def test_groups_demo_example(self):
+      
+        # make a point cloud
+        pts = np.zeros((300,3))
+        psCloud = ps.register_point_cloud("my cloud", pts)
+
+        # make a curve network
+        nodes = np.zeros((4,3))
+        edges = np.array([[1, 3], [3, 0], [1, 0], [0, 2]])
+        psCurve = ps.register_curve_network("my network", nodes, edges)
+
+        # create a group for these two objects
+        group = ps.create_group("my group")
+        psCurve.add_to_group(group) # you also say psCurve.add_to_group("my group")
+        psCloud.add_to_group(group)
+
+        # toggle the enabled state for everything in the group
+        group.set_enabled(False)
+
+        # hide items in group from displaying in the UI
+        # (useful if you are registering huge numbers of structures you don't always need to see)
+        group.set_hide_descendents_from_structure_lists(True)
+        group.set_show_child_details(False)
+
+        # nest groups inside of other groups
+        super_group = ps.create_group("py parent group")
+        super_group.add_child_group(group)
+
+        ps.show(3)
+
+        ps.remove_all_groups()
+        ps.remove_all_structures()
+   
+
 class TestImGuiBindings(unittest.TestCase):
 
     def test_ui_calls(self):

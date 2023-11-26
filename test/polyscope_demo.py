@@ -15,28 +15,51 @@ import polyscope
 import polyscope.imgui as psim
 from polyscope import imgui as psim
 import potpourri3d as pp3d
+import igl
+import imageio
 
 import sys
 import argparse
 import numpy as np
+
+# Helper funcs for defining implicits
+def sphere_sdf(pts):
+    res = np.linalg.norm(pts, axis=-1) - 1.
+    return res
+def color_func(pts):
+    # return np.cos(3*pts)**2
+    A = np.ones_like(pts) * 0.3
+    A[:,0] = np.cos(3*pts[:,0])**2
+    return A
+
 
 def main():
 
     parser = argparse.ArgumentParser()
 
     # Build arguments
-    parser.add_argument('mesh', type=str, help='path to a mesh')
+    # parser.add_argument('mesh', type=str, help='path to a mesh')
+    # parser.add_argument('image', type=str, help='path to a image')
     parser.add_argument('--surfacemesh', default=True, action='store_true')
     parser.add_argument('--no-surfacemesh', dest='surfacemesh', action='store_false')
     parser.add_argument('--pointcloud', default=False, action='store_true')
     parser.add_argument('--volumemesh', default=False, action='store_true')
+    parser.add_argument('--volumegrid', default=False, action='store_true')
 
     # Parse arguments
     args = parser.parse_args()
 
     # Load a mesh argument
-    verts, faces = pp3d.read_mesh(args.mesh)
+    # verts, faces = pp3d.read_mesh(args.mesh)
 
+    # verts, UVs, _, faces, UVinds, _ = igl.read_obj(args.mesh)
+    # corner_UVs = UVs[UVinds,:].reshape(-1,2)
+    # print(corner_UVs.shape)
+    # 
+    # color_tex = imageio.imread(args.image) / 255.
+    # print(color_tex.shape)
+    
+    # print(UVs[:10,:])
 
     # Set up a simple callback and UI button
     def my_function():
@@ -59,6 +82,7 @@ def main():
     polyscope.init() 
 
     polyscope.set_ground_plane_mode("shadow_only")
+    polyscope.set_verbosity(101)
 
     ## Examples with a mesh
     if args.surfacemesh:
@@ -67,6 +91,13 @@ def main():
         # Scalar functions
         ps_mesh.add_scalar_quantity("X", verts[:,0])
         ps_mesh.add_scalar_quantity("Y", verts[:,1])
+
+        ps_mesh.add_parameterization_quantity("param", corner_UVs, defined_on='corners')
+        
+        ps_mesh.add_color_quantity("color_tex", color_tex, defined_on='texture', param_name="param", image_origin='upper_left')
+        ps_mesh.add_scalar_quantity("scalar_tex", color_tex[:,:,1], defined_on='texture', param_name="param")
+
+        polyscope.add_color_image_quantity("my im", color_tex)
 
         # Look at them
         polyscope.show() 
@@ -194,21 +225,32 @@ def main():
         # Remove the whole mesh structure
         polyscope.remove_all_structures()
         
+    
+    if args.volumegrid:
+
+# Any implicit function mapping [N,3] numpy array 
+# of locations --> [N] numpy array of values
+def sphere_sdf(pts):
+    res = np.linalg.norm(pts, axis=-1) - 1.
+    return res
+
+# Create the grid structure
+bound_min = np.array([-1., -1., -1.])
+bound_max = np.array([+1., +1., +1.])
+node_dims = np.array([128,128,128])
+ps_grid = polyscope.register_volume_grid("test volume grid", bound_min, bound_max, node_dims)
+
+# This makes polyscope register the scalar quantity by calling 
+# your function for each point on the grid (so you don't have 
+# to worry about getting indexing right)
+ps_grid.add_scalar_quantity_from_callable("sdf", sphere_sdf)
+
+polyscope.show()
 
     # Back to empty
     polyscope.show() 
 
     # polyscope.clear_user_callback()
-
-def sphere_sdf(pts):
-    res = np.linalg.norm(pts, axis=-1) - 1.
-    return res
-
-def color_func(pts):
-    # return np.cos(3*pts)**2
-    A = np.ones_like(pts) * 0.3
-    A[:,0] = np.cos(3*pts[:,0])**2
-    return A
 
 def implicit_ui():
 

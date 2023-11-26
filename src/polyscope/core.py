@@ -278,7 +278,64 @@ def set_transparency_render_passes(n):
 ## Rendering
 def set_SSAA_factor(n):
     psb.set_SSAA_factor(n)
-  
+
+## Groups
+
+class Group:
+    # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
+
+    # End users should not call this constrctor, use add_group() instead
+    def __init__(self, instance):
+        # Wrap an existing instance
+        self.bound_group = instance
+    
+    def get_name(self):
+        return self.bound_group.name
+    
+    def add_child_group(self, child_group):
+        if isinstance(child_group, str):
+            self.bound_group.add_child_group(get_group(child_group).bound_group)
+        else:
+            self.bound_group.add_child_group(child_group.bound_group)
+
+    def add_child_structure(self, child_structure):
+        self.bound_group.add_child_structure(child_structure.bound_instance)
+    
+    def remove_child_group(self, child_group):
+        if isinstance(child_group, str):
+            self.bound_group.remove_child_group(get_group(child_group).bound_group)
+        else:
+            self.bound_group.remove_child_group(child_group.bound_group)
+
+    def remove_child_structure(self, child_structure):
+        self.bound_group.remove_child_structure(child_structure.bound_instance)
+    
+    def set_enabled(self, new_val):
+        self.bound_group.set_enabled(new_val)
+    
+    def set_show_child_details(self, new_val):
+        self.bound_group.set_show_child_details(new_val)
+    
+    def set_hide_descendents_from_structure_lists(self, new_val):
+        self.bound_group.set_hide_descendents_from_structure_lists(new_val)
+
+def create_group(name):
+    return Group(psb.create_group(name))
+
+def get_group(name):
+    return Group(psb.get_group(name))
+
+def remove_group(group, error_if_absent=True):
+    # accept either a string or a group ref as input
+    if isinstance(group, str):
+        psb.remove_group(group, error_if_absent)
+    else:
+        psb.remove_group(group.get_name(), error_if_absent)
+
+def remove_all_groups():
+    psb.remove_all_groups()
+
+
 ## Low-level internals access
 # (warning, 'advanced' users only, may change)
 def get_final_scene_color_texture_native_handle():

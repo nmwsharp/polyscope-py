@@ -247,6 +247,35 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Rendering
   m.def("set_SSAA_factor", [](int n) { ps::options::ssaaFactor = n; });
+  
+
+  // === Structure
+
+  // (this is the generic structure class, subtypes get bound in their respective files)
+  py::class_<ps::Structure>(m, "Structure")
+   .def_readonly("name", &ps::Structure::name) 
+  ;
+  
+  // === Groups
+ 
+  py::class_<ps::Group>(m, "Group")
+   .def(py::init<std::string>())
+   .def_readonly("name", &ps::Group::name) 
+   .def("add_child_group", &ps::Group::addChildGroup)
+   .def("add_child_structure", &ps::Group::addChildStructure)
+   .def("remove_child_group", &ps::Group::removeChildGroup)
+   .def("remove_child_structure", &ps::Group::removeChildStructure)
+   .def("set_enabled", &ps::Group::setEnabled, py::return_value_policy::reference)
+   .def("set_show_child_details", &ps::Group::setShowChildDetails)
+   .def("set_hide_descendents_from_structure_lists", &ps::Group::setHideDescendentsFromStructureLists)
+  ;
+
+  // create/get/delete
+  m.def("create_group", &ps::createGroup, py::return_value_policy::reference);
+  m.def("get_group", &ps::getGroup, py::return_value_policy::reference);
+  m.def("remove_group", overload_cast_<std::string, bool>()(&ps::removeGroup));
+  m.def("remove_all_groups", &ps::removeAllGroups);
+
 
   // === Low-level internals access
   // (warning, 'advanced' users only, may change)

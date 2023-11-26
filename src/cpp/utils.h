@@ -97,7 +97,7 @@ void def_all_managed_buffer_funcs(C& c, ps::ManagedBufferType t) {
 template <typename StructureT>
 py::class_<StructureT> bindStructure(py::module& m, std::string name) {
 
-  py::class_<StructureT> s(m, name.c_str());
+  py::class_<StructureT, ps::Structure> s(m, name.c_str());
 
   // structure basics
   s.def("remove", &StructureT::remove, "Remove the structure")
@@ -108,6 +108,9 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("is_enabled", &StructureT::isEnabled, "Check if the structure is enabled")
       .def("set_transparency", &StructureT::setTransparency, "Set transparency alpha")
       .def("get_transparency", &StructureT::getTransparency, "Get transparency alpha")
+      
+      // group things
+      .def("add_to_group", overload_cast_<std::string>()(&StructureT::addToGroup) , "Add to group")
 
       // slice plane things
       .def("set_ignore_slice_plane", &StructureT::setIgnoreSlicePlane, "Set ignore slice plane")

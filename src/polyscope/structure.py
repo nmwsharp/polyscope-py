@@ -110,6 +110,13 @@ class Structure:
             psb.ManagedBufferType.UVec4     :  lambda q,n,t : ManagedBuffer(self.bound_instance.get_quantity_buffer_UVec4   (q,n), t),
         }[buffer_type](quantity_name, buffer_name, buffer_type)
 
+    ## Groups
+    def add_to_group(self, group):
+        # take either a string or a group object as input
+        if isinstance(group, str):
+            self.bound_instance.add_to_group(group)
+        else:
+            self.bound_instance.add_to_group(group.get_name())
     
     ## Slice planes
 
