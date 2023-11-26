@@ -36,11 +36,11 @@ void bind_floating_quantities(py::module& m) {
   qColorImage.def("set_is_premultiplied", &ps::ColorImageQuantity::setIsPremultiplied);
 
   // global / free-floating adders
-  m.def("add_scalar_image_quantity", &ps::addScalarImageQuantity<Eigen::VectorXd>, 
+  m.def("add_scalar_image_quantity", &ps::addScalarImageQuantity<Eigen::VectorXf>, 
         py::return_value_policy::reference);
-  m.def("add_color_image_quantity", &ps::addColorImageQuantity<Eigen::MatrixXd>, 
+  m.def("add_color_image_quantity", &ps::addColorImageQuantity<Eigen::MatrixXf>, 
         py::return_value_policy::reference);
-  m.def("add_color_alpha_image_quantity", &ps::addColorAlphaImageQuantity<Eigen::MatrixXd>,
+  m.def("add_color_alpha_image_quantity", &ps::addColorAlphaImageQuantity<Eigen::MatrixXf>,
         py::return_value_policy::reference);
 
   // == Render image floating quantities
@@ -66,15 +66,15 @@ void bind_floating_quantities(py::module& m) {
   qRawColorAlphaRenderImage.def("set_is_premultiplied", &ps::RawColorAlphaRenderImageQuantity::setIsPremultiplied);
   
   // global / free-floating adders
-  m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, 
+  m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, 
       py::return_value_policy::reference);
-  m.def("add_color_render_image_quantity", &ps::addColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd>, 
+  m.def("add_color_render_image_quantity", &ps::addColorRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf, Eigen::MatrixXf>, 
       py::return_value_policy::reference);
-  m.def("add_scalar_render_image_quantity", &ps::addScalarRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd, Eigen::VectorXd>, 
+  m.def("add_scalar_render_image_quantity", &ps::addScalarRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf, Eigen::VectorXf>, 
       py::return_value_policy::reference);
-  m.def("add_raw_color_render_image_quantity", &ps::addRawColorRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, 
+  m.def("add_raw_color_render_image_quantity", &ps::addRawColorRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, 
       py::return_value_policy::reference);
-  m.def("add_raw_color_alpha_render_image_quantity", &ps::addRawColorAlphaRenderImageQuantity<Eigen::VectorXd, Eigen::MatrixXd>, 
+  m.def("add_raw_color_alpha_render_image_quantity", &ps::addRawColorAlphaRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, 
       py::return_value_policy::reference);
 
 }

@@ -64,11 +64,11 @@ void bind_volume_grid(py::module& m) {
       // = quantities
 
       // Scalars
-      .def("add_node_scalar_quantity", &ps::VolumeGrid::addNodeScalarQuantity<Eigen::VectorXd>, 
+      .def("add_node_scalar_quantity", &ps::VolumeGrid::addNodeScalarQuantity<Eigen::VectorXf>, 
           py::arg("name"), py::arg("values"), py::arg("data_type") = ps::DataType::STANDARD, 
           py::return_value_policy::reference)
 
-      .def("add_cell_scalar_quantity", &ps::VolumeGrid::addCellScalarQuantity<Eigen::VectorXd>,
+      .def("add_cell_scalar_quantity", &ps::VolumeGrid::addCellScalarQuantity<Eigen::VectorXf>,
           py::arg("name"), py::arg("values"), py::arg("data_type") = ps::DataType::STANDARD, 
           py::return_value_policy::reference)
       
