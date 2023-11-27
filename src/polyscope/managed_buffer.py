@@ -14,12 +14,17 @@ class ManagedBuffer:
     # End users should not call this constructor, use structure.get_buffer("name") or another like it
     def __init__(self, instance, buffer_type):
 
+        self.uniqueID = None # gets overwritten below, setting early so it is defined if __del__ gets called
+
         self.bound_buffer = instance
         self.buffer_type = buffer_type
         self.device_buffer_type = self.bound_buffer.get_device_buffer_type()
         
         self.buffer_weak_ref = self.bound_buffer.get_generic_weak_handle()
         self.uniqueID = self.buffer_weak_ref.get_unique_ID()
+    
+    def __del__(self):
+        self.release_mapped_buffer_CUDAOpenGL()
        
     def check_ref_still_valid(self):
         if not self.buffer_weak_ref.is_valid():
