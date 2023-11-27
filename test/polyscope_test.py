@@ -1946,6 +1946,9 @@ class TestCameraView(unittest.TestCase):
 
         self.assertTrue(isinstance(params.get_fov_vertical_deg(), float))
         self.assertTrue(isinstance(params.get_aspect(), float))
+        
+        rays = params.generate_camera_rays((300,200))
+        ray_corners = params.generate_camera_ray_corners()
     
     def test_floating_scalar_images(self):
 

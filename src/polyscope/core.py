@@ -428,7 +428,6 @@ class CameraExtrinsics:
         else:
             raise ValueError("bad arguments, must pass non-None (root,look_dir,up_dir) or non-None mat")
 
-# TODO still needs tests
 class CameraParameters:
 
     def __init__(self, intrinsics=None, extrinsics=None, instance=None):
@@ -451,8 +450,16 @@ class CameraParameters:
     def get_camera_frame(self): return self.instance.get_camera_frame()
     def get_fov_vertical_deg(self): return self.instance.get_fov_vertical_deg()
     def get_aspect(self): return self.instance.get_aspect()
-    def generate_camera_rays(self): return self.instance.generate_camera_rays()
-    def generate_camera_ray_corners(self): return self.instance.generate_camera_ray_corners()
+
+    def generate_camera_rays(self, dims, image_origin='upper_left'): 
+        out_rays = self.instance.generate_camera_rays(
+                int(dims[0]), int(dims[1]),
+                str_to_image_origin(image_origin)
+            )
+        return out_rays.reshape(dims[0], dims[1], 3)
+
+    def generate_camera_ray_corners(self): 
+        return self.instance.generate_camera_ray_corners()
 
 
 ## Small utilities
