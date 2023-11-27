@@ -31,6 +31,8 @@ def main():
     ui_text = "some input text"
     ui_options = ["option A", "option B", "option C"]
     ui_options_selected = ui_options[1]
+    
+    alt_font = None
 
     def my_function():
         # ... do something important here ...
@@ -149,8 +151,27 @@ def main():
         psim.PopItemWidth()
 
 
+        # Create an annotation window, use a custom font
+        if False:
+            psim.SetNextWindowPos((200, 200))
+            psim.SetNextWindowSize((100, 50))
+            psim.SetNextWindowBgAlpha(0.8)
+            psim.Begin("Annotation Window", None, psim.ImGuiWindowFlags_NoDecoration)
+            psim.PushFont(alt_font)
+            psim.TextUnformatted("annotation text")
+            psim.PopFont()
+            psim.End()
+
     polyscope.init() 
     polyscope.set_user_callback(callback)
+
+    
+    # Load a custom font
+    if False:
+        io = psim.GetIO()
+        alt_font = io.Fonts.AddFontFromFileTTF("your_font_file.otf", 50)
+
+
     polyscope.show()
 
 if __name__ == '__main__':
