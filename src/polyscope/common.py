@@ -135,6 +135,10 @@ def process_render_image_args(structure, quantity, image_args):
     if val is not None:
         quantity.set_material(val)
     
+    val = check_and_pop_arg(image_args, 'allow_fullscreen_compositing')
+    if val is not None:
+        quantity.set_allow_fullscreen_compositing(val)
+    
 # Process args, removing them from the dict if they are present
 def process_implicit_render_args(opts, implicit_args):
 

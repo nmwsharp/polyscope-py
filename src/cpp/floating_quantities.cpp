@@ -49,21 +49,26 @@ void bind_floating_quantities(py::module& m) {
   qDepthRenderImage.def("set_material", &ps::DepthRenderImageQuantity::setMaterial, "Set material");
   qDepthRenderImage.def("set_color", &ps::DepthRenderImageQuantity::setColor, "Set color");
   qDepthRenderImage.def("set_transparency", &ps::DepthRenderImageQuantity::setTransparency, "Set transparency");
+  qDepthRenderImage.def("set_allow_fullscreen_compositing", &ps::DepthRenderImageQuantity::setAllowFullscreenCompositing);
 
   auto qColorRenderImage = bindColorQuantity<ps::ColorRenderImageQuantity>(m, "ColorRenderImageQuantity");
   qColorRenderImage.def("set_material", &ps::ColorRenderImageQuantity::setMaterial, "Set material");
   qColorRenderImage.def("set_transparency", &ps::ColorRenderImageQuantity::setTransparency, "Set transparency");
+  qColorRenderImage.def("set_allow_fullscreen_compositing", &ps::ColorRenderImageQuantity::setAllowFullscreenCompositing);
 
   auto qScalarRenderImage = bindScalarQuantity<ps::ScalarRenderImageQuantity>(m, "ScalarRenderImageQuantity");
   qScalarRenderImage.def("set_material", &ps::ScalarRenderImageQuantity::setMaterial, "Set material");
   qScalarRenderImage.def("set_transparency", &ps::ScalarRenderImageQuantity::setTransparency, "Set transparency");
+  qScalarRenderImage.def("set_allow_fullscreen_compositing", &ps::ScalarRenderImageQuantity::setAllowFullscreenCompositing);
   
   auto qRawColorRenderImage = bindColorQuantity<ps::RawColorRenderImageQuantity>(m, "RawColorRenderImageQuantity");
   qRawColorRenderImage.def("set_transparency", &ps::RawColorRenderImageQuantity::setTransparency, "Set transparency");
+  qRawColorRenderImage.def("set_allow_fullscreen_compositing", &ps::RawColorRenderImageQuantity::setAllowFullscreenCompositing);
   
   auto qRawColorAlphaRenderImage = bindColorQuantity<ps::RawColorAlphaRenderImageQuantity>(m, "RawColorAlphaRenderImageQuantity");
   qRawColorAlphaRenderImage.def("set_transparency", &ps::RawColorAlphaRenderImageQuantity::setTransparency, "Set transparency");
   qRawColorAlphaRenderImage.def("set_is_premultiplied", &ps::RawColorAlphaRenderImageQuantity::setIsPremultiplied);
+  qRawColorAlphaRenderImage.def("set_allow_fullscreen_compositing", &ps::RawColorAlphaRenderImageQuantity::setAllowFullscreenCompositing);
   
   // global / free-floating adders
   m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, 

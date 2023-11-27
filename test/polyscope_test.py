@@ -2023,7 +2023,7 @@ class TestCameraView(unittest.TestCase):
         cam.add_depth_render_image_quantity("render_img2", depths, normals, enabled=True, image_origin='lower_left', color=(0., 1., 0.), material='wax', transparency=0.7)
         
         # true floating adder
-        ps.add_depth_render_image_quantity("render_img3", depths, normals, enabled=True, image_origin='lower_left', color=(0., 1., 0.), material='wax', transparency=0.7, )
+        ps.add_depth_render_image_quantity("render_img3", depths, normals, enabled=True, image_origin='lower_left', color=(0., 1., 0.), material='wax', transparency=0.7, allow_fullscreen_compositing=True)
         
         ps.show(3)
         ps.remove_all_structures()
@@ -2045,7 +2045,7 @@ class TestCameraView(unittest.TestCase):
         cam.add_color_render_image_quantity("render_img2", depths, normals, colors, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
         
         # true floating adder
-        ps.add_color_render_image_quantity("render_img3", depths, normals, colors, enabled=True, image_origin='lower_left', material='wax', transparency=0.7, )
+        ps.add_color_render_image_quantity("render_img3", depths, normals, colors, enabled=True, image_origin='lower_left', material='wax', transparency=0.7, allow_fullscreen_compositing=True)
         
         ps.show(3)
         ps.remove_all_structures()
@@ -2067,7 +2067,7 @@ class TestCameraView(unittest.TestCase):
         cam.add_scalar_render_image_quantity("render_img2", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
         
         # true floating adder
-        ps.add_scalar_render_image_quantity("render_img3", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
+        ps.add_scalar_render_image_quantity("render_img3", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7, allow_fullscreen_compositing=True)
         
         ps.show(3)
         ps.remove_all_structures()
@@ -2088,7 +2088,7 @@ class TestCameraView(unittest.TestCase):
         cam.add_raw_color_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
         
         # true floating adder
-        ps.add_raw_color_render_image_quantity("render_img3", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
+        ps.add_raw_color_render_image_quantity("render_img3", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7, allow_fullscreen_compositing=True)
         
         ps.show(3)
         ps.remove_all_structures()
@@ -2109,7 +2109,7 @@ class TestCameraView(unittest.TestCase):
         cam.add_raw_color_alpha_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7, is_premultiplied=True)
         
         # true floating adder
-        ps.add_raw_color_alpha_render_image_quantity("render_img3", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
+        ps.add_raw_color_alpha_render_image_quantity("render_img3", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7, allow_fullscreen_compositing=True)
         
         ps.show(3)
         ps.remove_all_structures()
