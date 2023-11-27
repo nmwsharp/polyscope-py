@@ -619,8 +619,8 @@ void bind_imgui_methods(py::module& m) {
         py::arg("label"),
         py::arg("v"),
         py::arg("v_speed") = 1.0f,
-        py::arg("v_min") = 0.0f,
-        py::arg("v_max") = 0.0f,
+        py::arg("v_min"),
+        py::arg("v_max"),
         py::arg("format") = "%.3f",
         py::arg("power") = 1.0f);
     m.def(
@@ -639,8 +639,8 @@ void bind_imgui_methods(py::module& m) {
         py::arg("label"),
         py::arg("v"),
         py::arg("v_speed") = 1.0f,
-        py::arg("v_min") = 0.0f,
-        py::arg("v_max") = 0.0f,
+        py::arg("v_min"),
+        py::arg("v_max"),
         py::arg("format") = "%.3f",
         py::arg("power") = 1.0f);
     m.def(
@@ -659,8 +659,8 @@ void bind_imgui_methods(py::module& m) {
         py::arg("label"),
         py::arg("v"),
         py::arg("v_speed") = 1.0f,
-        py::arg("v_min") = 0.0f,
-        py::arg("v_max") = 0.0f,
+        py::arg("v_min"),
+        py::arg("v_max"),
         py::arg("format") = "%.3f",
         py::arg("power") = 1.0f);
     m.def(
@@ -679,8 +679,8 @@ void bind_imgui_methods(py::module& m) {
         py::arg("label"),
         py::arg("v"),
         py::arg("v_speed") = 1.0f,
-        py::arg("v_min") = 0.0f,
-        py::arg("v_max") = 0.0f,
+        py::arg("v_min"),
+        py::arg("v_max"),
         py::arg("format") = "%.3f",
         py::arg("power") = 1.0f);
     m.def(
@@ -709,8 +709,8 @@ void bind_imgui_methods(py::module& m) {
         py::arg("v_current_min"),
         py::arg("v_current_max"),
         py::arg("v_speed") = 1.0f,
-        py::arg("v_min") = 0.0f,
-        py::arg("v_max") = 0.0f,
+        py::arg("v_min"),
+        py::arg("v_max"),
         py::arg("format") = "%.3f",
         py::arg("format_max") = nullptr,
         py::arg("power") = 1.0f);
@@ -816,8 +816,8 @@ void bind_imgui_methods(py::module& m) {
         },
         py::arg("label"),
         py::arg("v"),
-        py::arg("v_min") = 0.0f,
-        py::arg("v_max") = 0.0f,
+        py::arg("v_min"),
+        py::arg("v_max"),
         py::arg("format") = "%.3f",
         py::arg("power") = 1.0f);
     m.def(
@@ -833,8 +833,8 @@ void bind_imgui_methods(py::module& m) {
         },
         py::arg("label"),
         py::arg("v"),
-        py::arg("v_min") = 0.0f,
-        py::arg("v_max") = 0.0f,
+        py::arg("v_min"),
+        py::arg("v_max"),
         py::arg("format") = "%.3f",
         py::arg("power") = 1.0f);
     m.def(
@@ -850,8 +850,8 @@ void bind_imgui_methods(py::module& m) {
         },
         py::arg("label"),
         py::arg("v"),
-        py::arg("v_min") = 0.0f,
-        py::arg("v_max") = 0.0f,
+        py::arg("v_min"),
+        py::arg("v_max"),
         py::arg("format") = "%.3f",
         py::arg("power") = 1.0f);
     m.def(
@@ -867,8 +867,8 @@ void bind_imgui_methods(py::module& m) {
         },
         py::arg("label"),
         py::arg("v"),
-        py::arg("v_min") = 0.0f,
-        py::arg("v_max") = 0.0f,
+        py::arg("v_min"),
+        py::arg("v_max"),
         py::arg("format") = "%.3f",
         py::arg("power") = 1.0f);
 
