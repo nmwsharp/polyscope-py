@@ -409,6 +409,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   py::enum_<ps::ParamVizStyle>(m, "ParamVizStyle")
     .value("checker", ps::ParamVizStyle::CHECKER)
+    .value("checker_islands", ps::ParamVizStyle::CHECKER_ISLANDS)
     .value("grid", ps::ParamVizStyle::GRID)
     .value("local_check", ps::ParamVizStyle::LOCAL_CHECK)
     .value("local_rad", ps::ParamVizStyle::LOCAL_RAD)

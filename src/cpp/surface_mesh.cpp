@@ -7,6 +7,7 @@
 
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
+#include "polyscope/curve_network.h"
 
 #include "utils.h"
 
@@ -38,14 +39,18 @@ void bind_surface_mesh(py::module& m) {
       .def("set_grid_colors", &ps::SurfaceCornerParameterizationQuantity::setGridColors, "Set grid colors")
       .def("set_checker_colors", &ps::SurfaceCornerParameterizationQuantity::setCheckerColors, "Set checker colors")
       .def("set_checker_size", &ps::SurfaceCornerParameterizationQuantity::setCheckerSize, "Set checker size")
-      .def("set_color_map", &ps::SurfaceCornerParameterizationQuantity::setColorMap, "Set color map");
+      .def("set_color_map", &ps::SurfaceCornerParameterizationQuantity::setColorMap, "Set color map")
+      .def("set_island_labels", &ps::SurfaceCornerParameterizationQuantity::setIslandLabels<Eigen::VectorXf>)
+      .def("create_curve_network_from_seams", &ps::SurfaceCornerParameterizationQuantity::createCurveNetworkFromSeams, py::return_value_policy::reference);
   py::class_<ps::SurfaceVertexParameterizationQuantity>(m, "SurfaceVertexParameterizationQuantity")
       .def("set_enabled", &ps::SurfaceVertexParameterizationQuantity::setEnabled, "Set enabled")
       .def("set_style", &ps::SurfaceVertexParameterizationQuantity::setStyle, "Set style")
       .def("set_grid_colors", &ps::SurfaceVertexParameterizationQuantity::setGridColors, "Set grid colors")
       .def("set_checker_colors", &ps::SurfaceVertexParameterizationQuantity::setCheckerColors, "Set checker colors")
       .def("set_checker_size", &ps::SurfaceVertexParameterizationQuantity::setCheckerSize, "Set checker size")
-      .def("set_color_map", &ps::SurfaceVertexParameterizationQuantity::setColorMap, "Set color map");
+      .def("set_color_map", &ps::SurfaceVertexParameterizationQuantity::setColorMap, "Set color map")
+      .def("set_island_labels", &ps::SurfaceVertexParameterizationQuantity::setIslandLabels<Eigen::VectorXf>)
+      .def("create_curve_network_from_seams", &ps::SurfaceVertexParameterizationQuantity::createCurveNetworkFromSeams, py::return_value_policy::reference);
 
   // Vector quantities
   bindVectorQuantity<ps::SurfaceVertexVectorQuantity>(m, "SurfaceVertexVectorQuantity");

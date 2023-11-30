@@ -626,6 +626,7 @@ def str_to_param_coords_type(s):
 def str_to_param_viz_style(s):
     d = {
         "checker" : psb.ParamVizStyle.checker,
+        "checker_islands" : psb.ParamVizStyle.checker_islands,
         "grid" : psb.ParamVizStyle.grid,
         "local_check" : psb.ParamVizStyle.local_check,
         "local_rad" : psb.ParamVizStyle.local_rad,
