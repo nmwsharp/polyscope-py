@@ -59,6 +59,8 @@ void bind_volume_grid(py::module& m) {
       .def("get_material", &ps::VolumeGrid::getMaterial, "Get material")
       .def("set_edge_width", &ps::VolumeGrid::setEdgeWidth, "Set edge width")
       .def("get_edge_width", &ps::VolumeGrid::getEdgeWidth, "Get edge width")
+      .def("set_cube_size_factor", &ps::VolumeGrid::setCubeSizeFactor, "Set cube size factor")
+      .def("get_cube_size_factor", &ps::VolumeGrid::getCubeSizeFactor, "Get cube size factor")
 
 
       // = quantities

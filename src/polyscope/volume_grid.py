@@ -94,6 +94,12 @@ class VolumeGrid(Structure):
     def get_edge_width(self):
         return self.bound_instance.get_edge_width()
     
+    # Edge width
+    def set_cube_size_factor(self, val):
+        self.bound_instance.set_cube_size_factor(val)
+    def get_cube_size_factor(self):
+        return self.bound_instance.get_cube_size_factor()
+    
     # Material
     def set_material(self, mat):
         self.bound_instance.set_material(mat)
@@ -114,17 +120,20 @@ class VolumeGrid(Structure):
 
     def add_scalar_quantity(self, name, values, defined_on='nodes', datatype="standard", **scalar_args):
 
+        # NOTE: notice the .flatten('F') below to flatten in Fortran order. This assumes the input data is indexed like array[xInd,yInd,zInd],
+        # and converts to the internal x-changes-fastest data layout that the volume grid uses.
+
         if defined_on == 'nodes':
 
             if values.shape != self.get_grid_node_dim(): raise ValueError(f"'values' should be a {self.get_grid_node_dim()} array")
 
-            q = self.bound_instance.add_node_scalar_quantity(name, values.flatten(), str_to_datatype(datatype))
+            q = self.bound_instance.add_node_scalar_quantity(name, values.flatten('F'), str_to_datatype(datatype))
 
         elif defined_on == 'cells':
             
             if values.shape != self.get_grid_cell_dim(): raise ValueError(f"'values' should be a {self.get_grid_cell_dim()} array")
 
-            q = self.bound_instance.add_cell_scalar_quantity(name, values.flatten(), str_to_datatype(datatype))
+            q = self.bound_instance.add_cell_scalar_quantity(name, values.flatten('F'), str_to_datatype(datatype))
 
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'cells']".format(defined_on))
@@ -160,7 +169,7 @@ class VolumeGrid(Structure):
         check_all_args_processed(self, q, scalar_args)
    
 
-def register_volume_grid(name, bound_low, bound_high, node_dims, enabled=None, color=None, edge_color=None, edge_width=None, material=None, transparency=None):
+def register_volume_grid(name, bound_low, bound_high, node_dims, enabled=None, color=None, edge_color=None, edge_width=None, cube_size_factor=None, material=None, transparency=None):
 
     """Register a new volume grid"""
 
@@ -178,6 +187,8 @@ def register_volume_grid(name, bound_low, bound_high, node_dims, enabled=None, c
         p.set_edge_color(edge_color)
     if edge_width is not None:
         p.set_edge_width(edge_width)
+    if cube_size_factor is not None:
+        p.set_cube_size_factor(cube_size_factor)
     if material is not None:
         p.set_material(material)
     if transparency is not None:
