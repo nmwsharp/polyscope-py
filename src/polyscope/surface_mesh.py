@@ -121,6 +121,16 @@ class SurfaceMesh(Structure):
         self.bound_instance.set_back_face_color(glm3(val))
     def get_back_face_color(self):
         return self.bound_instance.get_back_face_color().as_tuple()
+    
+
+    def mark_edges_as_used(self):
+        self.bound_instance.mark_edges_as_used()
+    
+    def mark_halfedges_as_used(self):
+        self.bound_instance.mark_halfedges_as_used()
+    
+    def mark_corners_as_used(self):
+        self.bound_instance.mark_corners_as_used()
 
     ## Permutations and bases
 

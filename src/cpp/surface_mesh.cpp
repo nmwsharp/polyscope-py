@@ -97,6 +97,10 @@ void bind_surface_mesh(py::module& m) {
       .def("set_halfedge_permutation", &ps::SurfaceMesh::setHalfedgePermutation<Eigen::VectorXi>,
            "Set halfedge permutation")
       .def("set_corner_permutation", &ps::SurfaceMesh::setCornerPermutation<Eigen::VectorXi>, "Set corner permutation")
+      
+      .def("mark_edges_as_used", &ps::SurfaceMesh::markEdgesAsUsed)
+      .def("mark_halfedges_as_used", &ps::SurfaceMesh::markHalfedgesAsUsed)
+      .def("mark_corners_as_used", &ps::SurfaceMesh::markCornersAsUsed)
 
       // = quantities
 
