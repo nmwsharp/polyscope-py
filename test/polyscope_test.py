@@ -32,6 +32,30 @@ class TestCore(unittest.TestCase):
     def test_show(self):
         ps.show(forFrames=3)
 
+    def test_frame_tick(self):
+        for i in range(4):
+            ps.frame_tick()
+    
+    def test_frame_tick_imgui(self):
+        def callback():
+            psim.Button("test button")
+        ps.set_user_callback(callback)
+        for i in range(4):
+            ps.frame_tick()
+
+    def test_unshow(self):
+        counts = [0]
+        def callback():
+            counts[0] = counts[0] + 1
+            if(counts[0] > 2):
+                ps.unshow()
+
+        ps.set_user_callback(callback)
+        ps.show(10)
+
+        self.assertLess(counts[0], 4)
+
+
     def test_options(self):
 
         # Remember, polyscope has global state, so we're actually setting these for the remainder of the tests (lol)
@@ -1068,7 +1092,16 @@ class TestSurfaceMesh(unittest.TestCase):
         # Transparency
         p.set_transparency(0.8)
         self.assertAlmostEqual(0.8, p.get_transparency())
-      
+     
+        # Mark elements as used
+        # p.set_corner_permutation(np.random.permutation(p.n_corners())) # not required
+        p.mark_corners_as_used()
+        p.set_edge_permutation(np.random.permutation(p.n_edges()))
+        p.mark_edges_as_used()
+        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()))
+        p.mark_halfedges_as_used()
+     
+
         # Set with optional arguments 
         p2 = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
@@ -1711,6 +1744,11 @@ class TestVolumeGrid(unittest.TestCase):
         ps.show(3)
         self.assertAlmostEqual(p.get_edge_width(), 1.5)
         
+        # Cube size factor
+        p.set_cube_size_factor(0.5)
+        ps.show(3)
+        self.assertAlmostEqual(p.get_cube_size_factor(), 0.5)
+        
         # Material
         p.set_material("candy")
         self.assertEqual("candy", p.get_material())
@@ -1722,7 +1760,7 @@ class TestVolumeGrid(unittest.TestCase):
       
         # Set with optional arguments 
         p2 = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14),
-                    enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), edge_width=0.5, transparency=0.9)
+                    enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), edge_width=0.5, cube_size_factor=0.5, transparency=0.9)
 
         ps.show(3)
 
