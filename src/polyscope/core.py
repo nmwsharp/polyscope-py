@@ -37,6 +37,10 @@ def is_initialized():
 def frame_tick():
     psb.frame_tick()
 
+def shutdown():
+    psb.shutdown()
+
+
 ### Render engine
 
 def get_render_engine_backend_name():

@@ -9,7 +9,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
-__version__ = '1.3.1'
+__version__ = '1.3.4'
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir='', exclude_arch=False):
@@ -92,7 +92,7 @@ def main():
         name='polyscope',
         version=__version__,
         author='Nicholas Sharp',
-        author_email='nsharp@cs.cmu.edu',
+        author_email='nmwsharp@gmail.com',
         url='https://polyscope.run',
         description='Polyscope: A viewer and user interface for 3D data.',
         long_description=long_description,

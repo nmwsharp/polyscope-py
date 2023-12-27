@@ -88,6 +88,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   );
   m.def("unshow", &ps::unshow);
   m.def("frame_tick", &ps::frameTick);
+  m.def("shutdown", &ps::shutdown);
 
   // === Render engine related things
   m.def("get_render_engine_backend_name", &ps::render::getRenderEngineBackendName);
