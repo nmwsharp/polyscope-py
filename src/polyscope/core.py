@@ -25,8 +25,29 @@ def show(forFrames=None):
     else:
         psb.show(forFrames)
 
+def unshow():
+    psb.unshow()
+
+def check_initialized():
+    psb.check_initialized()
+
+def is_initialized():
+    return psb.is_initialized()
+
+def frame_tick():
+    psb.frame_tick()
+
 def shutdown():
     psb.shutdown()
+
+
+### Render engine
+
+def get_render_engine_backend_name():
+    return psb.get_render_engine_backend_name()
+
+def get_key_code(c):
+    return psb.get_key_code(c)
 
 ### Structure management
 
@@ -64,8 +85,17 @@ def set_errors_throw_exceptions(val):
 def set_max_fps(f):
     psb.set_max_fps(f)
 
+def set_enable_vsync(b):
+    psb.set_enable_vsync(b)
+
 def set_use_prefs_file(v):
     psb.set_use_prefs_file(v)
+
+def request_redraw():
+    psb.request_redraw()
+
+def get_redraw_requested():
+    return psb.get_redraw_requested()
 
 def set_always_redraw(v):
     psb.set_always_redraw(v)
@@ -82,6 +112,15 @@ def set_autoscale_structures(b):
 def set_build_gui(b):
     psb.set_build_gui(b)
 
+def set_user_gui_is_on_right_side(b):
+    psb.set_user_gui_is_on_right_side(b)
+
+def set_build_default_gui_panels(b):
+    psb.set_build_default_gui_panels(b)
+
+def set_render_scene(b):
+    psb.set_render_scene(b)
+
 def set_open_imgui_window_for_user_callback(b):
     psb.set_open_imgui_window_for_user_callback(b)
 
@@ -91,11 +130,23 @@ def set_invoke_user_callback_for_nested_show(b):
 def set_give_focus_on_show(b):
     psb.set_give_focus_on_show(b)
 
+def set_hide_window_after_show(b):
+    psb.set_hide_window_after_show(b)
+
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))
+def get_navigation_style():
+    return navigate_style_to_str(psb.get_navigation_style());
 
 def set_up_dir(d):
     psb.set_up_dir(str_to_updir(d))
+def get_up_dir():
+    return updir_to_str(psb.get_up_dir())
+
+def set_front_dir(d):
+    psb.set_front_dir(str_to_frontdir(d))
+def get_front_dir():
+    return frontdir_to_str(psb.get_front_dir())
 
 ### Scene extents
 
@@ -128,6 +179,54 @@ def look_at_dir(camera_location, target, up_dir, fly_to=False):
 
 def set_view_projection_mode(s):
     psb.set_view_projection_mode(str_to_projection_mode(s))
+
+def set_window_size(width, height):
+    width = int(width)
+    height = int(height)
+    psb.set_window_size(width, height)
+
+def get_window_size():
+    return psb.get_window_size()
+
+def get_buffer_size():
+    return psb.get_buffer_size()
+
+def set_window_resizable(is_resizable):
+    psb.set_window_resizable(is_resizable)
+
+def get_window_resizable():
+    return psb.get_window_resizable()
+
+def set_view_from_json(json_str, fly_to=False):
+    psb.set_view_from_json(json_str, fly_to)
+
+def get_view_as_json():
+    return psb.get_view_as_json()
+
+def set_background_color(c):
+    if len(c) == 3: c = (c[0], c[1], c[2], 1.0)
+    psb.set_background_color(glm4(c))
+
+def get_background_color():
+    return psb.get_background_color()
+
+def get_view_camera_parameters():
+    return CameraParameters(instance=psb.get_view_camera_parameters())
+
+def set_view_camera_parameters(params):
+    if not isinstance(params, CameraParameters): raise ValueError("must pass CameraParameters")
+    psb.set_view_camera_parameters(params.instance)
+
+def get_view_buffer_resolution():
+    return CameraParameters(instance=psb.get_view_camera_parameters())
+
+def set_camera_view_matrix(mat):
+    mat = np.asarray(mat)
+    if mat.shape != (4,4): raise ValueError("mat should be a 4x4 numpy matrix")
+    psb.set_camera_view_matrix(mat)
+
+def get_camera_view_matrix():
+    return psb.get_camera_view_matrix()
 
 ### Messages
 
@@ -184,6 +283,68 @@ def set_transparency_render_passes(n):
 def set_SSAA_factor(n):
     psb.set_SSAA_factor(n)
 
+## Groups
+
+class Group:
+    # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
+
+    # End users should not call this constrctor, use add_group() instead
+    def __init__(self, instance):
+        # Wrap an existing instance
+        self.bound_group = instance
+    
+    def get_name(self):
+        return self.bound_group.name
+    
+    def add_child_group(self, child_group):
+        if isinstance(child_group, str):
+            self.bound_group.add_child_group(get_group(child_group).bound_group)
+        else:
+            self.bound_group.add_child_group(child_group.bound_group)
+
+    def add_child_structure(self, child_structure):
+        self.bound_group.add_child_structure(child_structure.bound_instance)
+    
+    def remove_child_group(self, child_group):
+        if isinstance(child_group, str):
+            self.bound_group.remove_child_group(get_group(child_group).bound_group)
+        else:
+            self.bound_group.remove_child_group(child_group.bound_group)
+
+    def remove_child_structure(self, child_structure):
+        self.bound_group.remove_child_structure(child_structure.bound_instance)
+    
+    def set_enabled(self, new_val):
+        self.bound_group.set_enabled(new_val)
+    
+    def set_show_child_details(self, new_val):
+        self.bound_group.set_show_child_details(new_val)
+    
+    def set_hide_descendants_from_structure_lists(self, new_val):
+        self.bound_group.set_hide_descendants_from_structure_lists(new_val)
+
+def create_group(name):
+    return Group(psb.create_group(name))
+
+def get_group(name):
+    return Group(psb.get_group(name))
+
+def remove_group(group, error_if_absent=True):
+    # accept either a string or a group ref as input
+    if isinstance(group, str):
+        psb.remove_group(group, error_if_absent)
+    else:
+        psb.remove_group(group.get_name(), error_if_absent)
+
+def remove_all_groups():
+    psb.remove_all_groups()
+
+
+## Low-level internals access
+# (warning, 'advanced' users only, may change)
+def get_final_scene_color_texture_native_handle():
+    return psb.get_final_scene_color_texture_native_handle()
+
 ## Slice planes
 
 class SlicePlane:
@@ -232,12 +393,90 @@ def add_scene_slice_plane():
 def remove_last_scene_slice_plane():
     psb.remove_last_scene_slice_plane()
 
+### Camera Parameters
+
+class CameraIntrinsics:
+
+    def __init__(self, fov_vertical_deg=None, fov_horizontal_deg=None, aspect=None, instance=None):
+
+        if instance is not None:
+            self.instance = instance
+        elif fov_vertical_deg is not None and aspect is not None:
+            self.instance = psb.CameraIntrinsics.from_FoV_deg_vertical_and_aspect(float(fov_vertical_deg), float(aspect))
+        elif fov_horizontal_deg is not None and aspect is not None:
+            self.instance = psb.CameraIntrinsics.from_FoV_deg_horizontal_and_aspect(float(fov_horizontal_deg), float(aspect))
+        elif fov_vertical_deg is not None and fov_horizontal_deg is not None:
+            self.instance = psb.CameraIntrinsics.from_FoV_deg_horizontal_and_vertical(float(fov_horizontal_deg), float(fov_vertical_deg))
+        else:
+            raise ValueError("bad arguments, at least two of (fov_vertical_deg,fov_horizontal_deg,aspect) must be given and non-None")
+
+class CameraExtrinsics:
+
+    def __init__(self, root=None, look_dir=None, up_dir=None, mat=None, instance=None):
+        
+        if instance is not None:
+            self.instance = instance
+
+        elif mat is not None:
+            mat = np.asarray(mat)
+            if mat.shape != (4,4): raise ValueError("mat should be a 4x4 numpy matrix")
+            self.instance = psb.CameraExtrinsics.from_matrix(mat)
+
+        elif (root is not None) and (look_dir is not None) and (up_dir is not None):
+
+            root = np.asarray(root)
+            look_dir = np.asarray(look_dir)
+            up_dir = np.asarray(up_dir)
+            self.instance = psb.CameraExtrinsics.from_vectors(root, look_dir, up_dir)
+        
+        else:
+            raise ValueError("bad arguments, must pass non-None (root,look_dir,up_dir) or non-None mat")
+
+class CameraParameters:
+
+    def __init__(self, intrinsics=None, extrinsics=None, instance=None):
+        if instance is not None:
+            self.instance = instance
+        else:
+            self.instance = psb.CameraParameters(intrinsics.instance, extrinsics.instance)
+
+    # getters
+    def get_intrinsics(self): return CameraIntrinsics(instance=self.instance.get_intrinsics())
+    def get_extrinsics(self): return CameraExtrinsics(instance=self.instance.get_extrinsics())
+    def get_T(self): return self.instance.get_T()
+    def get_R(self): return self.instance.get_R()
+    def get_view_mat(self): return self.instance.get_view_mat() # same as get_E()
+    def get_E(self): return self.instance.get_E()
+    def get_position(self): return self.instance.get_position()
+    def get_look_dir(self): return self.instance.get_look_dir()
+    def get_up_dir(self): return self.instance.get_up_dir()
+    def get_right_dir(self): return self.instance.get_right_dir()
+    def get_camera_frame(self): return self.instance.get_camera_frame()
+    def get_fov_vertical_deg(self): return self.instance.get_fov_vertical_deg()
+    def get_aspect(self): return self.instance.get_aspect()
+
+    def generate_camera_rays(self, dims, image_origin='upper_left'): 
+        out_rays = self.instance.generate_camera_rays(
+                int(dims[0]), int(dims[1]),
+                str_to_image_origin(image_origin)
+            )
+        return out_rays.reshape(dims[0], dims[1], 3)
+
+    def generate_camera_ray_corners(self): 
+        return self.instance.generate_camera_ray_corners()
+
 
 ## Small utilities
+def glm3u(vals):
+    return psb.glm_uvec3(vals[0], vals[1], vals[2])
 def glm3(vals):
     return psb.glm_vec3(vals[0], vals[1], vals[2])
 def glm4(vals):
     return psb.glm_vec4(vals[0], vals[1], vals[2], vals[3])
+def degrees(val):
+    return 180.*val / np.PI
+def radians(val):
+    return np.PI * val / 180.
 
 ### Materials
 
@@ -268,18 +507,28 @@ def load_color_map(cmap_name, filename):
 
 ## String-to-enum translation
 
+d_navigate = {
+    "turntable" : psb.NavigateStyle.turntable,
+    "free" : psb.NavigateStyle.free,
+    "planar" : psb.NavigateStyle.planar,
+    "none" : psb.NavigateStyle.none,
+    "first_person" : psb.NavigateStyle.first_person,
+}
 def str_to_navigate_style(s):
-    d = {
-        "turntable" : psb.NavigateStyle.turntable,
-        "free" : psb.NavigateStyle.free,
-        "planar" : psb.NavigateStyle.planar,
-    }
 
-    if s not in d:
+    if s not in d_navigate:
         raise ValueError("Bad navigate style specifier '{}', should be one of [{}]".format(s, 
-            ",".join(["'{}'".format(x) for x in d.keys()])))
+            ",".join(["'{}'".format(x) for x in d_navigate.keys()])))
 
-    return d[s]
+    return d_navigate[s]
+def navigate_style_to_str(val):
+    for k,v in d_navigate.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad navigate style specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_navigate.values()])))
+
 
 def str_to_projection_mode(s):
     d = {
@@ -293,21 +542,53 @@ def str_to_projection_mode(s):
 
     return d[s]
 
+
+d_updir = {
+    "x_up" : psb.UpDir.x_up,
+    "neg_x_up" : psb.UpDir.neg_x_up,
+    "y_up" : psb.UpDir.y_up,
+    "neg_y_up" : psb.UpDir.neg_y_up,
+    "z_up" : psb.UpDir.z_up,
+    "neg_z_up" : psb.UpDir.neg_z_up,
+}
 def str_to_updir(s):
-    d = {
-        "x_up" : psb.UpDir.x_up,
-        "neg_x_up" : psb.UpDir.neg_x_up,
-        "y_up" : psb.UpDir.y_up,
-        "neg_y_up" : psb.UpDir.neg_y_up,
-        "z_up" : psb.UpDir.z_up,
-        "neg_z_up" : psb.UpDir.neg_z_up,
-    }
-
-    if s not in d:
+    if s not in d_updir:
         raise ValueError("Bad up direction specifier '{}', should be one of [{}]".format(s, 
-            ",".join(["'{}'".format(x) for x in d.keys()])))
+            ",".join(["'{}'".format(x) for x in d_updir.keys()])))
 
-    return d[s]
+    return d_updir[s]
+
+def updir_to_str(val):
+    for k,v in d_updir.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad up direction specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_updir.values()])))
+
+
+d_frontdir = {
+    "x_front" : psb.FrontDir.x_front,
+    "neg_x_front" : psb.FrontDir.neg_x_front,
+    "y_front" : psb.FrontDir.y_front,
+    "neg_y_front" : psb.FrontDir.neg_y_front,
+    "z_front" : psb.FrontDir.z_front,
+    "neg_z_front" : psb.FrontDir.neg_z_front,
+}
+def str_to_frontdir(s):
+
+    if s not in d_frontdir:
+        raise ValueError("Bad front direction specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_frontdir.keys()])))
+
+    return d_frontdir[s]
+def frontdir_to_str(val):
+    for k,v in d_frontdir.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad front direction specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_frontdir.values()])))
 
 def str_to_datatype(s):
     d = {
@@ -349,6 +630,7 @@ def str_to_param_coords_type(s):
 def str_to_param_viz_style(s):
     d = {
         "checker" : psb.ParamVizStyle.checker,
+        "checker_islands" : psb.ParamVizStyle.checker_islands,
         "grid" : psb.ParamVizStyle.grid,
         "local_check" : psb.ParamVizStyle.local_check,
         "local_rad" : psb.ParamVizStyle.local_rad,
@@ -435,3 +717,73 @@ def point_render_mode_to_str(val):
 
     raise ValueError("Bad point render mode specifier '{}', should be one of [{}]".format(val, 
         ",".join(["'{}'".format(x) for x in d_point_render_mode.values()])))
+
+# Image origin to/from string
+d_image_origin = {
+        "lower_left" : psb.ImageOrigin.lower_left,
+        "upper_left" : psb.ImageOrigin.upper_left,
+    }
+
+def str_to_image_origin(s):
+
+    if s not in d_image_origin:
+        raise ValueError("Bad image origin specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_image_origin.keys()])))
+
+    return d_image_origin[s]
+
+def image_origin_to_str(val):
+
+    for k,v in d_image_origin.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad image origin specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_image_origin.values()])))
+
+# Shade style to/from string
+d_mesh_shade_style = {
+        "smooth" : psb.MeshShadeStyle.smooth,
+        "flat" : psb.MeshShadeStyle.flat,
+        "tri_flat" : psb.MeshShadeStyle.tri_flat,
+    }
+
+def str_to_mesh_shade_style(s):
+
+    if s not in d_mesh_shade_style:
+        raise ValueError("Bad specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_mesh_shade_style.keys()])))
+
+    return d_mesh_shade_style[s]
+
+def mesh_shade_style_to_str(val):
+
+    for k,v in d_mesh_shade_style.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_mesh_shade_style.values()])))
+
+# Implicit render mode to/from string
+d_implicit_render_mode = {
+        "fixed_step" : psb.ImplicitRenderMode.fixed_step,
+        "sphere_march" : psb.ImplicitRenderMode.sphere_march,
+    }
+
+def str_to_implicit_render_mode(s):
+
+    if s not in d_implicit_render_mode:
+        raise ValueError("Bad specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_implicit_render_mode.keys()])))
+
+    return d_implicit_render_mode[s]
+
+def implicit_render_mode_to_str(val):
+
+    for k,v in d_implicit_render_mode.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_implicit_render_mode.values()])))

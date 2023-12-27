@@ -17,8 +17,14 @@ pybind11_add_module(polyscope_bindings
   src/cpp/point_cloud.cpp
   src/cpp/curve_network.cpp
   src/cpp/volume_mesh.cpp
+  src/cpp/volume_grid.cpp
+  src/cpp/camera_view.cpp
+  src/cpp/floating_quantities.cpp
+  src/cpp/implicit_helpers.cpp
+  src/cpp/managed_buffer.cpp
   src/cpp/imgui.cpp
 )
+set_target_properties(polyscope_bindings PROPERTIES CXX_VISIBILITY_PRESET "default")
 
 target_include_directories(polyscope_bindings PUBLIC "${EIGEN3_INCLUDE_DIR}")
 target_link_libraries(polyscope_bindings PRIVATE polyscope)

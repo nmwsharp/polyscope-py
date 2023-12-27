@@ -2,17 +2,21 @@ import polyscope_bindings as psb
 import numpy as np
 
 from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3
+from polyscope.structure import Structure
+from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed
 
-class VolumeMesh:
+class VolumeMesh(Structure):
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
 
     # End users should not call this constrctor, use register_volume_mesh instead
     def __init__(self, name=None, vertices=None, tets=None, hexes=None, mixed_cells=None, instance=None):
+        
+        super().__init__()
 
         if instance is not None:
             # Wrap an existing instance
-            self.bound_mesh = instance
+            self.bound_instance = instance
 
         else:
             # Create a new instance
@@ -26,15 +30,15 @@ class VolumeMesh:
                 raise ValueError("specify EITHER mixed_cells OR tets/hexes but not both")
 
             if mixed_cells is not None:
-                self.bound_mesh = psb.register_volume_mesh(name, vertices, mixed_cells)
+                self.bound_instance = psb.register_volume_mesh(name, vertices, mixed_cells)
 
             else:
                 if tets is None:
-                    self.bound_mesh = psb.register_hex_mesh(name, vertices, hexes)
+                    self.bound_instance = psb.register_hex_mesh(name, vertices, hexes)
                 elif hexes is None:
-                    self.bound_mesh = psb.register_tet_mesh(name, vertices, tets)
+                    self.bound_instance = psb.register_tet_mesh(name, vertices, tets)
                 else:
-                    self.bound_mesh = psb.register_tet_hex_mesh(name, vertices, tets, hexes)
+                    self.bound_instance = psb.register_tet_hex_mesh(name, vertices, tets, hexes)
 
 
     def check_shape(self, points):
@@ -63,186 +67,127 @@ class VolumeMesh:
 
 
     def n_vertices(self):
-        return self.bound_mesh.n_vertices()
+        return self.bound_instance.n_vertices()
     def n_faces(self):
-        return self.bound_mesh.n_faces()
+        return self.bound_instance.n_faces()
     def n_cells(self):
-        return self.bound_mesh.n_cells()
+        return self.bound_instance.n_cells()
 
     ## Structure management
-    
-    def remove(self):
-        '''Remove the structure itself'''
-        self.bound_mesh.remove()
-    def remove_all_quantities(self):
-        '''Remove all quantities on the structure'''
-        self.bound_mesh.remove_all_quantities()
-    def remove_quantity(self, name):
-        '''Remove a single quantity on the structure'''
-        self.bound_mesh.remove_quantity(name)
-
-    # Enable/disable
-    def set_enabled(self, val=True):
-        self.bound_mesh.set_enabled(val)
-    def is_enabled(self):
-        return self.bound_mesh.is_enabled()
-    
-    # Transparency
-    def set_transparency(self, val):
-        self.bound_mesh.set_transparency(val)
-    def get_transparency(self):
-        return self.bound_mesh.get_transparency()
-    
-    # Transformation things
-    def center_bounding_box(self):
-        self.bound_mesh.center_bounding_box()
-    def rescale_to_unit(self):
-        self.bound_mesh.rescale_to_unit()
-    def reset_transform(self):
-        self.bound_mesh.reset_transform()
-    def set_transform(self, new_mat4x4):
-        self.bound_mesh.set_transform(new_mat4x4)
-    def set_position(self, new_vec3):
-        self.bound_mesh.set_position(new_vec3)
-    def translate(self, trans_vec3):
-        self.bound_mesh.translate(trans_vec3)
-    def get_transform(self):
-        return self.bound_mesh.get_transform()
-    def get_position(self):
-        return self.bound_mesh.get_position()
-    
-    # Slice planes
-    def set_cull_whole_elements(self, val):
-        self.bound_mesh.set_cull_whole_elements(val)
-    def get_cull_whole_elements(self):
-        return self.bound_mesh.get_cull_whole_elements()
-    def set_ignore_slice_plane(self, plane, val):
-        # take either a string or a slice plane object as input
-        if isinstance(plane, str):
-            self.bound_mesh.set_ignore_slice_plane(plane, val)
-        else:
-            self.bound_mesh.set_ignore_slice_plane(plane.get_name(), val)
-    def get_ignore_slice_plane(self, plane):
-        # take either a string or a slice plane object as input
-        if isinstance(plane, str):
-            return self.bound_mesh.get_ignore_slice_plane(plane)
-        else:
-            return self.bound_mesh.get_ignore_slice_plane(plane.get_name())
-
 
     # Update
     def update_vertex_positions(self, vertices):
         self.check_shape(vertices)
-        self.bound_mesh.update_vertex_positions(vertices)
+        self.bound_instance.update_vertex_positions(vertices)
 
 
     ## Options
 
     # Color
     def set_color(self, val):
-        self.bound_mesh.set_color(glm3(val))
+        self.bound_instance.set_color(glm3(val))
     def get_color(self):
-        return self.bound_mesh.get_color().as_tuple()
+        return self.bound_instance.get_color().as_tuple()
     
     # Interior Color
     def set_interior_color(self, val):
-        self.bound_mesh.set_interior_color(glm3(val))
+        self.bound_instance.set_interior_color(glm3(val))
     def get_interior_color(self):
-        return self.bound_mesh.get_interior_color().as_tuple()
+        return self.bound_instance.get_interior_color().as_tuple()
     
     # Edge Color
     def set_edge_color(self, val):
-        self.bound_mesh.set_edge_color(glm3(val))
+        self.bound_instance.set_edge_color(glm3(val))
     def get_edge_color(self):
-        return self.bound_mesh.get_edge_color().as_tuple()
+        return self.bound_instance.get_edge_color().as_tuple()
     
     # Edge width
     def set_edge_width(self, val):
-        self.bound_mesh.set_edge_width(val)
+        self.bound_instance.set_edge_width(val)
     def get_edge_width(self):
-        return self.bound_mesh.get_edge_width()
+        return self.bound_instance.get_edge_width()
     
     # Material
     def set_material(self, mat):
-        self.bound_mesh.set_material(mat)
+        self.bound_instance.set_material(mat)
     def get_material(self):
-        return self.bound_mesh.get_material()
+        return self.bound_instance.get_material()
 
 
     ## Quantities
 
     # Scalar
-    def add_scalar_quantity(self, name, values, defined_on='vertices', enabled=None, datatype="standard", vminmax=None, cmap=None):
+    def add_scalar_quantity(self, name, values, defined_on='vertices', datatype="standard", **scalar_args):
 
         if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
 
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_mesh.add_vertex_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_vertex_scalar_quantity(name, values, str_to_datatype(datatype))
         elif defined_on == 'cells':
             if values.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
-            q = self.bound_mesh.add_cell_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_cell_scalar_quantity(name, values, str_to_datatype(datatype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
-            
+  
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if vminmax is not None:
-            q.set_map_range(vminmax)
-        if cmap is not None:
-            q.set_color_map(cmap)
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, scalar_args)
+        process_scalar_args(self, q, scalar_args)
+        check_all_args_processed(self, q, scalar_args)
+
     
     
     # Color
-    def add_color_quantity(self, name, values, defined_on='vertices', enabled=None):
+    def add_color_quantity(self, name, values, defined_on='vertices', **color_args):
         if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
         
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_mesh.add_vertex_color_quantity(name, values)
+            q = self.bound_instance.add_vertex_color_quantity(name, values)
         elif defined_on == 'cells':
             if values.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
-            q = self.bound_mesh.add_cell_color_quantity(name, values)
+            q = self.bound_instance.add_cell_color_quantity(name, values)
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
+
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, color_args)
+        process_color_args(self, q, color_args)
+        check_all_args_processed(self, q, color_args)
     
     
     # Vector
-    def add_vector_quantity(self, name, values, defined_on='vertices', enabled=None, vectortype="standard", length=None, radius=None, color=None):
+    def add_vector_quantity(self, name, values, defined_on='vertices', vectortype="standard", **vector_args):
         if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
         
         
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_mesh.add_vertex_vector_quantity(name, values, str_to_vectortype(vectortype))
+            q = self.bound_instance.add_vertex_vector_quantity(name, values, str_to_vectortype(vectortype))
         elif defined_on == 'cells':
             if values.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
-            q = self.bound_mesh.add_cell_vector_quantity(name, values, str_to_vectortype(vectortype))
+            q = self.bound_instance.add_cell_vector_quantity(name, values, str_to_vectortype(vectortype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if length is not None:
-            q.set_length(length, True)
-        if radius is not None:
-            q.set_radius(radius, True)
-        if color is not None:
-            q.set_color(glm3(color))
+
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, vector_args)
+        process_vector_args(self, q, vector_args)
+        check_all_args_processed(self, q, vector_args)
     
     
 
 def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None, enabled=None, color=None, interior_color=None, edge_color=None, edge_width=None, material=None, transparency=None):
 
-    """Register a new surface mesh"""
-    if not psb.isInitialized():
+    """Register a new volume mesh"""
+
+    if not psb.is_initialized():
         raise RuntimeError("Polyscope has not been initialized")
     
     p = VolumeMesh(name, vertices=vertices, tets=tets, hexes=hexes, mixed_cells=mixed_cells)

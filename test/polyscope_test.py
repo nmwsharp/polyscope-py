@@ -22,11 +22,39 @@ import polyscope.imgui as psim
 # Path to test assets
 assets_prefix = path.join(path.dirname(__file__), "assets/")
 
+def assertArrayWithShape(self, arr, shape):
+    self.assertTrue(isinstance(arr, np.ndarray))
+    self.assertEqual(tuple(arr.shape), tuple(shape))
+
 class TestCore(unittest.TestCase):
 
 
     def test_show(self):
         ps.show(forFrames=3)
+
+    def test_frame_tick(self):
+        for i in range(4):
+            ps.frame_tick()
+    
+    def test_frame_tick_imgui(self):
+        def callback():
+            psim.Button("test button")
+        ps.set_user_callback(callback)
+        for i in range(4):
+            ps.frame_tick()
+
+    def test_unshow(self):
+        counts = [0]
+        def callback():
+            counts[0] = counts[0] + 1
+            if(counts[0] > 2):
+                ps.unshow()
+
+        ps.set_user_callback(callback)
+        ps.show(10)
+
+        self.assertLess(counts[0], 4)
+
 
     def test_options(self):
 
@@ -37,6 +65,7 @@ class TestCore(unittest.TestCase):
         ps.set_print_prefix("polyscope test")
         ps.set_errors_throw_exceptions(True)
         ps.set_max_fps(60)
+        ps.set_enable_vsync(True)
         ps.set_use_prefs_file(True)
         ps.set_always_redraw(False)
         
@@ -45,10 +74,21 @@ class TestCore(unittest.TestCase):
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
 
+        ps.request_redraw()
+        self.assertTrue(ps.get_redraw_requested())
+        ps.set_always_redraw(False)
+
         ps.set_build_gui(True)
+        ps.set_render_scene(True)
         ps.set_open_imgui_window_for_user_callback(True)
         ps.set_invoke_user_callback_for_nested_show(False)
         ps.set_give_focus_on_show(True)
+        
+        ps.set_background_color((0.7, 0.8, 0.9))
+        ps.set_background_color((0.7, 0.8, 0.9, 0.9))
+        ps.get_background_color()
+
+        ps.get_final_scene_color_texture_native_handle()
         
         ps.show(3)
 
@@ -80,6 +120,9 @@ class TestCore(unittest.TestCase):
         ps.set_navigation_style("turntable")
         ps.set_navigation_style("free")
         ps.set_navigation_style("planar")
+        ps.set_navigation_style("none")
+        ps.set_navigation_style("first_person")
+        ps.set_navigation_style(ps.get_navigation_style())
 
         ps.set_up_dir("x_up")
         ps.set_up_dir("neg_x_up")
@@ -87,9 +130,29 @@ class TestCore(unittest.TestCase):
         ps.set_up_dir("neg_y_up")
         ps.set_up_dir("z_up")
         ps.set_up_dir("neg_z_up")
+        ps.set_up_dir(ps.get_up_dir())
+        
+        ps.set_front_dir("x_front")
+        ps.set_front_dir("neg_x_front")
+        ps.set_front_dir("y_front")
+        ps.set_front_dir("neg_y_front")
+        ps.set_front_dir("z_front")
+        ps.set_front_dir("neg_z_front")
+        ps.set_front_dir(ps.get_front_dir())
         
         ps.set_view_projection_mode("orthographic")
         ps.set_view_projection_mode("perspective")
+        
+        ps.set_camera_view_matrix(ps.get_camera_view_matrix())
+
+        ps.set_window_size(800, 600)
+        self.assertEqual(ps.get_window_size(), (800,600))
+
+        tup = ps.get_buffer_size()
+        w, h = int(tup[0]), int(tup[1])
+
+        ps.set_window_resizable(True)
+        self.assertEqual(ps.get_window_resizable(), True)
         
         ps.show(3)
     
@@ -107,6 +170,9 @@ class TestCore(unittest.TestCase):
         
         ps.show(3)
     
+    def test_view_json(self):
+        ps.set_view_from_json(ps.get_view_as_json())
+
     def test_ground_options(self):
 
         ps.set_ground_plane_mode("none")
@@ -206,6 +272,78 @@ class TestCore(unittest.TestCase):
         self.assertTrue(np.abs(phigh-high).sum() < 0.0001)
         
         ps.set_automatically_compute_scene_extents(True)
+   
+
+    def test_groups(self):
+
+        pts = np.zeros((10,3))
+        pt_cloud_0 = ps.register_point_cloud("cloud0", pts)
+        pt_cloud_1 = ps.register_point_cloud("cloud1", pts)
+        pt_cloud_2 = ps.register_point_cloud("cloud2", pts)
+
+        groupA = ps.create_group("group_A")
+        groupB = ps.create_group("group_B")
+        groupC = ps.create_group("group_C")
+
+        groupA.add_child_group(groupB)
+        groupA.add_child_group("group_C")
+
+        pt_cloud_0.add_to_group(groupA)
+        pt_cloud_1.add_to_group("group_A")
+        groupA.add_child_structure(pt_cloud_2)
+
+        groupA.set_enabled(False)
+        groupB.set_show_child_details(True)
+        groupC.set_hide_descendants_from_structure_lists(True)
+
+        ps.show(3)
+
+        groupA.remove_child_group(groupB)
+        groupA.remove_child_group("group_C")
+        groupA.remove_child_structure(pt_cloud_0)
+
+        ps.remove_group(groupB, True)
+        ps.remove_group("group_C", False)
+        
+        ps.show(3)
+
+        ps.remove_all_groups()
+        
+        ps.remove_all_structures()
+
+
+    def test_groups_demo_example(self):
+      
+        # make a point cloud
+        pts = np.zeros((300,3))
+        psCloud = ps.register_point_cloud("my cloud", pts)
+
+        # make a curve network
+        nodes = np.zeros((4,3))
+        edges = np.array([[1, 3], [3, 0], [1, 0], [0, 2]])
+        psCurve = ps.register_curve_network("my network", nodes, edges)
+
+        # create a group for these two objects
+        group = ps.create_group("my group")
+        psCurve.add_to_group(group) # you also say psCurve.add_to_group("my group")
+        psCloud.add_to_group(group)
+
+        # toggle the enabled state for everything in the group
+        group.set_enabled(False)
+
+        # hide items in group from displaying in the UI
+        # (useful if you are registering huge numbers of structures you don't always need to see)
+        group.set_hide_descendants_from_structure_lists(True)
+        group.set_show_child_details(False)
+
+        # nest groups inside of other groups
+        super_group = ps.create_group("py parent group")
+        super_group.add_child_group(group)
+
+        ps.show(3)
+
+        ps.remove_all_groups()
+        ps.remove_all_structures()
    
 
 class TestImGuiBindings(unittest.TestCase):
@@ -954,7 +1092,16 @@ class TestSurfaceMesh(unittest.TestCase):
         # Transparency
         p.set_transparency(0.8)
         self.assertAlmostEqual(0.8, p.get_transparency())
-      
+     
+        # Mark elements as used
+        # p.set_corner_permutation(np.random.permutation(p.n_corners())) # not required
+        p.mark_corners_as_used()
+        p.set_edge_permutation(np.random.permutation(p.n_edges()))
+        p.mark_edges_as_used()
+        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()))
+        p.mark_halfedges_as_used()
+     
+
         # Set with optional arguments 
         p2 = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces(), 
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), 
@@ -1017,28 +1164,18 @@ class TestSurfaceMesh(unittest.TestCase):
     
     
     def test_permutation(self):
+
         p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
 
-        p.set_vertex_permutation(np.random.permutation(p.n_vertices()))
-        p.set_vertex_permutation(np.random.permutation(p.n_vertices()), 3*p.n_vertices())
-
-        p.set_face_permutation(np.random.permutation(p.n_faces()))
-        p.set_face_permutation(np.random.permutation(p.n_faces()), 3*p.n_faces())
-        
         p.set_edge_permutation(np.random.permutation(p.n_edges()))
-        p.set_edge_permutation(np.random.permutation(p.n_edges()), 3*p.n_edges())
         
         p.set_corner_permutation(np.random.permutation(p.n_corners()))
-        p.set_corner_permutation(np.random.permutation(p.n_corners()), 3*p.n_corners())
         
         p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()))
-        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()), 3*p.n_halfedges())
 
         p = ps.register_surface_mesh("test_mesh2", self.generate_verts(), self.generate_faces())
 
         p.set_all_permutations(
-            vertex_perm=np.random.permutation(p.n_vertices()),
-            face_perm=np.random.permutation(p.n_faces()),
             edge_perm=np.random.permutation(p.n_edges()),
             corner_perm=np.random.permutation(p.n_corners()),
             halfedge_perm=np.random.permutation(p.n_halfedges()),
@@ -1046,40 +1183,62 @@ class TestSurfaceMesh(unittest.TestCase):
 
         ps.show(3)
         ps.remove_all_structures()
+    
+    def test_permutation_with_size(self):
 
-
-    def test_tangent_basis(self):
         p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
 
-        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3))
-        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 2))
+        p.set_edge_permutation(np.random.permutation(p.n_edges()), 3*p.n_edges())
+        
+        p.set_corner_permutation(np.random.permutation(p.n_corners()), 3*p.n_corners())
+        
+        p.set_halfedge_permutation(np.random.permutation(p.n_halfedges()), 3*p.n_halfedges())
 
-        p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 3))
-        p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 2))
+        p = ps.register_surface_mesh("test_mesh2", self.generate_verts(), self.generate_faces())
+
+        p.set_all_permutations(
+            edge_perm=np.random.permutation(p.n_edges()),
+            edge_perm_size=3*p.n_edges(),
+            corner_perm=np.random.permutation(p.n_corners()),
+            corner_perm_size=3*p.n_corners(),
+            halfedge_perm=np.random.permutation(p.n_halfedges()),
+            halfedge_perm_size=p.n_halfedges(),
+        )
 
         ps.show(3)
         ps.remove_all_structures()
+
     
     def test_scalar(self):
-        ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
-        p = ps.get_surface_mesh("test_mesh")
 
-        for on in ['vertices', 'faces', 'edges', 'halfedges']:
-       
+        for on in ['vertices', 'faces', 'edges', 'halfedges', 'texture']:
+        
+            ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+            p = ps.get_surface_mesh("test_mesh")
+      
+            param_name = None  # used for texture case only
+
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices())
             elif on == 'faces':
                 vals = np.random.rand(p.n_faces())
             elif on  == 'edges':
                 vals = np.random.rand(p.n_edges())
+                p.set_edge_permutation(np.random.permutation(p.n_edges()))
             elif on  == 'halfedges':
                 vals = np.random.rand(p.n_halfedges())
+            elif on == 'texture':
+                param_vals = np.random.rand(p.n_vertices(), 2)
+                param_name = "test_param"
+                p.add_parameterization_quantity(param_name, param_vals, defined_on='vertices', enabled=True)
+                vals = np.random.rand(20,30)
 
-            p.add_scalar_quantity("test_vals", vals, defined_on=on)
-            p.add_scalar_quantity("test_vals2", vals, defined_on=on, enabled=True)
-            p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
-            p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, enabled=True, datatype='symmetric')
-            p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, enabled=True, cmap='blues')
+
+            p.add_scalar_quantity("test_vals", vals, defined_on=on, param_name=param_name)
+            p.add_scalar_quantity("test_vals2", vals, defined_on=on, param_name=param_name, enabled=True)
+            p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, param_name=param_name, vminmax=(-5., 5.), enabled=True)
+            p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, param_name=param_name, enabled=True, datatype='symmetric')
+            p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, param_name=param_name, enabled=True, cmap='blues')
 
             ps.show(3)
 
@@ -1089,22 +1248,29 @@ class TestSurfaceMesh(unittest.TestCase):
             p.remove_all_quantities()
             p.remove_all_quantities()
 
-        ps.remove_all_structures()
+            ps.remove_all_structures()
     
     def test_color(self):
         ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
         p = ps.get_surface_mesh("test_mesh")
 
-        for on in ['vertices', 'faces']:
-       
+        for on in ['vertices', 'faces', 'texture']:
+      
+            param_name = None  # used for texture case only
+
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices(), 3)
             elif on == 'faces':
                 vals = np.random.rand(p.n_faces(), 3)
+            elif on == 'texture':
+                param_vals = np.random.rand(p.n_vertices(), 2)
+                param_name = "test_param"
+                p.add_parameterization_quantity(param_name, param_vals, defined_on='vertices', enabled=True)
+                vals = np.random.rand(20,30,3)
        
 
-            p.add_color_quantity("test_vals", vals, defined_on=on)
-            p.add_color_quantity("test_vals", vals, defined_on=on, enabled=True)
+            p.add_color_quantity("test_vals", vals, defined_on=on, param_name=param_name)
+            p.add_color_quantity("test_vals", vals, defined_on=on, param_name=param_name, enabled=True)
 
             ps.show(3)
             p.remove_all_quantities()
@@ -1200,7 +1366,7 @@ class TestSurfaceMesh(unittest.TestCase):
         ps.remove_all_structures()
    
 
-    def test_intrinsic_vector(self):
+    def test_tangent_vector(self):
 
         ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
         p = ps.get_surface_mesh("test_mesh")
@@ -1208,31 +1374,34 @@ class TestSurfaceMesh(unittest.TestCase):
         for on in ['vertices', 'faces']:
        
             if on == 'vertices':
-                vals = np.random.rand(p.n_vertices(),2)
-                p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3));
+                vals = np.random.rand(p.n_vertices(), 2)
+                basisX = np.random.rand(p.n_vertices(), 3)
+                basisY = np.random.rand(p.n_vertices(), 3)
             elif on  == 'faces':
                 vals = np.random.rand(p.n_faces(), 2)
-                p.set_face_tangent_basisX(np.random.rand(p.n_faces(), 3));
+                basisX = np.random.rand(p.n_faces(), 3)
+                basisY = np.random.rand(p.n_faces(), 3)
 
-            p.add_intrinsic_vector_quantity("test_vals1", vals, defined_on=on)
-            p.add_intrinsic_vector_quantity("test_vals2", vals, defined_on=on, enabled=True)
-            p.add_intrinsic_vector_quantity("test_vals3", vals, defined_on=on, enabled=True, vectortype='ambient')
-            p.add_intrinsic_vector_quantity("test_vals4", vals, defined_on=on, enabled=True, length=0.005)
-            p.add_intrinsic_vector_quantity("test_vals5", vals, defined_on=on, enabled=True, radius=0.001)
-            p.add_intrinsic_vector_quantity("test_vals6", vals, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
-            p.add_intrinsic_vector_quantity("test_vals7", vals, defined_on=on, enabled=True, radius=0.001, ribbon=True)
-            p.add_intrinsic_vector_quantity("test_vals8", vals, n_sym=4, defined_on=on, enabled=True)
+            p.add_tangent_vector_quantity("test_vals1", vals, basisX, basisY, defined_on=on)
+            p.add_tangent_vector_quantity("test_vals2", vals, basisX, basisY, defined_on=on, enabled=True)
+            p.add_tangent_vector_quantity("test_vals3", vals, basisX, basisY, defined_on=on, enabled=True, vectortype='ambient')
+            p.add_tangent_vector_quantity("test_vals4", vals, basisX, basisY, defined_on=on, enabled=True, length=0.005)
+            p.add_tangent_vector_quantity("test_vals5", vals, basisX, basisY, defined_on=on, enabled=True, radius=0.001)
+            p.add_tangent_vector_quantity("test_vals6", vals, basisX, basisY, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
+            p.add_tangent_vector_quantity("test_vals7", vals, basisX, basisY, defined_on=on, enabled=True, radius=0.001)
+            p.add_tangent_vector_quantity("test_vals8", vals, basisX, basisY, n_sym=4, defined_on=on, enabled=True)
 
             ps.show(3)
             p.remove_all_quantities()
         
         ps.remove_all_structures()
     
-    def test_one_form_intrinsic_vector(self):
+    def test_one_form_tangent_vector(self):
 
         ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
         p = ps.get_surface_mesh("test_mesh")
-        p.set_vertex_tangent_basisX(np.random.rand(p.n_vertices(), 3));
+        
+        p.set_edge_permutation(np.random.permutation(p.n_edges()))
         
         vals = np.random.rand(p.n_edges())
         orients = np.random.rand(p.n_edges()) > 0.5
@@ -1243,7 +1412,7 @@ class TestSurfaceMesh(unittest.TestCase):
         p.add_one_form_vector_quantity("test_vals4", vals, orients, enabled=True, length=0.005)
         p.add_one_form_vector_quantity("test_vals5", vals, orients, enabled=True, radius=0.001)
         p.add_one_form_vector_quantity("test_vals6", vals, orients, enabled=True, color=(0.2, 0.5, 0.5))
-        p.add_one_form_vector_quantity("test_vals7", vals, orients, enabled=True, radius=0.001, ribbon=True)
+        p.add_one_form_vector_quantity("test_vals7", vals, orients, enabled=True, radius=0.001)
 
         ps.show(3)
         p.remove_all_quantities()
@@ -1498,6 +1667,639 @@ class TestVolumeMesh(unittest.TestCase):
             p.remove_all_quantities()
         
         ps.remove_all_structures()
+
+class TestVolumeGrid(unittest.TestCase):
+
+    def test_add_remove(self):
+
+        # add
+        n = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        self.assertTrue(ps.has_volume_grid("test_grid"))
+        self.assertFalse(ps.has_volume_grid("nope"))
+        self.assertEqual(n.n_nodes(), 10*12*14)
+        self.assertEqual(n.n_cells(), (10-1)*(12-1)*(14-1))
+      
+        # remove by name
+        ps.register_volume_grid("test_grid2", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        ps.remove_volume_grid("test_grid2")
+        self.assertTrue(ps.has_volume_grid("test_grid"))
+        self.assertFalse(ps.has_volume_grid("test_grid2"))
+
+        # remove by ref
+        c = ps.register_volume_grid("test_grid2", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        c.remove()
+        self.assertTrue(ps.has_volume_grid("test_grid"))
+        self.assertFalse(ps.has_volume_grid("test_grid2"))
+
+        # get by name
+        ps.register_volume_grid("test_grid3",  (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        p = ps.get_volume_grid("test_grid3") # should be wrapped instance, not underlying PSB instance
+        self.assertTrue(isinstance(p, ps.VolumeGrid))
+
+        ps.remove_all_structures()
+    
+    def test_render(self):
+
+        ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        ps.show(3)
+        ps.remove_all_structures()
+
+    def test_options(self):
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+
+        # misc getters
+        p.n_nodes()
+        p.n_cells()
+        p.grid_spacing()
+        self.assertTrue((p.get_grid_node_dim() == (10,12,14)))
+        self.assertTrue((p.get_grid_cell_dim() == ((10-1),(12-1),(14-1))))
+        self.assertTrue((p.get_bound_min() == np.array((0., 0., 0.))).all())
+        self.assertTrue((p.get_bound_max() == np.array((1., 1., 1.))).all())
+
+        # Set enabled
+        p.set_enabled()
+        p.set_enabled(False)
+        p.set_enabled(True)
+        self.assertTrue(p.is_enabled())
+    
+        # Color
+        color = (0.3, 0.3, 0.5)
+        p.set_color(color)
+        ret_color = p.get_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+        
+        # Edge color
+        color = (0.1, 0.5, 0.5)
+        p.set_edge_color(color)
+        ret_color = p.get_edge_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+        
+        ps.show(3)
+
+        # Edge width 
+        p.set_edge_width(1.5)
+        ps.show(3)
+        self.assertAlmostEqual(p.get_edge_width(), 1.5)
+        
+        # Cube size factor
+        p.set_cube_size_factor(0.5)
+        ps.show(3)
+        self.assertAlmostEqual(p.get_cube_size_factor(), 0.5)
+        
+        # Material
+        p.set_material("candy")
+        self.assertEqual("candy", p.get_material())
+        p.set_material("clay")
+        
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
+      
+        # Set with optional arguments 
+        p2 = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14),
+                    enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), edge_width=0.5, cube_size_factor=0.5, transparency=0.9)
+
+        ps.show(3)
+
+        ps.remove_all_structures()
+        ps.set_transparency_mode('none')
+    
+    def test_transform(self):
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        test_transforms(self,p)
+        ps.remove_all_structures()
+   
+    def test_slice_plane(self):
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+        
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+        
+        ps.show(3)
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
+
+
+    def test_scalar(self):
+        node_dim = (10,12,14)
+        cell_dim = (10-1,12-1,14-1)
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+
+        for on in ['nodes', 'cells']:
+       
+            if on == 'nodes':
+                vals = np.random.rand(*node_dim)
+            elif on  == 'cells':
+                vals = np.random.rand(*cell_dim)
+
+            p.add_scalar_quantity("test_vals", vals, defined_on=on)
+            p.add_scalar_quantity("test_vals2", vals, defined_on=on, enabled=True)
+            p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
+            p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, enabled=True, datatype='symmetric')
+            p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, enabled=True, cmap='blues', enable_gridcube_viz=False)
+
+            ps.show(3)
+
+            # test some additions/removal while we're at it
+            p.remove_quantity("test_vals")
+            p.remove_quantity("not_here") # should not error
+            p.remove_all_quantities()
+            p.remove_all_quantities()
+
+        ps.remove_all_structures()
+    
+    def test_scalar_from_callable(self):
+        node_dim = (10,12,14)
+        cell_dim = (10-1,12-1,14-1)
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+
+        for on in ['nodes', 'cells']:
+       
+            p.add_scalar_quantity_from_callable("test_vals", sphere_sdf, defined_on=on)
+            p.add_scalar_quantity_from_callable("test_vals2", sphere_sdf, defined_on=on, enabled=True)
+            p.add_scalar_quantity_from_callable("test_vals_with_range", sphere_sdf, defined_on=on, vminmax=(-5., 5.), enabled=True)
+            p.add_scalar_quantity_from_callable("test_vals_with_datatype", sphere_sdf, defined_on=on, enabled=True, datatype='symmetric')
+            p.add_scalar_quantity_from_callable("test_vals_with_cmap", sphere_sdf, defined_on=on, enabled=True, cmap='blues', enable_gridcube_viz=False)
+
+            ps.show(3)
+
+            # test some additions/removal while we're at it
+            p.remove_quantity("test_vals")
+            p.remove_quantity("not_here") # should not error
+            p.remove_all_quantities()
+            p.remove_all_quantities()
+
+        ps.remove_all_structures()
+    
+    def test_scalar_isosurface_array(self):
+        node_dim = (10,12,14)
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        vals = np.random.rand(*node_dim)
+
+        p.add_scalar_quantity("test_vals", vals, defined_on='nodes', enabled=True,
+                              enable_gridcube_viz=False, enable_isosurface_viz=True,
+                              isosurface_level=-0.2, isosurface_color=(0.5,0.6,0.7),
+                              slice_planes_affect_isosurface=False,
+                              register_isosurface_as_mesh_with_name="isomesh")
+
+        ps.remove_all_structures()
+             
+    def test_scalar_isosurface_callable(self):
+        node_dim = (10,12,14)
+
+        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+
+        p.add_scalar_quantity_from_callable("test_vals", sphere_sdf, defined_on='nodes', enabled=True,
+                              enable_gridcube_viz=False, enable_isosurface_viz=True,
+                              isosurface_level=-0.2, isosurface_color=(0.5,0.6,0.7),
+                              slice_planes_affect_isosurface=False,
+                              register_isosurface_as_mesh_with_name="isomesh")
+
+        ps.remove_all_structures()
+             
+    
+
+class TestCameraView(unittest.TestCase):
+
+    def generate_parameters(self):
+        intrinsics = ps.CameraIntrinsics(fov_vertical_deg=60, aspect=2)
+        extrinsics = ps.CameraExtrinsics(root=(2., 2., 2.), look_dir=(-1., -1.,-1.), up_dir=(0.,1.,0.))
+        return ps.CameraParameters(intrinsics, extrinsics)
+    
+    def test_add_remove(self):
+
+        # add
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        self.assertTrue(ps.has_camera_view("cam1"))
+        self.assertFalse(ps.has_camera_view("nope"))
+      
+        # remove by name
+        ps.register_camera_view("cam2", self.generate_parameters())
+        ps.remove_camera_view("cam2")
+        self.assertTrue(ps.has_camera_view("cam1"))
+        self.assertFalse(ps.has_camera_view("cam2"))
+
+        # remove by ref
+        c = ps.register_camera_view("cam3", self.generate_parameters())
+        c.remove()
+        self.assertTrue(ps.has_camera_view("cam1"))
+        self.assertFalse(ps.has_camera_view("cam3"))
+
+        # get by name
+        ps.register_camera_view("cam3", self.generate_parameters())
+        p = ps.get_camera_view("cam3") # should be wrapped instance, not underlying PSB instance
+        self.assertTrue(isinstance(p, ps.CameraView))
+
+        ps.remove_all_structures()
+    
+    def test_render(self):
+
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        ps.show(3)
+        ps.remove_all_structures()
+   
+    def test_transform(self):
+
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        test_transforms(self, cam)
+        ps.remove_all_structures()
+
+    def test_options(self):
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        
+        # widget color
+        color = (0.3, 0.3, 0.5)
+        cam.set_widget_color(color)
+        ret_color = cam.get_widget_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+
+        # widget thickness
+        cam.set_widget_thickness(0.03)
+        self.assertAlmostEqual(0.03, cam.get_widget_thickness())
+        
+        # widget focal length
+        cam.set_widget_focal_length(0.03, False)
+        self.assertAlmostEqual(0.03, cam.get_widget_focal_length())
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_update(self):
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        cam.update_camera_parameters(self.generate_parameters())
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_camera_things(self):
+
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        cam.set_view_to_this_camera()
+        ps.show(3)
+        cam.set_view_to_this_camera(with_flight=True)
+        ps.show(3)
+        
+        ps.remove_all_structures()
+
+    def test_camera_parameters(self):
+
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        params = cam.get_camera_parameters() 
+
+        self.assertTrue(isinstance(params.get_intrinsics(), ps.CameraIntrinsics))
+        self.assertTrue(isinstance(params.get_extrinsics(), ps.CameraExtrinsics))
+
+        assertArrayWithShape(self, params.get_R(), [3,3])
+        assertArrayWithShape(self, params.get_T(), [3])
+        assertArrayWithShape(self, params.get_view_mat(), [4,4])
+        assertArrayWithShape(self, params.get_E(), [4,4])
+        assertArrayWithShape(self, params.get_position(), [3])
+        assertArrayWithShape(self, params.get_look_dir(), [3])
+        assertArrayWithShape(self, params.get_up_dir(), [3])
+        assertArrayWithShape(self, params.get_right_dir(), [3])
+        assertArrayWithShape(self, params.get_camera_frame()[0], [3])
+        assertArrayWithShape(self, params.get_camera_frame()[1], [3])
+        assertArrayWithShape(self, params.get_camera_frame()[2], [3])
+
+        self.assertTrue(isinstance(params.get_fov_vertical_deg(), float))
+        self.assertTrue(isinstance(params.get_aspect(), float))
+        
+        rays = params.generate_camera_rays((300,200))
+        ray_corners = params.generate_camera_ray_corners()
+    
+    def test_floating_scalar_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        cam.add_scalar_image_quantity("scalar_img", np.zeros((dimX, dimY)))
+        cam.add_scalar_image_quantity("scalar_img2", np.zeros((dimX, dimY)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds', show_in_camera_billboard=True)
+        cam.add_scalar_image_quantity("scalar_img3", np.zeros((dimX, dimY)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+        cam.add_scalar_image_quantity("scalar_img4", np.zeros((dimX, dimY)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
+        
+        # true floating adder
+        ps.add_scalar_image_quantity("scalar_img2", np.zeros((dimX, dimY)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds')
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_color_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        cam.add_color_image_quantity("color_img", np.zeros((dimX, dimY, 3)))
+        cam.add_color_image_quantity("color_img2", np.zeros((dimX, dimY, 3)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
+        cam.add_color_image_quantity("color_img3", np.zeros((dimX, dimY, 3)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+        cam.add_color_image_quantity("color_img4", np.zeros((dimX, dimY, 3)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
+       
+        # true floating adder
+        ps.add_color_image_quantity("color_img2", np.zeros((dimX, dimY, 3)), enabled=True, image_origin='lower_left', show_in_camera_billboard=False)
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_color_alpha_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        cam.add_color_alpha_image_quantity("color_alpha_img", np.zeros((dimX, dimY, 4)))
+        cam.add_color_alpha_image_quantity("color_alpha_img2", np.zeros((dimX, dimY, 4)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
+        cam.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimX, dimY, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False, is_premultiplied=True)
+        cam.add_color_alpha_image_quantity("color_alpha_img4", np.zeros((dimX, dimY, 4)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False)
+
+        # true floating adder
+        ps.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimX, dimY, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+
+        ps.show(3)
+        ps.remove_all_structures()
+   
+    def test_floating_depth_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        normals = np.ones((dimX, dimY, 3))
+
+        cam.add_depth_render_image_quantity("render_img", depths, normals)
+        cam.add_depth_render_image_quantity("render_img2", depths, normals, enabled=True, image_origin='lower_left', color=(0., 1., 0.), material='wax', transparency=0.7)
+        
+        # true floating adder
+        ps.add_depth_render_image_quantity("render_img3", depths, normals, enabled=True, image_origin='lower_left', color=(0., 1., 0.), material='wax', transparency=0.7, allow_fullscreen_compositing=True)
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_color_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        normals = np.ones((dimX, dimY, 3))
+        colors = np.ones((dimX, dimY, 3))
+
+        cam.add_color_render_image_quantity("render_img", depths, normals, colors)
+        cam.add_color_render_image_quantity("render_img2", depths, normals, colors, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
+        
+        # true floating adder
+        ps.add_color_render_image_quantity("render_img3", depths, normals, colors, enabled=True, image_origin='lower_left', material='wax', transparency=0.7, allow_fullscreen_compositing=True)
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_scalar_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        normals = np.ones((dimX, dimY, 3))
+        scalars = np.ones((dimX, dimY))
+
+        cam.add_scalar_render_image_quantity("render_img", depths, normals, scalars)
+        cam.add_scalar_render_image_quantity("render_img2", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
+        
+        # true floating adder
+        ps.add_scalar_render_image_quantity("render_img3", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7, allow_fullscreen_compositing=True)
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_raw_color_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        colors = np.ones((dimX, dimY, 3))
+
+        cam.add_raw_color_render_image_quantity("render_img", depths, colors)
+        cam.add_raw_color_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
+        
+        # true floating adder
+        ps.add_raw_color_render_image_quantity("render_img3", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7, allow_fullscreen_compositing=True)
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_raw_color_alpha_render_images(self):
+
+        # technically these can be added to any structure, but we will test them here
+        
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+
+        dimX = 300
+        dimY = 600
+
+        depths = np.zeros((dimX, dimY))
+        colors = np.ones((dimX, dimY, 4))
+
+        cam.add_raw_color_alpha_render_image_quantity("render_img", depths, colors)
+        cam.add_raw_color_alpha_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7, is_premultiplied=True)
+        
+        # true floating adder
+        ps.add_raw_color_alpha_render_image_quantity("render_img3", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7, allow_fullscreen_compositing=True)
+        
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_implicit_surface_render(self):
+
+        # this can be called free-floating or on a camera view, but we will test them here
+    
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+       
+        # basic
+        ps.render_implicit_surface("sphere sdf", sphere_sdf, 'fixed_step', subsample_factor=10, n_max_steps=10, enabled=True)
+
+        # with some args
+        ps.render_implicit_surface("sphere sdf", sphere_sdf, 'sphere_march', enabled=True, 
+                                        camera_parameters=self.generate_parameters(),
+                                        dim=(50,75),
+                                        miss_dist=20.5, miss_dist_relative=True,
+                                        hit_dist=0.001, hit_dist_relative=False,
+                                        step_factor=0.98,
+                                        normal_sample_eps=0.02,
+                                        step_size=0.01, step_size_relative=True,
+                                        n_max_steps=50,
+                                        material='wax',
+                                        color=(0.5,0.5,0.5)
+                                   )
+
+        # from this camera view
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        ps.render_implicit_surface("sphere sdf", sphere_sdf, 'sphere_march', dim=(50,75), n_max_steps=10, camera_view=cam, enabled=True)
+
+        ps.show(3)
+        ps.remove_all_structures()
+    
+    def test_floating_implicit_surface_color_render(self):
+
+        # this can be called free-floating or on a camera view, but we will test them here
+    
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+        def color_func(pts): return np.zeros_like(pts)
+       
+        # basic
+        ps.render_implicit_surface_color("sphere sdf", sphere_sdf, color_func, 'fixed_step', subsample_factor=10, n_max_steps=10, enabled=True)
+
+        # with some args
+        ps.render_implicit_surface_color("sphere sdf", sphere_sdf, color_func, 'sphere_march', enabled=True, 
+                                        camera_parameters=self.generate_parameters(),
+                                        dim=(50,75),
+                                        miss_dist=20.5, miss_dist_relative=True,
+                                        hit_dist=0.001, hit_dist_relative=False,
+                                        step_factor=0.98,
+                                        normal_sample_eps=0.02,
+                                        step_size=0.01, step_size_relative=True,
+                                        n_max_steps=50,
+                                        material='wax',
+                                   )
+
+        # from this camera view
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        ps.render_implicit_surface_color("sphere sdf", sphere_sdf, color_func, 'sphere_march', dim=(50,75), n_max_steps=10, camera_view=cam, enabled=True)
+
+        ps.show(3)
+        ps.remove_all_structures()
+
+
+    def test_floating_implicit_surface_scalar_render(self):
+
+        # this can be called free-floating or on a camera view, but we will test them here
+    
+        def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
+        def scalar_func(pts): return np.ones_like(pts[:,0])
+       
+        # basic
+        ps.render_implicit_surface_scalar("sphere sdf", sphere_sdf, scalar_func, 'fixed_step', subsample_factor=10, n_max_steps=10, enabled=True)
+
+        # with some args
+        ps.render_implicit_surface_scalar("sphere sdf", sphere_sdf, scalar_func, 'sphere_march', enabled=True, 
+                                        camera_parameters=self.generate_parameters(),
+                                        dim=(50,75),
+                                        miss_dist=20.5, miss_dist_relative=True,
+                                        hit_dist=0.001, hit_dist_relative=False,
+                                        step_factor=0.98,
+                                        normal_sample_eps=0.02,
+                                        step_size=0.01, step_size_relative=True,
+                                        n_max_steps=50,
+                                        material='wax',
+                                        cmap='blues',
+                                        vminmax=(0.,1.)
+                                   )
+
+        # from this camera view
+        cam = ps.register_camera_view("cam1", self.generate_parameters())
+        ps.render_implicit_surface_scalar("sphere sdf", sphere_sdf, scalar_func, 'sphere_march', dim=(50,75), n_max_steps=10, camera_view=cam, enabled=True)
+
+        ps.show(3)
+        ps.remove_all_structures()
+
+class TestManagedBuffers(unittest.TestCase):
+
+    def test_managed_buffer_basics(self):
+
+        # NOTE: this only tests the float & vec3 versions, really there are variant methods for each type 
+    
+        def generate_points(n_pts=10):
+            np.random.seed(777)        
+            return np.random.rand(n_pts, 3)
+
+        def generate_scalar(n_pts=10):
+            np.random.seed(777)        
+            return np.random.rand(n_pts)
+
+
+        # create a dummy point cloud;
+        ps_cloud = ps.register_point_cloud("test_cloud", generate_points())
+        ps_scalar = ps_cloud.add_scalar_quantity("test_vals", generate_scalar())
+        ps.show(3)
+
+        # test a structure buffer of vec3
+        pos_buf = ps_cloud.get_buffer("points")
+        self.assertEqual(pos_buf.size(), 10)
+        self.assertTrue(pos_buf.has_data())
+        pos_buf.summary_string()
+        pos_buf.get_value(3)
+        pos_buf.update_data(generate_points())
+        
+        # test a quantity buffer of float
+        scalar_buf = ps_cloud.get_quantity_buffer("test_vals", "values")
+        self.assertEqual(scalar_buf.size(), 10)
+        self.assertTrue(scalar_buf.has_data())
+        scalar_buf.summary_string()
+        scalar_buf.get_value(3)
+        scalar_buf.update_data(generate_scalar())
+
+        ps.show(3)
+
+        # test a free-floating quantity buffer
+        dimX = 200
+        dimY = 300
+        ps.add_scalar_image_quantity("test_float_img", np.zeros((dimX, dimY)))
+        img_buf = ps.get_quantity_buffer("test_float_img", "values")
+        self.assertEqual(img_buf.size(), dimX*dimY)
+        self.assertTrue(img_buf.has_data())
+        img_buf.summary_string()
+        img_buf.get_value(3)
+        img_buf.update_data(np.zeros(dimX*dimY))
+
+
+        ps.show(3)
+
 
 if __name__ == '__main__':
 

@@ -1,17 +1,21 @@
 import polyscope_bindings as psb
 
 from polyscope.core import str_to_datatype, str_to_vectortype, glm3
+from polyscope.structure import Structure
+from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed
 
-class CurveNetwork:
+class CurveNetwork(Structure):
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
 
     # End users should not call this constrctor, use register_curve_network instead
     def __init__(self, name=None, nodes=None, edges=None, instance=None):
+        
+        super().__init__()
 
         if instance is not None:
             # Wrap an existing instance
-            self.bound_network = instance
+            self.bound_instance = instance
 
         else:
             # Create a new instance
@@ -24,14 +28,14 @@ class CurveNetwork:
 
                 if nodes.shape[1] == 3:
                     if edges == 'line':
-                        self.bound_network = psb.register_curve_network_line(name, nodes)
+                        self.bound_instance = psb.register_curve_network_line(name, nodes)
                     elif edges == 'loop':
-                        self.bound_network = psb.register_curve_network_loop(name, nodes)
+                        self.bound_instance = psb.register_curve_network_loop(name, nodes)
                 elif nodes.shape[1] == 2:
                     if edges == 'line':
-                        self.bound_network = psb.register_curve_network_line2D(name, nodes)
+                        self.bound_instance = psb.register_curve_network_line2D(name, nodes)
                     elif edges == 'loop':
-                        self.bound_network = psb.register_curve_network_loop2D(name, nodes)
+                        self.bound_instance = psb.register_curve_network_loop2D(name, nodes)
             else:
                 # Common case: process edges as numpy array
 
@@ -39,9 +43,9 @@ class CurveNetwork:
                     raise ValueError("curve network edges should have shape (N_edge,2); shape is " + str(edges.shape))
 
                 if nodes.shape[1] == 3:
-                    self.bound_network = psb.register_curve_network(name, nodes, edges) 
+                    self.bound_instance = psb.register_curve_network(name, nodes, edges) 
                 elif nodes.shape[1] == 2:
-                    self.bound_network = psb.register_curve_network2D(name, nodes, edges) 
+                    self.bound_instance = psb.register_curve_network2D(name, nodes, edges) 
 
     def check_shape(self, points):
         # Helper to validate arrays
@@ -49,79 +53,19 @@ class CurveNetwork:
             raise ValueError("curve network node positions should have shape (N,3); shape is " + str(points.shape))
        
     def n_nodes(self):
-        return self.bound_network.n_nodes()
+        return self.bound_instance.n_nodes()
     def n_edges(self):
-        return self.bound_network.n_edges()
+        return self.bound_instance.n_edges()
 
-
-    ## Structure management
-    
-    def remove(self):
-        '''Remove the structure itself'''
-        self.bound_network.remove()
-    def remove_all_quantities(self):
-        '''Remove all quantities on the structure'''
-        self.bound_network.remove_all_quantities()
-    def remove_quantity(self, name):
-        '''Remove a single quantity on the structure'''
-        self.bound_network.remove_quantity(name)
-
-    # Enable/disable
-    def set_enabled(self, val=True):
-        self.bound_network.set_enabled(val)
-    def is_enabled(self):
-        return self.bound_network.is_enabled()
-    
-    # Transparency
-    def set_transparency(self, val):
-        self.bound_network.set_transparency(val)
-    def get_transparency(self):
-        return self.bound_network.get_transparency()
-    
-    # Transformation things
-    def center_bounding_box(self):
-        self.bound_network.center_bounding_box()
-    def rescale_to_unit(self):
-        self.bound_network.rescale_to_unit()
-    def reset_transform(self):
-        self.bound_network.reset_transform()
-    def set_transform(self, new_mat4x4):
-        self.bound_network.set_transform(new_mat4x4)
-    def set_position(self, new_vec3):
-        self.bound_network.set_position(new_vec3)
-    def translate(self, trans_vec3):
-        self.bound_network.translate(trans_vec3)
-    def get_transform(self):
-        return self.bound_network.get_transform()
-    def get_position(self):
-        return self.bound_network.get_position()
-    
-    # Slice planes
-    def set_cull_whole_elements(self, val):
-        self.bound_network.set_cull_whole_elements(val)
-    def get_cull_whole_elements(self):
-        return self.bound_network.get_cull_whole_elements()
-    def set_ignore_slice_plane(self, plane, val):
-        # take either a string or a slice plane object as input
-        if isinstance(plane, str):
-            self.bound_network.set_ignore_slice_plane(plane, val)
-        else:
-            self.bound_network.set_ignore_slice_plane(plane.get_name(), val)
-    def get_ignore_slice_plane(self, plane):
-        # take either a string or a slice plane object as input
-        if isinstance(plane, str):
-            return self.bound_network.get_ignore_slice_plane(plane)
-        else:
-            return self.bound_network.get_ignore_slice_plane(plane.get_name())
 
     # Update
     def update_node_positions(self, nodes):
         self.check_shape(nodes)
         
         if nodes.shape[1] == 3:
-            self.bound_network.update_node_positions(nodes)
+            self.bound_instance.update_node_positions(nodes)
         elif nodes.shape[1] == 2:
-            self.bound_network.update_node_positions2D(nodes)
+            self.bound_instance.update_node_positions2D(nodes)
         else:
             raise ValueError("bad node shape")
 
@@ -129,70 +73,71 @@ class CurveNetwork:
    
     # Radius
     def set_radius(self, rad, relative=True):
-        self.bound_network.set_radius(rad, relative)
+        self.bound_instance.set_radius(rad, relative)
     def get_radius(self):
-        return self.bound_network.get_radius()
+        return self.bound_instance.get_radius()
     
     # Color
     def set_color(self, val):
-        self.bound_network.set_color(glm3(val))
+        self.bound_instance.set_color(glm3(val))
     def get_color(self):
-        return self.bound_network.get_color().as_tuple()
+        return self.bound_instance.get_color().as_tuple()
     
     # Material
     def set_material(self, mat):
-        self.bound_network.set_material(mat)
+        self.bound_instance.set_material(mat)
     def get_material(self):
-        return self.bound_network.get_material()
+        return self.bound_instance.get_material()
 
 
     ## Quantities
        
     # Scalar
-    def add_scalar_quantity(self, name, values, defined_on='nodes', enabled=None, datatype="standard", vminmax=None, cmap=None):
+    def add_scalar_quantity(self, name, values, defined_on='nodes', datatype="standard", **scalar_args):
 
         if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
 
         if defined_on == 'nodes':
             if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes array")
-            q = self.bound_network.add_node_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_node_scalar_quantity(name, values, str_to_datatype(datatype))
         elif defined_on == 'edges':
             if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
-            q = self.bound_network.add_edge_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_edge_scalar_quantity(name, values, str_to_datatype(datatype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
-            
+   
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if vminmax is not None:
-            q.set_map_range(vminmax)
-        if cmap is not None:
-            q.set_color_map(cmap)
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, scalar_args)
+        process_scalar_args(self, q, scalar_args)
+        check_all_args_processed(self, q, scalar_args)
     
     
     # Color
-    def add_color_quantity(self, name, values, defined_on='nodes', enabled=None):
+    def add_color_quantity(self, name, values, defined_on='nodes', **color_args):
         if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
             
         
         if defined_on == 'nodes':
             if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes array")
-            q = self.bound_network.add_node_color_quantity(name, values)
+            q = self.bound_instance.add_node_color_quantity(name, values)
         elif defined_on == 'edges':
             if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
-            q = self.bound_network.add_edge_color_quantity(name, values)
+            q = self.bound_instance.add_edge_color_quantity(name, values)
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
+
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, color_args)
+        process_color_args(self, q, color_args)
+        check_all_args_processed(self, q, color_args)
     
     
     # Vector
-    def add_vector_quantity(self, name, values, defined_on='nodes', enabled=None, vectortype="standard", length=None, radius=None, color=None):
+    def add_vector_quantity(self, name, values, defined_on='nodes', vectortype="standard", **vector_args):
         if len(values.shape) != 2 or values.shape[1] not in [2,3]: raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
         
         
@@ -200,35 +145,32 @@ class CurveNetwork:
             if values.shape[0] != self.n_nodes(): raise ValueError("'values' should be a length n_nodes array")
 
             if values.shape[1] == 2:
-                q = self.bound_network.add_node_vector_quantity2D(name, values, str_to_vectortype(vectortype))
+                q = self.bound_instance.add_node_vector_quantity2D(name, values, str_to_vectortype(vectortype))
             elif values.shape[1] == 3:
-                q = self.bound_network.add_node_vector_quantity(name, values, str_to_vectortype(vectortype))
+                q = self.bound_instance.add_node_vector_quantity(name, values, str_to_vectortype(vectortype))
 
         elif defined_on == 'edges':
             if values.shape[0] != self.n_edges(): raise ValueError("'values' should be a length n_edges array")
             
             if values.shape[1] == 2:
-                q = self.bound_network.add_edge_vector_quantity2D(name, values, str_to_vectortype(vectortype))
+                q = self.bound_instance.add_edge_vector_quantity2D(name, values, str_to_vectortype(vectortype))
             elif values.shape[1] == 3:
-                q = self.bound_network.add_edge_vector_quantity(name, values, str_to_vectortype(vectortype))
+                q = self.bound_instance.add_edge_vector_quantity(name, values, str_to_vectortype(vectortype))
 
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'edges']".format(defined_on))
 
-        # Support optional params
-        if enabled is not None:
-            q.set_enabled(enabled)
-        if length is not None:
-            q.set_length(length, True)
-        if radius is not None:
-            q.set_radius(radius, True)
-        if color is not None:
-            q.set_color(glm3(color))
+
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, vector_args)
+        process_vector_args(self, q, vector_args)
+        check_all_args_processed(self, q, vector_args)
 
 
 def register_curve_network(name, nodes, edges, enabled=None, radius=None, color=None, material=None, transparency=None):
     """Register a new curve network"""
-    if not psb.isInitialized():
+    if not psb.is_initialized():
         raise RuntimeError("Polyscope has not been initialized")
     
     p = CurveNetwork(name, nodes, edges)

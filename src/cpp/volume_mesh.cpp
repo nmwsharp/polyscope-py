@@ -34,7 +34,7 @@ void bind_volume_mesh(py::module& m) {
   bindStructure<ps::VolumeMesh>(m, "VolumeMesh")
 
       // basics
-      .def("update_vertex_positions", &ps::VolumeMesh::updateVertexPositions<Eigen::MatrixXd>,
+      .def("update_vertex_positions", &ps::VolumeMesh::updateVertexPositions<Eigen::MatrixXf>,
            "Update vertex positions")
       .def("n_vertices", &ps::VolumeMesh::nVertices, "# vertices")
       .def("n_faces", &ps::VolumeMesh::nFaces, "# faces")
@@ -52,48 +52,42 @@ void bind_volume_mesh(py::module& m) {
       .def("set_material", &ps::VolumeMesh::setMaterial, "Set material")
       .def("get_material", &ps::VolumeMesh::getMaterial, "Get material")
 
-      // slice planes
-      .def("set_ignore_slice_plane", &ps::VolumeMesh::setIgnoreSlicePlane, "Set ignore slice plane")
-      .def("get_ignore_slice_plane", &ps::VolumeMesh::getIgnoreSlicePlane, "Get ignore slice plane")
-      .def("set_cull_whole_elements", &ps::VolumeMesh::setCullWholeElements, "Set cull whole elements")
-      .def("get_cull_whole_elements", &ps::VolumeMesh::getCullWholeElements, "Get cull whole elements")
-
 
       // = quantities
 
       // Scalars
-      .def("add_vertex_scalar_quantity", &ps::VolumeMesh::addVertexScalarQuantity<Eigen::VectorXd>,
+      .def("add_vertex_scalar_quantity", &ps::VolumeMesh::addVertexScalarQuantity<Eigen::VectorXf>,
            "Add a scalar function at vertices", py::arg("name"), py::arg("values"),
            py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
-      .def("add_cell_scalar_quantity", &ps::VolumeMesh::addCellScalarQuantity<Eigen::VectorXd>,
+      .def("add_cell_scalar_quantity", &ps::VolumeMesh::addCellScalarQuantity<Eigen::VectorXf>,
            "Add a scalar function at cells", py::arg("name"), py::arg("values"),
            py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
 
       // Colors
-      .def("add_vertex_color_quantity", &ps::VolumeMesh::addVertexColorQuantity<Eigen::MatrixXd>,
+      .def("add_vertex_color_quantity", &ps::VolumeMesh::addVertexColorQuantity<Eigen::MatrixXf>,
            "Add a color value at vertices", py::return_value_policy::reference)
-      .def("add_cell_color_quantity", &ps::VolumeMesh::addCellColorQuantity<Eigen::MatrixXd>,
+      .def("add_cell_color_quantity", &ps::VolumeMesh::addCellColorQuantity<Eigen::MatrixXf>,
            "Add a color value at cells", py::return_value_policy::reference)
 
 
       // Vector
-      .def("add_vertex_vector_quantity", &ps::VolumeMesh::addVertexVectorQuantity<Eigen::MatrixXd>,
+      .def("add_vertex_vector_quantity", &ps::VolumeMesh::addVertexVectorQuantity<Eigen::MatrixXf>,
            "Add a vertex vector quantity", py::return_value_policy::reference)
-      .def("add_cell_vector_quantity", &ps::VolumeMesh::addCellVectorQuantity<Eigen::MatrixXd>,
+      .def("add_cell_vector_quantity", &ps::VolumeMesh::addCellVectorQuantity<Eigen::MatrixXf>,
            "Add a cell vector quantity", py::return_value_policy::reference);
 
 
   // Static adders and getters
-  m.def("register_tet_mesh", &ps::registerTetMesh<Eigen::MatrixXd, Eigen::MatrixXi>, py::arg("name"),
+  m.def("register_tet_mesh", &ps::registerTetMesh<Eigen::MatrixXf, Eigen::MatrixXi>, py::arg("name"),
         py::arg("vertices"), py::arg("tets"), "Register a volume mesh of tet cells",
         py::return_value_policy::reference);
-  m.def("register_hex_mesh", &ps::registerHexMesh<Eigen::MatrixXd, Eigen::MatrixXi>, py::arg("name"),
+  m.def("register_hex_mesh", &ps::registerHexMesh<Eigen::MatrixXf, Eigen::MatrixXi>, py::arg("name"),
         py::arg("vertices"), py::arg("hexes"), "Register a volume mesh of hex cells",
         py::return_value_policy::reference);
-  m.def("register_volume_mesh", &ps::registerVolumeMesh<Eigen::MatrixXd, Eigen::MatrixXi>, py::arg("name"),
+  m.def("register_volume_mesh", &ps::registerVolumeMesh<Eigen::MatrixXf, Eigen::MatrixXi>, py::arg("name"),
         py::arg("vertices"), py::arg("cells"), "Register a volume mesh with a mix of element types",
         py::return_value_policy::reference);
-  m.def("register_tet_hex_mesh", &ps::registerTetHexMesh<Eigen::MatrixXd, Eigen::MatrixXi, Eigen::MatrixXi>,
+  m.def("register_tet_hex_mesh", &ps::registerTetHexMesh<Eigen::MatrixXf, Eigen::MatrixXi, Eigen::MatrixXi>,
         py::arg("name"), py::arg("vertices"), py::arg("tets"), py::arg("hexes"),
         "Register a volume mesh with lists of tet and hex elements", py::return_value_policy::reference);
 
