@@ -23,7 +23,7 @@ or
 conda install -c conda-forge polyscope
 ```
 
-polyscope-py should work out-of-the-box on any combination of Python 3.5-3.9 and Linux/macOS/Windows. Your graphics hardware must support OpenGL >= 3.3 core profile.
+polyscope-py should work out-of-the-box on any combination of Python 3.5-3.12 and Linux/macOS/Windows. Your graphics hardware must support OpenGL >= 3.3 core profile.
 
 ## For developers
 
