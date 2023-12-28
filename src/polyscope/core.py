@@ -203,6 +203,12 @@ def set_view_from_json(json_str, fly_to=False):
 def get_view_as_json():
     return psb.get_view_as_json()
 
+def screen_coords_to_world_ray(screen_coords):
+    return np.array(psb.screen_coords_to_world_ray(glm2(screen_coords)).as_tuple())
+
+def screen_coords_to_world_position(screen_coords):
+    return np.array(psb.screen_coords_to_world_position(glm2(screen_coords)).as_tuple())
+
 def set_background_color(c):
     if len(c) == 3: c = (c[0], c[1], c[2], 1.0)
     psb.set_background_color(glm4(c))
@@ -467,6 +473,8 @@ class CameraParameters:
 
 
 ## Small utilities
+def glm2(vals):
+    return psb.glm_vec2(vals[0], vals[1])
 def glm3u(vals):
     return psb.glm_uvec3(vals[0], vals[1], vals[2])
 def glm3(vals):

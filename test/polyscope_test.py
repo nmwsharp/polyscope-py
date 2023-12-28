@@ -172,6 +172,12 @@ class TestCore(unittest.TestCase):
     
     def test_view_json(self):
         ps.set_view_from_json(ps.get_view_as_json())
+    
+    def test_screen_coords(self):
+        io = psim.GetIO()
+        screen_coords = io.MousePos
+        world_ray = ps.screen_coords_to_world_ray(screen_coords)
+        world_pos = ps.screen_coords_to_world_position(screen_coords)
 
     def test_ground_options(self):
 

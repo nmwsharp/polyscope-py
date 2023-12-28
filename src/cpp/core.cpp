@@ -163,11 +163,14 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("get_window_resizable", &ps::view::getWindowResizable);
   m.def("set_view_from_json", ps::view::setViewFromJson);
   m.def("get_view_as_json", ps::view::getViewAsJson);
+  m.def("screen_coords_to_world_ray", ps::view::screenCoordsToWorldRay);
+  m.def("screen_coords_to_world_position", ps::view::screenCoordsToWorldPosition);
   m.def("set_background_color", [](glm::vec4 c) { for(int i = 0; i < 4; i++) ps::view::bgColor[i] = c[i]; });
   m.def("get_background_color", []() { return glm2eigen(glm::vec4{
         ps::view::bgColor[0], ps::view::bgColor[1], ps::view::bgColor[2], ps::view::bgColor[3] 
       }); 
   });
+
   
   // === "Advanced" UI management
   m.def("build_polyscope_gui", &ps::buildPolyscopeGui);
@@ -481,6 +484,13 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .export_values(); 
 
   // === Mini bindings for a little bit of glm
+  py::class_<glm::vec2>(m, "glm_vec2").
+    def(py::init<float, float>())
+   .def("as_tuple",
+        [](const glm::vec2& x) {
+        return std::tuple<float, float>(x[0], x[1]);
+        });
+
   py::class_<glm::vec3>(m, "glm_vec3").
     def(py::init<float, float, float>())
    .def("as_tuple",
