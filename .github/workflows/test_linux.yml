@@ -33,4 +33,4 @@ jobs:
       run: cd build && make
 
     - name: run test
-      run: python3 test/polyscope_test.py
+      run: python3 test/polyscope_test.py -v

@@ -30,4 +30,4 @@ jobs:
       run: cd build && cmake --build "."
 
     - name: run test
-      run: python test/polyscope_test.py
+      run: python test/polyscope_test.py -v
