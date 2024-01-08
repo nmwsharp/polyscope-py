@@ -1686,26 +1686,26 @@ class TestVolumeGrid(unittest.TestCase):
     def test_add_remove(self):
 
         # add
-        n = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        n = ps.register_volume_grid("test_grid", (10,12,14), (0.,0.,0,), (1., 1., 1.))
         self.assertTrue(ps.has_volume_grid("test_grid"))
         self.assertFalse(ps.has_volume_grid("nope"))
         self.assertEqual(n.n_nodes(), 10*12*14)
         self.assertEqual(n.n_cells(), (10-1)*(12-1)*(14-1))
       
         # remove by name
-        ps.register_volume_grid("test_grid2", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        ps.register_volume_grid("test_grid2", (10,12,14), (0.,0.,0,), (1., 1., 1.))
         ps.remove_volume_grid("test_grid2")
         self.assertTrue(ps.has_volume_grid("test_grid"))
         self.assertFalse(ps.has_volume_grid("test_grid2"))
 
         # remove by ref
-        c = ps.register_volume_grid("test_grid2", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        c = ps.register_volume_grid("test_grid2", (10,12,14), (0.,0.,0,), (1., 1., 1.))
         c.remove()
         self.assertTrue(ps.has_volume_grid("test_grid"))
         self.assertFalse(ps.has_volume_grid("test_grid2"))
 
         # get by name
-        ps.register_volume_grid("test_grid3",  (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        ps.register_volume_grid("test_grid3", (10,12,14),  (0.,0.,0,), (1., 1., 1.))
         p = ps.get_volume_grid("test_grid3") # should be wrapped instance, not underlying PSB instance
         self.assertTrue(isinstance(p, ps.VolumeGrid))
 
@@ -1713,13 +1713,13 @@ class TestVolumeGrid(unittest.TestCase):
     
     def test_render(self):
 
-        ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        ps.register_volume_grid("test_grid", (10,12,14), (0.,0.,0,), (1., 1., 1.))
         ps.show(3)
         ps.remove_all_structures()
 
     def test_options(self):
 
-        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        p = ps.register_volume_grid("test_grid", (10,12,14), (0.,0.,0,), (1., 1., 1.))
 
         # misc getters
         p.n_nodes()
@@ -1772,7 +1772,7 @@ class TestVolumeGrid(unittest.TestCase):
         self.assertAlmostEqual(0.8, p.get_transparency())
       
         # Set with optional arguments 
-        p2 = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14),
+        p2 = ps.register_volume_grid("test_grid", (10,12,14), (0.,0.,0,), (1., 1., 1.),
                     enabled=True, material='wax', color=(1., 0., 0.), edge_color=(0.5, 0.5, 0.5), edge_width=0.5, cube_size_factor=0.5, transparency=0.9)
 
         ps.show(3)
@@ -1782,13 +1782,13 @@ class TestVolumeGrid(unittest.TestCase):
     
     def test_transform(self):
 
-        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        p = ps.register_volume_grid("test_grid", (10,12,14), (0.,0.,0,), (1., 1., 1.))
         test_transforms(self,p)
         ps.remove_all_structures()
    
     def test_slice_plane(self):
 
-        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), (10,12,14))
+        p = ps.register_volume_grid("test_grid", (10,12,14), (0.,0.,0,), (1., 1., 1.))
 
         plane = ps.add_scene_slice_plane()
         p.set_cull_whole_elements(True)
@@ -1810,7 +1810,7 @@ class TestVolumeGrid(unittest.TestCase):
     def test_scalar(self):
         node_dim = (10,12,14)
         cell_dim = (10-1,12-1,14-1)
-        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        p = ps.register_volume_grid("test_grid", node_dim, (0.,0.,0,), (1., 1., 1.))
 
         for on in ['nodes', 'cells']:
        
@@ -1838,7 +1838,7 @@ class TestVolumeGrid(unittest.TestCase):
     def test_scalar_from_callable(self):
         node_dim = (10,12,14)
         cell_dim = (10-1,12-1,14-1)
-        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        p = ps.register_volume_grid("test_grid", node_dim, (0.,0.,0,), (1., 1., 1.))
         
         def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
 
@@ -1863,7 +1863,7 @@ class TestVolumeGrid(unittest.TestCase):
     def test_scalar_isosurface_array(self):
         node_dim = (10,12,14)
 
-        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        p = ps.register_volume_grid("test_grid", node_dim, (0.,0.,0,), (1., 1., 1.))
         vals = np.random.rand(*node_dim)
 
         p.add_scalar_quantity("test_vals", vals, defined_on='nodes', enabled=True,
@@ -1877,7 +1877,7 @@ class TestVolumeGrid(unittest.TestCase):
     def test_scalar_isosurface_callable(self):
         node_dim = (10,12,14)
 
-        p = ps.register_volume_grid("test_grid", (0.,0.,0,), (1., 1., 1.), node_dim)
+        p = ps.register_volume_grid("test_grid", node_dim, (0.,0.,0,), (1., 1., 1.))
         def sphere_sdf(pts): return np.linalg.norm(pts, axis=-1) - 1.
 
         p.add_scalar_quantity_from_callable("test_vals", sphere_sdf, defined_on='nodes', enabled=True,

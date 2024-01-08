@@ -169,7 +169,7 @@ class VolumeGrid(Structure):
         check_all_args_processed(self, q, scalar_args)
    
 
-def register_volume_grid(name, bound_low, bound_high, node_dims, enabled=None, color=None, edge_color=None, edge_width=None, cube_size_factor=None, material=None, transparency=None):
+def register_volume_grid(name, node_dims, bound_low, bound_high, enabled=None, color=None, edge_color=None, edge_width=None, cube_size_factor=None, material=None, transparency=None):
 
     """Register a new volume grid"""
 
