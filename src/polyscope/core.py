@@ -466,7 +466,7 @@ class CameraParameters:
                 int(dims[0]), int(dims[1]),
                 str_to_image_origin(image_origin)
             )
-        return out_rays.reshape(dims[0], dims[1], 3)
+        return out_rays.reshape(dims[1], dims[0], 3)
 
     def generate_camera_ray_corners(self): 
         return self.instance.generate_camera_ray_corners()
