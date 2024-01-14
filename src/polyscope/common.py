@@ -62,6 +62,21 @@ def process_scalar_args(structure, quantity, scalar_args):
     val = check_and_pop_arg(scalar_args, 'cmap')
     if val is not None:
         quantity.set_color_map(val)
+    
+    val = check_and_pop_arg(scalar_args, 'isolines_enabled')
+    if val is not None:
+        quantity.set_isolines_enabled(val)
+    
+    val = check_and_pop_arg(scalar_args, 'isoline_width')
+    val_relative = check_and_pop_arg(scalar_args, 'isoline_width_relative')
+    if val is not None:
+        if val_relative is None: 
+            val_relative = False
+        quantity.set_isoline_width(val, val_relative)
+    
+    val = check_and_pop_arg(scalar_args, 'isoline_darkness')
+    if val is not None:
+        quantity.set_isoline_darkness(val)
 
 
 # Process args, removing them from the dict if they are present

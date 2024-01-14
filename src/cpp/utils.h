@@ -196,7 +196,9 @@ py::class_<ScalarQ> bindScalarQuantity(py::module& m, std::string name) {
   return bindQuantity<ScalarQ>(m, name.c_str())
       .def("set_color_map", &ScalarQ::setColorMap, "Set color map")
       .def("set_map_range", &ScalarQ::setMapRange, "Set map range")
-      .def("set_isoline_width", &ScalarQ::setIsolineWidth, "Set isoline width");
+      .def("set_isolines_enabled", &ScalarQ::setIsolinesEnabled)
+      .def("set_isoline_width", &ScalarQ::setIsolineWidth, "Set isoline width")
+      .def("set_isoline_darkness", &ScalarQ::setIsolineDarkness);
 }
 
 template <typename VolumeMeshVertexScalarQuantity>
