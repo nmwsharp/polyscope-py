@@ -691,6 +691,10 @@ class TestPointCloud(unittest.TestCase):
         p.add_scalar_quantity("test_vals_with_range", vals, vminmax=(-5., 5.), enabled=True)
         p.add_scalar_quantity("test_vals_with_datatype", vals, enabled=True, datatype='symmetric')
         p.add_scalar_quantity("test_vals_with_cmap", vals, enabled=True, cmap='blues')
+        p.add_scalar_quantity("test_vals_with_iso", vals, enabled=True, cmap='blues',
+                              isolines_enabled=True, isoline_width=0.1, isoline_darkness=0.5)
+        p.add_scalar_quantity("test_vals_with_iso_rel", vals, enabled=True, cmap='blues',
+                              isolines_enabled=True, isoline_width=0.1, isoline_width_relative=True, isoline_darkness=0.5)
         ps.show(3)
 
         # test some additions/removal while we're at it
@@ -911,6 +915,8 @@ class TestCurveNetwork(unittest.TestCase):
             p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, vminmax=(-5., 5.), enabled=True)
             p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, enabled=True, datatype='symmetric')
             p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, enabled=True, cmap='blues')
+            p.add_scalar_quantity("test_vals_with_iso", vals, defined_on=on, enabled=True, cmap='blues',
+                                  isolines_enabled=True, isoline_width=0.1, isoline_darkness=0.5)
 
             ps.show(3)
 
@@ -1248,6 +1254,8 @@ class TestSurfaceMesh(unittest.TestCase):
             p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, param_name=param_name, vminmax=(-5., 5.), enabled=True)
             p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, param_name=param_name, enabled=True, datatype='symmetric')
             p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, param_name=param_name, enabled=True, cmap='blues')
+            p.add_scalar_quantity("test_vals_with_iso", vals, enabled=True, defined_on=on, cmap='blues',
+                              isolines_enabled=True, isoline_width=0.1, isoline_darkness=0.5)
 
             ps.show(3)
 
@@ -2013,13 +2021,13 @@ class TestCameraView(unittest.TestCase):
         dimX = 300
         dimY = 600
 
-        cam.add_scalar_image_quantity("scalar_img", np.zeros((dimX, dimY)))
-        cam.add_scalar_image_quantity("scalar_img2", np.zeros((dimX, dimY)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds', show_in_camera_billboard=True)
-        cam.add_scalar_image_quantity("scalar_img3", np.zeros((dimX, dimY)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
-        cam.add_scalar_image_quantity("scalar_img4", np.zeros((dimX, dimY)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
+        cam.add_scalar_image_quantity("scalar_img", np.zeros((dimY, dimX)))
+        cam.add_scalar_image_quantity("scalar_img2", np.zeros((dimY, dimX)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds', show_in_camera_billboard=True)
+        cam.add_scalar_image_quantity("scalar_img3", np.zeros((dimY, dimX)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+        cam.add_scalar_image_quantity("scalar_img4", np.zeros((dimY, dimX)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
         
         # true floating adder
-        ps.add_scalar_image_quantity("scalar_img2", np.zeros((dimX, dimY)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds')
+        ps.add_scalar_image_quantity("scalar_img2", np.zeros((dimY, dimX)), enabled=True, image_origin='lower_left', datatype='symmetric', vminmax=(-3.,.3), cmap='reds')
         
         ps.show(3)
         ps.remove_all_structures()
@@ -2033,13 +2041,13 @@ class TestCameraView(unittest.TestCase):
         dimX = 300
         dimY = 600
 
-        cam.add_color_image_quantity("color_img", np.zeros((dimX, dimY, 3)))
-        cam.add_color_image_quantity("color_img2", np.zeros((dimX, dimY, 3)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
-        cam.add_color_image_quantity("color_img3", np.zeros((dimX, dimY, 3)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
-        cam.add_color_image_quantity("color_img4", np.zeros((dimX, dimY, 3)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
+        cam.add_color_image_quantity("color_img", np.zeros((dimY, dimX, 3)))
+        cam.add_color_image_quantity("color_img2", np.zeros((dimY, dimX, 3)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
+        cam.add_color_image_quantity("color_img3", np.zeros((dimY, dimX, 3)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+        cam.add_color_image_quantity("color_img4", np.zeros((dimY, dimX, 3)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False, transparency=0.5)
        
         # true floating adder
-        ps.add_color_image_quantity("color_img2", np.zeros((dimX, dimY, 3)), enabled=True, image_origin='lower_left', show_in_camera_billboard=False)
+        ps.add_color_image_quantity("color_img2", np.zeros((dimY, dimX, 3)), enabled=True, image_origin='lower_left', show_in_camera_billboard=False)
 
         ps.show(3)
         ps.remove_all_structures()
@@ -2053,13 +2061,13 @@ class TestCameraView(unittest.TestCase):
         dimX = 300
         dimY = 600
 
-        cam.add_color_alpha_image_quantity("color_alpha_img", np.zeros((dimX, dimY, 4)))
-        cam.add_color_alpha_image_quantity("color_alpha_img2", np.zeros((dimX, dimY, 4)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
-        cam.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimX, dimY, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False, is_premultiplied=True)
-        cam.add_color_alpha_image_quantity("color_alpha_img4", np.zeros((dimX, dimY, 4)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False)
+        cam.add_color_alpha_image_quantity("color_alpha_img", np.zeros((dimY, dimX, 4)))
+        cam.add_color_alpha_image_quantity("color_alpha_img2", np.zeros((dimY, dimX, 4)), enabled=True, image_origin='lower_left', show_in_camera_billboard=True)
+        cam.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimY, dimX, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False, is_premultiplied=True)
+        cam.add_color_alpha_image_quantity("color_alpha_img4", np.zeros((dimY, dimX, 4)), enabled=True, show_fullscreen=True, show_in_camera_billboard=False)
 
         # true floating adder
-        ps.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimX, dimY, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
+        ps.add_color_alpha_image_quantity("color_alpha_img3", np.zeros((dimY, dimX, 4)), enabled=True, show_in_imgui_window=True, show_in_camera_billboard=False)
 
         ps.show(3)
         ps.remove_all_structures()
@@ -2073,8 +2081,8 @@ class TestCameraView(unittest.TestCase):
         dimX = 300
         dimY = 600
 
-        depths = np.zeros((dimX, dimY))
-        normals = np.ones((dimX, dimY, 3))
+        depths = np.zeros((dimY, dimX))
+        normals = np.ones((dimY, dimX, 3))
 
         cam.add_depth_render_image_quantity("render_img", depths, normals)
         cam.add_depth_render_image_quantity("render_img2", depths, normals, enabled=True, image_origin='lower_left', color=(0., 1., 0.), material='wax', transparency=0.7)
@@ -2094,9 +2102,9 @@ class TestCameraView(unittest.TestCase):
         dimX = 300
         dimY = 600
 
-        depths = np.zeros((dimX, dimY))
-        normals = np.ones((dimX, dimY, 3))
-        colors = np.ones((dimX, dimY, 3))
+        depths = np.zeros((dimY, dimX))
+        normals = np.ones((dimY, dimX, 3))
+        colors = np.ones((dimY, dimX, 3))
 
         cam.add_color_render_image_quantity("render_img", depths, normals, colors)
         cam.add_color_render_image_quantity("render_img2", depths, normals, colors, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
@@ -2116,9 +2124,9 @@ class TestCameraView(unittest.TestCase):
         dimX = 300
         dimY = 600
 
-        depths = np.zeros((dimX, dimY))
-        normals = np.ones((dimX, dimY, 3))
-        scalars = np.ones((dimX, dimY))
+        depths = np.zeros((dimY, dimX))
+        normals = np.ones((dimY, dimX, 3))
+        scalars = np.ones((dimY, dimX))
 
         cam.add_scalar_render_image_quantity("render_img", depths, normals, scalars)
         cam.add_scalar_render_image_quantity("render_img2", depths, normals, scalars, enabled=True, image_origin='lower_left', material='wax', transparency=0.7)
@@ -2138,8 +2146,8 @@ class TestCameraView(unittest.TestCase):
         dimX = 300
         dimY = 600
 
-        depths = np.zeros((dimX, dimY))
-        colors = np.ones((dimX, dimY, 3))
+        depths = np.zeros((dimY, dimX))
+        colors = np.ones((dimY, dimX, 3))
 
         cam.add_raw_color_render_image_quantity("render_img", depths, colors)
         cam.add_raw_color_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7)
@@ -2159,8 +2167,8 @@ class TestCameraView(unittest.TestCase):
         dimX = 300
         dimY = 600
 
-        depths = np.zeros((dimX, dimY))
-        colors = np.ones((dimX, dimY, 4))
+        depths = np.zeros((dimY, dimX))
+        colors = np.ones((dimY, dimX, 4))
 
         cam.add_raw_color_alpha_render_image_quantity("render_img", depths, colors)
         cam.add_raw_color_alpha_render_image_quantity("render_img2", depths, colors, enabled=True, image_origin='lower_left', transparency=0.7, is_premultiplied=True)
@@ -2305,7 +2313,7 @@ class TestManagedBuffers(unittest.TestCase):
         # test a free-floating quantity buffer
         dimX = 200
         dimY = 300
-        ps.add_scalar_image_quantity("test_float_img", np.zeros((dimX, dimY)))
+        ps.add_scalar_image_quantity("test_float_img", np.zeros((dimY, dimX)))
         img_buf = ps.get_quantity_buffer("test_float_img", "values")
         self.assertEqual(img_buf.size(), dimX*dimY)
         self.assertTrue(img_buf.has_data())
