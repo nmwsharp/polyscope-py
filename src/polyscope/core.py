@@ -28,6 +28,9 @@ def show(forFrames=None):
 def unshow():
     psb.unshow()
 
+def window_requests_close():
+    return psb.window_requests_close()
+
 def check_initialized():
     psb.check_initialized()
 

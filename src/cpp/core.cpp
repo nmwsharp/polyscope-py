@@ -87,6 +87,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
       py::arg("forFrames")=std::numeric_limits<size_t>::max()
   );
   m.def("unshow", &ps::unshow);
+  m.def("window_requests_close", &ps::windowRequestsClose);
   m.def("frame_tick", &ps::frameTick);
   m.def("shutdown", &ps::shutdown);
 
