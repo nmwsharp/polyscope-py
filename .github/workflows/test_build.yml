@@ -73,3 +73,10 @@ jobs:
       - name: Build wheels
         run: |
           python -m cibuildwheel --output-dir wheelhouse
+      
+      # Upload binaries to the github artifact store
+      - uses: actions/upload-artifact@v2
+        with:
+          path: |
+            ./wheelhouse/*.whl 
+            ./wheelhouse/*.tar.gz 
