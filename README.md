@@ -31,13 +31,14 @@ This repo is configured with CI on github actions.
 
 - By default, all commits to the main branch build & run tests. Use `[ci skip]` to skip this.
 - Tagging a commit with `[ci build]` causes it to also build all precompiled wheels and upload them as artifacts.
-- Creating a tagged version like `v1.2.3` will build wheels as above, and ALSO automatically upload them to pypi as described below.
+- Creating a tagged version like `v1.2.3` will build wheels as above, and ALSO automatically upload them to pypi as described below. You can also manually cause the build & publish action to kick off by pushing a commit with "[ci publish]" in the message, this is useful if the initial deploy for the tagged commit fails and you need to retry.
 
 ### Deploy a new version
 
 - Commit the desired version to the `master` branch, be sure the version string in `setup.py` corresponds to the new version number. Use the `[ci build]` tag in the commit message to trigger builds, which should take about an hour.
 - Watch the github actions builds to ensure all wheels build successfully. The resulting binaries will be saved as artifacts if you want try test with them.
 - While you're waiting, update the docs, including the changelog.
+- If something goes wrong with the build & publish on teh tagged commit, you can manually retry without tagging a new version by pushing a commit with "[ci publish]" in the message.
 - Tag the commit with a tag like `v1.2.3`, matching the version in `setup.py`. This will kick off a new github actions build which deploys the wheels to PyPI after compilation.
-- If we are still doing builds with multiple rounds of actions, it may be necessary to manually upload some of the generated wheels. Download from the github actions `Summary/Artifacs` pane, then upload with `twine upload * --skip-existing`
+
 - Update the conda builds by committing to the [feedstock repository](https://github.com/conda-forge/polyscope-feedstock). This generally just requires bumping the version number and updating the hash in `meta.yml`. Since `meta.yml` is configured to pull source from PyPi, you can't do this until after the source build has been uploaded from the github action.
