@@ -102,6 +102,10 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Screenshots
   m.def("screenshot", overload_cast_<bool>()(&ps::screenshot), "Take a screenshot");
+  m.def("screenshot_to_buffer", [](bool transparent_bg) { 
+      std::vector<unsigned char> buff = ps::screenshotToBuffer(transparent_bg);
+      return py::array(buff.size(), buff.data());
+    }, "Take a screenshot to buffer");
   m.def("named_screenshot", overload_cast_<std::string, bool>()(&ps::screenshot), "Take a screenshot");
   m.def("set_screenshot_extension", [](std::string x) { ps::options::screenshotExtension = x; });
 

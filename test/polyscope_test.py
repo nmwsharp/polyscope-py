@@ -220,6 +220,10 @@ class TestCore(unittest.TestCase):
         
         ps.set_screenshot_extension(".jpg")
         ps.set_screenshot_extension(".png")
+        
+        buff = ps.screenshot_to_buffer(False)
+        w, h = ps.get_buffer_size()
+        self.assertEqual(buff.shape, (h,w,4))
     
         ps.show(3)
     

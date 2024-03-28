@@ -68,6 +68,14 @@ def set_screenshot_extension(ext):
     psb.set_screenshot_extension(ext)
 
 
+def screenshot_to_buffer(transparent_bg=True, vertical_flip=True):
+    buff = psb.screenshot_to_buffer(transparent_bg)
+    w, h = get_buffer_size()
+    buff = buff.reshape(h, w, 4)
+    if(vertical_flip):
+        buff = buff[::-1,:,:]
+    return buff
+
 ### Small options
 
 def set_program_name(name):
