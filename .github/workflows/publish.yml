@@ -2,44 +2,17 @@ name: Build and Publish
 
 # NOTE: build logic is duplicated here and in test_build.yml
 
-# Run on the main branch for commits or version tags only
-# These triggers are treated as an 'OR', so we also need to filter with 'if:' checks below
+# Run on the main branch for commits only
 on:
   push:
     branches:     
       - master
-    tags:        
-      - v*    # run on version tags like v2.3.4
 
 jobs:
-
-  # Get the name of the branch we are running on
-  # (apparently on a tag push there is no other way?)
-  # https://stackoverflow.com/a/72959712
-  check:
-    runs-on: ubuntu-latest
-    outputs:
-      branch: ${{ steps.check_step.outputs.branch }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Get current branch
-        id: check_step
-        run: |
-          raw=$(git branch -r --contains ${{ github.ref }})
-          branch=${raw##*/}
-          echo "{name}=branch" >> $GITHUB_OUTPUT
-          echo "Branch is $branch."
-
-
   build_wheels:
-    needs: check
 
-    # only run if on master branch, and commit contains '[ci publish]' or it is tagged with a v* tag like v2.3.4
-    # if: "${{ needs.check.outputs.branch == 'master' && (contains(toJSON(github.event.commits.*.message), '[ci publish]') || startsWith(github.event.ref, 'refs/tags/v')) }}"
+    # only run if the most recent commit contains '[ci publish]'
+    if: "contains(github.event.head_commit.message, '[ci publish]')"
 
     strategy:
       matrix:
@@ -68,14 +41,6 @@ jobs:
       CIBW_BEFORE_BUILD_LINUX : "yum remove -y cmake && python -m pip install cmake && yum install -y libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel mesa-libGL libXi-devel freeglut-devel"
 
     steps:
-      - env:
-          OUTPUT1: ${{ needs.check.outputs.branch }}
-          OUTPUT2: ${{ needs.check.outputs.name }}
-        run: |
-          echo "stored branch"
-          echo "$OUTPUT1"
-          echo "$OUTPUT2"
-
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
@@ -117,11 +82,11 @@ jobs:
   # Push the resulting binaries to pypi on a tag starting with 'v'
   upload_pypi:
     name: Upload release to PyPI
-    needs: [check, build_wheels]
 
-    # only run if on master branch, and commit contains '[ci publish]' or it is tagged with a v* tag like v2.3.4
-    if: "${{ needs.check.outputs.branch == 'master' && (contains(toJSON(github.event.commits.*.message), '[ci publish]') || startsWith(github.event.ref, 'refs/tags/v')) }}"
+    # only run if the most recent commit contains '[ci publish]'
+    if: "contains(github.event.head_commit.message, '[ci publish]')"
 
+    needs: [build_wheels]
     runs-on: ubuntu-latest
     environment:
       name: pypi
