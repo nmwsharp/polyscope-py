@@ -16,7 +16,7 @@ jobs:
   # Get the name of the branch we are running on
   # (apparently on a tag push there is no other way?)
   # https://stackoverflow.com/a/72959712
-  check_branch:
+  check:
     runs-on: ubuntu-latest
     outputs:
       branch: ${{ steps.check_step.outputs.branch }}
@@ -69,7 +69,7 @@ jobs:
 
     steps:
       - env:
-          OUTPUT1: ${{ needs.check_branch.outputs.branch }}
+          OUTPUT1: ${{ needs.check.outputs.branch }}
           OUTPUT2: ${{ needs.check_branch.outputs.name }}
         run: |
           echo "stored branch"
