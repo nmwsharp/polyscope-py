@@ -2325,6 +2325,9 @@ class TestManagedBuffers(unittest.TestCase):
         img_buf.get_value(3)
         img_buf.update_data(np.zeros(dimX*dimY))
 
+        # test key presses
+        if(psim.IsKeyPressed(psim.ImGuiKey_A)):
+            pass
 
         ps.show(3)
 
