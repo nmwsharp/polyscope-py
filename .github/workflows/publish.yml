@@ -39,7 +39,7 @@ jobs:
     needs: check_branch
 
     # only run if on master branch, and commit contains '[ci publish]' or it is tagged with a v* tag like v2.3.4
-    if: "${{ needs.check_branch.outputs.branch == 'master' && (contains(toJSON(github.event.commits.*.message), '[ci publish]') || startsWith(github.event.ref, 'refs/tags/v')) }}"
+    # if: "${{ needs.check_branch.outputs.branch == 'master' && (contains(toJSON(github.event.commits.*.message), '[ci publish]') || startsWith(github.event.ref, 'refs/tags/v')) }}"
 
     strategy:
       matrix:
