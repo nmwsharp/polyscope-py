@@ -36,10 +36,10 @@ jobs:
 
 
   build_wheels:
-    needs: check_branch
+    needs: check
 
     # only run if on master branch, and commit contains '[ci publish]' or it is tagged with a v* tag like v2.3.4
-    # if: "${{ needs.check_branch.outputs.branch == 'master' && (contains(toJSON(github.event.commits.*.message), '[ci publish]') || startsWith(github.event.ref, 'refs/tags/v')) }}"
+    # if: "${{ needs.check.outputs.branch == 'master' && (contains(toJSON(github.event.commits.*.message), '[ci publish]') || startsWith(github.event.ref, 'refs/tags/v')) }}"
 
     strategy:
       matrix:
@@ -70,7 +70,7 @@ jobs:
     steps:
       - env:
           OUTPUT1: ${{ needs.check.outputs.branch }}
-          OUTPUT2: ${{ needs.check_branch.outputs.name }}
+          OUTPUT2: ${{ needs.check.outputs.name }}
         run: |
           echo "stored branch"
           echo "$OUTPUT1"
@@ -117,10 +117,10 @@ jobs:
   # Push the resulting binaries to pypi on a tag starting with 'v'
   upload_pypi:
     name: Upload release to PyPI
-    needs: [check_branch, build_wheels]
+    needs: [check, build_wheels]
 
     # only run if on master branch, and commit contains '[ci publish]' or it is tagged with a v* tag like v2.3.4
-    if: "${{ needs.check_branch.outputs.branch == 'master' && (contains(toJSON(github.event.commits.*.message), '[ci publish]') || startsWith(github.event.ref, 'refs/tags/v')) }}"
+    if: "${{ needs.check.outputs.branch == 'master' && (contains(toJSON(github.event.commits.*.message), '[ci publish]') || startsWith(github.event.ref, 'refs/tags/v')) }}"
 
     runs-on: ubuntu-latest
     environment:
