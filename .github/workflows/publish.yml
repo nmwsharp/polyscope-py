@@ -71,7 +71,7 @@ jobs:
       - env:
           OUTPUT1: ${{ needs.check_branch.outputs.branch }}
           OUTPUT2: ${{ needs.check_branch.outputs.name }}
-      - run: |
+        run: |
           echo "stored branch"
           echo "$OUTPUT1"
           echo "$OUTPUT2"
