@@ -93,10 +93,6 @@ PYBIND11_MODULE(polyscope_bindings, m) {
 
   // === Render engine related things
   m.def("get_render_engine_backend_name", &ps::render::getRenderEngineBackendName);
-  m.def("get_key_code", [](char c) { 
-      ps::checkInitialized();
-      return ps::render::engine->getKeyCode(c); 
-  });
 
   // === Structure management
   m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
