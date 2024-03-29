@@ -68,9 +68,14 @@ jobs:
       CIBW_BEFORE_BUILD_LINUX : "yum remove -y cmake && python -m pip install cmake && yum install -y libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel mesa-libGL libXi-devel freeglut-devel"
 
     steps:
+      - env:
+          OUTPUT1: ${{ needs.check_branch.outputs.branch }}
+          OUTPUT2: ${{ needs.check_branch.outputs.name }}
       - run: |
           echo "stored branch"
-          echo ${{ needs.check_branch.outputs.branch }}
+          echo "$OUTPUT1"
+          echo "$OUTPUT2"
+
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
