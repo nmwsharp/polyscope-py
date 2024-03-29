@@ -38,10 +38,8 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Build arguments
-    # parser.add_argument('mesh', type=str, help='path to a mesh')
-    # parser.add_argument('image', type=str, help='path to a image')
-    parser.add_argument('--surfacemesh', default=True, action='store_true')
-    parser.add_argument('--no-surfacemesh', dest='surfacemesh', action='store_false')
+    parser.add_argument('--mesh', type=str, help='path to a mesh')
+    parser.add_argument('--image', type=str, help='path to a image')
     parser.add_argument('--pointcloud', default=False, action='store_true')
     parser.add_argument('--volumemesh', default=False, action='store_true')
     parser.add_argument('--volumegrid', default=False, action='store_true')
@@ -49,8 +47,6 @@ def main():
     # Parse arguments
     args = parser.parse_args()
 
-    # Load a mesh argument
-    # verts, faces = pp3d.read_mesh(args.mesh)
 
     # verts, UVs, _, faces, UVinds, _ = igl.read_obj(args.mesh)
     # corner_UVs = UVs[UVinds,:].reshape(-1,2)
@@ -81,11 +77,14 @@ def main():
     # Always initialize exactly once
     polyscope.init() 
 
-    polyscope.set_ground_plane_mode("shadow_only")
+    # polyscope.set_ground_plane_mode("shadow_only")
     polyscope.set_verbosity(101)
 
     ## Examples with a mesh
-    if args.surfacemesh:
+    if args.mesh:
+        # Load a mesh argument
+        verts, faces = pp3d.read_mesh(args.mesh)
+
         ps_mesh = polyscope.register_surface_mesh("test mesh", verts, faces, enabled=True)
 
         # Scalar functions
@@ -228,29 +227,30 @@ def main():
     
     if args.volumegrid:
 
-# Any implicit function mapping [N,3] numpy array 
-# of locations --> [N] numpy array of values
-def sphere_sdf(pts):
-    res = np.linalg.norm(pts, axis=-1) - 1.
-    return res
+        # Any implicit function mapping [N,3] numpy array 
+        # of locations --> [N] numpy array of values
+        def sphere_sdf(pts):
+            res = np.linalg.norm(pts, axis=-1) - 1.
+            return res
 
-# Create the grid structure
-bound_min = np.array([-1., -1., -1.])
-bound_max = np.array([+1., +1., +1.])
-node_dims = np.array([128,128,128])
-ps_grid = polyscope.register_volume_grid("test volume grid", bound_min, bound_max, node_dims)
+        # Create the grid structure
+        bound_min = np.array([-1., -1., -1.])
+        bound_max = np.array([+1., +1., +1.])
+        node_dims = np.array([128,128,128])
+        ps_grid = polyscope.register_volume_grid("test volume grid", bound_min, bound_max, node_dims)
 
-# This makes polyscope register the scalar quantity by calling 
-# your function for each point on the grid (so you don't have 
-# to worry about getting indexing right)
-ps_grid.add_scalar_quantity_from_callable("sdf", sphere_sdf)
+        # This makes polyscope register the scalar quantity by calling 
+        # your function for each point on the grid (so you don't have 
+        # to worry about getting indexing right)
+        ps_grid.add_scalar_quantity_from_callable("sdf", sphere_sdf)
 
-polyscope.show()
+        polyscope.show()
 
     # Back to empty
     polyscope.show() 
 
     # polyscope.clear_user_callback()
+
 
 def implicit_ui():
 
