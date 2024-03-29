@@ -30,15 +30,16 @@ polyscope-py should work out-of-the-box on any combination of Python 3.5-3.12 an
 This repo is configured with CI on github actions. 
 
 - By default, all commits to the main branch build & run tests. Use `[ci skip]` to skip this.
-- Tagging a commit with `[ci build]` causes it to also build all precompiled wheels and upload them as artifacts.
-- Creating a tagged version like `v1.2.3` will build wheels as above, and ALSO automatically upload them to pypi as described below. You can also manually cause the build & publish action to kick off by pushing a commit with "[ci publish]" in the message, this is useful if the initial deploy for the tagged commit fails and you need to retry.
+- Tagging a commit with `[ci build]` causes it to also build all precompiled wheels on a matrix of platforms to ensure the build scripts succeed.
+- Tagging a commit with `[ci publish]` causes it to build all precompiled wheels on a matrix of platforms AND upload them to pypi index
 
 ### Deploy a new version
 
-- Commit the desired version to the `master` branch, be sure the version string in `setup.py` corresponds to the new version number. Use the `[ci build]` tag in the commit message to trigger builds, which should take about an hour.
+- Commit the desired version to the `master` branch. Use the `[ci build]` string in the commit message to trigger builds, which should take about an hour.
 - Watch the github actions builds to ensure all wheels build successfully. The resulting binaries will be saved as artifacts if you want try test with them.
 - While you're waiting, update the docs, including the changelog.
-- If something goes wrong with the build & publish on teh tagged commit, you can manually retry without tagging a new version by pushing a commit with "[ci publish]" in the message.
-- Tag the commit with a tag like `v1.2.3`, matching the version in `setup.py`. This will kick off a new github actions build which deploys the wheels to PyPI after compilation.
+- Update the version string in `setup.py` to the new version number. When you commit, include the string `[ci publish]`, which will kick of a publish job to build wheels again AND upload them to PyPI.
+- If something goes wrong with the build & publish, you can manually retry by pushing any new commit with "[ci publish]" in the message.
+- Create a github release. Tag the release commit with a tag like `v1.2.3`, matching the version in `setup.py`
 
 - Update the conda builds by committing to the [feedstock repository](https://github.com/conda-forge/polyscope-feedstock). This generally just requires bumping the version number and updating the hash in `meta.yml`. Since `meta.yml` is configured to pull source from PyPi, you can't do this until after the source build has been uploaded from the github action.
