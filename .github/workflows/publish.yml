@@ -70,7 +70,7 @@ jobs:
     steps:
       - run: |
           echo "stored branch"
-          echo needs.check_branch.outputs.branch
+          echo ${{ needs.check_branch.outputs.branch }}
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
