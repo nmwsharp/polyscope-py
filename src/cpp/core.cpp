@@ -38,8 +38,7 @@ void bind_camera_view(py::module& m);
 void bind_floating_quantities(py::module& m);
 void bind_implicit_helpers(py::module& m);
 void bind_managed_buffer(py::module& m);
-// void bind_imgui(py::module& m);
-void bind_imgui2(py::module& m);
+void bind_imgui(py::module& m);
 
 // Signal handler (makes ctrl-c work, etc)
 void checkSignals() {
