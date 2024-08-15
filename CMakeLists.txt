@@ -23,7 +23,6 @@ pybind11_add_module(polyscope_bindings
   src/cpp/implicit_helpers.cpp
   src/cpp/managed_buffer.cpp
   src/cpp/imgui.cpp
-  src/cpp/imgui2.cpp
 )
 set_property(TARGET polyscope_bindings PROPERTY CXX_STANDARD 17)
 set_property(TARGET polyscope_bindings PROPERTY CXX_STANDARD_REQUIRED TRUE)
