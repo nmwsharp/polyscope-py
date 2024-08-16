@@ -15,14 +15,13 @@ jobs:
       with:
         submodules: 'recursive'
 
-    # Use system python on mac; 3.9 seems to be available and this way there aren't multiple versions floating around 
-    #- uses: actions/setup-python@v2
-      #name: Install Python
-      #with:
-        #python-version: '3.7'
+    - uses: actions/setup-python@v2
+      name: Install Python
+      with:
+        python-version: '3.9'
 
     - name: install python packages
-      run: python3 -m pip install numpy
+      run: python -m pip install numpy
 
     - name: configure
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DPOLYSCOPE_BACKEND_OPENGL3_GLFW=ON -DPOLYSCOPE_BACKEND_OPENGL_MOCK=ON ..
@@ -31,4 +30,4 @@ jobs:
       run: cd build && make
 
     - name: run test
-      run: python3 test/polyscope_test.py -v
+      run: python test/polyscope_test.py -v
