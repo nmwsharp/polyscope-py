@@ -532,7 +532,6 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   bind_camera_view(m);
   bind_managed_buffer(m);
   bind_imgui(m);
-
 }
 
 // clang-format on

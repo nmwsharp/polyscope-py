@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.12)
 project(polyscope-py)
 
 # Gather dependencies
@@ -24,6 +24,8 @@ pybind11_add_module(polyscope_bindings
   src/cpp/managed_buffer.cpp
   src/cpp/imgui.cpp
 )
+set_property(TARGET polyscope_bindings PROPERTY CXX_STANDARD 17)
+set_property(TARGET polyscope_bindings PROPERTY CXX_STANDARD_REQUIRED TRUE)
 set_target_properties(polyscope_bindings PROPERTIES CXX_VISIBILITY_PRESET "default")
 
 target_include_directories(polyscope_bindings PUBLIC "${EIGEN3_INCLUDE_DIR}")
