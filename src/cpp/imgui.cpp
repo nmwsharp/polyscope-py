@@ -1,5 +1,6 @@
 
 #include "imgui.h"
+#include "misc/cpp/imgui_stdlib.h"
 
 #include <pybind11/functional.h>
 #include <pybind11/numpy.h>
@@ -36,9 +37,33 @@ void bind_imgui_funcs(py::module& m) {
       },
       "Creates a Metrics/Debugger window that displays internal state and other metrics.",
       py::arg("open") = std::nullopt);
+  m.def(
+      "ShowStyleEditor",
+      []() {
+        ImGui::ShowStyleEditor();
+      },
+      "Opens the style editor, which allows you to customize the style parameters.");
   m.def("ShowUserGuide", &ImGui::ShowUserGuide,
         "Shows a user guide window with basic help and information about ImGui usage.");
   m.def("GetVersion", &ImGui::GetVersion, "Returns the ImGui version as a string.");
+  m.def(
+      "StyleColorsDark",
+      []() {
+        ImGui::StyleColorsDark();
+      },
+      "Applies the default dark style to the current context.");
+  m.def(
+      "StyleColorsLight",
+      []() {
+        ImGui::StyleColorsLight();
+      },
+      "Applies the default light style to the current context.");
+  m.def(
+      "StyleColorsClassic",
+      []() {
+        ImGui::StyleColorsClassic();
+      },
+      "Applies the classic ImGui style to the current context.");
   m.def(
       "Begin",
       [](const char* name, std::optional<bool> open, ImGuiWindowFlags flags) {
@@ -353,6 +378,16 @@ void bind_imgui_funcs(py::module& m) {
         "Displays raw text without formatting. This is roughly equivalent to Text('%s', text) but faster and with no "
         "memory copy, buffer size limits, or null termination requirement if text_end is specified.",
         py::arg("text"), py::arg("text_end") = NULL);
+  m.def("Text", [](const char* text) { ImGui::Text("%s", text); }, py::arg("text"));
+  m.def(
+      "TextColored", [](const ImVec4& col, const char* text) { ImGui::TextColored(col, "%s", text); }, py::arg("col"),
+      py::arg("text"));
+  m.def("TextDisabled", [](const char* text) { ImGui::TextDisabled("%s", text); }, py::arg("text"));
+  m.def("TextWrapped", [](const char* text) { ImGui::TextWrapped("%s", text); }, py::arg("text"));
+  m.def(
+      "LabelText", [](const char* label, const char* text) { ImGui::LabelText(label, "%s", text); }, py::arg("label"),
+      py::arg("text"));
+  m.def("BulletText", [](const char* text) { ImGui::BulletText("%s", text); }, py::arg("text"));
   m.def("SeparatorText", &ImGui::SeparatorText, "Displays formatted text with a horizontal line separator.",
         py::arg("label"));
   m.def("Button", &ImGui::Button,
@@ -684,6 +719,45 @@ void bind_imgui_funcs(py::module& m) {
       "string, and optional flags. Returns true if the value is changed.",
       py::arg("label"), py::arg("size"), py::arg("v_"), py::arg("v_min"), py::arg("v_max"), py::arg("format"),
       py::arg("flags") = 0);
+
+  m.def(
+      "InputText",
+      [](const char* label, const std::string& str, ImGuiInputTextFlags flags) {
+        IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+        flags |= ImGuiInputTextFlags_CallbackResize;
+
+        auto str_ = str;
+        const auto clicked = ImGui::InputText(label, &str_, flags);
+        return std::make_tuple(clicked, str_);
+      },
+      py::arg("label"), py::arg("str"), py::arg("flags") = 0);
+
+
+  m.def(
+      "InputTextMultiline",
+      [](const char* label, const std::string& str, const ImVec2& size, ImGuiInputTextFlags flags) {
+        IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+        flags |= ImGuiInputTextFlags_CallbackResize;
+
+        auto str_ = str;
+        const auto clicked = ImGui::InputTextMultiline(label, &str_, size, flags);
+        return std::make_tuple(clicked, str_);
+      },
+      py::arg("label"), py::arg("str"), py::arg("size") = ImVec2(0, 0), py::arg("flags") = 0);
+
+
+  m.def(
+      "InputTextWithHint",
+      [](const char* label, const char* hint, const std::string& str, ImGuiInputTextFlags flags) {
+        IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+        flags |= ImGuiInputTextFlags_CallbackResize;
+
+        auto str_ = str;
+        const auto clicked = ImGui::InputTextWithHint(label, hint, &str_, flags);
+        return std::make_tuple(clicked, str_);
+      },
+      py::arg("label"), py::arg("hint"), py::arg("str"), py::arg("flags") = 0);
+
   m.def(
       "InputFloat",
       [](const char* label, float v_, float step, float step_fast, const char* format, ImGuiInputTextFlags flags) {
@@ -795,6 +869,17 @@ void bind_imgui_funcs(py::module& m) {
       "Displays a color picker for an RGB color value with an optional set of flags. Returns true if the color was "
       "changed.",
       py::arg("label"), py::arg("col"), py::arg("flags") = 0);
+  m.def(
+      "ColorPicker4",
+      [](const char* label, std::array<float, 4> col, ImGuiColorEditFlags flags,
+         const std::optional<std::array<float, 4>>& ref_col) {
+        const float* ref_col_ = ref_col ? &ref_col.value()[0] : nullptr;
+        const auto res_ = ImGui::ColorPicker4(label, col.data(), flags, ref_col_);
+        return std::make_tuple(res_, col);
+      },
+      "Displays a color picker for an RGBA color value with an optional set of flags and reference color. Returns true "
+      "if the color was changed.",
+      py::arg("label"), py::arg("col"), py::arg("flags") = 0, py::arg("ref_col") = std::nullopt);
   m.def("ColorButton", &ImGui::ColorButton,
         "Displays a color square/button with the specified color, size, and flags. Returns true if the button was "
         "pressed.",
@@ -955,8 +1040,10 @@ void bind_imgui_funcs(py::module& m) {
         "Begins a tooltip window. Should call EndTooltip() if this returns true.");
   m.def("EndTooltip", &ImGui::EndTooltip,
         "Ends the tooltip window. Should be called only if BeginTooltip() or BeginItemTooltip() returned true.");
+  m.def("SetTooltip", [](const char* text) { ImGui::SetTooltip("%s", text); }, py::arg("text"));
   m.def("BeginItemTooltip", &ImGui::BeginItemTooltip,
         "Begins a tooltip window if the preceding item was hovered. Should call EndTooltip() if this returns true.");
+  m.def("SetItemTooltip", [](const char* text) { ImGui::SetItemTooltip("%s", text); }, py::arg("text"));
   m.def("BeginPopup", &ImGui::BeginPopup,
         "Begins a popup window with the specified ID and flags. Should call EndPopup() if this returns true.",
         py::arg("str_id"), py::arg("flags") = 0);
@@ -1084,17 +1171,43 @@ void bind_imgui_funcs(py::module& m) {
         py::arg("auto_open_depth") = -1);
   m.def("LogFinish", &ImGui::LogFinish, "Stops logging and closes any file or clipboard output.");
   m.def("LogButtons", &ImGui::LogButtons, "Helper function to display buttons for logging to tty, file, or clipboard.");
+  m.def("LogText", [](const char* text) { ImGui::LogText("%s", text); }, py::arg("text"));
   m.def("BeginDragDropSource", &ImGui::BeginDragDropSource,
         "Starts a drag-and-drop source. If this returns true, you should call SetDragDropPayload() and "
         "EndDragDropSource().",
         py::arg("flags") = 0);
+
+  m.def(
+      "SetDragDropPayload",
+      [](const char* type, py::bytes& data, ImGuiCond cond) {
+        void* data_ = PyBytes_AsString(data.ptr());
+        const auto data_size = PyBytes_Size(data.ptr());
+        return ImGui::SetDragDropPayload(type, data_, data_size, cond);
+      },
+      py::arg("type"), py::arg("data"), py::arg("cond") = 0);
+
   m.def("EndDragDropSource", &ImGui::EndDragDropSource,
         "Ends a drag-and-drop source operation. Should be called only if BeginDragDropSource() returns true.");
   m.def("BeginDragDropTarget", &ImGui::BeginDragDropTarget,
         "Marks an item as a possible drag-and-drop target. If this returns true, you can call AcceptDragDropPayload() "
         "and EndDragDropTarget().");
+
+  m.def(
+      "AcceptDragDropPayload",
+      [](const char* type, ImGuiDragDropFlags flags) {
+        const auto* payload = ImGui::AcceptDragDropPayload(type, flags);
+        return py::bytes(static_cast<const char*>(payload->Data), payload->DataSize);
+      },
+      py::arg("type"), py::arg("flags") = 0);
+
   m.def("EndDragDropTarget", &ImGui::EndDragDropTarget,
         "Ends a drag-and-drop target operation. Should be called only if BeginDragDropTarget() returns true.");
+
+  m.def("GetDragDropPayload", []() {
+    const auto* payload = ImGui::GetDragDropPayload();
+    return py::bytes(static_cast<const char*>(payload->Data), payload->DataSize);
+  });
+
   m.def("BeginDisabled", &ImGui::BeginDisabled, "Disables user interactions and dims item visuals. Can be nested.",
         py::arg("disabled") = true);
   m.def("EndDisabled", &ImGui::EndDisabled, "Ends the disabled section started by BeginDisabled().");
@@ -1159,6 +1272,26 @@ void bind_imgui_funcs(py::module& m) {
   m.def("GetTime", &ImGui::GetTime, "Returns the global ImGui time, incremented by io.DeltaTime every frame.");
   m.def("GetStyleColorName", &ImGui::GetStyleColorName,
         "Returns a string representing the enum value of a style color.", py::arg("idx"));
+
+  m.def(
+      "ColorConvertRGBtoHSV",
+      [](const std::tuple<float, float, float>& rgb) {
+        float out0, out1, out2;
+        ImGui::ColorConvertRGBtoHSV(std::get<0>(rgb), std::get<1>(rgb), std::get<2>(rgb), out0, out1, out2);
+        return std::make_tuple(out0, out1, out2);
+      },
+      py::arg("rgb"));
+
+
+  m.def(
+      "ColorConvertHSVtoRGB",
+      [](const std::tuple<float, float, float>& hsv) {
+        float out0, out1, out2;
+        ImGui::ColorConvertHSVtoRGB(std::get<0>(hsv), std::get<1>(hsv), std::get<2>(hsv), out0, out1, out2);
+        return std::make_tuple(out0, out1, out2);
+      },
+      py::arg("hsv"));
+
   m.def("IsKeyDown", &ImGui::IsKeyDown, "Checks if a key is being held down.", py::arg("key"));
   m.def("IsKeyPressed", &ImGui::IsKeyPressed,
         "Checks if a key was pressed (transitioned from not pressed to pressed). If repeat is true, considers "

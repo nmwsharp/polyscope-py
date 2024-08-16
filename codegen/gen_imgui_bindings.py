@@ -48,7 +48,7 @@ class ArgBinding(BaseModel):
     arg_name: Optional[str] = None
     arg_type: Optional[str] = None
     arg_default: Optional[str] = None
-    decl_name: str
+    decl_name: Optional[str] = None
     decl: Optional[str] = None
     ret: Optional[str] = None
 
@@ -124,17 +124,6 @@ float_ptr = lambda param: ptr(param, "float")
 int_ptr = lambda param: ptr(param, "int")
 
 
-# def unsgined_int_ptr(param: Parameter) -> ArgBinding:
-#     return ArgBinding(
-#         arg_name=param.name,
-#         arg_type="unsigned int",
-#         arg_default=param.default,
-#         decl_name=param.name,
-#         decl=None,
-#         ret=param.name,
-#     )
-
-
 def const_char_ptr_array(param: Parameter) -> ArgBinding:
     arg_name = f"{param.name}_"
     decl = f"const auto {param.name} = convert_string_items({param.name}_);"
@@ -144,6 +133,17 @@ def const_char_ptr_array(param: Parameter) -> ArgBinding:
         arg_default=param.default,
         decl_name=f"{param.name}.data()",
         decl=decl,
+        ret=None,
+    )
+
+
+def imgui_style_ptr(param: Parameter) -> ArgBinding:
+    return ArgBinding(
+        arg_name=None,
+        arg_type=None,
+        arg_default=None,
+        decl_name=None,
+        decl=None,
         ret=None,
     )
 
@@ -201,6 +201,7 @@ param_dispatch = {
     "ImGuiChildFlags": pass_thru,
     "ImGuiStyleVar": pass_thru,
     "const char* const[]": const_char_ptr_array,
+    "ImGuiStyle*": imgui_style_ptr,
 }
 
 # TODO: see combo for changing arg names
@@ -222,9 +223,24 @@ def combo_items_count_param(param: Parameter) -> ArgBinding:
     )
 
 
+def color_picker4_ref_col(param: Parameter) -> ArgBinding:
+    decl_name = f"{param.name}_"
+    decl = f"const float * {decl_name} = {param.name} ? &{param.name}.value()[0] : nullptr;"
+    return ArgBinding(
+        arg_name=param.name,
+        arg_type="const std::optional<std::array<float, 4>>&",
+        arg_default="std::nullopt",
+        decl_name=decl_name,
+        decl=decl,
+        ret=None,
+    )
+
+
 def route_param(param: Parameter, func: Function) -> Callable[[Parameter], ArgBinding]:
     if func.name == "Combo" and param.name == "items_count":
         return combo_items_count_param
+    if func.name == "ColorPicker4" and param.name == "ref_col":
+        return color_picker4_ref_col
 
     if param.type not in param_dispatch:
         raise ValueError(
@@ -281,7 +297,13 @@ def wrapped_binding(namespace: str, func: Function) -> str:
             if arg_binding.decl is not None
         ]
     )
-    params = ", ".join([arg_binding.decl_name for arg_binding in arg_bindings])
+    params = ", ".join(
+        [
+            arg_binding.decl_name
+            for arg_binding in arg_bindings
+            if arg_binding.decl_name is not None
+        ]
+    )
 
     rets = []
     if func.return_type == "void":
@@ -329,6 +351,170 @@ def wrapped_binding(namespace: str, func: Function) -> str:
     return f'm.def({", ".join(def_args)});'
 
 
+def fmt_vararg(namespace: str, func: Function) -> str:
+    arg_bindings: List[ArgBinding] = []
+    for param in func.parameters:
+        if param.name in {"fmt", "..."}:
+            continue
+
+        f = route_param(param, func)
+        arg_bindings.append(f(param))
+
+    args = [
+        f"{arg_binding.arg_type} {arg_binding.arg_name}"
+        for arg_binding in arg_bindings
+        if arg_binding.arg_name is not None
+    ]
+    args.append("const char* text")
+    gen_args = ", ".join(args)
+
+    arg_params = [
+        arg_binding.decl_name
+        for arg_binding in arg_bindings
+        if arg_binding.decl_name is not None
+    ]
+    arg_params.append('"%s"')
+    arg_params.append("text")
+    gen_arg_params = ", ".join(arg_params)
+
+    py_args = [
+        f'py::arg("{arg_binding.decl_name}")'
+        for arg_binding in arg_bindings
+        if arg_binding.decl_name is not None
+    ]
+    py_args.append('py::arg("text")')
+
+    impl = f"[]({gen_args}) {{ {namespace}::{func.name}({gen_arg_params}); }}"
+    def_args = [f'"{func.name}"', impl, *py_args]
+    return f'm.def({", ".join(def_args)});'
+
+
+def wrap_input_text(namespace: str, func: Function) -> str:
+    return f"""
+    m.def(
+        "{func.name}",
+        [](const char* label,
+            const std::string& str,
+            ImGuiInputTextFlags flags) {{
+            IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+            flags |= ImGuiInputTextFlags_CallbackResize;
+
+            auto str_ = str;
+            const auto clicked = {namespace}::{func.name}(label, &str_, flags);
+            return std::make_tuple(clicked, str_);
+        }},
+        py::arg("label"),
+        py::arg("str"),
+        py::arg("flags") = 0);
+    """
+
+
+def wrap_input_text_multiline(namespace: str, func: Function) -> str:
+    return f"""
+    m.def(
+        "{func.name}",
+        [](const char* label,
+            const std::string& str,
+            const ImVec2& size,
+            ImGuiInputTextFlags flags) {{
+            IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+            flags |= ImGuiInputTextFlags_CallbackResize;
+
+            auto str_ = str;
+            const auto clicked = {namespace}::{func.name}(label, &str_, size, flags);
+            return std::make_tuple(clicked, str_);
+        }},
+        py::arg("label"),
+        py::arg("str"),
+        py::arg("size") = ImVec2(0, 0),
+        py::arg("flags") = 0);
+    """
+
+
+def wrap_input_text_with_hint(namespace: str, func: Function) -> str:
+    return f"""
+    m.def(
+        "{func.name}",
+        [](const char* label,
+            const char* hint,
+            const std::string& str,
+            ImGuiInputTextFlags flags) {{
+            IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+            flags |= ImGuiInputTextFlags_CallbackResize;
+
+            auto str_ = str;
+            const auto clicked = {namespace}::{func.name}(label, hint, &str_, flags);
+            return std::make_tuple(clicked, str_);
+        }},
+        py::arg("label"),
+        py::arg("hint"),
+        py::arg("str"),
+        py::arg("flags") = 0);
+    """
+
+
+def wrap_set_drag_drop_payload(namespace: str, func: Function) -> str:
+    return f"""
+    m.def(
+        "{func.name}",
+        [](const char* type,
+            py::bytes& data,
+            ImGuiCond cond) {{
+            void* data_ = PyBytes_AsString(data.ptr());
+            const auto data_size = PyBytes_Size(data.ptr());
+            return {namespace}::{func.name}(type, data_, data_size, cond);
+        }},
+        py::arg("type"),
+        py::arg("data"),
+        py::arg("cond") = 0);
+    """
+
+
+def wrap_accept_drag_drop_payload(namespace: str, func: Function) -> str:
+    return f"""
+    m.def(
+        "{func.name}",
+        [](const char* type, ImGuiDragDropFlags flags) {{
+            const auto *payload = {namespace}::{func.name}(type, flags);
+            return py::bytes(static_cast<const char *>(payload->Data), payload->DataSize);
+        }},
+        py::arg("type"),
+        py::arg("flags") = 0);
+    """
+
+
+def wrap_get_drag_drop_payload(namespace: str, func: Function) -> str:
+    return f"""
+    m.def(
+        "{func.name}",
+        []() {{
+            const auto *payload = {namespace}::{func.name}();
+            return py::bytes(static_cast<const char *>(payload->Data), payload->DataSize);
+        }});
+    """
+
+
+def wrap_color_conversion(namespace: str, func: Function) -> str:
+    in_arg_name = "".join([param.name for param in func.parameters[:3]])
+    return f"""
+    m.def(
+        "{func.name}",
+        [](const std::tuple<float, float, float>& {in_arg_name}) {{
+            float out0, out1, out2;
+            {namespace}::{func.name}(
+                std::get<0>({in_arg_name}),
+                std::get<1>({in_arg_name}),
+                std::get<2>({in_arg_name}),
+                out0,
+                out1,
+                out2
+            );
+            return std::make_tuple(out0, out1, out2);
+        }},
+        py::arg("{in_arg_name}"));
+    """
+
+
 template_dispatch = {
     "CreateContext": None,
     "DestroyContext": None,
@@ -342,12 +528,12 @@ template_dispatch = {
     "GetDrawData": None,
     "ShowDemoWindow": wrapped_binding,
     "ShowMetricsWindow": wrapped_binding,
-    "ShowStyleEditor": None,  # TODO
+    "ShowStyleEditor": wrapped_binding,
     "ShowUserGuide": basic,
     "GetVersion": basic,
-    "StyleColorsDark": None,  # TODO
-    "StyleColorsLight": None,  # TODO
-    "StyleColorsClassic": None,  # TODO
+    "StyleColorsDark": wrapped_binding,
+    "StyleColorsLight": wrapped_binding,
+    "StyleColorsClassic": wrapped_binding,
     "Begin": wrapped_binding,
     "End": basic,
     "BeginChild": wrapped_binding,
@@ -426,17 +612,17 @@ template_dispatch = {
     "PushID": wrapped_binding,
     "GetID": wrapped_binding,
     "TextUnformatted": basic,
-    "Text": None,  # TODO
+    "Text": fmt_vararg,
     "TextV": None,
-    "TextColored": None,  # TODO
+    "TextColored": fmt_vararg,
     "TextColoredV": None,
-    "TextDisabled": None,  # TODO
+    "TextDisabled": fmt_vararg,
     "TextDisabledV": None,
-    "TextWrapped": None,  # TODO
+    "TextWrapped": fmt_vararg,
     "TextWrappedV": None,
-    "LabelText": None,  # TODO
+    "LabelText": fmt_vararg,
     "LabelTextV": None,
-    "BulletText": None,  # TODO
+    "BulletText": fmt_vararg,
     "BulletTextV": None,
     "SeparatorText": basic,
     "Button": basic,
@@ -481,9 +667,9 @@ template_dispatch = {
     "VSliderFloat": wrapped_binding,
     "VSliderInt": wrapped_binding,
     "VSliderScalar": None,
-    "InputText": None,  # TODO
-    "InputTextMultiline": None,  # TODO
-    "InputTextWithHint": None,  # TODO
+    "InputText": wrap_input_text,
+    "InputTextMultiline": wrap_input_text_multiline,
+    "InputTextWithHint": wrap_input_text_with_hint,
     "InputFloat": wrapped_binding,
     "InputFloat2": wrapped_binding,
     "InputFloat3": wrapped_binding,
@@ -498,7 +684,7 @@ template_dispatch = {
     "ColorEdit3": wrapped_binding,
     "ColorEdit4": wrapped_binding,
     "ColorPicker3": wrapped_binding,
-    "ColorPicker4": None,  # TODO
+    "ColorPicker4": wrapped_binding,
     "ColorButton": basic,
     "SetColorEditOptions": basic,
     "TreeNode": wrapped_binding,
@@ -530,11 +716,11 @@ template_dispatch = {
     "MenuItem": wrapped_binding,
     "BeginTooltip": basic,
     "EndTooltip": basic,
-    "SetTooltip": None,  # TODO
+    "SetTooltip": fmt_vararg,
     "SetTooltipV": None,
     "BeginItemTooltip": basic,
     "EndItemTooltip": basic,
-    "SetItemTooltip": None,  # TODO
+    "SetItemTooltip": fmt_vararg,
     "SetItemTooltipV": None,
     "BeginPopup": basic,
     "BeginPopupModal": wrapped_binding,
@@ -583,15 +769,15 @@ template_dispatch = {
     "LogToClipboard": basic,
     "LogFinish": basic,
     "LogButtons": basic,
-    "LogText": None,  # TODO
+    "LogText": fmt_vararg,
     "LogTextV": None,
     "BeginDragDropSource": basic,
-    "SetDragDropPayload": None,  # TODO
+    "SetDragDropPayload": wrap_set_drag_drop_payload,
     "EndDragDropSource": basic,
     "BeginDragDropTarget": basic,
-    "AcceptDragDropPayload": None,  # TODO
+    "AcceptDragDropPayload": wrap_accept_drag_drop_payload,
     "EndDragDropTarget": basic,
-    "GetDragDropPayload": None,  # TODO
+    "GetDragDropPayload": wrap_get_drag_drop_payload,
     "BeginDisabled": basic,
     "EndDisabled": basic,
     "PushClipRect": basic,
@@ -627,8 +813,8 @@ template_dispatch = {
     "CalcTextSize": None,
     "ColorConvertU32ToFloat4": None,
     "ColorConvertFloat4ToU32": None,
-    "ColorConvertRGBtoHSV": None,  # TODO
-    "ColorConvertHSVtoRGB": None,  # TODO
+    "ColorConvertRGBtoHSV": wrap_color_conversion,
+    "ColorConvertHSVtoRGB": wrap_color_conversion,
     "IsKeyDown": basic,
     "IsKeyPressed": basic,
     "IsKeyReleased": basic,
@@ -759,6 +945,7 @@ gen_bound_functions = "\n".join(bound_funcs)
 gen_bound_enums = "\n".join(bound_enums)
 pybind_module = f"""
 #include "imgui.h"
+#include "misc/cpp/imgui_stdlib.h"
 
 #include <pybind11/functional.h>
 #include <pybind11/numpy.h>
