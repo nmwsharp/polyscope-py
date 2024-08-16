@@ -189,6 +189,10 @@ class TestCore(unittest.TestCase):
         ps.set_ground_plane_height_factor(1.5, is_relative=False)
         ps.set_ground_plane_height_factor(0.)
         
+        ps.set_ground_plane_height(0.)
+        ps.set_ground_plane_height_mode('automatic')
+        ps.set_ground_plane_height_mode('manual')
+        
         ps.set_shadow_blur_iters(3)
         ps.set_shadow_darkness(0.1)
         
