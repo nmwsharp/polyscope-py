@@ -55,7 +55,7 @@ jobs:
 
       - name: Install cibuildwheel
         run: |
-          python -m pip install cibuildwheel==2.16.2
+          python -m pip install cibuildwheel==2.20.0
 
       - name: Configure cibuildwheel
         shell: bash
