@@ -39,6 +39,7 @@ jobs:
     env:
       CIBW_BUILD_VERBOSITY: 3
       CIBW_BEFORE_BUILD_LINUX : "yum remove -y cmake && python -m pip install cmake && yum install -y libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel mesa-libGL libXi-devel freeglut-devel"
+      CIBW_SKIP: "cp313-*" # skip python 13 for now, builds failing
 
     steps:
       - uses: actions/checkout@v2
