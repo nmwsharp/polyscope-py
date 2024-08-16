@@ -25,6 +25,7 @@ void bind_surface_mesh(py::module& m) {
   bindScalarQuantity<ps::SurfaceFaceScalarQuantity>(m, "SurfaceFaceScalarQuantity");
   bindScalarQuantity<ps::SurfaceEdgeScalarQuantity>(m, "SurfaceEdgeScalarQuantity");
   bindScalarQuantity<ps::SurfaceHalfedgeScalarQuantity>(m, "SurfaceHalfedgeScalarQuantity");
+  bindScalarQuantity<ps::SurfaceCornerScalarQuantity>(m, "SurfaceCornerScalarQuantity");
   bindScalarQuantity<ps::SurfaceTextureScalarQuantity>(m, "SurfaceTextureScalarQuantity");
 
   // Color quantities
@@ -102,6 +103,11 @@ void bind_surface_mesh(py::module& m) {
       .def("mark_halfedges_as_used", &ps::SurfaceMesh::markHalfedgesAsUsed)
       .def("mark_corners_as_used", &ps::SurfaceMesh::markCornersAsUsed)
 
+      // scalar transparency
+      .def("set_transparency_quantity", 
+          overload_cast_<std::string>()(&ps::SurfaceMesh::setTransparencyQuantity), py::arg("quantity_name"))
+      .def("clear_transparency_quantity", &ps::SurfaceMesh::clearTransparencyQuantity)
+
       // = quantities
 
       // Scalars
@@ -116,6 +122,9 @@ void bind_surface_mesh(py::module& m) {
            py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
       .def("add_halfedge_scalar_quantity", &ps::SurfaceMesh::addHalfedgeScalarQuantity<Eigen::VectorXf>,
            "Add a scalar function at halfedges", py::arg("name"), py::arg("values"),
+           py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
+      .def("add_corner_scalar_quantity", &ps::SurfaceMesh::addCornerScalarQuantity<Eigen::VectorXf>,
+           "Add a scalar function at corners", py::arg("name"), py::arg("values"),
            py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
       .def("add_texture_scalar_quantity",
            overload_cast_<std::string, std::string, size_t, size_t, const Eigen::VectorXf&, ps::ImageOrigin,

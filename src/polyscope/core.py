@@ -278,7 +278,15 @@ def set_selection(name, index):
 def set_ground_plane_mode(mode_str):
     psb.set_ground_plane_mode(str_to_ground_plane_mode(mode_str))
 
+def set_ground_plane_height_mode(mode_str):
+    psb.set_ground_plane_height_mode(str_to_ground_plane_height_mode(mode_str))
+
+def set_ground_plane_height(h):
+    set_ground_plane_height_mode('manual')
+    psb.set_ground_plane_height(h)
+
 def set_ground_plane_height_factor(h, is_relative=True):
+    set_ground_plane_height_mode('automatic')
     psb.set_ground_plane_height_factor(h, is_relative)
 
 def set_shadow_blur_iters(n):
@@ -695,6 +703,18 @@ def str_to_ground_plane_mode(s):
 
     if s not in d:
         raise ValueError("Bad ground plane mode specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d.keys()])))
+
+    return d[s]
+
+def str_to_ground_plane_height_mode(s):
+    d = {
+        "automatic": psb.GroundPlaneHeightMode.automatic,
+        "manual" : psb.GroundPlaneHeightMode.manual,
+    }
+
+    if s not in d:
+        raise ValueError("Bad ground plane height mode specifier '{}', should be one of [{}]".format(s, 
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]

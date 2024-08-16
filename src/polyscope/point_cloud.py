@@ -57,11 +57,17 @@ class PointCloud(Structure):
         else:
             raise ValueError("bad point cloud shape")
 
+    # Custom radius quantity
     def set_point_radius_quantity(self, quantity_name, autoscale=True):
         self.bound_instance.set_point_radius_quantity(quantity_name, autoscale)
-    
     def clear_point_radius_quantity(self):
         self.bound_instance.clear_point_radius_quantity()
+   
+    # Custom transparency quantity
+    def set_transparency_quantity(self, quantity_name):
+        self.bound_instance.set_transparency_quantity(quantity_name)
+    def clear_transparency_quantity(self):
+        self.bound_instance.clear_transparency_quantity()
 
     ## Options
    

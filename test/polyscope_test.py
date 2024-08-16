@@ -761,6 +761,23 @@ class TestPointCloud(unittest.TestCase):
 
         ps.remove_all_structures()
     
+
+    def test_scalar_transparency(self):
+        pts = self.generate_points()
+        N = pts.shape[0]
+        ps.register_point_cloud("test_cloud", pts)
+        p = ps.get_point_cloud("test_cloud")
+        vals = np.random.rand(N)
+
+        p.add_scalar_quantity("test_vals", vals)
+
+        p.set_transparency_quantity("test_vals")
+        ps.show(3)
+        p.clear_transparency_quantity()
+        ps.show(3)
+
+        ps.remove_all_structures()
+    
 class TestCurveNetwork(unittest.TestCase):
 
     def generate_points(self, n_pts=10):
@@ -1226,7 +1243,7 @@ class TestSurfaceMesh(unittest.TestCase):
     
     def test_scalar(self):
 
-        for on in ['vertices', 'faces', 'edges', 'halfedges', 'texture']:
+        for on in ['vertices', 'faces', 'edges', 'halfedges', 'corners', 'texture']:
             
             if on == 'texture':
                 # TODO FIXME temporarily skipping this, it is hanging in Windows CI for some reason
@@ -1246,6 +1263,8 @@ class TestSurfaceMesh(unittest.TestCase):
                 p.set_edge_permutation(np.random.permutation(p.n_edges()))
             elif on  == 'halfedges':
                 vals = np.random.rand(p.n_halfedges())
+            elif on == 'corners':
+                vals = np.random.rand(p.n_corners())
             elif on == 'texture':
                 param_vals = np.random.rand(p.n_vertices(), 2)
                 param_name = "test_param"
@@ -1443,6 +1462,30 @@ class TestSurfaceMesh(unittest.TestCase):
         p.remove_all_quantities()
         
         ps.remove_all_structures()
+
+    def test_variable_radius(self):
+        
+        for on in ['vertices', 'faces', 'corners']:
+        
+            ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
+            p = ps.get_surface_mesh("test_mesh")
+            
+            if on == 'vertices':
+                vals = np.random.rand(p.n_vertices())
+            elif on == 'faces':
+                vals = np.random.rand(p.n_faces())
+            elif on == 'corners':
+                vals = np.random.rand(p.n_corners())
+
+            p.add_scalar_quantity("test_vals", vals, defined_on=on)
+
+            p.set_transparency_quantity("test_vals")
+            ps.show(3)
+            p.clear_transparency_quantity()
+            ps.show(3)
+
+            ps.remove_all_structures()
+
 
 class TestVolumeMesh(unittest.TestCase):
 

@@ -52,12 +52,14 @@ void bind_point_cloud(py::module& m) {
 
     // variable radius
     .def("set_point_radius_quantity", 
-        overload_cast_<ps::PointCloudScalarQuantity*, bool>()(&ps::PointCloud::setPointRadiusQuantity), 
-        "Use a scalar to set radius", py::arg("quantity"), py::arg("autoscale")=true)
-    .def("set_point_radius_quantity", 
         overload_cast_<std::string, bool>()(&ps::PointCloud::setPointRadiusQuantity), 
         "Use a scalar to set radius by name", py::arg("quantity_name"), py::arg("autoscale")=true)
     .def("clear_point_radius_quantity", &ps::PointCloud::clearPointRadiusQuantity, "Clear any quantity setting the radius")
+    
+    // scalar transparency
+    .def("set_transparency_quantity", 
+        overload_cast_<std::string>()(&ps::PointCloud::setTransparencyQuantity), py::arg("quantity_name"))
+    .def("clear_transparency_quantity", &ps::PointCloud::clearTransparencyQuantity)
         
     // quantities
     .def("add_color_quantity", &ps::PointCloud::addColorQuantity<Eigen::MatrixXf>, "Add a color function at points",

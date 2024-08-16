@@ -76,6 +76,12 @@ class SurfaceMesh(Structure):
             self.bound_instance.update_vertex_positions2D(vertices)
         else:
             raise ValueError("bad vertex shape")
+    
+    # Custom transparency quantity
+    def set_transparency_quantity(self, quantity_name):
+        self.bound_instance.set_transparency_quantity(quantity_name)
+    def clear_transparency_quantity(self):
+        self.bound_instance.clear_transparency_quantity()
 
     ## Options
 
@@ -181,6 +187,9 @@ class SurfaceMesh(Structure):
         elif defined_on == 'halfedges':
             if values.shape[0] != self.n_halfedges(): raise ValueError("'values' should be a length n_halfedges array")
             q = self.bound_instance.add_halfedge_scalar_quantity(name, values, str_to_datatype(datatype))
+        elif defined_on == 'corners':
+            if values.shape[0] != self.n_corners(): raise ValueError("'values' should be a length n_corners array")
+            q = self.bound_instance.add_corner_scalar_quantity(name, values, str_to_datatype(datatype))
         elif defined_on == 'texture':
             check_is_scalar_image(values)
             dimY = values.shape[0]
@@ -189,7 +198,7 @@ class SurfaceMesh(Structure):
                 raise ValueError("when adding a quantity defined in a texture, you must pass 'param_name' as a string giving the name of a parameterization quantity on this structure, which provides the UV coords")
             q = self.bound_instance.add_texture_scalar_quantity(name, param_name, dimX, dimY, values.flatten(), str_to_image_origin(image_origin), str_to_datatype(datatype))
         else:
-            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces', 'edges', 'halfedges', 'texture']".format(defined_on))
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces', 'edges', 'halfedges', 'corners', 'texture']".format(defined_on))
             
 
         # process and act on additional arguments

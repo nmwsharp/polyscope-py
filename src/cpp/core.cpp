@@ -232,7 +232,9 @@ PYBIND11_MODULE(polyscope_bindings, m) {
 
   // === Ground plane and shadows
   m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });
+  m.def("set_ground_plane_height_mode", [](ps::GroundPlaneHeightMode x) { ps::options::groundPlaneHeightMode = x; });
   m.def("set_ground_plane_height_factor", [](float x, bool isRelative) { ps::options::groundPlaneHeightFactor.set(x, isRelative); });
+  m.def("set_ground_plane_height", [](float x) { ps::options::groundPlaneHeight = x; });
   m.def("set_shadow_blur_iters", [](int x) { ps::options::shadowBlurIters = x; });
   m.def("set_shadow_darkness", [](float x) { ps::options::shadowDarkness = x; });
   
@@ -432,6 +434,11 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("tile", ps::GroundPlaneMode::Tile)
     .value("tile_reflection", ps::GroundPlaneMode::TileReflection)
     .value("shadow_only", ps::GroundPlaneMode::ShadowOnly)
+    .export_values(); 
+  
+  py::enum_<ps::GroundPlaneHeightMode>(m, "GroundPlaneHeightMode")
+    .value("automatic", ps::GroundPlaneHeightMode::Automatic)
+    .value("manual", ps::GroundPlaneHeightMode::Manual)
     .export_values(); 
   
   py::enum_<ps::TransparencyMode>(m, "TransparencyMode")
