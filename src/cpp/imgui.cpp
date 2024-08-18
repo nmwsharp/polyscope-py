@@ -35,31 +35,18 @@ void bind_imgui_funcs(py::module& m) {
       py::arg("open") = std::nullopt,
       "Creates a Metrics/Debugger window that displays internal state and other metrics.");
   m.def(
-      "ShowStyleEditor",
-      []() {
-        ImGui::ShowStyleEditor();
-      },
+      "ShowStyleEditor", []() { ImGui::ShowStyleEditor(); },
       "Opens the style editor, which allows you to customize the style parameters.");
   m.def("ShowUserGuide", &ImGui::ShowUserGuide,
         "Shows a user guide window with basic help and information about ImGui usage.");
   m.def("GetVersion", &ImGui::GetVersion, "Returns the ImGui version as a string.");
   m.def(
-      "StyleColorsDark",
-      []() {
-        ImGui::StyleColorsDark();
-      },
-      "Applies the default dark style to the current context.");
+      "StyleColorsDark", []() { ImGui::StyleColorsDark(); }, "Applies the default dark style to the current context.");
   m.def(
-      "StyleColorsLight",
-      []() {
-        ImGui::StyleColorsLight();
-      },
+      "StyleColorsLight", []() { ImGui::StyleColorsLight(); },
       "Applies the default light style to the current context.");
   m.def(
-      "StyleColorsClassic",
-      []() {
-        ImGui::StyleColorsClassic();
-      },
+      "StyleColorsClassic", []() { ImGui::StyleColorsClassic(); },
       "Applies the classic ImGui style to the current context.");
   m.def(
       "Begin",
@@ -105,60 +92,38 @@ void bind_imgui_funcs(py::module& m) {
         "Sets the background color alpha for the next window. This can be used to override the alpha component of "
         "ImGuiCol_WindowBg/ChildBg/PopupBg.");
   m.def(
-      "SetWindowPos",
-      [](const ImVec2& pos, ImGuiCond cond) {
-        ImGui::SetWindowPos(pos, cond);
-      },
-      py::arg("pos"), py::arg("cond") = 0,
+      "SetWindowPos", [](const ImVec2& pos, ImGuiCond cond) { ImGui::SetWindowPos(pos, cond); }, py::arg("pos"),
+      py::arg("cond") = 0,
       "(Not recommended) Sets the current window position. This should be called within a Begin()/End() block. Prefer "
       "using SetNextWindowPos().");
   m.def(
-      "SetWindowSize",
-      [](const ImVec2& size, ImGuiCond cond) {
-        ImGui::SetWindowSize(size, cond);
-      },
-      py::arg("size"), py::arg("cond") = 0,
+      "SetWindowSize", [](const ImVec2& size, ImGuiCond cond) { ImGui::SetWindowSize(size, cond); }, py::arg("size"),
+      py::arg("cond") = 0,
       "(Not recommended) Sets the current window size. This should be called within a Begin()/End() block. Prefer "
       "using SetNextWindowSize().");
   m.def(
-      "SetWindowCollapsed",
-      [](bool collapsed, ImGuiCond cond) {
-        ImGui::SetWindowCollapsed(collapsed, cond);
-      },
+      "SetWindowCollapsed", [](bool collapsed, ImGuiCond cond) { ImGui::SetWindowCollapsed(collapsed, cond); },
       py::arg("collapsed"), py::arg("cond") = 0,
       "(Not recommended) Sets the current window collapsed state. Prefer using SetNextWindowCollapsed().");
   m.def(
-      "SetWindowFocus",
-      []() {
-        ImGui::SetWindowFocus();
-      },
+      "SetWindowFocus", []() { ImGui::SetWindowFocus(); },
       "(Not recommended) Sets the current window to be focused and top-most. Prefer using SetNextWindowFocus().");
   m.def(
-      "SetWindowPos",
-      [](const char* name, const ImVec2& pos, ImGuiCond cond) {
-        ImGui::SetWindowPos(name, pos, cond);
-      },
+      "SetWindowPos", [](const char* name, const ImVec2& pos, ImGuiCond cond) { ImGui::SetWindowPos(name, pos, cond); },
       py::arg("name"), py::arg("pos"), py::arg("cond") = 0, "Sets the position of the window specified by name.");
   m.def(
       "SetWindowSize",
-      [](const char* name, const ImVec2& size, ImGuiCond cond) {
-        ImGui::SetWindowSize(name, size, cond);
-      },
+      [](const char* name, const ImVec2& size, ImGuiCond cond) { ImGui::SetWindowSize(name, size, cond); },
       py::arg("name"), py::arg("size"), py::arg("cond") = 0,
       "Sets the size of the window specified by name. Set an axis to 0.0f to force an auto-fit.");
   m.def(
       "SetWindowCollapsed",
-      [](const char* name, bool collapsed, ImGuiCond cond) {
-        ImGui::SetWindowCollapsed(name, collapsed, cond);
-      },
+      [](const char* name, bool collapsed, ImGuiCond cond) { ImGui::SetWindowCollapsed(name, collapsed, cond); },
       py::arg("name"), py::arg("collapsed"), py::arg("cond") = 0,
       "Sets the collapsed state of the window specified by name.");
   m.def(
-      "SetWindowFocus",
-      [](const char* name) {
-        ImGui::SetWindowFocus(name);
-      },
-      py::arg("name"), "Sets the window specified by name to be focused and top-most.");
+      "SetWindowFocus", [](const char* name) { ImGui::SetWindowFocus(name); }, py::arg("name"),
+      "Sets the window specified by name to be focused and top-most.");
   m.def("GetScrollX", &ImGui::GetScrollX,
         "Returns the horizontal scrolling amount, ranging from 0 to GetScrollMaxX().");
   m.def("GetScrollY", &ImGui::GetScrollY, "Returns the vertical scrolling amount, ranging from 0 to GetScrollMaxY().");
@@ -185,34 +150,20 @@ void bind_imgui_funcs(py::module& m) {
         "Adjusts the vertical scrolling amount to make the specified position visible. Use GetCursorStartPos() + "
         "offset to compute a valid position.");
   m.def(
-      "PushStyleColor",
-      [](ImGuiCol idx, ImU32 col) {
-        ImGui::PushStyleColor(idx, col);
-      },
-      py::arg("idx"), py::arg("col"),
-      "Pushes a style color onto the style color stack, modifying the color specified by idx.");
+      "PushStyleColor", [](ImGuiCol idx, ImU32 col) { ImGui::PushStyleColor(idx, col); }, py::arg("idx"),
+      py::arg("col"), "Pushes a style color onto the style color stack, modifying the color specified by idx.");
   m.def(
-      "PushStyleColor",
-      [](ImGuiCol idx, const ImVec4& col) {
-        ImGui::PushStyleColor(idx, col);
-      },
-      py::arg("idx"), py::arg("col"),
-      "Pushes a style color onto the style color stack, modifying the color specified by idx.");
+      "PushStyleColor", [](ImGuiCol idx, const ImVec4& col) { ImGui::PushStyleColor(idx, col); }, py::arg("idx"),
+      py::arg("col"), "Pushes a style color onto the style color stack, modifying the color specified by idx.");
   m.def("PopStyleColor", &ImGui::PopStyleColor, py::arg("count") = 1,
         "Pops one or more style colors from the style color stack.");
   m.def(
-      "PushStyleVar",
-      [](ImGuiStyleVar idx, float val) {
-        ImGui::PushStyleVar(idx, val);
-      },
-      py::arg("idx"), py::arg("val"),
+      "PushStyleVar", [](ImGuiStyleVar idx, float val) { ImGui::PushStyleVar(idx, val); }, py::arg("idx"),
+      py::arg("val"),
       "Pushes a style variable onto the style variable stack, modifying the float variable specified by idx.");
   m.def(
-      "PushStyleVar",
-      [](ImGuiStyleVar idx, const ImVec2& val) {
-        ImGui::PushStyleVar(idx, val);
-      },
-      py::arg("idx"), py::arg("val"),
+      "PushStyleVar", [](ImGuiStyleVar idx, const ImVec2& val) { ImGui::PushStyleVar(idx, val); }, py::arg("idx"),
+      py::arg("val"),
       "Pushes a style variable onto the style variable stack, modifying the ImVec2 variable specified by idx.");
   m.def("PopStyleVar", &ImGui::PopStyleVar, py::arg("count") = 1,
         "Pops one or more style variables from the style variable stack.");
@@ -314,23 +265,14 @@ void bind_imgui_funcs(py::module& m) {
         "Returns the height of a frame, including spacing. Approximately equal to FontSize + style.FramePadding.y * 2 "
         "+ style.ItemSpacing.y.");
   m.def(
-      "PushID",
-      [](const char* str_id) {
-        ImGui::PushID(str_id);
-      },
-      py::arg("str_id"), "Pushes a string into the ID stack (will hash the string).");
+      "PushID", [](const char* str_id) { ImGui::PushID(str_id); }, py::arg("str_id"),
+      "Pushes a string into the ID stack (will hash the string).");
   m.def(
-      "PushID",
-      [](const char* str_id_begin, const char* str_id_end) {
-        ImGui::PushID(str_id_begin, str_id_end);
-      },
+      "PushID", [](const char* str_id_begin, const char* str_id_end) { ImGui::PushID(str_id_begin, str_id_end); },
       py::arg("str_id_begin"), py::arg("str_id_end"), "Pushes a substring into the ID stack (will hash the string).");
   m.def(
-      "PushID",
-      [](int int_id) {
-        ImGui::PushID(int_id);
-      },
-      py::arg("int_id"), "Pushes an integer into the ID stack (will hash the integer).");
+      "PushID", [](int int_id) { ImGui::PushID(int_id); }, py::arg("int_id"),
+      "Pushes an integer into the ID stack (will hash the integer).");
   m.def(
       "GetID",
       [](const char* str_id) {
@@ -355,44 +297,23 @@ void bind_imgui_funcs(py::module& m) {
         return res_;
       },
       py::arg("int_id"), "Calculates a unique ID by hashing the entire ID stack with the given integer.");
+  m.def("Text", [](const char* text) { ImGui::Text("%s", text); }, py::arg("text"), "Displays formatted text.");
   m.def(
-      "Text",
-      [](const char* text) {
-        ImGui::Text("%s", text);
-      },
-      py::arg("text"), "Displays formatted text.");
+      "TextColored", [](const ImVec4& col, const char* text) { ImGui::TextColored(col, "%s", text); }, py::arg("col"),
+      py::arg("text"), "Displays formatted text with the specified color.");
   m.def(
-      "TextColored",
-      [](const ImVec4& col, const char* text) {
-        ImGui::TextColored(col, "%s", text);
-      },
-      py::arg("col"), py::arg("text"), "Displays formatted text with the specified color.");
+      "TextDisabled", [](const char* text) { ImGui::TextDisabled("%s", text); }, py::arg("text"),
+      "Displays formatted text in a disabled style (gray color).");
   m.def(
-      "TextDisabled",
-      [](const char* text) {
-        ImGui::TextDisabled("%s", text);
-      },
-      py::arg("text"), "Displays formatted text in a disabled style (gray color).");
-  m.def(
-      "TextWrapped",
-      [](const char* text) {
-        ImGui::TextWrapped("%s", text);
-      },
-      py::arg("text"),
+      "TextWrapped", [](const char* text) { ImGui::TextWrapped("%s", text); }, py::arg("text"),
       "Displays formatted text with word-wrapping enabled. The text will wrap at the end of the window or column by "
       "default.");
   m.def(
-      "LabelText",
-      [](const char* label, const char* text) {
-        ImGui::LabelText(label, "%s", text);
-      },
-      py::arg("label"), py::arg("text"), "Displays a label and value aligned in the same way as value+label widgets.");
+      "LabelText", [](const char* label, const char* text) { ImGui::LabelText(label, "%s", text); }, py::arg("label"),
+      py::arg("text"), "Displays a label and value aligned in the same way as value+label widgets.");
   m.def(
-      "BulletText",
-      [](const char* text) {
-        ImGui::BulletText("%s", text);
-      },
-      py::arg("text"), "Displays a bullet followed by formatted text.");
+      "BulletText", [](const char* text) { ImGui::BulletText("%s", text); }, py::arg("text"),
+      "Displays a bullet followed by formatted text.");
   m.def("SeparatorText", &ImGui::SeparatorText, py::arg("label"),
         "Displays formatted text with a horizontal line separator.");
   m.def("Button", &ImGui::Button, py::arg("label"), py::arg("size") = ImVec2(0, 0),
@@ -947,11 +868,8 @@ void bind_imgui_funcs(py::module& m) {
       py::arg("label"), py::arg("flags") = 0,
       "Creates an extended tree node with the specified label and flags. Returns true if the node is open.");
   m.def(
-      "TreePush",
-      [](const char* str_id) {
-        ImGui::TreePush(str_id);
-      },
-      py::arg("str_id"), "Pushes a string into the tree node stack, increasing the indentation level.");
+      "TreePush", [](const char* str_id) { ImGui::TreePush(str_id); }, py::arg("str_id"),
+      "Pushes a string into the tree node stack, increasing the indentation level.");
   m.def("TreePop", &ImGui::TreePop,
         "Pops the last element from the tree node stack, decreasing the indentation level.");
   m.def("GetTreeNodeToLabelSpacing", &ImGui::GetTreeNodeToLabelSpacing,
@@ -1016,17 +934,11 @@ void bind_imgui_funcs(py::module& m) {
       "Displays a list box with the specified label, current item index, items array, item count, and optional height "
       "in items. Returns true if the current item was changed.");
   m.def(
-      "Value",
-      [](const char* prefix, bool b) {
-        ImGui::Value(prefix, b);
-      },
-      py::arg("prefix"), py::arg("b"), "Displays a boolean value with a prefix in the format \"prefix: value\".");
+      "Value", [](const char* prefix, bool b) { ImGui::Value(prefix, b); }, py::arg("prefix"), py::arg("b"),
+      "Displays a boolean value with a prefix in the format \"prefix: value\".");
   m.def(
-      "Value",
-      [](const char* prefix, int v) {
-        ImGui::Value(prefix, v);
-      },
-      py::arg("prefix"), py::arg("v"), "Displays an integer value with a prefix in the format \"prefix: value\".");
+      "Value", [](const char* prefix, int v) { ImGui::Value(prefix, v); }, py::arg("prefix"), py::arg("v"),
+      "Displays an integer value with a prefix in the format \"prefix: value\".");
   m.def(
       "Value",
       [](const char* prefix, float v, const std::optional<std::string>& float_format) {
@@ -1072,19 +984,13 @@ void bind_imgui_funcs(py::module& m) {
   m.def("EndTooltip", &ImGui::EndTooltip,
         "Ends the tooltip window. Should be called only if BeginTooltip() or BeginItemTooltip() returned true.");
   m.def(
-      "SetTooltip",
-      [](const char* text) {
-        ImGui::SetTooltip("%s", text);
-      },
-      py::arg("text"), "Sets a text-only tooltip. Often used after a call to ImGui::IsItemHovered().");
+      "SetTooltip", [](const char* text) { ImGui::SetTooltip("%s", text); }, py::arg("text"),
+      "Sets a text-only tooltip. Often used after a call to ImGui::IsItemHovered().");
   m.def("BeginItemTooltip", &ImGui::BeginItemTooltip,
         "Begins a tooltip window if the preceding item was hovered. Should call EndTooltip() if this returns true.");
   m.def(
-      "SetItemTooltip",
-      [](const char* text) {
-        ImGui::SetItemTooltip("%s", text);
-      },
-      py::arg("text"), "Sets a text-only tooltip if the preceding item was hovered.");
+      "SetItemTooltip", [](const char* text) { ImGui::SetItemTooltip("%s", text); }, py::arg("text"),
+      "Sets a text-only tooltip if the preceding item was hovered.");
   m.def("BeginPopup", &ImGui::BeginPopup, py::arg("str_id"), py::arg("flags") = 0,
         "Begins a popup window with the specified ID and flags. Should call EndPopup() if this returns true.");
   m.def(
@@ -1099,17 +1005,11 @@ void bind_imgui_funcs(py::module& m) {
   m.def("EndPopup", &ImGui::EndPopup,
         "Ends a popup window. Should be called only if BeginPopup() or BeginPopupModal() returned true.");
   m.def(
-      "OpenPopup",
-      [](const char* str_id, ImGuiPopupFlags popup_flags) {
-        ImGui::OpenPopup(str_id, popup_flags);
-      },
+      "OpenPopup", [](const char* str_id, ImGuiPopupFlags popup_flags) { ImGui::OpenPopup(str_id, popup_flags); },
       py::arg("str_id"), py::arg("popup_flags") = 0, "Marks the popup as open. Should not be called every frame.");
   m.def(
-      "OpenPopup",
-      [](ImGuiID id, ImGuiPopupFlags popup_flags) {
-        ImGui::OpenPopup(id, popup_flags);
-      },
-      py::arg("id"), py::arg("popup_flags") = 0,
+      "OpenPopup", [](ImGuiID id, ImGuiPopupFlags popup_flags) { ImGui::OpenPopup(id, popup_flags); }, py::arg("id"),
+      py::arg("popup_flags") = 0,
       "Marks the popup with the specified ID as open, facilitating calling from nested stacks.");
   m.def(
       "OpenPopupOnItemClick",
@@ -1242,11 +1142,8 @@ void bind_imgui_funcs(py::module& m) {
   m.def("LogFinish", &ImGui::LogFinish, "Stops logging and closes any file or clipboard output.");
   m.def("LogButtons", &ImGui::LogButtons, "Helper function to display buttons for logging to tty, file, or clipboard.");
   m.def(
-      "LogText",
-      [](const char* text) {
-        ImGui::LogText("%s", text);
-      },
-      py::arg("text"), "Logs formatted text directly to the current log output without displaying it on the screen.");
+      "LogText", [](const char* text) { ImGui::LogText("%s", text); }, py::arg("text"),
+      "Logs formatted text directly to the current log output without displaying it on the screen.");
   m.def("BeginDragDropSource", &ImGui::BeginDragDropSource, py::arg("flags") = 0,
         "Starts a drag-and-drop source. If this returns true, you should call SetDragDropPayload() and "
         "EndDragDropSource().");
