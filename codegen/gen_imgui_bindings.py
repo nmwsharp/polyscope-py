@@ -1184,10 +1184,6 @@ def binding_pyi(bound_func: BoundFunction) -> str:
         if py_arg.ret_type is not None:
             def_rets.append(f"{py_type(py_arg.ret_type)}")
 
-    # if bound_func.func.name == "GetID":
-    #     print(bound_func)
-    #     raise ValueError("x")
-
     def_args_str = ", ".join(def_args)
 
     if len(def_rets) == 0:
@@ -1241,15 +1237,3 @@ pyi_dest_path = (
 )
 print(pyi_dest_path)
 pyi_dest_path.write_text(pyi_module)
-
-
-# TODO: set enum value defaults to enum name
-# e.g. ImGuiChildFlags = 0
-
-# wrong return type
-# def PushID(str_id: str) -> None: ...
-# def PushID(str_id_begin: str, str_id_end: str) -> None: ...
-# def PushID(int_id: int) -> None: ...
-# def GetID(str_id: str) -> None: ...
-# def GetID(str_id_begin: str, str_id_end: str) -> None: ...
-# def GetID(int_id: int) -> None: ...
