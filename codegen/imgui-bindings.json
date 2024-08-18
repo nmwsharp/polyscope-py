@@ -4171,6 +4171,10 @@
           {
             "name": "fmt",
             "type": "const char*"
+          },
+          {
+            "name": "...",
+            "type": "..."
           }
         ],
         "description": "Sets a text-only tooltip. Often used after a call to ImGui::IsItemHovered()."
@@ -4203,6 +4207,10 @@
           {
             "name": "fmt",
             "type": "const char*"
+          },
+          {
+            "name": "...",
+            "type": ""
           }
         ],
         "description": "Sets a text-only tooltip if the preceding item was hovered."
@@ -5830,6 +5838,96 @@
     ]
   },
   "enums": [
+    {
+      "name": "ImGuiMultiSelectFlags_",
+      "values": [
+        {
+          "name": "ImGuiMultiSelectFlags_None",
+          "value": 0,
+          "description": "No flags."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_SingleSelect",
+          "value": 1,
+          "description": "Disable selecting more than one item. This allows single-selection code to share the same logic. It essentially disables the main purpose of BeginMultiSelect() though."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_NoSelectAll",
+          "value": 2,
+          "description": "Disable CTRL+A shortcut to select all."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_NoRangeSelect",
+          "value": 4,
+          "description": "Disable Shift+selection mouse/keyboard support. Useful for unordered 2D selection. Ensures contiguous SetRange requests are not combined into one."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_NoAutoSelect",
+          "value": 8,
+          "description": "Disable selecting items when navigating. Useful for supporting range-select in a list of checkboxes."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_NoAutoClear",
+          "value": 16,
+          "description": "Disable clearing selection when navigating or selecting another item. Generally used with ImGuiMultiSelectFlags_NoAutoSelect."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_NoAutoClearOnReselect",
+          "value": 32,
+          "description": "Disable clearing selection when clicking/selecting an already selected item."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_BoxSelect1d",
+          "value": 64,
+          "description": "Enable box-selection with same width and same x position items. Box-selection works better with a bit of spacing between items' hit-boxes."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_BoxSelect2d",
+          "value": 128,
+          "description": "Enable box-selection with varying width or varying x position items support. Alters clipping logic, so horizontal movements update selection of normally clipped items."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_BoxSelectNoScroll",
+          "value": 256,
+          "description": "Disable scrolling when box-selecting near the edges of the scope."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_ClearOnEscape",
+          "value": 512,
+          "description": "Clear selection when pressing Escape while the scope is focused."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_ClearOnClickVoid",
+          "value": 1024,
+          "description": "Clear selection when clicking on an empty location within the scope."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_ScopeWindow",
+          "value": 2048,
+          "description": "Scope for _BoxSelect and _ClearOnClickVoid is the whole window (Default)."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_ScopeRect",
+          "value": 4096,
+          "description": "Scope for _BoxSelect and _ClearOnClickVoid is the rectangle encompassing BeginMultiSelect()/EndMultiSelect()."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_SelectOnClick",
+          "value": 8192,
+          "description": "Apply selection on mouse down when clicking on an unselected item. (Default)"
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_SelectOnClickRelease",
+          "value": 16384,
+          "description": "Apply selection on mouse release when clicking an unselected item. Allows dragging an unselected item without altering selection."
+        },
+        {
+          "name": "ImGuiMultiSelectFlags_NavWrapX",
+          "value": 65536,
+          "description": "[Temporary] Enable navigation wrapping on the X axis. Provided as a convenience until a more general Nav API is available."
+        }
+      ]
+    },
     {
       "name": "ImGuiWindowFlags_",
       "values": [
