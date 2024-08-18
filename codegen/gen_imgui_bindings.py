@@ -79,7 +79,7 @@ def const_char_ptr(param: Parameter) -> ArgBinding:
     if param.default == "NULL":
         arg_name = param.name
         decl_name = f"{param.name}_"
-        decl = f"const char *{decl_name} = {arg_name}.has_value() ? {arg_name}.c_str() : nullptr;"
+        decl = f"const char *{decl_name} = {arg_name}.has_value() ? {arg_name}.value().c_str() : nullptr;"
         return ArgBinding(
             arg_name=arg_name,
             arg_type="const std::optional<std::string>&",
