@@ -66,7 +66,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   }));
   
   // === Basic flow 
-  m.def("init", &ps::init, py::arg("backend")="", "Initialize Polyscope");
+  m.def("init", &ps::init, py::arg("backend")="auto", "Initialize Polyscope");
   m.def("check_initialized", &ps::checkInitialized);
   m.def("is_initialized", &ps::isInitialized);
   m.def("show", [](size_t forFrames) {
