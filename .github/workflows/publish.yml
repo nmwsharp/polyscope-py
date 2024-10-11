@@ -65,6 +65,7 @@ jobs:
           path: |
             ./wheelhouse/*.whl 
             ./wheelhouse/*.tar.gz 
+          overwrite: true
 
   # Push the resulting binaries to pypi on a tag starting with 'v'
   upload_pypi:
