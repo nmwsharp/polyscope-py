@@ -35,3 +35,5 @@ target_link_libraries(polyscope_bindings PRIVATE polyscope)
 
 # make the resulting target actually be called polyscope, without the py
 # set_target_properties(polyscope_py PROPERTIES OUTPUT_NAME polyscope)
+
+install(TARGETS polyscope_bindings LIBRARY DESTINATION .)
