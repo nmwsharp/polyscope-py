@@ -33,4 +33,4 @@ build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
 build.verbose = true
-logging.level = "DEBUG"
+logging.level = "INFO"
