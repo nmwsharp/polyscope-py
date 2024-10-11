@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.15.0) # minimum imposed by scikit-build-core
 project(polyscope-py)
 
 # Gather dependencies
