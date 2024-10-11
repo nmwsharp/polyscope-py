@@ -1,0 +1,7 @@
+[tool.cibuildwheel]
+skip = "cp36-*" # scikit-build-core requires >=3.7
+build-verbosity = 3
+before-build-linux = [
+    "yum remove -y cmake",
+    "yum install -y libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel mesa-libGL libXi-devel freeglut-devel mesa-libEGL-devel"
+]
