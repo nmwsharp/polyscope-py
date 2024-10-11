@@ -11,4 +11,4 @@ before-all = [
 # musllinux builds on an Alpinx Linux image, need different package names
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = "apk add libx11 libxcursor xrandr libxinerama libxi freeglut mesa mesa-gl mesa-egl"
+before-all = "apk add libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev freeglut-dev mesa-dev mesa-gl mesa-egl"
