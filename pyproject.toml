@@ -30,3 +30,7 @@ Discussions = "https://github.com/nmwsharp/polyscope/discussions"
 [build-system]
 requires = ["scikit-build-core"]
 build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+cmake.verbose = true
+logging.level = "INFO"
