@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.15.0) # minimum imposed by scikit-build-core
-project(polyscope-py)
+project(polyscope LANGUAGES CXX)
 
-# Gather dependencies
+
+## Gather dependencies
+
+# Eigen
 set(EIGEN3_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/deps/eigen/")
 
 # Recurse in to pybind
+set(PYBIND11_NEWPYTHON ON)
 add_subdirectory(deps/pybind11)
 
 # We need polyscope
