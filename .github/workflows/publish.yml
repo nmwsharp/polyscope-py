@@ -22,11 +22,6 @@ jobs:
     name: Build wheels ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
-    env:
-      CIBW_BUILD_VERBOSITY: 3
-      CIBW_BEFORE_BUILD_LINUX : "yum remove -y cmake && yum install -y libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel mesa-libGL libXi-devel freeglut-devel mesa-libEGL-devel"
-      CIBW_SKIP: "cp36-* cp313-*" # skip python 13 for now, builds failing
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -71,8 +66,11 @@ jobs:
       - name: Download built wheels artifact # downloads from the jobs storage from the previous step
         uses: actions/download-artifact@v4.1.7
         with:
-          name: artifact
+          # omitting the `name: ` field downloads all artifacts from this workflow
           path: dist
+
+      - name: List downloaded files from artifact
+        run: ls dist | cat  # piping through cat prints one per line
 
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
