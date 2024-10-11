@@ -20,7 +20,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-13, macos-14]
 
     name: Build wheels ${{ matrix.cibw-arch }}
-    runs-on: ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.os }}
 
     env:
       CIBW_BUILD_VERBOSITY: 3
