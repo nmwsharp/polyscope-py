@@ -70,7 +70,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           python -m pip install build
-          python -m build --sdist --wheel-dir=wheelhouse
+          python -m build --sdist --outdir=wheelhouse
 
       - name: Build wheels
         run: |
