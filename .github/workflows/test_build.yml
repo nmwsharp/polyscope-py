@@ -50,8 +50,9 @@ jobs:
           python -m build --sdist
 
       - name: Run cibuildwheel
-        uses: pypa/cibuildwheel@v2.21 
-        config-file: ".github/workflows/cibuildwheel_config.toml"
+        uses: pypa/cibuildwheel@v2.21
+        with:
+          config-file: ".github/workflows/cibuildwheel_config.toml"
 
       # Upload binaries to the github artifact store
       - name: Upload wheels

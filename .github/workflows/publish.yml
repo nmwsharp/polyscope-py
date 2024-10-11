@@ -52,7 +52,8 @@ jobs:
 
       - name: Run cibuildwheel
         uses: pypa/cibuildwheel@v2.21 
-        config-file: ".github/workflows/cibuildwheel_config.toml"
+        with:
+          config-file: ".github/workflows/cibuildwheel_config.toml"
 
       # Upload binaries to the github artifact store
       - name: Upload wheels
