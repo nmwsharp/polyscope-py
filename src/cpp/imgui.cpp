@@ -1379,6 +1379,92 @@ void bind_imgui_methods(py::module& m) {
         py::arg("flags") = 0);
     m.def("CloseCurrentPopup", []() { ImGui::CloseCurrentPopup(); });
 
+    // Tables
+    m.def(
+        "BeginTable",
+        [](const char*str_id, int columns, ImGuiTableFlags flags, Vec2T size, float innerwidth) -> bool {
+            return ImGui::BeginTable(str_id, columns, flags, to_vec2(size), innerwidth);
+        },
+        py::arg("str"),
+        py::arg("columns"),
+        py::arg("flags") = 0,
+        py::arg("size") = std::make_tuple(0.f, 0.f),
+        py::arg("inner_width") = 0.f
+    );
+    m.def( "EndTable", []() { ImGui::EndTable(); } );
+    m.def(
+        "TableNextRow",
+        [](float min_row_height, ImGuiTableRowFlags flags) {
+            ImGui::TableNextRow(flags, min_row_height);
+        },
+        py::arg("min_row_height") = 0.f,
+        py::arg("flags") = 0
+    );
+    m.def(
+        "TableNextColumn",
+        []() -> bool {
+            return ImGui::TableNextColumn();
+        }
+    );
+    m.def(
+        "TableSetColumnIndex",
+        [](int column_n) -> bool {
+            return ImGui::TableSetColumnIndex(column_n);
+        },
+        py::arg("column_n")
+    );
+
+    m.def(
+        "TableSetupColumn",
+        [](const char* label, ImGuiTableColumnFlags flags, float init_width_or_height, unsigned int user_id) {
+            ImGui::TableSetupColumn(label, flags, init_width_or_height, user_id);
+        },
+        py::arg("label"),
+        py::arg("flags") = 0,
+        py::arg("init_width_or_height") = 0.f,
+        py::arg("user_id") = 0u
+    );
+    m.def(
+        "TableSetupScrollFreeze",
+        [](int cols, int rows) {
+            ImGui::TableSetupScrollFreeze(cols, rows);
+        },
+        py::arg("cols"),
+        py::arg("rows")
+    );
+    m.def(
+        "TableHeader",
+        [](const char* label) {
+            ImGui::TableHeader(label);
+        },
+        py::arg("label")
+    );
+    m.def("TableHeadersRow", []() { ImGui::TableHeadersRow(); });
+
+    m.def("TableGetColumnCount", []() { return ImGui::TableGetColumnCount(); });
+    m.def("TableGetColumnIndex", []() { return ImGui::TableGetColumnIndex(); });
+    m.def("TableGetRowIndex", []() { return ImGui::TableGetRowIndex(); });
+    m.def(
+        "TableGetColumnName",
+        [](int column_n) { return py::str(ImGui::TableGetColumnName(column_n)); },
+        py::arg("column_n") = -1
+    );
+    m.def(
+        "TableSetColumnEnabled",
+        [](int column_n, bool enable) { return ImGui::TableSetColumnEnabled(column_n, enable); },
+        py::arg("column_n"),
+        py::arg("v")
+    );
+    m.def(
+        "TableSetBackgroundColor",
+        [](ImGuiTableBgTarget target, ImU32 color, int column_n) {
+          return ImGui::TableSetBgColor(target, color, column_n);
+        },
+        py::arg("target"),
+        py::arg("color"),
+        py::arg("column_n") = -1
+    );
+
     // Columns
     m.def(
         "Columns",
