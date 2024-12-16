@@ -359,6 +359,22 @@ class TestCore(unittest.TestCase):
         ps.remove_all_groups()
         ps.remove_all_structures()
    
+    def test_ui_advanced_custom_build(self):
+
+        def manual_build_callback():
+            ps.build_polyscope_gui()
+            ps.build_structure_gui()
+            ps.build_pick_gui()
+
+
+        # disable the standard function
+        ps.set_build_gui(False)
+        ps.set_user_callback(manual_build_callback)
+        ps.show(3) # smoke test
+
+        # unset
+        ps.set_user_callback(None)
+        ps.set_build_gui(True)
 
 class TestImGuiBindings(unittest.TestCase):
 

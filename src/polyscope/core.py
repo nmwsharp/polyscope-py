@@ -243,6 +243,21 @@ def set_camera_view_matrix(mat):
 def get_camera_view_matrix():
     return psb.get_camera_view_matrix()
 
+### "Advanced" UI management
+
+def build_polyscope_gui():
+    psb.build_polyscope_gui()
+
+def build_structure_gui():
+    psb.build_structure_gui()
+
+def build_pick_gui():
+    psb.build_pick_gui()
+
+def build_user_gui_and_invoke_callback():
+    psb.build_user_gui_and_invoke_callback()
+
+
 ### Messages
 
 def info(message):
