@@ -48,14 +48,6 @@ def main():
     args = parser.parse_args()
 
 
-    # verts, UVs, _, faces, UVinds, _ = igl.read_obj(args.mesh)
-    # corner_UVs = UVs[UVinds,:].reshape(-1,2)
-    # print(corner_UVs.shape)
-    # 
-    # color_tex = imageio.imread(args.image) / 255.
-    # print(color_tex.shape)
-    
-    # print(UVs[:10,:])
 
     # Set up a simple callback and UI button
     def my_function():
@@ -85,18 +77,26 @@ def main():
         # Load a mesh argument
         verts, faces = pp3d.read_mesh(args.mesh)
 
+        corner_UVs = None 
+        # verts, UVs, _, faces, UVinds, _ = igl.read_obj(args.mesh)
+        # corner_UVs = UVs[UVinds,:].reshape(-1,2)
+        # print(corner_UVs.shape)
+        # 
+        # color_tex = imageio.imread(args.image) / 255.
+        # print(color_tex.shape)
+        # print(UVs[:10,:])
+
         ps_mesh = polyscope.register_surface_mesh("test mesh", verts, faces, enabled=True)
 
         # Scalar functions
         ps_mesh.add_scalar_quantity("X", verts[:,0])
         ps_mesh.add_scalar_quantity("Y", verts[:,1])
 
-        ps_mesh.add_parameterization_quantity("param", corner_UVs, defined_on='corners')
-        
-        ps_mesh.add_color_quantity("color_tex", color_tex, defined_on='texture', param_name="param", image_origin='upper_left')
-        ps_mesh.add_scalar_quantity("scalar_tex", color_tex[:,:,1], defined_on='texture', param_name="param")
-
-        polyscope.add_color_image_quantity("my im", color_tex)
+        if corner_UVs is not None:
+            ps_mesh.add_parameterization_quantity("param", corner_UVs, defined_on='corners')
+            ps_mesh.add_color_quantity("color_tex", color_tex, defined_on='texture', param_name="param", image_origin='upper_left')
+            ps_mesh.add_scalar_quantity("scalar_tex", color_tex[:,:,1], defined_on='texture', param_name="param")
+            polyscope.add_color_image_quantity("my im", color_tex)
 
         # Look at them
         polyscope.show() 
