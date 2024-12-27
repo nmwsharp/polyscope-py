@@ -5,7 +5,7 @@ from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coor
                            str_to_param_viz_style, str_to_back_face_policy, back_face_policy_to_str,\
                            str_to_image_origin, glm3
 from polyscope.structure import Structure
-from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, process_parameterization_args, check_all_args_processed, check_is_scalar_image, check_is_image3
+from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, process_texture_map_args, process_parameterization_args, check_all_args_processed, check_is_scalar_image, check_is_image3
 
 class SurfaceMesh(Structure):
 
@@ -205,6 +205,7 @@ class SurfaceMesh(Structure):
         # note: each step modifies the args dict and removes processed args
         process_quantity_args(self, q, scalar_args)
         process_scalar_args(self, q, scalar_args)
+        process_texture_map_args(self, q, scalar_args)
         check_all_args_processed(self, q, scalar_args)
 
     
@@ -233,6 +234,7 @@ class SurfaceMesh(Structure):
         # note: each step modifies the args dict and removes processed args
         process_quantity_args(self, q, color_args)
         process_color_args(self, q, color_args)
+        process_texture_map_args(self, q, color_args)
         check_all_args_processed(self, q, color_args)
     
     

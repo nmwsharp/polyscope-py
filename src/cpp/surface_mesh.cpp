@@ -26,12 +26,17 @@ void bind_surface_mesh(py::module& m) {
   bindScalarQuantity<ps::SurfaceEdgeScalarQuantity>(m, "SurfaceEdgeScalarQuantity");
   bindScalarQuantity<ps::SurfaceHalfedgeScalarQuantity>(m, "SurfaceHalfedgeScalarQuantity");
   bindScalarQuantity<ps::SurfaceCornerScalarQuantity>(m, "SurfaceCornerScalarQuantity");
-  bindScalarQuantity<ps::SurfaceTextureScalarQuantity>(m, "SurfaceTextureScalarQuantity");
+  py::class_<ps::SurfaceTextureScalarQuantity> boundScalarQ = 
+     bindScalarQuantity<ps::SurfaceTextureScalarQuantity>(m, "SurfaceTextureScalarQuantity");
+  addTextureMapQuantityBindings<ps::SurfaceTextureScalarQuantity>(boundScalarQ);
 
   // Color quantities
   bindColorQuantity<ps::SurfaceVertexColorQuantity>(m, "SurfaceVertexColorQuantity");
   bindColorQuantity<ps::SurfaceFaceColorQuantity>(m, "SurfaceFaceColorQuantity");
-  bindColorQuantity<ps::SurfaceTextureColorQuantity>(m, "SurfaceTextureColorQuantity");
+  py::class_<ps::SurfaceTextureColorQuantity> boundColorQ = 
+     bindColorQuantity<ps::SurfaceTextureColorQuantity>(m, "SurfaceTextureColorQuantity");
+  addTextureMapQuantityBindings<ps::SurfaceTextureColorQuantity>(boundColorQ);
+
 
   // Parameterization quantities
   py::class_<ps::SurfaceCornerParameterizationQuantity>(m, "SurfaceCornerParameterizationQuantity")

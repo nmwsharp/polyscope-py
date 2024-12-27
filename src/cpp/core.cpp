@@ -452,6 +452,11 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("quad", ps::PointRenderMode::Quad)
     .export_values(); 
   
+  py::enum_<ps::FilterMode>(m, "FilterMode")
+    .value("linear", ps::FilterMode::Linear)
+    .value("nearest", ps::FilterMode::Nearest)
+    .export_values(); 
+  
   py::enum_<ps::ImageOrigin>(m, "ImageOrigin")
     .value("lower_left", ps::ImageOrigin::LowerLeft)
     .value("upper_left", ps::ImageOrigin::UpperLeft)

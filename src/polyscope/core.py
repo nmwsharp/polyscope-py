@@ -770,6 +770,29 @@ def point_render_mode_to_str(val):
     raise ValueError("Bad point render mode specifier '{}', should be one of [{}]".format(val, 
         ",".join(["'{}'".format(x) for x in d_point_render_mode.values()])))
 
+# Filter mode to/from string
+d_filter_mode = {
+        "linear" : psb.FilterMode.linear,
+        "nearest" : psb.FilterMode.nearest,
+    }
+
+def str_to_filter_mode(s):
+
+    if s not in d_filter_mode:
+        raise ValueError("Bad filter mode specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_filter_mode.keys()])))
+
+    return d_filter_mode[s]
+
+def filter_mode_to_str(val):
+
+    for k,v in d_filter_mode.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad filter mode specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_filter_mode.values()])))
+
 # Image origin to/from string
 d_image_origin = {
         "lower_left" : psb.ImageOrigin.lower_left,

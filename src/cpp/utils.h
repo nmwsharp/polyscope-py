@@ -229,6 +229,13 @@ py::class_<VectorQ> bindVectorQuantity(py::module& m, std::string name) {
       .def("set_color", &VectorQ::setVectorColor, "Set color");
 }
 
+// Add common bindings for all texture map quantities
+// (this one is 'additive', )
+template <typename TextureQ>
+void addTextureMapQuantityBindings(py::class_<TextureQ>& boundTextureQ) {
+  boundTextureQ.def("set_filter_mode", &TextureQ::setFilterMode, "Set filter mode");
+}
+
 // Add common image options
 // Note: unlike the others above, this adds methods to an existing quantity rather than binding a new one.
 template <typename ImageQ>

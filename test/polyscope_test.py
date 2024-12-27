@@ -1265,15 +1265,16 @@ class TestSurfaceMesh(unittest.TestCase):
 
         for on in ['vertices', 'faces', 'edges', 'halfedges', 'corners', 'texture']:
             
-            if on == 'texture':
+            # if on == 'texture':
                 # TODO FIXME temporarily skipping this, it is hanging in Windows CI for some reason
-                continue
+                # continue
         
             ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
             p = ps.get_surface_mesh("test_mesh")
       
             param_name = None  # used for texture case only
 
+            extra_args = {}
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices())
             elif on == 'faces':
@@ -1290,6 +1291,7 @@ class TestSurfaceMesh(unittest.TestCase):
                 param_name = "test_param"
                 p.add_parameterization_quantity(param_name, param_vals, defined_on='vertices', enabled=True)
                 vals = np.random.rand(20,30)
+                extra_args['filter_mode'] = 'nearest'
 
 
             p.add_scalar_quantity("test_vals", vals, defined_on=on, param_name=param_name)
@@ -1297,8 +1299,8 @@ class TestSurfaceMesh(unittest.TestCase):
             p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, param_name=param_name, vminmax=(-5., 5.), enabled=True)
             p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, param_name=param_name, enabled=True, datatype='symmetric')
             p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, param_name=param_name, enabled=True, cmap='blues')
-            p.add_scalar_quantity("test_vals_with_iso", vals, enabled=True, defined_on=on, cmap='blues',
-                              isolines_enabled=True, isoline_width=0.1, isoline_darkness=0.5)
+            p.add_scalar_quantity("test_vals_with_iso", vals, defined_on=on, param_name=param_name, cmap='blues', isolines_enabled=True, isoline_width=0.1, isoline_darkness=0.5, enabled=True)
+            p.add_scalar_quantity("test_vals_with_extra", vals, defined_on=on, param_name=param_name, enabled=True, **extra_args)
 
             ps.show(3)
 
@@ -1316,12 +1318,13 @@ class TestSurfaceMesh(unittest.TestCase):
 
         for on in ['vertices', 'faces', 'texture']:
 
-            if on == 'texture':
+            # if on == 'texture':
                 # TODO FIXME temporarily skipping this, it is hanging in Windows CI for some reason
-                continue
+                # continue
       
             param_name = None  # used for texture case only
 
+            extra_args = {}
             if on == 'vertices':
                 vals = np.random.rand(p.n_vertices(), 3)
             elif on == 'faces':
@@ -1331,10 +1334,11 @@ class TestSurfaceMesh(unittest.TestCase):
                 param_name = "test_param"
                 p.add_parameterization_quantity(param_name, param_vals, defined_on='vertices', enabled=True)
                 vals = np.random.rand(20,30,3)
+                extra_args['filter_mode'] = 'linear'
        
 
             p.add_color_quantity("test_vals", vals, defined_on=on, param_name=param_name)
-            p.add_color_quantity("test_vals", vals, defined_on=on, param_name=param_name, enabled=True)
+            p.add_color_quantity("test_vals", vals, defined_on=on, param_name=param_name, enabled=True, **extra_args)
 
             ps.show(3)
             p.remove_all_quantities()

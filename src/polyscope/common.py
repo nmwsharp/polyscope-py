@@ -1,6 +1,6 @@
 import polyscope_bindings as psb
 
-from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str, str_to_param_viz_style
+from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str, str_to_filter_mode, str_to_param_viz_style
 
 
 def check_is_scalar_image(values):
@@ -128,6 +128,12 @@ def process_parameterization_args(structure, quantity, parameterization_args):
     if val is not None:
         quantity.create_curve_network_from_seams(val)
         
+# Process args, removing them from the dict if they are present
+def process_texture_map_args(structure, quantity, texture_map_args):
+
+    val = check_and_pop_arg(texture_map_args, 'filter_mode')
+    if val is not None:
+        quantity.set_filter_mode(str_to_filter_mode(val))
 
 # Process args, removing them from the dict if they are present
 def process_image_args(structure, quantity, image_args):
