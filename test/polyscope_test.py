@@ -1265,10 +1265,6 @@ class TestSurfaceMesh(unittest.TestCase):
 
         for on in ['vertices', 'faces', 'edges', 'halfedges', 'corners', 'texture']:
             
-            # if on == 'texture':
-                # TODO FIXME temporarily skipping this, it is hanging in Windows CI for some reason
-                # continue
-        
             ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
             p = ps.get_surface_mesh("test_mesh")
       
@@ -1318,10 +1314,6 @@ class TestSurfaceMesh(unittest.TestCase):
 
         for on in ['vertices', 'faces', 'texture']:
 
-            # if on == 'texture':
-                # TODO FIXME temporarily skipping this, it is hanging in Windows CI for some reason
-                # continue
-      
             param_name = None  # used for texture case only
 
             extra_args = {}
