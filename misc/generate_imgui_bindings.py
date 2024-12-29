@@ -12,7 +12,7 @@ IMGUI_ROOT = os.path.join(PROJECT_ROOT, "deps", "polyscope", "deps", "imgui", "i
 CIMGUI_ROOT = os.path.join(PROJECT_ROOT, "deps", "cimgui")
 CIMGUI_IMGUI_ROOT = os.path.join(PROJECT_ROOT, "deps", "cimgui", "imgui")
 DEFINITIONS_PATH = os.path.join(CIMGUI_ROOT, "generator", "output", "definitions.json")
-OUPUT_FILENAME = "imgui_bindings.cpp"
+OUPUT_FILENAME = os.path.join(PROJECT_ROOT, "src", "cpp", "imgui_GENERATED.cpp")
 
 
 # =============================================================
@@ -88,16 +88,15 @@ def is_modifiable_arg(argtype):
 
     return False, None, None, None
 
-def strip_modifiable_pointer(arg_type):
-    return arg_type[:-1]
 
-def find_modifiable_arg(func_variant):
-    """Check if any of the args get modified"""
-    for arg in func_variant['argsT']:
-        if is_modifiable_arg(arg):
-            return arg['name']
+def is_string_end_arg(arg):
+    return (arg['type'] == "const char*") and (arg['name'].endswith("_end"))
 
-    return None
+def is_variable_length_arg(arg):
+    return (arg['type'] == "va_list") or (arg['type'] == "...")
+
+def is_voidstar_arg(arg):
+    return arg['type'].endswith("void*")
 
 def emit_func_binding(func_c_name, func_variant):
     # if func_c_name not in ["igBegin", "igEnd"]:
@@ -115,6 +114,14 @@ def emit_func_binding(func_c_name, func_variant):
     for arg in func_variant["argsT"]:
         argname = arg["name"]
         argtype = arg["type"]
+
+        # some arg types we skip and don't include in arglists
+        if is_string_end_arg(arg):
+            print(f" -- skipping string arg {argname}")
+            continue
+        if is_variable_length_arg(arg):
+            print(f" -- skipping binding this function due to variable arg {argname}")
+            return None
 
         this_arg_is_modifable = False
         call_prefix = ""
@@ -153,7 +160,7 @@ def emit_func_binding(func_c_name, func_variant):
     arg_params_str = ", ".join(arg_params)
     call_arg_params_str = ", ".join(call_arg_params)
     arg_annotations_str = ",\n        ".join(arg_annotations)
-    if len(arg_annotations) > 0: arg_annotations_str = "\n        " + arg_annotations_str
+    if len(arg_annotations) > 0: arg_annotations_str = ",\n        " + arg_annotations_str
     has_mod_args = (len(mod_argnames) > 0)
 
     # Generate the body
@@ -182,7 +189,7 @@ def emit_func_binding(func_c_name, func_variant):
         "{funcname}",
         []({arg_params_str}) {{
             {body}
-        }}, {arg_annotations_str}
+        }} {arg_annotations_str}
         );
 """
 
@@ -227,7 +234,8 @@ for func_name in definitions:
             continue
 
         binding_str = emit_func_binding(func_name, func_variant)
-        definitions_bindings_list.append(binding_str)
+        if binding_str is not None:
+            definitions_bindings_list.append(binding_str)
 
 
 
@@ -251,8 +259,8 @@ utilities_literal = """
 using Vec2T = std::tuple<float, float>;
 using Vec4T = std::tuple<float, float, float, float>;
 
-ImVec2 to_vec2(const Vec2T& v) {{ return ImVec2(std::get<0>(v), std::get<1>(v)); }
-ImVec4 to_vec4(const Vec4T& v) {{ return ImVec4(std::get<0>(v), std::get<1>(v), std::get<2>(v), std::get<3>(v)); }
+ImVec2 to_vec2(const Vec2T& v) { return ImVec2(std::get<0>(v), std::get<1>(v)); }
+ImVec4 to_vec4(const Vec4T& v) { return ImVec4(std::get<0>(v), std::get<1>(v), std::get<2>(v), std::get<3>(v)); }
 
 Vec2T from_vec2(const ImVec2& v) { return std::make_tuple(v.x, v.y); }
 Vec4T from_vec4(const ImVec4& v) { return std::make_tuple(v.x, v.y, v.z, v.w); }
@@ -272,7 +280,23 @@ combined_str = f"""
 // === Definitions
 // =================================
 
+void bind_imgui_methods(py::module& m) {{
+
 {definitions_bindings_str}
+
+}}
+
+
+// =================================
+// === Top-level call
+// =================================
+
+void bind_imgui(py::module& m) {{
+  auto imgui_module = m.def_submodule("imgui", "ImGui bindings");
+  // bind_imgui_structs(imgui_module);
+  bind_imgui_methods(imgui_module);
+  // bind_imgui_enums(imgui_module);
+}}
 """
 
 print(f"Writing output to {OUPUT_FILENAME}")

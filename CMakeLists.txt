@@ -26,7 +26,7 @@ pybind11_add_module(polyscope_bindings
   src/cpp/floating_quantities.cpp
   src/cpp/implicit_helpers.cpp
   src/cpp/managed_buffer.cpp
-  src/cpp/imgui.cpp
+  src/cpp/imgui_GENERATED.cpp
 )
 set_target_properties(polyscope_bindings PROPERTIES CXX_VISIBILITY_PRESET "default")
 
