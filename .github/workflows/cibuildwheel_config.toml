@@ -7,6 +7,8 @@ before-all = [
     "yum remove -y cmake",
     "yum install -y libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel mesa-libGL libXi-devel freeglut-devel mesa-libEGL-devel"
 ]
+[tool.cibuildwheel.environment.linux]
+CMAKE_ARGS = "DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON"
 
 # musllinux builds on an Alpinx Linux image, need different package names
 [[tool.cibuildwheel.overrides]]
