@@ -77,6 +77,7 @@ class TestCore(unittest.TestCase):
         ps.set_enable_render_error_checks(True)
         ps.set_enable_render_error_checks(True)
         ps.set_warn_for_invalid_values(True)
+        ps.set_display_message_popups(False)
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
 
@@ -123,6 +124,7 @@ class TestCore(unittest.TestCase):
     
     def test_view_options(self):
 
+        print("nav style")
         ps.set_navigation_style("turntable")
         ps.set_navigation_style("free")
         ps.set_navigation_style("planar")
@@ -130,6 +132,7 @@ class TestCore(unittest.TestCase):
         ps.set_navigation_style("first_person")
         ps.set_navigation_style(ps.get_navigation_style())
 
+        print("up dir")
         ps.set_up_dir("x_up")
         ps.set_up_dir("neg_x_up")
         ps.set_up_dir("y_up")
@@ -151,18 +154,25 @@ class TestCore(unittest.TestCase):
         
         ps.set_camera_view_matrix(ps.get_camera_view_matrix())
 
+        print("set_window_size()")
         ps.set_window_size(800, 600)
+        print("get_window_size()")
         self.assertEqual(ps.get_window_size(), (800,600))
 
+        print("get_buffer_size()")
         tup = ps.get_buffer_size()
         w, h = int(tup[0]), int(tup[1])
 
+        print("set_resizable()")
         ps.set_window_resizable(True)
+        print("get_resizable()")
         self.assertEqual(ps.get_window_resizable(), True)
         
+        print("show()")
         ps.show(3)
     
         ps.set_up_dir("y_up")
+        print("done")
 
     def test_camera_movement(self):
 
@@ -2418,6 +2428,7 @@ if __name__ == '__main__':
     # Note that since these tests depend on the bound object's global state, 
     # we generally cannot continue past the first failed test.
     ps.set_errors_throw_exceptions(True)
+    ps.set_display_message_popups(False)
     ps.init(ps_backend) 
 
     unittest.main()
