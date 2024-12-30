@@ -93,6 +93,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
 
   // === Render engine related things
   m.def("get_render_engine_backend_name", &ps::render::getRenderEngineBackendName);
+  m.def("is_headless", &ps::isHeadless);
+  m.def("set_allow_headless_backends", [](bool x) { ps::options::allowHeadlessBackends = x; });
 
   // === Structure management
   m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
@@ -114,6 +116,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_max_fps", [](int x) { ps::options::maxFPS = x; });
   m.def("set_enable_vsync", [](bool x) { ps::options::enableVSync = x; });
   m.def("set_use_prefs_file", [](bool x) { ps::options::usePrefsFile = x; });
+  m.def("set_do_default_mouse_interaction", [](bool x) { ps::state::doDefaultMouseInteraction = x; });
   m.def("request_redraw", []() { ps::requestRedraw(); });
   m.def("get_redraw_requested", []() { return ps::redrawRequested(); });
   m.def("set_always_redraw", [](bool x) { ps::options::alwaysRedraw = x; });
@@ -128,6 +131,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });
   m.def("set_give_focus_on_show", [](bool x) { ps::options::giveFocusOnShow = x; });
   m.def("set_hide_window_after_show", [](bool x) { ps::options::hideWindowAfterShow = x; });
+  m.def("set_warn_for_invalid_values", [](bool x) { ps::options::warnForInvalidValues = x; });
 
 
   // === Scene extents

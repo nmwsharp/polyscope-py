@@ -67,10 +67,14 @@ class TestCore(unittest.TestCase):
         ps.set_max_fps(60)
         ps.set_enable_vsync(True)
         ps.set_use_prefs_file(True)
+        ps.set_do_default_mouse_interaction(True)
         ps.set_always_redraw(False)
         
-        ps.set_enable_render_error_checks(True)
+        self.assertTrue(ps.is_headless() in [True, False])
+        ps.set_allow_headless_backends(True)
         
+        ps.set_enable_render_error_checks(True)
+        ps.set_warn_for_invalid_values(True)
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
 

@@ -50,6 +50,12 @@ def shutdown():
 def get_render_engine_backend_name():
     return psb.get_render_engine_backend_name()
 
+def is_headless():
+    return psb.is_headless()
+
+def set_allow_headless_backends(b):
+    return psb.set_allow_headless_backends(b)
+
 ### Structure management
 
 def remove_all_structures():
@@ -100,6 +106,9 @@ def set_enable_vsync(b):
 def set_use_prefs_file(v):
     psb.set_use_prefs_file(v)
 
+def set_do_default_mouse_interaction(v):
+    psb.set_do_default_mouse_interaction(v)
+
 def request_redraw():
     psb.request_redraw()
 
@@ -141,6 +150,9 @@ def set_give_focus_on_show(b):
 
 def set_hide_window_after_show(b):
     psb.set_hide_window_after_show(b)
+
+def set_warn_for_invalid_values(b):
+    psb.set_warn_for_invalid_values(b)
 
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))
