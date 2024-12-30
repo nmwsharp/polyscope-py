@@ -132,6 +132,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_give_focus_on_show", [](bool x) { ps::options::giveFocusOnShow = x; });
   m.def("set_hide_window_after_show", [](bool x) { ps::options::hideWindowAfterShow = x; });
   m.def("set_warn_for_invalid_values", [](bool x) { ps::options::warnForInvalidValues = x; });
+  m.def("set_display_message_popups", [](bool x) { ps::options::displayMessagePopups = x; });
 
 
   // === Scene extents

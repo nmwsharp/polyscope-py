@@ -154,6 +154,9 @@ def set_hide_window_after_show(b):
 def set_warn_for_invalid_values(b):
     psb.set_warn_for_invalid_values(b)
 
+def set_display_message_popups(b):
+    psb.set_display_message_popups(b)
+
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))
 def get_navigation_style():
