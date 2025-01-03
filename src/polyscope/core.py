@@ -854,9 +854,31 @@ def mesh_shade_style_to_str(val):
     for k,v in d_mesh_shade_style.items():
         if v == val:
             return k
-
     raise ValueError("Bad specifier '{}', should be one of [{}]".format(val, 
         ",".join(["'{}'".format(x) for x in d_mesh_shade_style.values()])))
+
+# Isoline style to/from string
+d_isoline_style = {
+        "stripe" : psb.IsolineStyle.stripe,
+        "contour" : psb.IsolineStyle.contour,
+    }
+
+def str_to_isoline_style(s):
+
+    if s not in d_isoline_style:
+        raise ValueError("Bad specifier '{}', should be one of [{}]".format(s, 
+            ",".join(["'{}'".format(x) for x in d_isoline_style.keys()])))
+
+    return d_isoline_style[s]
+
+def isoline_style_to_str(val):
+
+    for k,v in d_isoline_style.items():
+        if v == val:
+            return k
+
+    raise ValueError("Bad specifier '{}', should be one of [{}]".format(val, 
+        ",".join(["'{}'".format(x) for x in d_isoline_style.values()])))
 
 # Implicit render mode to/from string
 d_implicit_render_mode = {

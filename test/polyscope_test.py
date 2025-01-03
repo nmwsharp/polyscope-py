@@ -1301,7 +1301,9 @@ class TestSurfaceMesh(unittest.TestCase):
             p.add_scalar_quantity("test_vals_with_range", vals, defined_on=on, param_name=param_name, vminmax=(-5., 5.), enabled=True)
             p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on=on, param_name=param_name, enabled=True, datatype='symmetric')
             p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on=on, param_name=param_name, enabled=True, cmap='blues')
-            p.add_scalar_quantity("test_vals_with_iso", vals, defined_on=on, param_name=param_name, cmap='blues', isolines_enabled=True, isoline_width=0.1, isoline_darkness=0.5, enabled=True)
+            p.add_scalar_quantity("test_vals_with_iso_old", vals, defined_on=on, param_name=param_name, cmap='blues', isolines_enabled=True, isoline_width=0.1, isoline_darkness=0.5, enabled=True)
+            p.add_scalar_quantity("test_vals_with_iso2", vals, defined_on=on, param_name=param_name, cmap='blues', isolines_enabled=True, isoline_style='stripe', isoline_period=0.1, isoline_darkness=0.5, enabled=True)
+            p.add_scalar_quantity("test_vals_with_iso_contour", vals, defined_on=on, param_name=param_name, cmap='blues', isolines_enabled=True, isoline_style='contour', isoline_period=0.1, isoline_contour_thickness =0.4, enabled=True)
             p.add_scalar_quantity("test_vals_with_extra", vals, defined_on=on, param_name=param_name, enabled=True, **extra_args)
 
             ps.show(3)

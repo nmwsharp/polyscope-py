@@ -1,6 +1,6 @@
 import polyscope_bindings as psb
 
-from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str, str_to_filter_mode, str_to_param_viz_style
+from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str, str_to_filter_mode, str_to_param_viz_style, str_to_isoline_style
 
 
 def check_is_scalar_image(values):
@@ -67,6 +67,18 @@ def process_scalar_args(structure, quantity, scalar_args):
     if val is not None:
         quantity.set_isolines_enabled(val)
     
+    val = check_and_pop_arg(scalar_args, 'isoline_style')
+    if val is not None:
+        quantity.set_isoline_style(str_to_isoline_style(val))
+
+    val = check_and_pop_arg(scalar_args, 'isoline_period')
+    val_relative = check_and_pop_arg(scalar_args, 'isoline_period_relative')
+    if val is not None:
+        if val_relative is None: 
+            val_relative = False
+        quantity.set_isoline_period(val, val_relative)
+
+    # deprecated name
     val = check_and_pop_arg(scalar_args, 'isoline_width')
     val_relative = check_and_pop_arg(scalar_args, 'isoline_width_relative')
     if val is not None:
@@ -77,6 +89,10 @@ def process_scalar_args(structure, quantity, scalar_args):
     val = check_and_pop_arg(scalar_args, 'isoline_darkness')
     if val is not None:
         quantity.set_isoline_darkness(val)
+    
+    val = check_and_pop_arg(scalar_args, 'isoline_contour_thickness')
+    if val is not None:
+        quantity.set_isoline_contour_thickness(val)
 
 
 # Process args, removing them from the dict if they are present

@@ -474,6 +474,11 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("tri_flat", ps::MeshShadeStyle::TriFlat)
     .export_values(); 
   
+  py::enum_<ps::IsolineStyle>(m, "IsolineStyle")
+    .value("stripe", ps::IsolineStyle::Stripe)
+    .value("contour", ps::IsolineStyle::Contour)
+    .export_values(); 
+  
   py::enum_<ps::ImplicitRenderMode>(m, "ImplicitRenderMode")
     .value("sphere_march", ps::ImplicitRenderMode::SphereMarch)
     .value("fixed_step", ps::ImplicitRenderMode::FixedStep)

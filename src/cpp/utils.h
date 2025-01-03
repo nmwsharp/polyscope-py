@@ -101,16 +101,17 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
 
   // structure basics
   s.def("remove", &StructureT::remove, "Remove the structure")
-      .def("get_name", [](StructureT& s) { return s.name; }, "Ge the name")
+      .def(
+          "get_name", [](StructureT& s) { return s.name; }, "Ge the name")
       .def("get_unique_prefix", &StructureT::uniquePrefix, "Get unique prefix")
       .def("set_enabled", &StructureT::setEnabled, "Enable the structure")
       .def("enable_isolate", &StructureT::enableIsolate, "Enable the structure, disable all of same type")
       .def("is_enabled", &StructureT::isEnabled, "Check if the structure is enabled")
       .def("set_transparency", &StructureT::setTransparency, "Set transparency alpha")
       .def("get_transparency", &StructureT::getTransparency, "Get transparency alpha")
-      
+
       // group things
-      .def("add_to_group", overload_cast_<std::string>()(&StructureT::addToGroup) , "Add to group")
+      .def("add_to_group", overload_cast_<std::string>()(&StructureT::addToGroup), "Add to group")
 
       // slice plane things
       .def("set_ignore_slice_plane", &StructureT::setIgnoreSlicePlane, "Set ignore slice plane")
@@ -197,8 +198,11 @@ py::class_<ScalarQ> bindScalarQuantity(py::module& m, std::string name) {
       .def("set_color_map", &ScalarQ::setColorMap, "Set color map")
       .def("set_map_range", &ScalarQ::setMapRange, "Set map range")
       .def("set_isolines_enabled", &ScalarQ::setIsolinesEnabled)
-      .def("set_isoline_width", &ScalarQ::setIsolineWidth, "Set isoline width")
-      .def("set_isoline_darkness", &ScalarQ::setIsolineDarkness);
+      .def("set_isoline_style", &ScalarQ::setIsolineStyle)
+      .def("set_isoline_period", &ScalarQ::setIsolinePeriod, "Set isoline period")
+      .def("set_isoline_width", &ScalarQ::setIsolineWidth, "Set isoline width") // deprecated
+      .def("set_isoline_darkness", &ScalarQ::setIsolineDarkness)
+      .def("set_isoline_contour_thickness", &ScalarQ::setIsolineContourThickness);
 }
 
 template <typename VolumeMeshVertexScalarQuantity>
