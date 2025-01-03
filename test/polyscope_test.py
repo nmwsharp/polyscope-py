@@ -72,7 +72,9 @@ class TestCore(unittest.TestCase):
         
         self.assertTrue(ps.is_headless() in [True, False])
         ps.set_allow_headless_backends(True)
+        ps.set_egl_device_index(-1)
         
+        ps.set_enable_render_error_checks(True)
         ps.set_enable_render_error_checks(True)
         ps.set_warn_for_invalid_values(True)
         ps.set_autocenter_structures(False)

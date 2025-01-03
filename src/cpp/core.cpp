@@ -121,6 +121,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("get_redraw_requested", []() { return ps::redrawRequested(); });
   m.def("set_always_redraw", [](bool x) { ps::options::alwaysRedraw = x; });
   m.def("set_enable_render_error_checks", [](bool x) { ps::options::enableRenderErrorChecks = x; });
+  m.def("set_egl_device_index", [](int x) { ps::options::eglDeviceIndex = x; });
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
   m.def("set_autoscale_structures", [](bool x) { ps::options::autoscaleStructures = x; });
   m.def("set_build_gui", [](bool x) { ps::options::buildGui = x; });

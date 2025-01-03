@@ -121,6 +121,9 @@ def set_always_redraw(v):
 def set_enable_render_error_checks(b):
     psb.set_enable_render_error_checks(b)
 
+def set_egl_device_index(i):
+    psb.set_egl_device_index(i)
+
 def set_autocenter_structures(b):
     psb.set_autocenter_structures(b)
 
