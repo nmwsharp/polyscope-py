@@ -134,6 +134,8 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("translate", [](StructureT& s, Eigen::Vector3f T) { s.translate(eigen2glm(T)); }, "apply the given translation to the shape, updating its position")
       .def("get_transform", [](StructureT& s) { return glm2eigen(s.getTransform()); }, "get the current 4x4 transform matrix")
       .def("get_position", [](StructureT& s) { return glm2eigen(s.getPosition()); }, "get the position of the shape origin after transform")
+      .def("set_transform_gizmo_enabled", &StructureT::setTransformGizmoEnabled)
+      .def("get_transform_gizmo_enabled", &StructureT::getTransformGizmoEnabled)
       
       // floating quantites
       .def("add_scalar_image_quantity", &StructureT::template addScalarImageQuantity<Eigen::VectorXf>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::arg("type")=ps::DataType::STANDARD, py::return_value_policy::reference)

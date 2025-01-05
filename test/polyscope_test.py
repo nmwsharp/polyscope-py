@@ -559,6 +559,10 @@ def test_transforms(t,s):
 
     s.translate(v)
     t.assertTrue(np.abs(s.get_position()-2.*v).sum() < 1e-4)
+    
+    s.set_transform_gizmo_enabled(True)
+    t.assertTrue(s.get_transform_gizmo_enabled())
+    s.set_transform_gizmo_enabled(False)
 
 
 class TestPointCloud(unittest.TestCase):

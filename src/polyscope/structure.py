@@ -58,6 +58,10 @@ class Structure:
         return self.bound_instance.get_transform()
     def get_position(self):
         return self.bound_instance.get_position()
+    def set_transform_gizmo_enabled(self, val):
+        self.bound_instance.set_transform_gizmo_enabled(val)
+    def get_transform_gizmo_enabled(self):
+        return self.bound_instance.get_transform_gizmo_enabled()
     
     ## Managed Buffers
     
