@@ -41,8 +41,8 @@ def is_initialized():
 def frame_tick():
     psb.frame_tick()
 
-def shutdown():
-    psb.shutdown()
+def shutdown(allow_mid_frame_shutdown=False):
+    psb.shutdown(allow_mid_frame_shutdown)
 
 
 ### Render engine

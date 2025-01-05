@@ -61,7 +61,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   atexit.attr("register")(py::cpp_function([]() {
         ps::state::userCallback = nullptr;
         if (ps::render::engine != nullptr) {
-          ps::shutdown();
+          ps::shutdown(true);
         }
   }));
   
