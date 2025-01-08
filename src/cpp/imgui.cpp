@@ -538,8 +538,8 @@ void bind_imgui_methods(py::module& m) {
         py::arg("active"));
     m.def(
         "RadioButton",
-        [](const char* label, unsigned int v, unsigned int v_button) {
-            const auto clicked = ImGui::CheckboxFlags(label, &v, v_button);
+        [](const char* label, int v, int v_button) {
+            const auto clicked = ImGui::RadioButton(label, &v, v_button);
             return std::make_tuple(clicked, v);
         },
         py::arg("label"),
@@ -1663,7 +1663,7 @@ void bind_imgui_methods(py::module& m) {
     m.def(
         "AddLine", 
         [](const Vec2T& p1, const Vec2T& p2, ImU32 col, float thickness) {
-            ImGui::GetWindowDrawList()->AddRect(to_vec2(p1), to_vec2(p2), col, thickness);
+            ImGui::GetWindowDrawList()->AddLine(to_vec2(p1), to_vec2(p2), col, thickness);
         },
         py::arg("p_min"),
         py::arg("p_max"),
