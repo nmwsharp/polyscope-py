@@ -653,6 +653,7 @@ def str_to_datatype(s):
         "standard" : psb.DataType.standard,
         "symmetric" : psb.DataType.symmetric,
         "magnitude" : psb.DataType.magnitude,
+        "categorical" : psb.DataType.categorical,
     }
 
     if s not in d:

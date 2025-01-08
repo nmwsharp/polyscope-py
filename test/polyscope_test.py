@@ -724,6 +724,7 @@ class TestPointCloud(unittest.TestCase):
         p.add_scalar_quantity("test_vals", vals, enabled=True)
         p.add_scalar_quantity("test_vals_with_range", vals, vminmax=(-5., 5.), enabled=True)
         p.add_scalar_quantity("test_vals_with_datatype", vals, enabled=True, datatype='symmetric')
+        p.add_scalar_quantity("test_vals_with_categorical", vals, enabled=True, datatype='categorical')
         p.add_scalar_quantity("test_vals_with_cmap", vals, enabled=True, cmap='blues')
         p.add_scalar_quantity("test_vals_with_iso", vals, enabled=True, cmap='blues',
                               isolines_enabled=True, isoline_width=0.1, isoline_darkness=0.5)

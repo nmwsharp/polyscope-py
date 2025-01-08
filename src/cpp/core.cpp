@@ -408,6 +408,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("standard", ps::DataType::STANDARD)
     .value("symmetric", ps::DataType::SYMMETRIC)
     .value("magnitude", ps::DataType::MAGNITUDE)
+    .value("categorical", ps::DataType::CATEGORICAL)
     .export_values(); 
 
   py::enum_<ps::VectorType>(m, "VectorType")
