@@ -7,6 +7,11 @@ before-all = [
     "yum remove -y cmake",
     "yum install -y libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel mesa-libGL libXi-devel freeglut-devel mesa-libEGL-devel"
 ]
+# Tell auditwheel _not_ to bundle libEGL, as it is platform/driver specific won't work (segfaults). We need to use the system libEGL.
+# Fortunately almost all linux systems should have this, but might cause linking errors at runtime if not
+# libGL is already treated similarly, but libEGL is not on the default auditwheel whitelist
+repair-wheel-command = "auditwheel repair --exclude libEGL.so.1 -w {dest_dir} {wheel}"
+
 [tool.cibuildwheel.environment.linux]
 CMAKE_ARGS = "DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON"
 
