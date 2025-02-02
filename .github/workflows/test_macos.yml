@@ -11,11 +11,11 @@ jobs:
     runs-on: macos-latest
     if: "! contains(toJSON(github.event.commits.*.message), '[ci skip]')"
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
 
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v5
       name: Install Python
       with:
         python-version: '3.9'
