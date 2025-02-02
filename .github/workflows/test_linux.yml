@@ -8,32 +8,41 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     if: "! contains(toJSON(github.event.commits.*.message), '[ci skip]')"
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, ubuntu-22.04-arm]
+
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
-      
-    - uses: actions/setup-python@v2
+
+    - uses: actions/setup-python@v5
       name: Install Python
       with:
         python-version: '3.9'
 
     - name: install packages
-      run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
-    
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
+
     - name: install python packages
       run: python3 -m pip install numpy
 
     - name: configure
-      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DPYTHON_EXECUTABLE=$(python3 -c "import sys; print(sys.executable)") -DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON ..
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug -DPYTHON_EXECUTABLE=$(python3 -c "import sys; print(sys.executable)") -DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON ..
 
     - name: build
       run: cd build && make
 
     - name: run test backend mock
       run: python3 test/polyscope_test.py -v
-    
+
     - name: run test backend EGL
       run: python3 test/polyscope_test.py -v backend=openGL3_egl
