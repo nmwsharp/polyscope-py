@@ -30,7 +30,6 @@ jobs:
           brew install freeglut
           brew install xorg-server
           brew install xpra
-          brew install xorg-video-dummy
 
     - name: configure
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DPOLYSCOPE_BACKEND_OPENGL3_GLFW=ON -DPOLYSCOPE_BACKEND_OPENGL_MOCK=ON ..
