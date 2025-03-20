@@ -303,10 +303,25 @@ def have_selection():
     return psb.have_selection()
 
 def get_selection():
-    return psb.get_selection()
+    return PickResult(psb.get_selection())
 
-def set_selection(name, index):
-    psb.set_selection(name, index)
+class PickResult:
+
+    def __init__(self, bound_pick_result):
+
+        self.raw_result = bound_pick_result
+
+        # translate most properties
+        self.is_hit = bound_pick_result.is_hit
+        self.structure_type_name = bound_pick_result.structure_type
+        self.structure_name = bound_pick_result.structure_name
+        self.screen_coords = bound_pick_result.screen_coords.as_tuple()
+        self.buffer_inds = bound_pick_result.buffer_inds.as_tuple()
+        self.position = np.array(bound_pick_result.position.as_tuple())
+        self.depth = bound_pick_result.depth
+        self.local_index = bound_pick_result.local_index
+
+
 
 ## Ground plane and shadows
 def set_ground_plane_mode(mode_str):

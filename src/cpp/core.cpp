@@ -207,6 +207,21 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("clear_user_callback", []() {ps::state::userCallback = nullptr;});
 
   // === Pick
+
+  py::class_<ps::PickResult>(m, "PickResult")
+   .def(py::init<>())
+   .def_readonly("is_hit", &ps::PickResult::isHit)
+  //  .def_readonly("structure", &ps::PickResult::structure)
+   .def_readonly("structure_handle", &ps::PickResult::structureHandle)
+   .def_readonly("structure_type", &ps::PickResult::structureType)
+   .def_readonly("structure_name", &ps::PickResult::structureName)
+   .def_readonly("screen_coords", &ps::PickResult::screenCoords)
+   .def_readonly("buffer_inds", &ps::PickResult::bufferCoords)
+   .def_readonly("position", &ps::PickResult::position)
+   .def_readonly("depth", &ps::PickResult::depth)
+   .def_readonly("local_index", &ps::PickResult::localIndex)
+  ;
+
   m.def("have_selection", [](){ return ps::pick::haveSelection();});
   m.def("get_selection", [](){
     const auto selection = ps::pick::getSelection();
@@ -530,6 +545,13 @@ PYBIND11_MODULE(polyscope_bindings, m) {
         return std::tuple<float, float, float, float>(x[0], x[1], x[2], x[3]);
         });
   
+  py::class_<glm::uvec3>(m, "glm_ivec2").
+    def(py::init<int32_t, int32_t>())
+   .def("as_tuple",
+        [](const glm::ivec2& x) {
+        return std::tuple<int32_t, int32_t>(x[0], x[1]); 
+        });
+
   py::class_<glm::uvec3>(m, "glm_uvec3").
     def(py::init<uint32_t, uint32_t, uint32_t>())
    .def("as_tuple",
