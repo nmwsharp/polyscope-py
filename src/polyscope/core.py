@@ -1,6 +1,12 @@
 import polyscope_bindings as psb
 import polyscope.imgui as psim
 
+from polyscope.point_cloud import get_point_cloud
+from polyscope.curve_network import get_curve_network
+from polyscope.surface_mesh import get_surface_mesh
+from polyscope.volume_mesh import get_volume_mesh
+from polyscope.volume_grid import get_volume_grid
+
 import os
 
 import numpy as np
@@ -298,12 +304,22 @@ def set_user_callback(func):
 def clear_user_callback():
     psb.clear_user_callback()
 
-### Pick
+### Picking
+
+def query_pick_at_screen_coords(screen_coords):
+    return PickResult(psb.query_pick_at_screen_coords(glm2(screen_coords)))
+
+def query_pick_at_buffer_inds(buffer_inds):
+    return PickResult(psb.query_pick_at_buffer_inds(glm2i(buffer_inds)))
+
 def have_selection():
     return psb.have_selection()
 
 def get_selection():
     return PickResult(psb.get_selection())
+
+def reset_selection():
+    psb.reset_selection()
 
 class PickResult:
 
@@ -321,10 +337,34 @@ class PickResult:
         self.depth = bound_pick_result.depth
         self.local_index = bound_pick_result.local_index
 
+        # additional per-structure data, such as barycentric coordinates 
+        # if its a triangle in a mesh
+        self.structure_data = {}
+
+        self.resolve_additional_data()
+
+    def resolve_additional_data(self):
+        # resolve data from various types
+        
+        if self.structure_type_name == "PointCloud":
+            get_point_cloud(self.structure_name).append_pick_data(self)
+        
+        if self.structure_type_name == "CurveNetwork":
+            get_curve_network(self.structure_name).append_pick_data(self)
+        
+        if self.structure_type_name == "SurfaceMesh":
+            get_surface_mesh(self.structure_name).append_pick_data(self)
+        
+        if self.structure_type_name == "VolumeMesh":
+            get_volume_mesh(self.structure_name).append_pick_data(self)
+        
+        if self.structure_type_name == "VolumeGrid":
+            get_volume_grid(self.structure_name).append_pick_data(self)
+
 
 
 ## Ground plane and shadows
-def set_ground_plane_mode(mode_str):
+def set_ground_plane_mode(mode_str):# 
     psb.set_ground_plane_mode(str_to_ground_plane_mode(mode_str))
 
 def set_ground_plane_height_mode(mode_str):
@@ -541,6 +581,8 @@ class CameraParameters:
 ## Small utilities
 def glm2(vals):
     return psb.glm_vec2(vals[0], vals[1])
+def glm2i(vals):
+    return psb.glm_ivec2(vals[0], vals[1])
 def glm3u(vals):
     return psb.glm_uvec3(vals[0], vals[1], vals[2])
 def glm3(vals):
@@ -580,6 +622,19 @@ def load_color_map(cmap_name, filename):
     psb.load_color_map(cmap_name, filename)
 
 ## String-to-enum translation
+
+# General case
+# TODO: gradually replace the enum-specific methods below with this, 
+# ensuring each doesn't have any special breakage
+def str_to_enum(s, enum):
+    if s in enum: return enum[s]
+    enum_val_names = [x.name for x in enum]
+    raise ValueError(f"Bad specifier '{s}' for {typename(enum)}, should be one of [{",".join(enum_val_names)}]")
+
+def enum_to_str(enum_val):
+    return enum_val.name
+
+## Per-enum maps
 
 d_navigate = {
     "turntable" : psb.NavigateStyle.turntable,
@@ -777,7 +832,7 @@ def str_to_transparency_mode(s):
     }
 
     if s not in d:
-        raise ValueError("Bad transparenccy mode specifier '{}', should be one of [{}]".format(s, 
+        raise ValueError("Bad transparency mode specifier '{}', should be one of [{}]".format(s, 
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]

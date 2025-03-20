@@ -20,7 +20,11 @@ using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
 // clang-format off
 void bind_point_cloud(py::module& m) {
 
-  // == Helper quantity classes
+  // == Helper classes
+  py::class_<ps::PointCloudPickResult>(m, "PointCloudPickResult")
+   .def(py::init<>())
+   .def_readonly("index", &ps::PointCloudPickResult::index)
+  ;
 
   // Scalar quantities
   bindScalarQuantity<ps::PointCloudScalarQuantity>(m, "PointCloudScalarQuantity");
@@ -49,6 +53,9 @@ void bind_point_cloud(py::module& m) {
     .def("get_material", &ps::PointCloud::getMaterial, "Get material")
     .def("set_point_render_mode", &ps::PointCloud::setPointRenderMode, "Set point render mode")
     .def("get_point_render_mode", &ps::PointCloud::getPointRenderMode, "Get point render mode")
+
+    // picking
+    .def("interpret_pick_result", &ps::PointCloud::interpretPickResult)
 
     // variable radius
     .def("set_point_radius_quantity", 

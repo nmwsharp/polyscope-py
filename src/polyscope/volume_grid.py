@@ -1,7 +1,7 @@
 import polyscope_bindings as psb
 import numpy as np
 
-from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3, glm3u
+from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3, glm3u, enum_to_str
 from polyscope.structure import Structure
 from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed, check_and_pop_arg
 
@@ -113,6 +113,12 @@ class VolumeGrid(Structure):
     def mark_cells_as_used(self):
         return self.bound_instance.mark_cells_as_used()
 
+
+    # Picking
+    def interpret_pick_result(self, pick_result):
+        struct_result = self.bound_instance.interpret_pick_result(pick_result)
+        pick_result.structure_data["element_type"] = enum_to_str(struct_result.element_type)
+        pick_result.structure_data["index"] = struct_result.index
 
     ## Quantities
 

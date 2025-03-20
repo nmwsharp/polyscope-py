@@ -18,7 +18,14 @@ namespace ps = polyscope;
 void bind_surface_mesh(py::module& m) {
 
 
-  // == Helper quantity classes
+  // == Helper classes
+  py::class_<ps::SurfaceMeshPickResult>(m, "SurfaceMeshPickResult")
+   .def(py::init<>())
+   .def_readonly("element_type", &ps::SurfaceMeshPickResult::elementType)
+   .def_readonly("index", &ps::SurfaceMeshPickResult::index)
+   .def_readonly("bary_coords", &ps::SurfaceMeshPickResult::baryCoords)
+  ;
+
 
   // Scalar quantities
   bindScalarQuantity<ps::SurfaceVertexScalarQuantity>(m, "SurfaceVertexScalarQuantity");
@@ -97,6 +104,9 @@ void bind_surface_mesh(py::module& m) {
       .def("get_back_face_policy", &ps::SurfaceMesh::getBackFacePolicy, "Get back face policy")
       .def("set_back_face_color", &ps::SurfaceMesh::setBackFaceColor, "Set back face color")
       .def("get_back_face_color", &ps::SurfaceMesh::getBackFaceColor, "Get back face color")
+    
+      // picking
+      .def("interpret_pick_result", &ps::SurfaceMesh::interpretPickResult)
 
       // permutations & bases
       .def("set_edge_permutation", &ps::SurfaceMesh::setEdgePermutation<Eigen::VectorXi>, "Set edge permutation")

@@ -168,10 +168,10 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("get_buffer_size", &ps::view::getBufferSize);
   m.def("set_window_resizable", &ps::view::setWindowResizable);
   m.def("get_window_resizable", &ps::view::getWindowResizable);
-  m.def("set_view_from_json", ps::view::setViewFromJson);
-  m.def("get_view_as_json", ps::view::getViewAsJson);
-  m.def("screen_coords_to_world_ray", ps::view::screenCoordsToWorldRay);
-  m.def("screen_coords_to_world_position", ps::view::screenCoordsToWorldPosition);
+  m.def("set_view_from_json", &ps::view::setViewFromJson);
+  m.def("get_view_as_json", &ps::view::getViewAsJson);
+  m.def("screen_coords_to_world_ray", &ps::view::screenCoordsToWorldRay);
+  m.def("screen_coords_to_world_position", &ps::view::screenCoordsToWorldPosition);
   m.def("set_background_color", [](glm::vec4 c) { for(int i = 0; i < 4; i++) ps::view::bgColor[i] = c[i]; });
   m.def("get_background_color", []() { return glm2eigen(glm::vec4{
         ps::view::bgColor[0], ps::view::bgColor[1], ps::view::bgColor[2], ps::view::bgColor[3] 
@@ -187,9 +187,9 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   
   // === Messages
   m.def("info", overload_cast_<int, std::string>()(&ps::info), "Send an info message");
-  m.def("warning", ps::warning, "Send a warning message");
-  m.def("error", ps::error, "Send an error message");
-  m.def("terminating_error", ps::terminatingError, "Send a terminating error message");
+  m.def("warning", &ps::warning, "Send a warning message");
+  m.def("error", &ps::error, "Send an error message");
+  m.def("terminating_error", &ps::terminatingError, "Send a terminating error message");
 
   // === Callback
   m.def("set_user_callback", [](const std::function<void(void)>& func) { 
@@ -216,40 +216,21 @@ PYBIND11_MODULE(polyscope_bindings, m) {
    .def_readonly("structure_type", &ps::PickResult::structureType)
    .def_readonly("structure_name", &ps::PickResult::structureName)
    .def_readonly("screen_coords", &ps::PickResult::screenCoords)
-   .def_readonly("buffer_inds", &ps::PickResult::bufferCoords)
+   .def_readonly("buffer_inds", &ps::PickResult::bufferInds)
    .def_readonly("position", &ps::PickResult::position)
    .def_readonly("depth", &ps::PickResult::depth)
    .def_readonly("local_index", &ps::PickResult::localIndex)
   ;
 
-  m.def("have_selection", [](){ return ps::pick::haveSelection();});
-  m.def("get_selection", [](){
-    const auto selection = ps::pick::getSelection();
-    const auto * structure = std::get<0>(selection);
-    if (structure == nullptr) {
-      return std::make_tuple(std::string(), size_t{0});
-    }
-    return std::make_tuple(structure->name, std::get<1>(selection));
-  });
-  m.def(
-    "set_selection",
-    [](const std::string &name, size_t index){
-      for(const auto &structureTypeName : std::array<std::string, 4>{
-        ps::PointCloud::structureTypeName,
-        ps::CurveNetwork::structureTypeName,
-        ps::SurfaceMesh::structureTypeName,
-        ps::VolumeMesh::structureTypeName
-      }) {
-        if (ps::hasStructure(structureTypeName, name)) {
-          auto * structure = ps::getStructure(structureTypeName, name);
-          ps::pick::setSelection(std::make_pair(structure, index));
-          break;
-        }
-      }
-    },
-    py::arg("name"),
-    py::arg("index")
-  );
+  // stateful selection
+  m.def("have_selection", &ps::haveSelection);
+  m.def("get_selection", &ps::getSelection);
+  m.def("reset_selection", &ps::resetSelection);
+  // inentionally no binding to set_selection(), it is low-level and not obvious how to bind
+
+  // query what is under a pixel
+  m.def("query_pick_at_screen_coords", &ps::queryPickAtScreenCoords);
+  m.def("query_pick_at_buffer_inds", &ps::queryPickAtBufferInds);
 
   // === Ground plane and shadows
   m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });
@@ -468,6 +449,31 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("simple", ps::TransparencyMode::Simple)
     .value("pretty", ps::TransparencyMode::Pretty)
     .export_values(); 
+    
+    py::enum_<ps::CurveNetworkElement>(m, "CurveNetworkElement")
+    .value("node", ps::CurveNetworkElement::NODE)
+    .value("edge", ps::CurveNetworkElement::EDGE)
+    .export_values();
+
+    py::enum_<ps::MeshElement>(m, "MeshElement")
+    .value("vertex", ps::MeshElement::VERTEX)
+    .value("face", ps::MeshElement::FACE)
+    .value("edge", ps::MeshElement::EDGE)
+    .value("halfedge", ps::MeshElement::HALFEDGE)
+    .value("corner", ps::MeshElement::CORNER)
+    .export_values(); 
+
+    py::enum_<ps::VolumeMeshElement>(m, "VolumeMeshElement")
+    .value("vertex", ps::VolumeMeshElement::VERTEX)
+    .value("edge", ps::VolumeMeshElement::EDGE)
+    .value("face", ps::VolumeMeshElement::FACE)
+    .value("cell", ps::VolumeMeshElement::CELL)
+    .export_values(); 
+    
+    py::enum_<ps::VolumeGridElement>(m, "VolumeGridElement")
+    .value("node", ps::VolumeGridElement::NODE)
+    .value("cell", ps::VolumeGridElement::CELL)
+    .export_values(); 
   
   py::enum_<ps::PointRenderMode>(m, "PointRenderMode")
     .value("sphere", ps::PointRenderMode::Sphere)
@@ -545,7 +551,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
         return std::tuple<float, float, float, float>(x[0], x[1], x[2], x[3]);
         });
   
-  py::class_<glm::uvec3>(m, "glm_ivec2").
+  py::class_<glm::ivec2>(m, "glm_ivec2").
     def(py::init<int32_t, int32_t>())
    .def("as_tuple",
         [](const glm::ivec2& x) {

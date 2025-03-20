@@ -17,7 +17,12 @@ namespace ps = polyscope;
 
 void bind_volume_grid(py::module& m) {
 
-  // == Helper quantity classes
+  // == Helper classes
+  py::class_<ps::VolumeGridPickResult>(m, "VolumeMeshPickResult")
+   .def(py::init<>())
+   .def_readonly("element_type", &ps::VolumeGridPickResult::elementType)
+   .def_readonly("index", &ps::VolumeGridPickResult::index)
+  ;
 
   // Scalar quantities
   bindScalarQuantity<ps::VolumeGridNodeScalarQuantity>(m, "VolumeGridNodeScalarQuantity")
@@ -62,6 +67,8 @@ void bind_volume_grid(py::module& m) {
       .def("set_cube_size_factor", &ps::VolumeGrid::setCubeSizeFactor, "Set cube size factor")
       .def("get_cube_size_factor", &ps::VolumeGrid::getCubeSizeFactor, "Get cube size factor")
 
+      // picking
+      .def("interpret_pick_result", &ps::VolumeGrid::interpretPickResult)
 
       // = quantities
 
