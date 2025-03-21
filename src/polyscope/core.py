@@ -235,8 +235,10 @@ def get_view_as_json():
 def screen_coords_to_world_ray(screen_coords):
     return np.array(psb.screen_coords_to_world_ray(glm2(screen_coords)).as_tuple())
 
+# deprecated! use query_pick_at_screen_coords
 def screen_coords_to_world_position(screen_coords):
-    return np.array(psb.screen_coords_to_world_position(glm2(screen_coords)).as_tuple())
+    pick_result = query_pick_at_screen_coords(screen_coords)
+    return pick_result.position
 
 def set_background_color(c):
     if len(c) == 3: c = (c[0], c[1], c[2], 1.0)

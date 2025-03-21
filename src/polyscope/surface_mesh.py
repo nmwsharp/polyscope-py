@@ -120,6 +120,12 @@ class SurfaceMesh(Structure):
     def get_smooth_shade(self):
         return self.bound_instance.get_smooth_shade()
     
+    # Selection Mode
+    def set_selection_mode(self, val):
+        self.bound_instance.set_selection_mode(val)
+    def get_selection_mode(self):
+        return self.bound_instance.get_selection_mode()
+    
     # Material
     def set_material(self, mat):
         self.bound_instance.set_material(mat)

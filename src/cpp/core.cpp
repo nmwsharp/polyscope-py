@@ -171,7 +171,6 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_view_from_json", &ps::view::setViewFromJson);
   m.def("get_view_as_json", &ps::view::getViewAsJson);
   m.def("screen_coords_to_world_ray", &ps::view::screenCoordsToWorldRay);
-  m.def("screen_coords_to_world_position", &ps::view::screenCoordsToWorldPosition);
   m.def("set_background_color", [](glm::vec4 c) { for(int i = 0; i < 4; i++) ps::view::bgColor[i] = c[i]; });
   m.def("get_background_color", []() { return glm2eigen(glm::vec4{
         ps::view::bgColor[0], ps::view::bgColor[1], ps::view::bgColor[2], ps::view::bgColor[3] 
@@ -461,6 +460,12 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("edge", ps::MeshElement::EDGE)
     .value("halfedge", ps::MeshElement::HALFEDGE)
     .value("corner", ps::MeshElement::CORNER)
+    .export_values(); 
+
+  py::enum_<ps::MeshSelectionMode>(m, "MeshSelectionMode")
+    .value("auto", ps::MeshSelectionMode::Auto)
+    .value("vertices_only", ps::MeshSelectionMode::VerticesOnly)
+    .value("faces_only", ps::MeshSelectionMode::FacesOnly)
     .export_values(); 
 
     py::enum_<ps::VolumeMeshElement>(m, "VolumeMeshElement")

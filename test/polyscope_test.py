@@ -1138,6 +1138,12 @@ class TestSurfaceMesh(unittest.TestCase):
         p.set_edge_width(1.5)
         ps.show(3)
         self.assertAlmostEqual(p.get_edge_width(), 1.5)
+
+        # Selection mode
+        p.set_selection_mode('auto')
+        p.set_selection_mode('vertices_only')
+        p.set_selection_mode('faces_only')
+        ps.show(3)
         
         # Material
         p.set_material("candy")
