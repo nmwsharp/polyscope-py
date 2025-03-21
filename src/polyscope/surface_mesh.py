@@ -3,7 +3,7 @@ import numpy as np
 
 from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type,            \
                            str_to_param_viz_style, str_to_back_face_policy, back_face_policy_to_str,\
-                           str_to_image_origin, glm3, enum_to_str
+                           str_to_image_origin, glm3, enum_to_str, str_to_enum
 from polyscope.structure import Structure
 from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, process_texture_map_args, process_parameterization_args, check_all_args_processed, check_is_scalar_image, check_is_image3
 
@@ -122,9 +122,9 @@ class SurfaceMesh(Structure):
     
     # Selection Mode
     def set_selection_mode(self, val):
-        self.bound_instance.set_selection_mode(val)
+        self.bound_instance.set_selection_mode(str_to_enum(val, psb.MeshSelectionMode))
     def get_selection_mode(self):
-        return self.bound_instance.get_selection_mode()
+        return enum_to_str(self.bound_instance.get_selection_mode())
     
     # Material
     def set_material(self, mat):

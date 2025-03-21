@@ -66,7 +66,7 @@ def main():
             io = psim.GetIO()
             if io.MouseClicked[0]:
                 screen_coords = io.MousePos
-                pick_result = polyscope.query_pick_at_screen_coords(screen_coords)
+                pick_result = polyscope.pick(screen_coords=screen_coords)
                 print(pick_result)
                 is_test_clicking = False
 

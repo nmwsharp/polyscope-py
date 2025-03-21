@@ -228,8 +228,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   // inentionally no binding to set_selection(), it is low-level and not obvious how to bind
 
   // query what is under a pixel
-  m.def("query_pick_at_screen_coords", &ps::queryPickAtScreenCoords);
-  m.def("query_pick_at_buffer_inds", &ps::queryPickAtBufferInds);
+  m.def("pick_at_screen_coords", &ps::pickAtScreenCoords);
+  m.def("pick_at_buffer_inds", &ps::pickAtBufferInds);
 
   // === Ground plane and shadows
   m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });
@@ -374,12 +374,12 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("arcball", ps::view::NavigateStyle::Arcball)
     .value("none", ps::view::NavigateStyle::None)
     .value("first_person", ps::view::NavigateStyle::FirstPerson)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::ProjectionMode>(m, "ProjectionMode")
     .value("perspective", ps::ProjectionMode::Perspective)
     .value("orthographic", ps::ProjectionMode::Orthographic)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::UpDir>(m, "UpDir")
     .value("x_up", ps::UpDir::XUp)
@@ -388,7 +388,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("neg_x_up", ps::UpDir::NegXUp)
     .value("neg_y_up", ps::UpDir::NegYUp)
     .value("neg_z_up", ps::UpDir::NegZUp)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::FrontDir>(m, "FrontDir")
     .value("x_front", ps::FrontDir::XFront)
@@ -397,24 +397,24 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("neg_x_front", ps::FrontDir::NegXFront)
     .value("neg_y_front", ps::FrontDir::NegYFront)
     .value("neg_z_front", ps::FrontDir::NegZFront)
-    .export_values(); 
+    ; 
 
   py::enum_<ps::DataType>(m, "DataType")
     .value("standard", ps::DataType::STANDARD)
     .value("symmetric", ps::DataType::SYMMETRIC)
     .value("magnitude", ps::DataType::MAGNITUDE)
     .value("categorical", ps::DataType::CATEGORICAL)
-    .export_values(); 
+    ; 
 
   py::enum_<ps::VectorType>(m, "VectorType")
     .value("standard", ps::VectorType::STANDARD)
     .value("ambient", ps::VectorType::AMBIENT)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::ParamCoordsType>(m, "ParamCoordsType")
     .value("unit", ps::ParamCoordsType::UNIT)
     .value("world", ps::ParamCoordsType::WORLD)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::ParamVizStyle>(m, "ParamVizStyle")
     .value("checker", ps::ParamVizStyle::CHECKER)
@@ -422,37 +422,37 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("grid", ps::ParamVizStyle::GRID)
     .value("local_check", ps::ParamVizStyle::LOCAL_CHECK)
     .value("local_rad", ps::ParamVizStyle::LOCAL_RAD)
-    .export_values(); 
+    ; 
 
   py::enum_<ps::BackFacePolicy>(m, "BackFacePolicy")
     .value("identical", ps::BackFacePolicy::Identical)
     .value("different", ps::BackFacePolicy::Different)
     .value("custom", ps::BackFacePolicy::Custom)
     .value("cull", ps::BackFacePolicy::Cull)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::GroundPlaneMode>(m, "GroundPlaneMode")
     .value("none", ps::GroundPlaneMode::None)
     .value("tile", ps::GroundPlaneMode::Tile)
     .value("tile_reflection", ps::GroundPlaneMode::TileReflection)
     .value("shadow_only", ps::GroundPlaneMode::ShadowOnly)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::GroundPlaneHeightMode>(m, "GroundPlaneHeightMode")
     .value("automatic", ps::GroundPlaneHeightMode::Automatic)
     .value("manual", ps::GroundPlaneHeightMode::Manual)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::TransparencyMode>(m, "TransparencyMode")
     .value("none", ps::TransparencyMode::None)
     .value("simple", ps::TransparencyMode::Simple)
     .value("pretty", ps::TransparencyMode::Pretty)
-    .export_values(); 
+    ; 
     
     py::enum_<ps::CurveNetworkElement>(m, "CurveNetworkElement")
     .value("node", ps::CurveNetworkElement::NODE)
     .value("edge", ps::CurveNetworkElement::EDGE)
-    .export_values();
+    ;
 
     py::enum_<ps::MeshElement>(m, "MeshElement")
     .value("vertex", ps::MeshElement::VERTEX)
@@ -460,56 +460,56 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("edge", ps::MeshElement::EDGE)
     .value("halfedge", ps::MeshElement::HALFEDGE)
     .value("corner", ps::MeshElement::CORNER)
-    .export_values(); 
+    ; 
 
   py::enum_<ps::MeshSelectionMode>(m, "MeshSelectionMode")
     .value("auto", ps::MeshSelectionMode::Auto)
     .value("vertices_only", ps::MeshSelectionMode::VerticesOnly)
     .value("faces_only", ps::MeshSelectionMode::FacesOnly)
-    .export_values(); 
+    ; 
 
     py::enum_<ps::VolumeMeshElement>(m, "VolumeMeshElement")
     .value("vertex", ps::VolumeMeshElement::VERTEX)
     .value("edge", ps::VolumeMeshElement::EDGE)
     .value("face", ps::VolumeMeshElement::FACE)
     .value("cell", ps::VolumeMeshElement::CELL)
-    .export_values(); 
+    ; 
     
     py::enum_<ps::VolumeGridElement>(m, "VolumeGridElement")
     .value("node", ps::VolumeGridElement::NODE)
     .value("cell", ps::VolumeGridElement::CELL)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::PointRenderMode>(m, "PointRenderMode")
     .value("sphere", ps::PointRenderMode::Sphere)
     .value("quad", ps::PointRenderMode::Quad)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::FilterMode>(m, "FilterMode")
     .value("linear", ps::FilterMode::Linear)
     .value("nearest", ps::FilterMode::Nearest)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::ImageOrigin>(m, "ImageOrigin")
     .value("lower_left", ps::ImageOrigin::LowerLeft)
     .value("upper_left", ps::ImageOrigin::UpperLeft)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::MeshShadeStyle>(m, "MeshShadeStyle")
     .value("smooth", ps::MeshShadeStyle::Smooth)
     .value("flat", ps::MeshShadeStyle::Flat)
     .value("tri_flat", ps::MeshShadeStyle::TriFlat)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::IsolineStyle>(m, "IsolineStyle")
     .value("stripe", ps::IsolineStyle::Stripe)
     .value("contour", ps::IsolineStyle::Contour)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::ImplicitRenderMode>(m, "ImplicitRenderMode")
     .value("sphere_march", ps::ImplicitRenderMode::SphereMarch)
     .value("fixed_step", ps::ImplicitRenderMode::FixedStep)
-    .export_values(); 
+    ; 
   
   py::enum_<ps::ManagedBufferType>(m, "ManagedBufferType")
     .value(ps::typeName(ps::ManagedBufferType::Float   ).c_str(),   ps::ManagedBufferType::Float   )
@@ -525,14 +525,14 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value(ps::typeName(ps::ManagedBufferType::UVec2   ).c_str(),   ps::ManagedBufferType::UVec2   )
     .value(ps::typeName(ps::ManagedBufferType::UVec3   ).c_str(),   ps::ManagedBufferType::UVec3   )
     .value(ps::typeName(ps::ManagedBufferType::UVec4   ).c_str(),   ps::ManagedBufferType::UVec4   )
-    .export_values(); 
+    ; 
   
   py::enum_<ps::DeviceBufferType>(m, "DeviceBufferType")
     .value("attribute", ps::DeviceBufferType::Attribute)
     .value("texture1d", ps::DeviceBufferType::Texture1d)
     .value("texture2d", ps::DeviceBufferType::Texture2d)
     .value("texture3d", ps::DeviceBufferType::Texture3d)
-    .export_values(); 
+    ; 
 
   // === Mini bindings for a little bit of glm
   py::class_<glm::vec2>(m, "glm_vec2").

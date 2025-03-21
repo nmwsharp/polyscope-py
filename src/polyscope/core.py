@@ -237,7 +237,7 @@ def screen_coords_to_world_ray(screen_coords):
 
 # deprecated! use query_pick_at_screen_coords
 def screen_coords_to_world_position(screen_coords):
-    pick_result = query_pick_at_screen_coords(screen_coords)
+    pick_result = pick(screen_coords=screen_coords)
     return pick_result.position
 
 def set_background_color(c):
@@ -304,11 +304,18 @@ def clear_user_callback():
 
 ### Picking
 
-def query_pick_at_screen_coords(screen_coords):
-    return PickResult(psb.query_pick_at_screen_coords(glm2(screen_coords)))
+def pick(*, screen_coords=None, buffer_inds=None):
+    if(screen_coords is not None and buffer_inds is not None):
+        raise ValueError("pass args one of screen_coords OR buffer_inds, but not both")
+    if(screen_coords is None and buffer_inds is None):
+        raise ValueError("must pass args one of screen_coords or buffer_inds")
 
-def query_pick_at_buffer_inds(buffer_inds):
-    return PickResult(psb.query_pick_at_buffer_inds(glm2i(buffer_inds)))
+    if(screen_coords is not None):
+        raw_result = psb.pick_at_screen_coords(glm2(screen_coords))
+    if(buffer_inds is not None):
+        raw_result = psb.pick_at_buffer_inds(glm2i(buffer_inds))
+
+    return PickResult(raw_result)
 
 def have_selection():
     return psb.have_selection()
@@ -638,9 +645,9 @@ def load_color_map(cmap_name, filename):
 # TODO: gradually replace the enum-specific methods below with this, 
 # ensuring each doesn't have any special breakage
 def str_to_enum(s, enum):
-    if s in enum: return enum[s]
-    enum_val_names = [x.name for x in enum]
-    raise ValueError(f"Bad specifier '{s}' for {typename(enum)}, should be one of [{','.join(enum_val_names)}]")
+    if s in enum.__members__: return enum.__members__[s]
+    enum_val_names = [x for x in enum.__members__]
+    raise ValueError(f"Bad specifier '{s}' for {enum.__name__}, should be one of [{','.join(enum_val_names)}]")
 
 def enum_to_str(enum_val):
     return enum_val.name

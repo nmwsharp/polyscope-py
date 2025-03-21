@@ -237,6 +237,14 @@ class TestCore(unittest.TestCase):
         self.assertEqual(buff.shape, (h,w,4))
     
         ps.show(3)
+
+
+    def test_picking(self):
+
+        res = ps.pick(buffer_inds=(77,88))
+        res = ps.pick(screen_coords=(0.78,.96))
+
+        ps.show(3)
     
     def test_slice_plane(self):
 
