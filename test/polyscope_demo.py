@@ -32,6 +32,7 @@ def color_func(pts):
     A[:,0] = np.cos(3*pts[:,0])**2
     return A
 
+is_test_clicking = False
 
 def main():
 
@@ -56,10 +57,27 @@ def main():
     def callback():
         # Executed every frame
 
+        global is_test_clicking
+
+        if is_test_clicking:
+            if(psim.Button("Cancel")):
+                is_test_clicking = False
+
+            io = psim.GetIO()
+            if io.MouseClicked[0]:
+                screen_coords = io.MousePos
+                pick_result = polyscope.query_pick_at_screen_coords(screen_coords)
+                print(pick_result)
+                is_test_clicking = False
+
         if(psim.Button("Test button")):
             my_function()
 
         implicit_ui()
+
+        if(psim.Button("Test pick")):
+            is_test_clicking = True
+
 
     polyscope.set_user_callback(callback)
    

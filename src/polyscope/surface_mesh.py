@@ -85,11 +85,13 @@ class SurfaceMesh(Structure):
     
     
     # Picking
-    def interpret_pick_result(self, pick_result):
-        struct_result = self.bound_instance.interpret_pick_result(pick_result)
+    def append_pick_data(self, pick_result):
+        struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
         pick_result.structure_data["element_type"] = enum_to_str(struct_result.element_type)
         pick_result.structure_data["index"] = struct_result.index
-        pick_result.structure_data["bary_coords"] = struct_result.bary_coords
+        bary_coords = np.array(struct_result.bary_coords.as_tuple())
+        if not (bary_coords == np.array((-1,-1,-1))).all():
+            pick_result.structure_data["bary_coords"] = bary_coords
 
     ## Options
 

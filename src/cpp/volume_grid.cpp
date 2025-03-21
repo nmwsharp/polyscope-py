@@ -18,7 +18,7 @@ namespace ps = polyscope;
 void bind_volume_grid(py::module& m) {
 
   // == Helper classes
-  py::class_<ps::VolumeGridPickResult>(m, "VolumeMeshPickResult")
+  py::class_<ps::VolumeGridPickResult>(m, "VolumeGridPickResult")
    .def(py::init<>())
    .def_readonly("element_type", &ps::VolumeGridPickResult::elementType)
    .def_readonly("index", &ps::VolumeGridPickResult::index)

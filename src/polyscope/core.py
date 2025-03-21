@@ -1,11 +1,7 @@
 import polyscope_bindings as psb
 import polyscope.imgui as psim
 
-from polyscope.point_cloud import get_point_cloud
-from polyscope.curve_network import get_curve_network
-from polyscope.surface_mesh import get_surface_mesh
-from polyscope.volume_mesh import get_volume_mesh
-from polyscope.volume_grid import get_volume_grid
+import polyscope
 
 import os
 
@@ -346,22 +342,35 @@ class PickResult:
     def resolve_additional_data(self):
         # resolve data from various types
         
-        if self.structure_type_name == "PointCloud":
-            get_point_cloud(self.structure_name).append_pick_data(self)
+        if self.structure_type_name == "Point Cloud":
+            polyscope.point_cloud.get_point_cloud(self.structure_name).append_pick_data(self)
         
-        if self.structure_type_name == "CurveNetwork":
-            get_curve_network(self.structure_name).append_pick_data(self)
+        if self.structure_type_name == "Curve Network":
+            polyscope.curve_network.get_curve_network(self.structure_name).append_pick_data(self)
         
-        if self.structure_type_name == "SurfaceMesh":
-            get_surface_mesh(self.structure_name).append_pick_data(self)
+        if self.structure_type_name == "Surface Mesh":
+            polyscope.surface_mesh.get_surface_mesh(self.structure_name).append_pick_data(self)
         
-        if self.structure_type_name == "VolumeMesh":
-            get_volume_mesh(self.structure_name).append_pick_data(self)
+        if self.structure_type_name == "Volume Mesh":
+            polyscope.volume_mesh.get_volume_mesh(self.structure_name).append_pick_data(self)
         
-        if self.structure_type_name == "VolumeGrid":
-            get_volume_grid(self.structure_name).append_pick_data(self)
+        if self.structure_type_name == "Volume Grid":
+            polyscope.volume_grid.get_volume_grid(self.structure_name).append_pick_data(self)
 
-
+    def __str__(self):
+            return f"""
+PickResult(
+    is_hit={self.is_hit},
+    structure_type_name={self.structure_type_name},
+    structure_name={self.structure_name},
+    screen_coords={self.screen_coords},
+    buffer_inds={self.buffer_inds},
+    position={self.position},
+    depth={self.depth},
+    local_index={self.local_index},
+    structure_data={self.structure_data}
+)
+"""
 
 ## Ground plane and shadows
 def set_ground_plane_mode(mode_str):# 
@@ -629,7 +638,7 @@ def load_color_map(cmap_name, filename):
 def str_to_enum(s, enum):
     if s in enum: return enum[s]
     enum_val_names = [x.name for x in enum]
-    raise ValueError(f"Bad specifier '{s}' for {typename(enum)}, should be one of [{",".join(enum_val_names)}]")
+    raise ValueError(f"Bad specifier '{s}' for {typename(enum)}, should be one of [{','.join(enum_val_names)}]")
 
 def enum_to_str(enum_val):
     return enum_val.name
