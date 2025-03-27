@@ -406,7 +406,6 @@ class TestImGuiBindings(unittest.TestCase):
 
         def my_function():
             # ... do something important here ...
-            # print("executing function")
             pass
 
         # Define our callback function, which Polyscope will repeatedly execute while running the UI.
