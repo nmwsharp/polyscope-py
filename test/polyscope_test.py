@@ -77,6 +77,7 @@ class TestCore(unittest.TestCase):
         ps.set_enable_render_error_checks(True)
         ps.set_enable_render_error_checks(True)
         ps.set_warn_for_invalid_values(True)
+        ps.set_display_message_popups(False)
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
 
@@ -405,7 +406,7 @@ class TestImGuiBindings(unittest.TestCase):
 
         def my_function():
             # ... do something important here ...
-            print("executing function")
+            pass
 
         # Define our callback function, which Polyscope will repeatedly execute while running the UI.
         # We can write any code we want here, but in particular it is an opportunity to create ImGui 
@@ -2418,6 +2419,7 @@ if __name__ == '__main__':
     # Note that since these tests depend on the bound object's global state, 
     # we generally cannot continue past the first failed test.
     ps.set_errors_throw_exceptions(True)
+    ps.set_display_message_popups(False)
     ps.init(ps_backend) 
 
     unittest.main()
