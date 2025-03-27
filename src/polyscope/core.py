@@ -278,8 +278,9 @@ def build_user_gui_and_invoke_callback():
 
 ### Messages
 
-def info(message):
-    psb.info(message)
+def info(message, verbosity=0):
+    # only printed if verbosity > vebosityLevel
+    psb.info(verbosity, message)
 
 def warning(message, detail=""):
     psb.warning(message, detail)

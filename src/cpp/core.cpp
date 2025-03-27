@@ -186,7 +186,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("build_user_gui_and_invoke_callback", &ps::buildUserGuiAndInvokeCallback);
   
   // === Messages
-  m.def("info", ps::info, "Send an info message");
+  m.def("info", overload_cast_<int, std::string>()(&ps::info), "Send an info message");
   m.def("warning", ps::warning, "Send a warning message");
   m.def("error", ps::error, "Send an error message");
   m.def("terminating_error", ps::terminatingError, "Send a terminating error message");
