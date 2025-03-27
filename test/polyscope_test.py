@@ -124,7 +124,6 @@ class TestCore(unittest.TestCase):
     
     def test_view_options(self):
 
-        print("nav style")
         ps.set_navigation_style("turntable")
         ps.set_navigation_style("free")
         ps.set_navigation_style("planar")
@@ -132,7 +131,6 @@ class TestCore(unittest.TestCase):
         ps.set_navigation_style("first_person")
         ps.set_navigation_style(ps.get_navigation_style())
 
-        print("up dir")
         ps.set_up_dir("x_up")
         ps.set_up_dir("neg_x_up")
         ps.set_up_dir("y_up")
@@ -154,25 +152,18 @@ class TestCore(unittest.TestCase):
         
         ps.set_camera_view_matrix(ps.get_camera_view_matrix())
 
-        print("set_window_size()")
         ps.set_window_size(800, 600)
-        print("get_window_size()")
         self.assertEqual(ps.get_window_size(), (800,600))
 
-        print("get_buffer_size()")
         tup = ps.get_buffer_size()
         w, h = int(tup[0]), int(tup[1])
 
-        print("set_resizable()")
         ps.set_window_resizable(True)
-        print("get_resizable()")
         self.assertEqual(ps.get_window_resizable(), True)
         
-        print("show()")
         ps.show(3)
     
         ps.set_up_dir("y_up")
-        print("done")
 
     def test_camera_movement(self):
 
@@ -415,7 +406,8 @@ class TestImGuiBindings(unittest.TestCase):
 
         def my_function():
             # ... do something important here ...
-            print("executing function")
+            # print("executing function")
+            pass
 
         # Define our callback function, which Polyscope will repeatedly execute while running the UI.
         # We can write any code we want here, but in particular it is an opportunity to create ImGui 
