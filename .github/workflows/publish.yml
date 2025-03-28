@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-13, macos-latest]
 
     name: Build wheels ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -34,10 +34,10 @@ jobs:
           python -m build --sdist
 
       - name: Run cibuildwheel
-        uses: pypa/cibuildwheel@v2.21 
+        uses: pypa/cibuildwheel@v2.23.2
         with:
           config-file: ".github/workflows/cibuildwheel_config.toml"
-      
+
       - name: Copy source distribution into wheelhouse
         if: runner.os == 'Linux'
         run: mv dist/*.tar.gz wheelhouse/
@@ -46,10 +46,10 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: |
             ./wheelhouse/*.whl 
-            ./wheelhouse/*.tar.gz 
+            ./wheelhouse/*.tar.gz
           overwrite: true
 
   # Push the resulting binaries to pypi on a tag starting with 'v'
@@ -68,7 +68,7 @@ jobs:
       id-token: write
     steps:
       - name: Download built wheels artifact # downloads from the jobs storage from the previous step
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4.2.1
         with:
           # omitting the `name: ` field downloads all artifacts from this workflow
           path: dist
@@ -77,10 +77,10 @@ jobs:
         run: ls dist | cat  # piping through cat prints one per line
 
         # dist directory has subdirs from the different jobs, merge them into one directory and delete
-        # the empty leftover dirs 
-      - name: Flatten directory 
+        # the empty leftover dirs
+      - name: Flatten directory
         run: find dist -mindepth 2 -type f -exec mv -t dist {} + && find dist -type d -empty -delete
-      
+
       - name: List downloaded files from artifact after flatten
         run: ls dist | cat  # piping through cat prints one per line
 

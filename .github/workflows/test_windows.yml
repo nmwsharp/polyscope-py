@@ -11,17 +11,21 @@ jobs:
     runs-on: windows-latest
     if: "! contains(toJSON(github.event.commits.*.message), '[ci skip]')"
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v5
       name: Install Python
       with:
-        python-version: '3.7'
+        python-version: '3.12'
     
     - name: install python packages
       run: python -m pip install numpy
+
+    - name: install packages
+      run: |
+        choco install -y eigen
 
     - name: configure
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..

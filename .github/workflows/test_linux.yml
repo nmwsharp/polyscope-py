@@ -8,32 +8,48 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Only run if the commit message contains '[ci build]'
     if: "! contains(toJSON(github.event.commits.*.message), '[ci skip]')"
+    name: Build wheels - ${{ matrix.os }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x64
+          - os: ubuntu-24.04-arm
+            arch: aarch64
+
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
-      
-    - uses: actions/setup-python@v2
+
+    - uses: actions/setup-python@v5
       name: Install Python
       with:
-        python-version: '3.9'
+        python-version: '3.12'
 
     - name: install packages
-      run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
-    
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc g++ libeigen3-dev xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
+
     - name: install python packages
       run: python3 -m pip install numpy
 
     - name: configure
-      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DPYTHON_EXECUTABLE=$(python3 -c "import sys; print(sys.executable)") -DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON ..
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug -DPYTHON_EXECUTABLE=$(python3 -c "import sys; print(sys.executable)") -DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON ..
 
     - name: build
       run: cd build && make
 
     - name: run test backend mock
       run: python3 test/polyscope_test.py -v
-    
+
     - name: run test backend EGL
       run: python3 test/polyscope_test.py -v backend=openGL3_egl

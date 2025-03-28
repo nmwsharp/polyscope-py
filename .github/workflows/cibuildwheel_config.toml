@@ -1,11 +1,11 @@
 [tool.cibuildwheel]
-skip = "cp36-*" # scikit-build-core requires >=3.7
+skip = "cp36-*" # scikit-build-core requires >=3.9
 build-verbosity = 3
 
 [tool.cibuildwheel.linux]
 before-all = [
     "yum remove -y cmake",
-    "yum install -y libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel mesa-libGL libXi-devel freeglut-devel mesa-libEGL-devel"
+    "yum install -y llvm-devel clang-devel eigen3 eigen3-devel libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel mesa-libGL-devel mesa-libGL libXi-devel freeglut-devel mesa-libEGL-devel"
 ]
 # Tell auditwheel _not_ to bundle libEGL, as it is platform/driver specific won't work (segfaults). We need to use the system libEGL.
 # Fortunately almost all linux systems should have this, but might cause linking errors at runtime if not
@@ -18,4 +18,7 @@ CMAKE_ARGS = "DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON"
 # musllinux builds on an Alpinx Linux image, need different package names
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = "apk add libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev freeglut-dev mesa-dev mesa-gl mesa-egl"
+before-all = "gcc g++ libeigen3-dev apk add libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev freeglut-dev mesa-dev mesa-gl mesa-egl"
+
+manylinux-x86_64-image = "quay.io/pypa/manylinux_2_28_x86_64"
+manylinux-aarch64-image = "quay.io/pypa/manylinux_2_28_aarch64"
