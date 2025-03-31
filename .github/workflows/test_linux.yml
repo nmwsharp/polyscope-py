@@ -34,7 +34,7 @@ jobs:
     - name: install packages
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc g++ libeigen3-dev xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
+        run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
 
     - name: install python packages
       run: python3 -m pip install numpy
