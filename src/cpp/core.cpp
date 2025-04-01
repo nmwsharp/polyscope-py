@@ -207,29 +207,29 @@ PYBIND11_MODULE(polyscope_bindings, m) {
 
   // === Pick
 
-  // py::class_<ps::PickResult>(m, "PickResult")
-  //  .def(py::init<>())
-  //  .def_readonly("is_hit", &ps::PickResult::isHit)
-  // //  .def_readonly("structure", &ps::PickResult::structure)
-  //  .def_readonly("structure_handle", &ps::PickResult::structureHandle)
-  //  .def_readonly("structure_type", &ps::PickResult::structureType)
-  //  .def_readonly("structure_name", &ps::PickResult::structureName)
-  //  .def_readonly("screen_coords", &ps::PickResult::screenCoords)
-  //  .def_readonly("buffer_inds", &ps::PickResult::bufferInds)
-  //  .def_readonly("position", &ps::PickResult::position)
-  //  .def_readonly("depth", &ps::PickResult::depth)
-  //  .def_readonly("local_index", &ps::PickResult::localIndex)
-  // ;
+  py::class_<ps::PickResult>(m, "PickResult")
+   .def(py::init<>())
+   .def_readonly("is_hit", &ps::PickResult::isHit)
+  //  .def_readonly("structure", &ps::PickResult::structure)
+   .def_readonly("structure_handle", &ps::PickResult::structureHandle)
+   .def_readonly("structure_type", &ps::PickResult::structureType)
+   .def_readonly("structure_name", &ps::PickResult::structureName)
+   .def_readonly("screen_coords", &ps::PickResult::screenCoords)
+   .def_readonly("buffer_inds", &ps::PickResult::bufferInds)
+   .def_readonly("position", &ps::PickResult::position)
+   .def_readonly("depth", &ps::PickResult::depth)
+   .def_readonly("local_index", &ps::PickResult::localIndex)
+  ;
 
-  // // stateful selection
-  // m.def("have_selection", &ps::haveSelection);
-  // m.def("get_selection", &ps::getSelection);
-  // m.def("reset_selection", &ps::resetSelection);
-  // // inentionally no binding to set_selection(), it is low-level and not obvious how to bind
+  // stateful selection
+  m.def("have_selection", &ps::haveSelection);
+  m.def("get_selection", &ps::getSelection);
+  m.def("reset_selection", &ps::resetSelection);
+  // inentionally no binding to set_selection(), it is low-level and not obvious how to bind
 
-  // // query what is under a pixel
-  // m.def("pick_at_screen_coords", &ps::pickAtScreenCoords);
-  // m.def("pick_at_buffer_inds", &ps::pickAtBufferInds);
+  // query what is under a pixel
+  m.def("pick_at_screen_coords", &ps::pickAtScreenCoords);
+  m.def("pick_at_buffer_inds", &ps::pickAtBufferInds);
 
   // === Ground plane and shadows
   m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });
