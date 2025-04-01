@@ -8,17 +8,29 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    # Skip running if the commit message contains '[ci skip]'
     if: "! contains(toJSON(github.event.commits.*.message), '[ci skip]')"
+    name: Build wheels - ${{ matrix.os }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            arch: x64
+          # Windows ARM is not available as of Mar 2025, but coming soon: https://github.com/github/roadmap/issues/1098
+
+
+
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v5
       name: Install Python
       with:
-        python-version: '3.7'
+        python-version: '3.12'
     
     - name: install python packages
       run: python -m pip install numpy
