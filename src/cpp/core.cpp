@@ -185,7 +185,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("build_user_gui_and_invoke_callback", &ps::buildUserGuiAndInvokeCallback);
   
   // === Messages
-  // m.def("info", overload_cast_<int, std::string>()(&ps::info), "Send an info message");
+  m.def("info", overload_cast_<int, std::string>()(&ps::info), "Send an info message");
   m.def("warning", &ps::warning, "Send a warning message");
   m.def("error", &ps::error, "Send an error message");
   m.def("terminating_error", &ps::terminatingError, "Send a terminating error message");
@@ -449,24 +449,24 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("pretty", ps::TransparencyMode::Pretty)
     ; 
     
-    // py::enum_<ps::CurveNetworkElement>(m, "CurveNetworkElement")
-    // .value("node", ps::CurveNetworkElement::NODE)
-    // .value("edge", ps::CurveNetworkElement::EDGE)
-    // ;
+    py::enum_<ps::CurveNetworkElement>(m, "CurveNetworkElement")
+    .value("node", ps::CurveNetworkElement::NODE)
+    .value("edge", ps::CurveNetworkElement::EDGE)
+    ;
 
-  //   py::enum_<ps::MeshElement>(m, "MeshElement")
-  //   .value("vertex", ps::MeshElement::VERTEX)
-  //   .value("face", ps::MeshElement::FACE)
-  //   .value("edge", ps::MeshElement::EDGE)
-  //   .value("halfedge", ps::MeshElement::HALFEDGE)
-  //   .value("corner", ps::MeshElement::CORNER)
-  //   ; 
+    py::enum_<ps::MeshElement>(m, "MeshElement")
+    .value("vertex", ps::MeshElement::VERTEX)
+    .value("face", ps::MeshElement::FACE)
+    .value("edge", ps::MeshElement::EDGE)
+    .value("halfedge", ps::MeshElement::HALFEDGE)
+    .value("corner", ps::MeshElement::CORNER)
+    ; 
 
-  // py::enum_<ps::MeshSelectionMode>(m, "MeshSelectionMode")
-  //   .value("auto", ps::MeshSelectionMode::Auto)
-  //   .value("vertices_only", ps::MeshSelectionMode::VerticesOnly)
-  //   .value("faces_only", ps::MeshSelectionMode::FacesOnly)
-  //   ; 
+  py::enum_<ps::MeshSelectionMode>(m, "MeshSelectionMode")
+    .value("auto", ps::MeshSelectionMode::Auto)
+    .value("vertices_only", ps::MeshSelectionMode::VerticesOnly)
+    .value("faces_only", ps::MeshSelectionMode::FacesOnly)
+    ; 
 
     py::enum_<ps::VolumeMeshElement>(m, "VolumeMeshElement")
     .value("vertex", ps::VolumeMeshElement::VERTEX)
@@ -475,10 +475,10 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("cell", ps::VolumeMeshElement::CELL)
     ; 
     
-    // py::enum_<ps::VolumeGridElement>(m, "VolumeGridElement")
-    // .value("node", ps::VolumeGridElement::NODE)
-    // .value("cell", ps::VolumeGridElement::CELL)
-    // ; 
+    py::enum_<ps::VolumeGridElement>(m, "VolumeGridElement")
+    .value("node", ps::VolumeGridElement::NODE)
+    .value("cell", ps::VolumeGridElement::CELL)
+    ; 
   
   py::enum_<ps::PointRenderMode>(m, "PointRenderMode")
     .value("sphere", ps::PointRenderMode::Sphere)
