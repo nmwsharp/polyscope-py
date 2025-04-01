@@ -208,17 +208,17 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   // === Pick
 
   py::class_<ps::PickResult>(m, "PickResult")
-   .def(py::init<>())
-   .def_readonly("is_hit", &ps::PickResult::isHit)
+  //  .def(py::init<>())
+  //  .def_readonly("is_hit", &ps::PickResult::isHit)
   //  .def_readonly("structure", &ps::PickResult::structure)
   //  .def_readonly("structure_handle", &ps::PickResult::structureHandle)
-   .def_readonly("structure_type", &ps::PickResult::structureType)
-   .def_readonly("structure_name", &ps::PickResult::structureName)
-   .def_readonly("screen_coords", &ps::PickResult::screenCoords)
-   .def_readonly("buffer_inds", &ps::PickResult::bufferInds)
-   .def_readonly("position", &ps::PickResult::position)
-   .def_readonly("depth", &ps::PickResult::depth)
-   .def_readonly("local_index", &ps::PickResult::localIndex)
+  //  .def_readonly("structure_type", &ps::PickResult::structureType)
+  //  .def_readonly("structure_name", &ps::PickResult::structureName)
+  //  .def_readonly("screen_coords", &ps::PickResult::screenCoords)
+  //  .def_readonly("buffer_inds", &ps::PickResult::bufferInds)
+  //  .def_readonly("position", &ps::PickResult::position)
+  //  .def_readonly("depth", &ps::PickResult::depth)
+  //  .def_readonly("local_index", &ps::PickResult::localIndex)
   ;
 
   // stateful selection
