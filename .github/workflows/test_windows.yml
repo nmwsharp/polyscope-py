@@ -8,9 +8,20 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
     # Skip running if the commit message contains '[ci skip]'
     if: "! contains(toJSON(github.event.commits.*.message), '[ci skip]')"
+    name: Build wheels - ${{ matrix.os }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            arch: x64
+          # Windows ARM is not available as of Mar 2025, but coming soon: https://github.com/github/roadmap/issues/1098
+
+
+
     steps:
     - uses: actions/checkout@v4
       with:
