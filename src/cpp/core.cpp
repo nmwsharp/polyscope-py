@@ -207,7 +207,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
 
   // === Pick
 
-  py::class_<ps::PickResult>(m, "PickResult")
+  // py::class_<ps::PickResult>(m, "PickResult")
   //  .def(py::init<>())
   //  .def_readonly("is_hit", &ps::PickResult::isHit)
   //  .def_readonly("structure", &ps::PickResult::structure)
@@ -219,7 +219,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   //  .def_readonly("position", &ps::PickResult::position)
   //  .def_readonly("depth", &ps::PickResult::depth)
   //  .def_readonly("local_index", &ps::PickResult::localIndex)
-  ;
+  // ;
 
   // stateful selection
   m.def("have_selection", &ps::haveSelection);
