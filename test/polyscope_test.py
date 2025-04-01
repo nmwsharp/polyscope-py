@@ -8,7 +8,6 @@ from os.path import isfile, join
 
 # extra debugging info
 os.environ["PYBIND11_DETAILED_ERROR"] = "1"
-sys.setdlopenflags(sys.getdlopenflags() | 8)  # Set RTLD_DEEPBIND flag on Linux
 
 
 # Path to where the bindings live
