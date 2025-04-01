@@ -19,6 +19,3 @@ CMAKE_ARGS = "DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON"
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
 before-all = "apk add libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev freeglut-dev mesa-dev mesa-gl mesa-egl"
-
-manylinux-x86_64-image = "quay.io/pypa/manylinux_2_28_x86_64"
-manylinux-aarch64-image = "quay.io/pypa/manylinux_2_28_aarch64"
