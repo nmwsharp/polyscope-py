@@ -1,6 +1,6 @@
 [project]
 name = "polyscope"
-version = "2.3.0"
+version = "2.4.0"
 description = "Polyscope: A viewer and user interface for 3D data."
 readme = "README.md"
 license.file = "LICENSE"
