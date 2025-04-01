@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-13 is an intel runner, macos-14 is apple silicon
+        # macos-13 is an intel runner, macos-14+ is apple silicon
         os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-13, macos-latest]
 
     name: Build wheels ${{ matrix.os }}
