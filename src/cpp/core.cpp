@@ -222,7 +222,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   // ;
 
   // stateful selection
-  // m.def("have_selection", &ps::haveSelection);
+  m.def("have_selection", &ps::haveSelection);
   // m.def("get_selection", &ps::getSelection);
   // m.def("reset_selection", &ps::resetSelection);
   // inentionally no binding to set_selection(), it is low-level and not obvious how to bind
