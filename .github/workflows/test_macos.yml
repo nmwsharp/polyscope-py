@@ -27,7 +27,7 @@ jobs:
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DPOLYSCOPE_BACKEND_OPENGL3_GLFW=ON -DPOLYSCOPE_BACKEND_OPENGL_MOCK=ON ..
 
     - name: build
-      run: cd build && make
+      run: cd build && cmake --build "." --parallel
 
     - name: run test
       run: python test/polyscope_test.py -v

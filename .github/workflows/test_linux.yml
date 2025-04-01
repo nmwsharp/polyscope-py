@@ -30,7 +30,7 @@ jobs:
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DPYTHON_EXECUTABLE=$(python3 -c "import sys; print(sys.executable)") -DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON ..
 
     - name: build
-      run: cd build && make
+      run: cd build && cmake --build "." --parallel
 
     - name: run test backend mock
       run: python3 test/polyscope_test.py -v
