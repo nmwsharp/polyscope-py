@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    # Skip running if the commit message contains '[ci skip]'
     if: "! contains(toJSON(github.event.commits.*.message), '[ci skip]')"
     steps:
     - uses: actions/checkout@v4

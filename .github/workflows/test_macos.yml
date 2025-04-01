@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    # Only run if the commit message contains '[ci build]'
+    # Skip running if the commit message contains '[ci skip]'
     if: "! contains(toJSON(github.event.commits.*.message), '[ci skip]')"
     name: Build wheels - ${{ matrix.os }}-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
