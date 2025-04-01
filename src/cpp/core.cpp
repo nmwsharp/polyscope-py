@@ -211,7 +211,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
    .def(py::init<>())
    .def_readonly("is_hit", &ps::PickResult::isHit)
   //  .def_readonly("structure", &ps::PickResult::structure)
-   .def_readonly("structure_handle", &ps::PickResult::structureHandle)
+  //  .def_readonly("structure_handle", &ps::PickResult::structureHandle)
    .def_readonly("structure_type", &ps::PickResult::structureType)
    .def_readonly("structure_name", &ps::PickResult::structureName)
    .def_readonly("screen_coords", &ps::PickResult::screenCoords)
