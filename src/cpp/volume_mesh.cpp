@@ -16,7 +16,12 @@ namespace ps = polyscope;
 
 void bind_volume_mesh(py::module& m) {
 
-  // == Helper quantity classes
+  // == Helper classes
+  py::class_<ps::VolumeMeshPickResult>(m, "VolumeMeshPickResult")
+   .def(py::init<>())
+   .def_readonly("element_type", &ps::VolumeMeshPickResult::elementType)
+   .def_readonly("index", &ps::VolumeMeshPickResult::index)
+  ;
 
   // Scalar quantities
   bindVMVScalarQuantity<ps::VolumeMeshVertexScalarQuantity>(m, "VolumeMeshVertexScalarQuantity");
@@ -52,6 +57,8 @@ void bind_volume_mesh(py::module& m) {
       .def("set_material", &ps::VolumeMesh::setMaterial, "Set material")
       .def("get_material", &ps::VolumeMesh::getMaterial, "Get material")
 
+      // picking
+      .def("interpret_pick_result", &ps::VolumeMesh::interpretPickResult)
 
       // = quantities
 
