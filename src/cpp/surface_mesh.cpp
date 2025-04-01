@@ -19,12 +19,12 @@ void bind_surface_mesh(py::module& m) {
 
 
   // == Helper classes
-  py::class_<ps::SurfaceMeshPickResult>(m, "SurfaceMeshPickResult")
-   .def(py::init<>())
-   .def_readonly("element_type", &ps::SurfaceMeshPickResult::elementType)
-   .def_readonly("index", &ps::SurfaceMeshPickResult::index)
-   .def_readonly("bary_coords", &ps::SurfaceMeshPickResult::baryCoords)
-  ;
+//   py::class_<ps::SurfaceMeshPickResult>(m, "SurfaceMeshPickResult")
+//    .def(py::init<>())
+//    .def_readonly("element_type", &ps::SurfaceMeshPickResult::elementType)
+//    .def_readonly("index", &ps::SurfaceMeshPickResult::index)
+//    .def_readonly("bary_coords", &ps::SurfaceMeshPickResult::baryCoords)
+//   ;
 
 
   // Scalar quantities
@@ -98,8 +98,8 @@ void bind_surface_mesh(py::module& m) {
       .def("get_smooth_shade", &ps::SurfaceMesh::isSmoothShade, "Get if smooth shading is enabled")
       .def("set_shade_style", &ps::SurfaceMesh::setShadeStyle, "Set shading")
       .def("get_shade_style", &ps::SurfaceMesh::getShadeStyle, "Get shading")
-      .def("set_selection_mode", &ps::SurfaceMesh::setSelectionMode)
-      .def("get_selection_mode", &ps::SurfaceMesh::getSelectionMode)
+     //  .def("set_selection_mode", &ps::SurfaceMesh::setSelectionMode)
+     //  .def("get_selection_mode", &ps::SurfaceMesh::getSelectionMode)
       .def("set_material", &ps::SurfaceMesh::setMaterial, "Set material")
       .def("get_material", &ps::SurfaceMesh::getMaterial, "Get material")
       .def("set_back_face_policy", &ps::SurfaceMesh::setBackFacePolicy, "Set back face policy")
@@ -108,7 +108,7 @@ void bind_surface_mesh(py::module& m) {
       .def("get_back_face_color", &ps::SurfaceMesh::getBackFaceColor, "Get back face color")
     
       // picking
-      .def("interpret_pick_result", &ps::SurfaceMesh::interpretPickResult)
+     //  .def("interpret_pick_result", &ps::SurfaceMesh::interpretPickResult)
 
       // permutations & bases
       .def("set_edge_permutation", &ps::SurfaceMesh::setEdgePermutation<Eigen::VectorXi>, "Set edge permutation")

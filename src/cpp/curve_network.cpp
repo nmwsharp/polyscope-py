@@ -16,13 +16,13 @@ namespace ps = polyscope;
 // clang-format off
 void bind_curve_network(py::module& m) {
   
-  // == Helper classes
-  py::class_<ps::CurveNetworkPickResult>(m, "CurveNetworkPickResult")
-   .def(py::init<>())
-   .def_readonly("element_type", &ps::CurveNetworkPickResult::elementType)
-   .def_readonly("index", &ps::CurveNetworkPickResult::index)
-   .def_readonly("t_edge", &ps::CurveNetworkPickResult::tEdge)
-  ;
+//   // == Helper classes
+//   py::class_<ps::CurveNetworkPickResult>(m, "CurveNetworkPickResult")
+//    .def(py::init<>())
+//    .def_readonly("element_type", &ps::CurveNetworkPickResult::elementType)
+//    .def_readonly("index", &ps::CurveNetworkPickResult::index)
+//    .def_readonly("t_edge", &ps::CurveNetworkPickResult::tEdge)
+//   ;
   
   // Scalar quantities
   bindScalarQuantity<ps::CurveNetworkNodeScalarQuantity>(m, "CurveNetworkNodeScalarQuantity");
@@ -55,7 +55,7 @@ void bind_curve_network(py::module& m) {
     .def("get_material", &ps::CurveNetwork::getMaterial, "Get material")
     
     // picking
-    .def("interpret_pick_result", &ps::CurveNetwork::interpretPickResult)
+    // .def("interpret_pick_result", &ps::CurveNetwork::interpretPickResult)
     
     // quantities
     .def("add_node_color_quantity", &ps::CurveNetwork::addNodeColorQuantity<Eigen::MatrixXf>, "Add a color function at nodes",
