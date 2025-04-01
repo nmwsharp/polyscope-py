@@ -6,6 +6,11 @@ import numpy as np
 from os import listdir
 from os.path import isfile, join
 
+# extra debugging info
+os.environ["PYBIND11_DETAILED_ERROR"] = "1"
+sys.setdlopenflags(sys.getdlopenflags() | 8)  # Set RTLD_DEEPBIND flag on Linux
+
+
 # Path to where the bindings live
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 if os.name == 'nt': # if Windows
