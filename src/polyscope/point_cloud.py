@@ -89,6 +89,9 @@ class PointCloud(Structure):
     def get_material(self):
         return self.bound_instance.get_material()
 
+    def append_pick_data(self, pick_result):
+        struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
+        pick_result.structure_data["index"] = struct_result.index
 
     ## Quantities
        

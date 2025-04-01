@@ -1,6 +1,8 @@
 import polyscope_bindings as psb
 import polyscope.imgui as psim
 
+import polyscope
+
 import os
 
 import numpy as np
@@ -233,8 +235,10 @@ def get_view_as_json():
 def screen_coords_to_world_ray(screen_coords):
     return np.array(psb.screen_coords_to_world_ray(glm2(screen_coords)).as_tuple())
 
+# deprecated! use query_pick_at_screen_coords
 def screen_coords_to_world_position(screen_coords):
-    return np.array(psb.screen_coords_to_world_position(glm2(screen_coords)).as_tuple())
+    pick_result = pick(screen_coords=screen_coords)
+    return pick_result.position
 
 def set_background_color(c):
     if len(c) == 3: c = (c[0], c[1], c[2], 1.0)
@@ -298,18 +302,87 @@ def set_user_callback(func):
 def clear_user_callback():
     psb.clear_user_callback()
 
-### Pick
+### Picking
+
+def pick(*, screen_coords=None, buffer_inds=None):
+    if(screen_coords is not None and buffer_inds is not None):
+        raise ValueError("pass args one of screen_coords OR buffer_inds, but not both")
+    if(screen_coords is None and buffer_inds is None):
+        raise ValueError("must pass args one of screen_coords or buffer_inds")
+
+    if(screen_coords is not None):
+        raw_result = psb.pick_at_screen_coords(glm2(screen_coords))
+    if(buffer_inds is not None):
+        raw_result = psb.pick_at_buffer_inds(glm2i(buffer_inds))
+
+    return PickResult(raw_result)
+
 def have_selection():
     return psb.have_selection()
 
 def get_selection():
-    return psb.get_selection()
+    return PickResult(psb.get_selection())
 
-def set_selection(name, index):
-    psb.set_selection(name, index)
+def reset_selection():
+    psb.reset_selection()
+
+class PickResult:
+
+    def __init__(self, bound_pick_result):
+
+        self.raw_result = bound_pick_result
+
+        # translate most properties
+        self.is_hit = bound_pick_result.is_hit
+        self.structure_type_name = bound_pick_result.structure_type
+        self.structure_name = bound_pick_result.structure_name
+        self.screen_coords = bound_pick_result.screen_coords.as_tuple()
+        self.buffer_inds = bound_pick_result.buffer_inds.as_tuple()
+        self.position = np.array(bound_pick_result.position.as_tuple())
+        self.depth = bound_pick_result.depth
+        self.local_index = bound_pick_result.local_index
+
+        # additional per-structure data, such as barycentric coordinates 
+        # if its a triangle in a mesh
+        self.structure_data = {}
+
+        self.resolve_additional_data()
+
+    def resolve_additional_data(self):
+        # resolve data from various types
+        
+        if self.structure_type_name == "Point Cloud":
+            polyscope.point_cloud.get_point_cloud(self.structure_name).append_pick_data(self)
+        
+        if self.structure_type_name == "Curve Network":
+            polyscope.curve_network.get_curve_network(self.structure_name).append_pick_data(self)
+        
+        if self.structure_type_name == "Surface Mesh":
+            polyscope.surface_mesh.get_surface_mesh(self.structure_name).append_pick_data(self)
+        
+        if self.structure_type_name == "Volume Mesh":
+            polyscope.volume_mesh.get_volume_mesh(self.structure_name).append_pick_data(self)
+        
+        if self.structure_type_name == "Volume Grid":
+            polyscope.volume_grid.get_volume_grid(self.structure_name).append_pick_data(self)
+
+    def __str__(self):
+            return f"""
+PickResult(
+    is_hit={self.is_hit},
+    structure_type_name={self.structure_type_name},
+    structure_name={self.structure_name},
+    screen_coords={self.screen_coords},
+    buffer_inds={self.buffer_inds},
+    position={self.position},
+    depth={self.depth},
+    local_index={self.local_index},
+    structure_data={self.structure_data}
+)
+"""
 
 ## Ground plane and shadows
-def set_ground_plane_mode(mode_str):
+def set_ground_plane_mode(mode_str):# 
     psb.set_ground_plane_mode(str_to_ground_plane_mode(mode_str))
 
 def set_ground_plane_height_mode(mode_str):
@@ -526,6 +599,8 @@ class CameraParameters:
 ## Small utilities
 def glm2(vals):
     return psb.glm_vec2(vals[0], vals[1])
+def glm2i(vals):
+    return psb.glm_ivec2(vals[0], vals[1])
 def glm3u(vals):
     return psb.glm_uvec3(vals[0], vals[1], vals[2])
 def glm3(vals):
@@ -565,6 +640,19 @@ def load_color_map(cmap_name, filename):
     psb.load_color_map(cmap_name, filename)
 
 ## String-to-enum translation
+
+# General case
+# TODO: gradually replace the enum-specific methods below with this, 
+# ensuring each doesn't have any special breakage
+def str_to_enum(s, enum):
+    if s in enum.__members__: return enum.__members__[s]
+    enum_val_names = [x for x in enum.__members__]
+    raise ValueError(f"Bad specifier '{s}' for {enum.__name__}, should be one of [{','.join(enum_val_names)}]")
+
+def enum_to_str(enum_val):
+    return enum_val.name
+
+## Per-enum maps
 
 d_navigate = {
     "turntable" : psb.NavigateStyle.turntable,
@@ -762,7 +850,7 @@ def str_to_transparency_mode(s):
     }
 
     if s not in d:
-        raise ValueError("Bad transparenccy mode specifier '{}', should be one of [{}]".format(s, 
+        raise ValueError("Bad transparency mode specifier '{}', should be one of [{}]".format(s, 
             ",".join(["'{}'".format(x) for x in d.keys()])))
 
     return d[s]

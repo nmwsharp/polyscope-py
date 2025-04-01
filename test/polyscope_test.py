@@ -237,6 +237,14 @@ class TestCore(unittest.TestCase):
         self.assertEqual(buff.shape, (h,w,4))
     
         ps.show(3)
+
+
+    def test_picking(self):
+
+        res = ps.pick(buffer_inds=(77,88))
+        res = ps.pick(screen_coords=(0.78,.96))
+
+        ps.show(3)
     
     def test_slice_plane(self):
 
@@ -1138,6 +1146,12 @@ class TestSurfaceMesh(unittest.TestCase):
         p.set_edge_width(1.5)
         ps.show(3)
         self.assertAlmostEqual(p.get_edge_width(), 1.5)
+
+        # Selection mode
+        p.set_selection_mode('auto')
+        p.set_selection_mode('vertices_only')
+        p.set_selection_mode('faces_only')
+        ps.show(3)
         
         # Material
         p.set_material("candy")

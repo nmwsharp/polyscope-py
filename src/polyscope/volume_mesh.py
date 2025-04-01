@@ -1,7 +1,7 @@
 import polyscope_bindings as psb
 import numpy as np
 
-from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3
+from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3, enum_to_str
 from polyscope.structure import Structure
 from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed
 
@@ -82,7 +82,7 @@ class VolumeMesh(Structure):
 
 
     ## Options
-
+    
     # Color
     def set_color(self, val):
         self.bound_instance.set_color(glm3(val))
@@ -112,6 +112,12 @@ class VolumeMesh(Structure):
         self.bound_instance.set_material(mat)
     def get_material(self):
         return self.bound_instance.get_material()
+
+    # Picking
+    def append_pick_data(self, pick_result):
+        struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
+        pick_result.structure_data["element_type"] = enum_to_str(struct_result.element_type)
+        pick_result.structure_data["index"] = struct_result.index
 
 
     ## Quantities
