@@ -52,3 +52,38 @@ jobs:
             ./wheelhouse/*.whl 
             ./wheelhouse/*.tar.gz 
           overwrite: true
+  
+  # Do all but the very last step of pushing the upload to pypi, to catch any problems
+  # in directory layout or multiply-generated wheels etc.
+  prep_upload:
+    name: Prep release upload
+
+    # Only run if the commit message contains '[ci build]'
+    if: "contains(toJSON(github.event.commits.*.message), '[ci build]') || contains(toJSON(github.event.pull_request.title), '[ci build]')"
+
+    needs: [build_wheels]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download built wheels artifact # downloads from the jobs storage from the previous step
+        uses: actions/download-artifact@v4.2.1
+        with:
+          # omitting the `name: ` field downloads all artifacts from this workflow
+          path: dist
+
+      - name: List downloaded files from artifact
+        run: ls -lR dist
+
+        # dist directory has subdirs from the different jobs, merge them into one directory and delete
+        # the empty leftover dirs
+      - name: Flatten directory
+        run: find dist -mindepth 2 -type f -exec mv -t dist {} + && find dist -type d -empty -delete
+
+      - name: List downloaded files from artifact after flatten
+        run: ls -lR dist
+
+      # This is where we would actually publish, if it were a real release
+      # - name: Publish package to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+        # with:
+          # To test: repository_url: https://test.pypi.org/legacy/
