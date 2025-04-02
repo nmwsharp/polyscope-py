@@ -62,7 +62,7 @@ class TestCore(unittest.TestCase):
 
         ps.set_program_name("polyscope test prog")
         ps.set_verbosity(2)
-        ps.set_print_prefix("polyscope test")
+        ps.set_print_prefix("[polyscope test] ")
         ps.set_errors_throw_exceptions(True)
         ps.set_max_fps(60)
         ps.set_enable_vsync(True)
@@ -861,6 +861,8 @@ class TestCurveNetwork(unittest.TestCase):
         ps.register_curve_network("test_network_line2D", self.generate_points()[:,:2], 'line')
         ps.register_curve_network("test_network_loop", self.generate_points(), 'loop')
         ps.register_curve_network("test_network_loop2D", self.generate_points()[:,:2], 'loop')
+        ps.register_curve_network("test_network_line", self.generate_points(), 'segments')
+        ps.register_curve_network("test_network_line2D", self.generate_points()[:,:2], 'segments')
 
         ps.show(3)
         ps.remove_all_structures();

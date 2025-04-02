@@ -25,18 +25,22 @@ class CurveNetwork(Structure):
             if isinstance(edges, str): 
                 # Special case: edges as a string key
 
-                if edges not in ['line', 'loop']: raise ValueError("bad edges setting, if not numpy array must be in 'line' or 'loop', got " + str(edges))
+                if edges not in ['line', 'loop', 'segments']: raise ValueError("bad edges setting, must either be numpy array, or must be in ['line', 'loop', 'segments'], got " + str(edges))
 
                 if nodes.shape[1] == 3:
                     if edges == 'line':
                         self.bound_instance = psb.register_curve_network_line(name, nodes)
                     elif edges == 'loop':
                         self.bound_instance = psb.register_curve_network_loop(name, nodes)
+                    elif edges == 'segments':
+                        self.bound_instance = psb.register_curve_network_segments(name, nodes)
                 elif nodes.shape[1] == 2:
                     if edges == 'line':
                         self.bound_instance = psb.register_curve_network_line2D(name, nodes)
                     elif edges == 'loop':
                         self.bound_instance = psb.register_curve_network_loop2D(name, nodes)
+                    elif edges == 'segments':
+                        self.bound_instance = psb.register_curve_network_segments2D(name, nodes)
             else:
                 # Common case: process edges as numpy array
 

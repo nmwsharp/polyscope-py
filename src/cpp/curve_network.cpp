@@ -96,6 +96,13 @@ void bind_curve_network(py::module& m) {
   m.def("register_curve_network_loop2D", &ps::registerCurveNetworkLoop2D<Eigen::MatrixXf>, 
       py::arg("name"), py::arg("nodes"), 
       "Register a curve network", py::return_value_policy::reference);
+  
+  m.def("register_curve_network_segments", &ps::registerCurveNetworkSegments<Eigen::MatrixXf>, 
+      py::arg("name"), py::arg("nodes"), 
+      "Register a curve network", py::return_value_policy::reference);
+  m.def("register_curve_network_segments2D", &ps::registerCurveNetworkSegments2D<Eigen::MatrixXf>, 
+      py::arg("name"), py::arg("nodes"),
+      "Register a curve network", py::return_value_policy::reference);
 
   m.def("remove_curve_network", &polyscope::removeCurveNetwork, "Remove a curve network by name");
   m.def("get_curve_network", &polyscope::getCurveNetwork, "Get a curve network by name", py::return_value_policy::reference);
