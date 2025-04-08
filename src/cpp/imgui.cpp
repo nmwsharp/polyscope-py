@@ -2131,7 +2131,7 @@ void bind_imgui_enums(py::module& m) {
   m.attr("ImGuiKey_CapsLock") = static_cast<ImGuiKey>(ImGuiKey_CapsLock);
   m.attr("ImGuiKey_ScrollLock") = static_cast<ImGuiKey>(ImGuiKey_ScrollLock);
   m.attr("ImGuiKey_NumLock") = static_cast<ImGuiKey>(ImGuiKey_NumLock);
-  m.attr("ImGuiKey_PrImGuiKeyScreen") = static_cast<int>(ImGuiKey_PrintScreen);
+  m.attr("ImGuiKey_PrintScreen") = static_cast<ImGuiKey>(ImGuiKey_PrintScreen);
   m.attr("ImGuiKey_Pause") = static_cast<ImGuiKey>(ImGuiKey_Pause);
   m.attr("ImGuiKey_Keypad0") = static_cast<ImGuiKey>(ImGuiKey_Keypad0);
   m.attr("ImGuiKey_Keypad1") = static_cast<ImGuiKey>(ImGuiKey_Keypad1);
