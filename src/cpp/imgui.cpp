@@ -78,7 +78,6 @@ void bind_imgui_structs(py::module& m) {
     .def_readwrite("MouseDoubleClickTime"                       ,&ImGuiIO::MouseDoubleClickTime                               )            
     .def_readwrite("MouseDoubleClickMaxDist"                    ,&ImGuiIO::MouseDoubleClickMaxDist                            )               
     .def_readwrite("MouseDragThreshold"                         ,&ImGuiIO::MouseDragThreshold                                 )          
-    .def_property_readonly("KeyMap"                             , [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{ImGuiKey_COUNT, o.KeyMap, ob};})
     .def_readwrite("KeyRepeatDelay"                             ,&ImGuiIO::KeyRepeatDelay                                     )      
     .def_readwrite("KeyRepeatRate"                              ,&ImGuiIO::KeyRepeatRate                                      )     
     .def_readwrite("Fonts"                                      ,&ImGuiIO::Fonts                                              )
@@ -101,8 +100,6 @@ void bind_imgui_structs(py::module& m) {
     .def_readwrite("KeyShift"                                   ,&ImGuiIO::KeyShift                                           ) 
     .def_readwrite("KeyAlt"                                     ,&ImGuiIO::KeyAlt                                             )
     .def_readwrite("KeySuper"                                   ,&ImGuiIO::KeySuper                                           )
-    .def_property_readonly("KeysDown"                           , [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{512, o.KeysDown , ob};})
-    .def_property_readonly("NavInputs"                          , [](py::object& ob) { ImGuiIO& o = ob.cast<ImGuiIO&>(); return py::array{ImGuiNavInput_COUNT, o.NavInputs , ob};})
     .def_readwrite("WantCaptureMouse"                           ,&ImGuiIO::WantCaptureMouse                                   )        
     .def_readwrite("WantCaptureKeyboard"                        ,&ImGuiIO::WantCaptureKeyboard                                )           
     .def_readwrite("WantTextInput"                              ,&ImGuiIO::WantTextInput                                      )     
@@ -1625,10 +1622,9 @@ void bind_imgui_methods(py::module& m) {
     m.def("ResetMouseDragDelta", [](ImGuiMouseButton button) { ImGui::ResetMouseDragDelta(button); }, py::arg("button"));
     m.def("GetMouseCursor", []() { return ImGui::GetMouseCursor(); });
     m.def("SetMouseCursor", [](ImGuiMouseCursor cursor_type) { ImGui::SetMouseCursor(cursor_type); }, py::arg("cursor_type"));
-    m.def("CaptureMouseFromApp", [](bool want_capture_mouse_value) { ImGui::CaptureMouseFromApp(want_capture_mouse_value); }, py::arg("want_capture_mouse_value"));
+    m.def("SetNextFrameWantCaptureMouse", [](bool want_capture_mouse) { ImGui::SetNextFrameWantCaptureMouse(want_capture_mouse); }, py::arg("want_capture_mouse"));
 
     // Inputs Utilities: Keyboard
-    m.def("GetKeyIndex", [](ImGuiKey imgui_key) { return ImGui::GetKeyIndex(imgui_key); }, py::arg("imgui_key"));
     m.def("IsKeyDown", [](ImGuiKey user_key_index) { return ImGui::IsKeyDown(user_key_index); }, py::arg("user_key_index"));
     m.def("IsKeyPressed", [](ImGuiKey user_key_index, bool repeat) { return ImGui::IsKeyPressed(user_key_index, repeat); }, py::arg("user_key_index"), py::arg("repeat")=true);
     m.def("IsKeyReleased", [](ImGuiKey user_key_index) { return ImGui::IsKeyReleased(user_key_index); }, py::arg("user_key_index"));
@@ -1642,11 +1638,11 @@ void bind_imgui_methods(py::module& m) {
         py::arg("rate")
     );
     m.def(
-        "CaptureKeyboardFromApp",
-        [](bool want_capture_keyboard_value) {
-            ImGui::CaptureKeyboardFromApp(want_capture_keyboard_value);
+        "SetNextFrameWantCaptureKeyboard",
+        [](bool want_capture_keyboard) {
+            ImGui::SetNextFrameWantCaptureKeyboard(want_capture_keyboard);
         },
-        py::arg("want_capture_keyboard_value") = true
+        py::arg("want_capture_keyboard") = true
     );
 
     // Clipboard Utilities
@@ -1803,7 +1799,7 @@ void bind_imgui_methods(py::module& m) {
     );
     m.def(
         "AddText", 
-        [](const ImFont* font, float font_size, const Vec2T& pos, ImU32 col, const char* text_begin, const char* text_end, float wrap_width) {
+        [](ImFont* font, float font_size, const Vec2T& pos, ImU32 col, const char* text_begin, const char* text_end, float wrap_width) {
             ImGui::GetWindowDrawList()->AddText(font, font_size, to_vec2(pos), col, text_begin, text_end, wrap_width);
         },
         py::arg("font"),
@@ -2181,28 +2177,12 @@ void bind_imgui_enums(py::module& m) {
   m.attr("ImGuiKey_ModAlt") = static_cast<ImGuiKey>(ImGuiKey_ModAlt);
   m.attr("ImGuiKey_ModSuper") = static_cast<ImGuiKey>(ImGuiKey_ModSuper);
 
-  m.attr("ImGuiModFlags_None") = static_cast<int>(ImGuiModFlags_None);
-  m.attr("ImGuiModFlags_Ctrl") = static_cast<int>(ImGuiModFlags_Ctrl);
-  m.attr("ImGuiModFlags_Shift") = static_cast<int>(ImGuiModFlags_Shift);
-  m.attr("ImGuiModFlags_Alt") = static_cast<int>(ImGuiModFlags_Alt);
-  m.attr("ImGuiModFlags_Super") = static_cast<int>(ImGuiModFlags_Super);
-
-  m.attr("ImGuiNavInput_Activate") = static_cast<int>(ImGuiNavInput_Activate);
-  m.attr("ImGuiNavInput_Cancel") = static_cast<int>(ImGuiNavInput_Cancel);
-  m.attr("ImGuiNavInput_Input") = static_cast<int>(ImGuiNavInput_Input);
-  m.attr("ImGuiNavInput_Menu") = static_cast<int>(ImGuiNavInput_Menu);
-  m.attr("ImGuiNavInput_DpadLeft") = static_cast<int>(ImGuiNavInput_DpadLeft);
-  m.attr("ImGuiNavInput_DpadRight") = static_cast<int>(ImGuiNavInput_DpadRight);
-  m.attr("ImGuiNavInput_DpadUp") = static_cast<int>(ImGuiNavInput_DpadUp);
-  m.attr("ImGuiNavInput_DpadDown") = static_cast<int>(ImGuiNavInput_DpadDown);
-  m.attr("ImGuiNavInput_LStickLeft") = static_cast<int>(ImGuiNavInput_LStickLeft);
-  m.attr("ImGuiNavInput_LStickRight") = static_cast<int>(ImGuiNavInput_LStickRight);
-  m.attr("ImGuiNavInput_LStickUp") = static_cast<int>(ImGuiNavInput_LStickUp);
-  m.attr("ImGuiNavInput_LStickDown") = static_cast<int>(ImGuiNavInput_LStickDown);
-  m.attr("ImGuiNavInput_FocusPrev") = static_cast<int>(ImGuiNavInput_FocusPrev);
-  m.attr("ImGuiNavInput_FocusNext") = static_cast<int>(ImGuiNavInput_FocusNext);
-  m.attr("ImGuiNavInput_TweakSlow") = static_cast<int>(ImGuiNavInput_TweakSlow);
-  m.attr("ImGuiNavInput_TweakFast") = static_cast<int>(ImGuiNavInput_TweakFast);
+  m.attr("ImGuiMod_None") = static_cast<int>(ImGuiMod_None);
+  m.attr("ImGuiMod_Ctrl") = static_cast<int>(ImGuiMod_Ctrl);
+  m.attr("ImGuiMod_Shift") = static_cast<int>(ImGuiMod_Shift);
+  m.attr("ImGuiMod_Alt") = static_cast<int>(ImGuiMod_Alt);
+  m.attr("ImGuiMod_Super") = static_cast<int>(ImGuiMod_Super);
+  m.attr("ImGuiMod_Mask_") = static_cast<int>(ImGuiMod_Mask_);
 
   m.attr("ImGuiConfigFlags_None") = static_cast<int>(ImGuiConfigFlags_None);
   m.attr("ImGuiConfigFlags_NavEnableKeyboard") = static_cast<int>(ImGuiConfigFlags_NavEnableKeyboard);
