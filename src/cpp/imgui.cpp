@@ -6,33 +6,30 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-namespace py = pybind11;
+#include "Eigen/Dense"
 
-// Type translations between Python and ImGui.  Prefer native Python types (tuples, arrays), translating into ImGui
-// equivalents.
-using Vec2T = std::tuple<float, float>;
-using Vec4T = std::tuple<float, float, float, float>;
+#include "utils.h"
+#include "imgui_utils.h"
 
-ImVec2 to_vec2(const Vec2T& v) { return ImVec2(std::get<0>(v), std::get<1>(v)); }
-ImVec4 to_vec4(const Vec4T& v) { return ImVec4(std::get<0>(v), std::get<1>(v), std::get<2>(v), std::get<3>(v)); }
 
-Vec2T from_vec2(const ImVec2& v) { return std::make_tuple(v.x, v.y); }
-Vec4T from_vec4(const ImVec4& v) { return std::make_tuple(v.x, v.y, v.z, v.w); }
+void bind_imgui_structs(py::module& m);
+void bind_imgui_methods(py::module& m);
+void bind_imgui_enums(py::module& m);
+
+void bind_imgui(py::module& m) {
+  auto imgui_module = m.def_submodule("imgui", "ImGui bindings");
+  bind_imgui_structs(imgui_module);
+  bind_imgui_methods(imgui_module);
+  bind_imgui_enums(imgui_module);
+}
+
+// clang-format off
 
 struct InputTextCallback_UserData {
   std::string* str;
   ImGuiInputTextCallback chain_callback;
   void* chain_callback_user_data;
 };
-
-std::vector<const char*> convert_string_items(const std::vector<std::string>& items) {
-  auto _items = std::vector<const char*>();
-  _items.reserve(items.size());
-  for (const auto& item : items) {
-    _items.push_back(item.data());
-  }
-  return _items;
-}
 
 static int input_text_callback(ImGuiInputTextCallbackData* data) {
   auto* user_data = reinterpret_cast<InputTextCallback_UserData*>(data->UserData);
@@ -51,27 +48,6 @@ static int input_text_callback(ImGuiInputTextCallbackData* data) {
   }
   return 0;
 }
-
-
-void bind_imgui_structs(py::module& m);
-void bind_imgui_methods(py::module& m);
-void bind_imgui_enums(py::module& m);
-void bind_implot_structs(py::module& m);
-void bind_implot_methods(py::module& m);
-void bind_implot_enums(py::module& m);
-
-void bind_imgui(py::module& m) {
-  auto imgui_module = m.def_submodule("imgui", "ImGui bindings");
-  bind_imgui_structs(imgui_module);
-  bind_imgui_methods(imgui_module);
-  bind_imgui_enums(imgui_module);
-  
-  bind_implot_structs(imgui_module);
-  bind_implot_methods(imgui_module);
-  bind_implot_enums(imgui_module);
-}
-
-// clang-format off
 
 
 // clang-format off
@@ -2332,73 +2308,3 @@ void bind_imgui_enums(py::module& m) {
 }
 
 
-
-void bind_implot_structs(py::module& m) {
-
-
-
-}
-
-void bind_implot_methods(py::module& m) {
-    
-    //-----------------------------------------------------------------------------
-    // [SECTION] Begin/End Plot
-    //-----------------------------------------------------------------------------
-
-    m.def(
-        "BeginPlot",
-        [](const char* name, const Vec2T& size, ImPlotFlags flags) {
-            return ImPlot::BeginPlot(name, to_vec2(size), flags);
-        },
-        py::arg("name"),
-        py::arg("size") = std::make_tuple(-1.f, 0.f),
-        py::arg("flags") = 0
-    );
-    m.def("EndPlot", []() { ImPlot::EndPlot(); });
-
-    //-----------------------------------------------------------------------------
-    // [SECTION] Setup
-    //-----------------------------------------------------------------------------
-    
-    
-
-
-    //-----------------------------------------------------------------------------
-    // [SECTION] Plot Items
-    //-----------------------------------------------------------------------------
-    
-    m.def(
-        "PlotLine",
-        [](const char* label_id, const Eigen::VectorXd& values, double xscale, double xstart, ImPlotLineFlags flags,) {
-            ImPlot::PlotLine(label_id, values, values.size(), xscale, xstart, flags);
-        },
-        py::arg("label_id"),
-        py::arg("values"),
-        py::arg("xscale")=1.,
-        py::arg("xstart")=0.,
-        py::arg("flags") = 0
-    );
-    
-    m.def(
-        "PlotLine",
-        [](const char* label_id, const Eigen::VectorXd& xs, const Eigen::VectorXd& ys, ImPlotLineFlags flags,) {
-            ImPlot::PlotLine(label_id, values, values.size(), xscale, xstart, flags);
-        },
-        py::arg("label_id"),
-        py::arg("xs"),
-        py::arg("ys"),
-        py::arg("flags") = 0
-    );
-
-}
-
-void bind_implot_enums(py::module& m) {
-  
-    m.attr("ImPlotLineFlags_None") = static_cast<int>(ImPlotLineFlags_None);
-    m.attr("ImPlotLineFlags_Segments") = static_cast<int>(ImPlotLineFlags_Segments);
-    m.attr("ImPlotLineFlags_Loop") = static_cast<int>(ImPlotLineFlags_Loop);
-    m.attr("ImPlotLineFlags_SkipNaN") = static_cast<int>(ImPlotLineFlags_SkipNaN);
-    m.attr("ImPlotLineFlags_NoClip") = static_cast<int>(ImPlotLineFlags_NoClip);
-    m.attr("ImPlotLineFlags_Shaded") = static_cast<int>(ImPlotLineFlags_Shaded);
-
-}
