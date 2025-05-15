@@ -1,4 +1,5 @@
 #include "imgui.h"
+#include "implot.h"
 
 #include <pybind11/functional.h>
 #include <pybind11/numpy.h>
@@ -55,12 +56,19 @@ static int input_text_callback(ImGuiInputTextCallbackData* data) {
 void bind_imgui_structs(py::module& m);
 void bind_imgui_methods(py::module& m);
 void bind_imgui_enums(py::module& m);
+void bind_implot_structs(py::module& m);
+void bind_implot_methods(py::module& m);
+void bind_implot_enums(py::module& m);
 
 void bind_imgui(py::module& m) {
   auto imgui_module = m.def_submodule("imgui", "ImGui bindings");
   bind_imgui_structs(imgui_module);
   bind_imgui_methods(imgui_module);
   bind_imgui_enums(imgui_module);
+  
+  bind_implot_structs(imgui_module);
+  bind_implot_methods(imgui_module);
+  bind_implot_enums(imgui_module);
 }
 
 // clang-format off
@@ -2321,4 +2329,76 @@ void bind_imgui_enums(py::module& m) {
   m.attr("ImGuiCond_Once") = static_cast<int>(ImGuiCond_Once);
   m.attr("ImGuiCond_FirstUseEver") = static_cast<int>(ImGuiCond_FirstUseEver);
   m.attr("ImGuiCond_Appearing") = static_cast<int>(ImGuiCond_Appearing);
+}
+
+
+
+void bind_implot_structs(py::module& m) {
+
+
+
+}
+
+void bind_implot_methods(py::module& m) {
+    
+    //-----------------------------------------------------------------------------
+    // [SECTION] Begin/End Plot
+    //-----------------------------------------------------------------------------
+
+    m.def(
+        "BeginPlot",
+        [](const char* name, const Vec2T& size, ImPlotFlags flags) {
+            return ImPlot::BeginPlot(name, to_vec2(size), flags);
+        },
+        py::arg("name"),
+        py::arg("size") = std::make_tuple(-1.f, 0.f),
+        py::arg("flags") = 0
+    );
+    m.def("EndPlot", []() { ImPlot::EndPlot(); });
+
+    //-----------------------------------------------------------------------------
+    // [SECTION] Setup
+    //-----------------------------------------------------------------------------
+    
+    
+
+
+    //-----------------------------------------------------------------------------
+    // [SECTION] Plot Items
+    //-----------------------------------------------------------------------------
+    
+    m.def(
+        "PlotLine",
+        [](const char* label_id, const Eigen::VectorXd& values, double xscale, double xstart, ImPlotLineFlags flags,) {
+            ImPlot::PlotLine(label_id, values, values.size(), xscale, xstart, flags);
+        },
+        py::arg("label_id"),
+        py::arg("values"),
+        py::arg("xscale")=1.,
+        py::arg("xstart")=0.,
+        py::arg("flags") = 0
+    );
+    
+    m.def(
+        "PlotLine",
+        [](const char* label_id, const Eigen::VectorXd& xs, const Eigen::VectorXd& ys, ImPlotLineFlags flags,) {
+            ImPlot::PlotLine(label_id, values, values.size(), xscale, xstart, flags);
+        },
+        py::arg("label_id"),
+        py::arg("xs"),
+        py::arg("ys"),
+        py::arg("flags") = 0
+    );
+
+}
+
+void bind_implot_enums(py::module& m) {
+  
+    m.attr("ImPlotLineFlags_None") = static_cast<int>(ImPlotLineFlags_None);
+    m.attr("ImPlotLineFlags_Segments") = static_cast<int>(ImPlotLineFlags_Segments);
+    m.attr("ImPlotLineFlags_Loop") = static_cast<int>(ImPlotLineFlags_Loop);
+    m.attr("ImPlotLineFlags_SkipNaN") = static_cast<int>(ImPlotLineFlags_SkipNaN);
+    m.attr("ImPlotLineFlags_NoClip") = static_cast<int>(ImPlotLineFlags_NoClip);
+    m.attr("ImPlotLineFlags_Shaded") = static_cast<int>(ImPlotLineFlags_Shaded);
+
 }
