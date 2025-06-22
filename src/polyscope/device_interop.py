@@ -53,7 +53,7 @@ def resolve_default_device_interop_funcs():
     # again and print an informative error below only if a relevant function is called)
     try: 
         import cuda
-        from cuda import cudart
+        import cuda.bindings.runtime
         import cupy
     except ImportError: 
         raise ImportError('This Polyscope functionality requires cuda bindings to be installed. Please install the packages `cuda` and `cupy`. Try `python -m pip install cuda-python cupy`. See https://nvidia.github.io/cuda-python/ & https://cupy.dev/.')
@@ -71,8 +71,8 @@ def resolve_default_device_interop_funcs():
 
     def format_cudart_err(err):
         return (
-            f"{cudart.cudaGetErrorName(err)[1].decode('utf-8')}({int(err)}): "
-            f"{cudart.cudaGetErrorString(err)[1].decode('utf-8')}"
+            f"{cuda.bindings.runtime.cudaGetErrorName(err)[1].decode('utf-8')}({int(err)}): "
+            f"{cuda.bindings.runtime.cudaGetErrorString(err)[1].decode('utf-8')}"
         )
 
 
@@ -91,8 +91,8 @@ def resolve_default_device_interop_funcs():
             err = args
             ret = None
 
-        assert isinstance(err, cudart.cudaError_t), type(err)
-        if err != cudart.cudaError_t.cudaSuccess:
+        assert isinstance(err, cuda.bindings.runtime.cudaError_t), type(err)
+        if err != cuda.bindings.runtime.cudaError_t.cudaSuccess:
             raise RuntimeError(format_cudart_err(err))
 
         return ret
@@ -121,12 +121,12 @@ def resolve_default_device_interop_funcs():
         return cupy_arr.data.ptr, shape, dtype, n_bytes
 
     def map_resource_and_get_array(handle):
-        check_cudart_err(cudart.cudaGraphicsMapResources(1, handle, None)),
-        return check_cudart_err(cudart.cudaGraphicsSubResourceGetMappedArray(handle, 0, 0))
+        check_cudart_err(cuda.bindings.runtime.cudaGraphicsMapResources(1, handle, None)),
+        return check_cudart_err(cuda.bindings.runtime.cudaGraphicsSubResourceGetMappedArray(handle, 0, 0))
     
     def map_resource_and_get_pointer(handle):
-        check_cudart_err(cudart.cudaGraphicsMapResources(1, handle, None)),
-        raw_ptr, size = check_cudart_err(cudart.cudaGraphicsResourceGetMappedPointer(handle))
+        check_cudart_err(cuda.bindings.runtime.cudaGraphicsMapResources(1, handle, None)),
+        raw_ptr, size = check_cudart_err(cuda.bindings.runtime.cudaGraphicsResourceGetMappedPointer(handle))
         return raw_ptr, size
 
     func_dict = {
@@ -135,36 +135,36 @@ def resolve_default_device_interop_funcs():
         # this function is optional, and only used for sanity checks it can be left undefined
         'get_array_info' : lambda array: 
             check_cudart_err(
-                cudart.cudaArrayGetInfo(array)
+                cuda.bindings.runtime.cudaArrayGetInfo(array)
             ),
 
         # as cudaGraphicsUnmapResources(1, handle, None)
         'unmap_resource' : lambda handle :
-            check_cudart_err(cudart.cudaGraphicsUnmapResources(1, handle, None)),
+            check_cudart_err(cuda.bindings.runtime.cudaGraphicsUnmapResources(1, handle, None)),
 
 
         # returns a registered handle
         # as cudaGraphicsGLRegisterBuffer()
         'register_gl_buffer' : lambda native_id :
-            check_cudart_err(cudart.cudaGraphicsGLRegisterBuffer(
+            check_cudart_err(cuda.bindings.runtime.cudaGraphicsGLRegisterBuffer(
                 native_id,
-                cudart.cudaGraphicsRegisterFlags.cudaGraphicsRegisterFlagsWriteDiscard
+                cuda.bindings.runtime.cudaGraphicsRegisterFlags.cudaGraphicsRegisterFlagsWriteDiscard
             )),
        
 
         # returns a registered handle
         # as in cudaGraphicsGLRegisterImage ()
         'register_gl_image_2d' : lambda native_id :
-            check_cudart_err(cudart.cudaGraphicsGLRegisterImage(
+            check_cudart_err(cuda.bindings.runtime.cudaGraphicsGLRegisterImage(
                 native_id,
                 _CONSTANT_GL_TEXTURE_2D,
-                cudart.cudaGraphicsRegisterFlags.cudaGraphicsRegisterFlagsWriteDiscard
+                cuda.bindings.runtime.cudaGraphicsRegisterFlags.cudaGraphicsRegisterFlagsWriteDiscard
             )),
       
 
         # as in cudaGraphicsUnregisterResource()
         'unregister_resource' : lambda handle :
-            check_cudart_err(cudart.cudaGraphicsUnregisterResource(handle)),
+            check_cudart_err(cuda.bindings.runtime.cudaGraphicsUnregisterResource(handle)),
 
 
         # returns array
@@ -183,15 +183,15 @@ def resolve_default_device_interop_funcs():
 
         # as in cudaMemcpy
         'memcpy' : lambda dst_ptr, src_ptr, size : 
-            check_cudart_err(cuda.cudart.cudaMemcpy(
-                 dst_ptr, src_ptr, size, cudart.cudaMemcpyKind.cudaMemcpyDeviceToDevice
+            check_cudart_err(cuda.bindings.runtime.cudaMemcpy(
+                 dst_ptr, src_ptr, size, cuda.bindings.runtime.cudaMemcpyKind.cudaMemcpyDeviceToDevice
             )),
 
 
         # as in cudaMemcpy2DToArray
         'memcpy_2d' : lambda dst_ptr, src_ptr, width, height : 
-            check_cudart_err(cuda.cudart.cudaMemcpy2DToArray(
-                 dst_ptr, 0, 0, src_ptr, width, width, height, cudart.cudaMemcpyKind.cudaMemcpyDeviceToDevice
+            check_cudart_err(cuda.bindings.runtime.cudaMemcpy2DToArray(
+                 dst_ptr, 0, 0, src_ptr, width, width, height, cuda.bindings.runtime.cudaMemcpyKind.cudaMemcpyDeviceToDevice
             )),
 
     }
