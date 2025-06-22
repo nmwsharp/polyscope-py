@@ -244,7 +244,10 @@ class CUDAOpenGLMappedAttributeBuffer:
         self.finished_init = True
         
     def __del__(self):
-        if self.finished_init: 
+        if self.finished_init and psb.is_initialized():
+            # Don't bother trying to unregister if Polyscope is not initialized.
+            # This usually happens during shotdown, if Polyscope gets shutdown first the openGL context
+            # is invalidated, and this would throw an error. Better to silently skip it.
             self.unregister()
 
     def unregister(self):
@@ -327,7 +330,10 @@ class CUDAOpenGLMappedTextureBuffer:
         self.finished_init = True
 
     def __del__(self):
-        if self.finished_init: 
+        if self.finished_init and psb.is_initialized():
+            # Don't bother trying to unregister if Polyscope is not initialized.
+            # This usually happens during shotdown, if Polyscope gets shutdown first the openGL context
+            # is invalidated, and this would throw an error. Better to silently skip it.
             self.unregister()
 
     def unregister(self):
