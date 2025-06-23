@@ -232,7 +232,8 @@ py::class_<VectorQ> bindVectorQuantity(py::module& m, std::string name) {
   return bindQuantity<VectorQ>(m, name.c_str())
       .def("set_length", &VectorQ::setVectorLengthScale, "Set length")
       .def("set_radius", &VectorQ::setVectorRadius, "Set radius")
-      .def("set_color", &VectorQ::setVectorColor, "Set color");
+      .def("set_color", &VectorQ::setVectorColor, "Set color")
+      .def("set_material", &VectorQ::setMaterial, "Set material");
 }
 
 // Add common bindings for all texture map quantities

@@ -109,6 +109,10 @@ def process_vector_args(structure, quantity, vector_args):
     val = check_and_pop_arg(vector_args, 'color')
     if val is not None:
         quantity.set_color(glm3(val))
+    
+    val = check_and_pop_arg(vector_args, 'material')
+    if val is not None:
+        quantity.set_material(val)
 
 
 # Process args, removing them from the dict if they are present

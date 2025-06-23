@@ -1488,6 +1488,7 @@ class TestSurfaceMesh(unittest.TestCase):
             p.add_vector_quantity("test_vals3", vals, defined_on=on, enabled=True, vectortype='ambient')
             p.add_vector_quantity("test_vals4", vals, defined_on=on, enabled=True, length=0.005)
             p.add_vector_quantity("test_vals5", vals, defined_on=on, enabled=True, radius=0.001)
+            p.add_vector_quantity("test_vals5", vals, defined_on=on, enabled=True, material="candy")
             p.add_vector_quantity("test_vals6", vals, defined_on=on, enabled=True, color=(0.2, 0.5, 0.5))
             
             # 2D 
