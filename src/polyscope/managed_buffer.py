@@ -24,6 +24,8 @@ class ManagedBuffer:
         self.uniqueID = self.buffer_weak_ref.get_unique_ID()
     
     def __del__(self):
+        # NOTE: this means that if the user writes the common ps.get_buffer("name").update_data_from_device(arr), then
+        # we are re-registering the buffer every time, which could be slow, and is unintuitive.
         self.release_mapped_buffer_CUDAOpenGL()
        
     def check_ref_still_valid(self):
@@ -121,6 +123,7 @@ class ManagedBuffer:
     
     def release_mapped_buffer_CUDAOpenGL(self):
         if self.uniqueID in _mapped_buffer_cache_CUDAOpenGL:
+            _mapped_buffer_cache_CUDAOpenGL[self.uniqueID].cleanup()
             del _mapped_buffer_cache_CUDAOpenGL[self.uniqueID]
     
     def get_texture_native_id(self):

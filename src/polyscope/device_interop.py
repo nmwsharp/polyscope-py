@@ -25,17 +25,19 @@ device_interop_funcs = None
 #
 # There are two options for users to get the needed functions
 #
-# - [Default Case] The python packages `cuda` and `cupy` can be installed as additional
-#   optional dependencies. They offer the necessary CUDA functions. This is the default 
-#   path if device interop functions are used. The result is that any array type which
-#   implements __cuda_array_interface__ or __dlpack__ (aka almost all libraries) 
-#   can be automatically read from.
+# - [Default Case] The python package `cuda-python` (https://nvidia.github.io/cuda-python/cuda-bindings/latest/install.html) 
+#   can be installed as an additional optional dependency, offering the necessary CUDA functions. 
+#   This is the default path if device interop functions are used. The result is that any array type which
+#   implements __cuda_array_interface__ aka almost all libraries) can be automatically read from.
+#   Also, if desired the `cupy` package can be installed to furthermore read from __dlpack__ arrays.
+#
 # 
-# - [Custom Case] In some cases, the `cuda` and `cupy` packages may not install correctly,
-#   or the user's own codebase may already have its own preferred bindings to cuda functions.
-#   in this case the user can call set_device_interop_funcs() once, and pass a dictionary 
+# - [Custom Case] The user may not wish to install the `cuda-python` package, or their codebase may already 
+#   have its own preferred bindings to cuda functions.
+#   In this case the user can call set_device_interop_funcs() once, and pass a dictionary 
 #   with a handful of callbacks to do the necessary mapping and copying. See below for 
 #   the meaning of these callbacks.
+
 
 def ensure_device_interop_funcs_resolve():
     check_device_module_availibility()
@@ -54,20 +56,51 @@ def resolve_default_device_interop_funcs():
     try: 
         import cuda
         import cuda.bindings.runtime
-        import cupy
     except ImportError: 
-        raise ImportError('This Polyscope functionality requires cuda bindings to be installed. Please install the packages `cuda` and `cupy`. Try `python -m pip install cuda-python cupy`. See https://nvidia.github.io/cuda-python/ & https://cupy.dev/.')
+        raise ImportError('This Polyscope functionality requires cuda bindings to be installed. Please install the `cuda-python` package. See https://nvidia.github.io/cuda-python/cuda-bindings/latest/install.html')
 
 
-    # TODO is it possible to implement this without relying on exceptions?
-    '''
-    def is_dlpack(obj):
-        return hasattr(obj, '__dlpack__') and hasattr(obj, '__dlpack_device__')
-    '''
+    def is_cuda_array_interface(arr):   
+        # we test `in dir(arr)` instead of `hasattr()`, because hasattr() returns false if accessing the 
+        # attribute throws an error, but in our case these errors are usually legitimate and we should bubble
+        # them up
+        return '__cuda_array_interface__' in dir(arr)
 
-    def is_cuda_array_interface(obj):
-        return hasattr(obj, '__cuda_array_interface__')
+    def resolve_cuda_array_interface(arr):
 
+        interface = arr.__cuda_array_interface__
+
+        arr_info_dict = {
+            'data_ptr' : interface['data'][0],
+            'shape' : interface['shape'],
+            'dtype' : np.dtype(interface['typestr']),
+        }
+
+        # compute n_bytes
+        n_entries = 1
+        for s in interface['shape']: n_entries *= s
+        arr_info_dict['n_bytes'] = n_entries * arr_info_dict['dtype'].itemsize
+
+        return arr_info_dict
+
+    def is_dlpack_cuda(arr):
+        # we test `in dir(arr)` instead of `hasattr()`, because hasattr() returns false if accessing the 
+        # attribute throws an error, but in our case these errors are usually legitimate and we should bubble
+        # them up
+        is_dlpack = '__dlpack__' in dir(arr) and '__dlpack_device__' in dir(arr)
+        if not is_dlpack:
+            return False
+
+        # futhermore check that its a CUDA dlpack array
+        is_dlpack_cuda = (arr.__dlpack_device__()[0] == 2) # this is an enum, and 2 is "cuda"
+
+        return is_dlpack and is_dlpack_cuda
+    
+    def resolve_dlpack(arr):
+        import cupy
+        cupy_arr = cupy.ascontiguousarray(cupy.from_dlpack(arr))
+        return resolve_cuda_array_interface(cupy_arr)
+    
 
     def format_cudart_err(err):
         return (
@@ -96,29 +129,35 @@ def resolve_default_device_interop_funcs():
             raise RuntimeError(format_cudart_err(err))
 
         return ret
-    
+
     # helper function: dispatch to one of the kinds of objects that we can read from
     def get_array_from_unknown_data(arr):
+        arr_info_dict = None
 
-        # __cuda_array_interface__
-        if is_cuda_array_interface(arr):
-            cupy_arr = cupy.ascontiguousarray(cupy.asarray(arr))
+        # try __cuda_array_interface__
+        if arr_info_dict is None and is_cuda_array_interface(arr):
+            arr_info_dict = resolve_cuda_array_interface(arr)
+        
+        # try__dlpack__
+        if arr_info_dict is None and is_dlpack_cuda(arr):
+            try: 
+                import cupy
+            except ImportError: 
+                raise ImportError("Passing __dlpack__ arrays requires the `cupy` package to be installed. NOTE: the __cuda_array_interface__ is generally simpler, widely supported, and does not require an additional dependency.")
 
-        else:
-            # __dlpack__
-            # (I can't figure out any way to check this except try-catch)
-            try:
-                cupy_arr = cupy.ascontiguousarray(cupy.from_dlpack(arr))
-            except ValueError:
-                pass 
-           
-            raise ValueError("Cannot read from device data object. Must be a _dlpack_ array or implement the __cuda_array_interface__.")
+            arr_info_dict = resolve_dlpack(arr)
 
-        shape = cupy_arr.shape
-        dtype = cupy_arr.dtype
-        n_bytes = cupy_arr.nbytes
+        # failure
+        if arr_info_dict is None:
+            raise ValueError("Cannot read from device (GPU) data object. The object must implement the __cuda_array_interface__, or if the cupy package is installed, implement the __dlpack__ protocol. Are you sure you are passing a GPU array?")
 
-        return cupy_arr.data.ptr, shape, dtype, n_bytes
+
+        ptr = arr_info_dict['data_ptr']
+        shape = arr_info_dict['shape']
+        dtype = arr_info_dict['dtype']
+        n_bytes = arr_info_dict['n_bytes']
+
+        return ptr, shape, dtype, n_bytes
 
     def map_resource_and_get_array(handle):
         check_cudart_err(cuda.bindings.runtime.cudaGraphicsMapResources(1, handle, None)),
@@ -240,13 +279,12 @@ class CUDAOpenGLMappedAttributeBuffer:
 
         # Register the buffer 
         self.resource_handle = device_interop_funcs['register_gl_buffer'](self.gl_attribute_native_id)
-        
         self.finished_init = True
         
-    def __del__(self):
+    def cleanup(self):
         if self.finished_init and psb.is_initialized():
             # Don't bother trying to unregister if Polyscope is not initialized.
-            # This usually happens during shotdown, if Polyscope gets shutdown first the openGL context
+            # This usually happens during shutdown, if Polyscope gets shutdown first the openGL context
             # is invalidated, and this would throw an error. Better to silently skip it.
             self.unregister()
 
@@ -256,7 +294,7 @@ class CUDAOpenGLMappedAttributeBuffer:
 
     def map(self):
         """
-        Returns a cupy memory pointer to the buffer
+        Returns a memory pointer to the buffer
         """
 
         if self.cuda_buffer_ptr is not None:
@@ -276,8 +314,6 @@ class CUDAOpenGLMappedAttributeBuffer:
     def set_data_from_array(self, arr, buffer_size_in_bytes=None, expected_shape=None, expected_dtype=None):
         
         self.map()
-      
-        # cupy_arr = self.get_array_from_unknown_data(arr)
 
         # access the input array
         arr_ptr, arr_shape, arr_dtype, arr_nbytes = device_interop_funcs['get_array_ptr'](arr)
@@ -329,7 +365,7 @@ class CUDAOpenGLMappedTextureBuffer:
 
         self.finished_init = True
 
-    def __del__(self):
+    def cleanup(self):
         if self.finished_init and psb.is_initialized():
             # Don't bother trying to unregister if Polyscope is not initialized.
             # This usually happens during shotdown, if Polyscope gets shutdown first the openGL context
