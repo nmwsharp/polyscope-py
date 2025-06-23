@@ -782,6 +782,36 @@ class TestPointCloud(unittest.TestCase):
         p.remove_all_quantities()
         ps.remove_all_structures()
     
+    def test_parameterization(self):
+
+        pts = self.generate_points()
+        N = pts.shape[0]
+        p = ps.register_point_cloud("test_cloud", pts)
+        vals = np.random.rand(N,2)
+
+
+        cA = (0.1, 0.2, 0.3)
+        cB = (0.4, 0.5, 0.6)
+
+        p.add_parameterization_quantity("test_vals1", vals, enabled=True)
+
+        p.add_parameterization_quantity("test_vals2", vals, coords_type='world')
+        p.add_parameterization_quantity("test_vals3", vals, coords_type='unit')
+
+        p.add_parameterization_quantity("test_vals4", vals, viz_style='checker')
+        p.add_parameterization_quantity("test_vals5", vals, viz_style='grid')
+        p.add_parameterization_quantity("test_vals6", vals, viz_style='local_check')
+        p.add_parameterization_quantity("test_vals7", vals, viz_style='local_rad')
+
+        p.add_parameterization_quantity("test_vals8", vals, grid_colors=(cA, cB))
+        p.add_parameterization_quantity("test_vals9", vals, checker_colors=(cA, cB))
+        p.add_parameterization_quantity("test_vals10", vals, checker_size=0.1)
+        p.add_parameterization_quantity("test_vals11", vals, cmap='blues')
+
+        ps.show(3)
+
+        p.remove_all_quantities()
+    
 
     def test_variable_radius(self):
         pts = self.generate_points()
@@ -1422,6 +1452,19 @@ class TestSurfaceMesh(unittest.TestCase):
             p.add_parameterization_quantity("test_vals10", vals, defined_on=on, checker_size=0.1)
             p.add_parameterization_quantity("test_vals11", vals, defined_on=on, cmap='blues')
 
+            ps.show(3)
+
+            # Test island labels
+            island_labels = np.random.randint(0, 10, size=p.n_faces())
+            p.add_parameterization_quantity("test_vals_check_islands",vals, defined_on=on, enabled=True, 
+                                             viz_style='checker_islands', island_labels=island_labels)
+            ps.show(3)
+            
+            # Test curve network from seams
+            p.add_parameterization_quantity("test_vals_curve_network", vals, defined_on=on, enabled=True, 
+                                             create_curve_network_from_seams="")
+            p.add_parameterization_quantity("test_vals_curve_network", vals, defined_on=on, enabled=True, 
+                                             create_curve_network_from_seams="my network")
             ps.show(3)
 
             p.remove_all_quantities()

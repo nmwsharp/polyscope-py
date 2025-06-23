@@ -1,6 +1,6 @@
 import polyscope_bindings as psb
 
-from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str
+from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str, str_to_param_coords_type
 from polyscope.structure import Structure
 from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, process_parameterization_args, check_all_args_processed
 
@@ -135,6 +135,22 @@ class PointCloud(Structure):
         process_quantity_args(self, q, vector_args)
         process_vector_args(self, q, vector_args)
         check_all_args_processed(self, q, vector_args)
+
+    # Parameterization
+    def add_parameterization_quantity(self, name, values, coords_type='unit', **parameterization_args):
+
+        if len(values.shape) != 2 or values.shape[0] != self.n_points() or values.shape[1] != 2: raise ValueError("'values' should be an Nx2 array")
+
+        # parse the coords type in to an enum
+        coords_type_enum = str_to_param_coords_type(coords_type)
+
+        q = self.bound_instance.add_parameterization_quantity(name, values, coords_type_enum)
+            
+        # process and act on additional arguments
+        # note: each step modifies the args dict and removes processed args
+        process_quantity_args(self, q, parameterization_args)
+        process_parameterization_args(self, q, parameterization_args, is_surface=False)
+        check_all_args_processed(self, q, parameterization_args)
 
 
 def register_point_cloud(name, points, enabled=None, radius=None, point_render_mode=None, color=None, material=None, transparency=None):

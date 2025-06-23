@@ -112,12 +112,7 @@ def process_vector_args(structure, quantity, vector_args):
 
 
 # Process args, removing them from the dict if they are present
-def process_parameterization_args(structure, quantity, parameterization_args):
-
-    val = check_and_pop_arg(parameterization_args, 'viz_style')
-    if val is not None:
-        viz_style_enum = str_to_param_viz_style(val)
-        quantity.set_style(viz_style_enum)
+def process_parameterization_args(structure, quantity, parameterization_args, is_surface=True):
 
     val = check_and_pop_arg(parameterization_args, 'grid_colors')
     if val is not None:
@@ -134,15 +129,24 @@ def process_parameterization_args(structure, quantity, parameterization_args):
     val = check_and_pop_arg(parameterization_args, 'cmap')
     if val is not None:
         quantity.set_color_map(val)
+
+    if is_surface:
         
-    val = check_and_pop_arg(parameterization_args, 'island_labels')
-    if val is not None:
-        if len(val.shape) != 1: raise ValueError("'island_labels' should be an (N_faces,) numpy array")
-        quantity.set_island_labels(val)
+        val = check_and_pop_arg(parameterization_args, 'island_labels')
+        if val is not None:
+            if len(val.shape) != 1: raise ValueError("'island_labels' should be an (N_faces,) numpy array")
+            quantity.set_island_labels(val)
+        
+        val = check_and_pop_arg(parameterization_args, 'create_curve_network_from_seams')
+        if val is not None:
+            quantity.create_curve_network_from_seams(val)
     
-    val = check_and_pop_arg(parameterization_args, 'create_curve_network_from_seams')
+    # this has to come after island_labels above 
+    val = check_and_pop_arg(parameterization_args, 'viz_style')
     if val is not None:
-        quantity.create_curve_network_from_seams(val)
+        viz_style_enum = str_to_param_viz_style(val)
+        quantity.set_style(viz_style_enum)
+
         
 # Process args, removing them from the dict if they are present
 def process_texture_map_args(structure, quantity, texture_map_args):

@@ -35,6 +35,15 @@ void bind_point_cloud(py::module& m) {
   // Vector quantities
   bindVectorQuantity<ps::PointCloudVectorQuantity>(m, "PointCloudVectorQuantity");
 
+  // Parameterization quantities
+  py::class_<ps::PointCloudParameterizationQuantity>(m, "PointCloudParameterizationQuantity")
+      .def("set_enabled", &ps::PointCloudParameterizationQuantity::setEnabled, "Set enabled")
+      .def("set_style", &ps::PointCloudParameterizationQuantity::setStyle, "Set style")
+      .def("set_grid_colors", &ps::PointCloudParameterizationQuantity::setGridColors, "Set grid colors")
+      .def("set_checker_colors", &ps::PointCloudParameterizationQuantity::setCheckerColors, "Set checker colors")
+      .def("set_checker_size", &ps::PointCloudParameterizationQuantity::setCheckerSize, "Set checker size")
+      .def("set_color_map", &ps::PointCloudParameterizationQuantity::setColorMap, "Set color map")
+    ;
 
   // == Main class
   bindStructure<ps::PointCloud>(m, "PointCloud")
@@ -76,7 +85,11 @@ void bind_point_cloud(py::module& m) {
     .def("add_vector_quantity", &ps::PointCloud::addVectorQuantity<Eigen::MatrixXf>, "Add a vector function at points",
         py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference)
     .def("add_vector_quantity2D", &ps::PointCloud::addVectorQuantity2D<Eigen::MatrixXf>, "Add a vector function at points",
-        py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference);
+        py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference)
+    .def("add_parameterization_quantity", &ps::PointCloud::addParameterizationQuantity<Eigen::MatrixXf>, 
+        py::return_value_policy::reference)
+
+    ;
 
   // Static adders and getters
   m.def("register_point_cloud", &ps::registerPointCloud<Eigen::MatrixXf>, 
