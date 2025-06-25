@@ -76,6 +76,10 @@ def resolve_default_device_interop_funcs():
             'dtype' : np.dtype(interface['typestr']),
         }
 
+        # check that it is contiguous (disallow arrays with a nonzero stride specified)
+        if "strides" in interface and interface["strides"] is not None and any(i != 0 for i in interface["strides"]):
+            raise ValueError("Device array must be contiguous")
+
         # compute n_bytes
         n_entries = 1
         for s in interface['shape']: n_entries *= s
