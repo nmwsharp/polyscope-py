@@ -13,9 +13,10 @@ device_interop_funcs = None
 ### Default CUDA implementation of interop functions
 #############################################################################
 
-# Device interoperability requires directly copying data from user's arrays
-# on the GPU into Polyscope's openGL buffers. This cannot be done directly
-# through openGL, it requires a memcopy from device compute library (generally CUDA).
+# On-device interoperability means directly copying data from user's arrays
+# on the GPU into Polyscope's openGL buffers without a CPU roundtrip. This cannot 
+# be done directly through openGL, it requires a memcopy from a device compute 
+# library (generally CUDA).
 #
 # Unfortunately, CUDA is is a nontrivial dependency, and many things could go wrong
 # with installation and mismatched versions. To give more flexibility, all of the
@@ -78,7 +79,7 @@ def resolve_default_device_interop_funcs():
 
         # check that it is contiguous (disallow arrays with a nonzero stride specified)
         if "strides" in interface and interface["strides"] is not None and any(i != 0 for i in interface["strides"]):
-            raise ValueError("Device array must be contiguous")
+            raise ValueError("GPU array must be contiguous")
 
         # compute n_bytes
         n_entries = 1
@@ -153,7 +154,7 @@ def resolve_default_device_interop_funcs():
 
         # failure
         if arr_info_dict is None:
-            raise ValueError("Cannot read from device (GPU) data object. The object must implement the __cuda_array_interface__, or if the cupy package is installed, implement the __dlpack__ protocol. Are you sure you are passing a GPU array?")
+            raise ValueError("Cannot read from GPU data object. The object must implement the __cuda_array_interface__, or if the cupy package is installed, implement the __dlpack__ protocol. Are you sure you are passing a GPU array?")
 
 
         ptr = arr_info_dict['data_ptr']
