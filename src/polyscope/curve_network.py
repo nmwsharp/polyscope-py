@@ -73,6 +73,17 @@ class CurveNetwork(Structure):
             self.bound_instance.update_node_positions2D(nodes)
         else:
             raise ValueError("bad node shape")
+    
+    # Custom radius quantity
+    def set_node_radius_quantity(self, quantity_name, autoscale=True):
+        self.bound_instance.set_node_radius_quantity(quantity_name, autoscale)
+    def clear_node_radius_quantity(self):
+        self.bound_instance.clear_node_radius_quantity()
+    
+    def set_edge_radius_quantity(self, quantity_name, autoscale=True):
+        self.bound_instance.set_edge_radius_quantity(quantity_name, autoscale)
+    def clear_edge_radius_quantity(self):
+        self.bound_instance.clear_edge_radius_quantity()
 
     ## Options
    

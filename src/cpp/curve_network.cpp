@@ -57,6 +57,14 @@ void bind_curve_network(py::module& m) {
     // picking
     .def("interpret_pick_result", &ps::CurveNetwork::interpretPickResult)
     
+    // variable radius
+    .def("set_node_radius_quantity", overload_cast_<std::string, bool>()(&ps::CurveNetwork::setNodeRadiusQuantity), 
+            py::arg("quantity_name"), py::arg("autoscale"))
+    .def("set_edge_radius_quantity", overload_cast_<std::string, bool>()(&ps::CurveNetwork::setEdgeRadiusQuantity), 
+            py::arg("quantity_name"), py::arg("autoscale"))
+    .def("clear_node_radius_quantity", &ps::CurveNetwork::clearNodeRadiusQuantity)
+    .def("clear_edge_radius_quantity", &ps::CurveNetwork::clearEdgeRadiusQuantity)
+
     // quantities
     .def("add_node_color_quantity", &ps::CurveNetwork::addNodeColorQuantity<Eigen::MatrixXf>, "Add a color function at nodes",
         py::arg("name"), py::arg("values"), py::return_value_policy::reference)

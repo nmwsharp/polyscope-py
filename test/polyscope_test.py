@@ -946,6 +946,35 @@ class TestCurveNetwork(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+
+    def test_variable_render(self):
+
+        p = ps.register_curve_network("test_network", self.generate_points(), self.generate_edges())
+
+        p.add_scalar_quantity("test_vals_nodes", np.random.rand(p.n_nodes()), defined_on='nodes')
+        p.add_scalar_quantity("test_vals_edges", np.random.rand(p.n_edges()), defined_on='edges', enabled=True)
+
+        # node only
+        p.set_node_radius_quantity('test_vals_nodes')
+        ps.show(3)
+        p.set_node_radius_quantity('test_vals_nodes', autoscale=False)
+        ps.show(3)
+        p.clear_node_radius_quantity()
+        
+        # edge only
+        p.set_edge_radius_quantity('test_vals_edges')
+        ps.show(3)
+        p.set_edge_radius_quantity('test_vals_edges', autoscale=False)
+        ps.show(3)
+        p.clear_edge_radius_quantity()
+        
+        # both
+        p.set_node_radius_quantity('test_vals_nodes')
+        p.set_edge_radius_quantity('test_vals_edges')
+        ps.show(3)
+        p.clear_edge_radius_quantity()
+
+        ps.remove_all_structures()
     
     def test_transform(self):
 
