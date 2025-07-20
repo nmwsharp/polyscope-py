@@ -278,6 +278,24 @@ PYBIND11_MODULE(polyscope_bindings, m) {
    .def("set_enabled", &ps::Group::setEnabled, py::return_value_policy::reference)
    .def("set_show_child_details", &ps::Group::setShowChildDetails)
    .def("set_hide_descendants_from_structure_lists", &ps::Group::setHideDescendantsFromStructureLists)
+   .def("get_child_structure_names", [](ps::Group& g) { 
+        std::vector<std::string> names;
+        for(ps::WeakHandle<ps::Structure>& wh : g.childrenStructures) {
+            if(wh.isValid()) {
+              names.push_back(wh.get().getName());
+            }
+        }
+        return names;
+    })
+   .def("get_child_group_names", [](ps::Group& g) { 
+        std::vector<std::string> names;
+        for(ps::WeakHandle<ps::Group>& wh : g.childrenGroups) {
+            if(wh.isValid()) {
+              names.push_back(wh.get().name);
+            }
+        }
+        return names;
+    })
   ;
 
   // create/get/delete

@@ -77,6 +77,7 @@ class TestCore(unittest.TestCase):
         ps.set_enable_render_error_checks(True)
         ps.set_enable_render_error_checks(True)
         ps.set_warn_for_invalid_values(True)
+        ps.set_warn_for_invalid_values(False)
         ps.set_display_message_popups(False)
         ps.set_autocenter_structures(False)
         ps.set_autoscale_structures(False)
@@ -319,10 +320,12 @@ class TestCore(unittest.TestCase):
 
         groupA.add_child_group(groupB)
         groupA.add_child_group("group_C")
+        self.assertTrue(set(groupA.get_child_group_names()) == set(["group_B", "group_C"]))
 
         pt_cloud_0.add_to_group(groupA)
         pt_cloud_1.add_to_group("group_A")
         groupA.add_child_structure(pt_cloud_2)
+        self.assertTrue(set(groupA.get_child_structure_names()) == set(["cloud0", "cloud1", "cloud2"]))
 
         groupA.set_enabled(False)
         groupB.set_show_child_details(True)
@@ -2483,6 +2486,7 @@ if __name__ == '__main__':
     # we generally cannot continue past the first failed test.
     ps.set_errors_throw_exceptions(True)
     ps.set_display_message_popups(False)
+    ps.set_warn_for_invalid_values(False)
     ps.init(ps_backend) 
 
     unittest.main()

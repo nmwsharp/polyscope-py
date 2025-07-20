@@ -459,6 +459,14 @@ class Group:
     
     def set_hide_descendants_from_structure_lists(self, new_val):
         self.bound_group.set_hide_descendants_from_structure_lists(new_val)
+    
+    def get_child_structure_names(self):
+        # Only returns first-level children, does not recurse
+        return self.bound_group.get_child_structure_names()
+    
+    def get_child_group_names(self):
+        # Only returns first-level children, does not recurse
+        return self.bound_group.get_child_group_names()
 
 def create_group(name):
     return Group(psb.create_group(name))
