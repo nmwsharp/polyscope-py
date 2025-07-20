@@ -265,6 +265,13 @@ def set_camera_view_matrix(mat):
 def get_camera_view_matrix():
     return psb.get_camera_view_matrix()
 
+def set_view_center(pos, fly_to=False):
+    pos = glm3(pos)
+    psb.set_view_center(pos, fly_to)
+
+def get_view_center():
+    return np.array(psb.get_view_center().as_tuple())
+
 ### "Advanced" UI management
 
 def build_polyscope_gui():

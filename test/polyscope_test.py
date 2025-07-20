@@ -151,6 +151,9 @@ class TestCore(unittest.TestCase):
         ps.set_view_projection_mode("perspective")
         
         ps.set_camera_view_matrix(ps.get_camera_view_matrix())
+        
+        ps.set_view_center((0.1, 0.1, 0.2))
+        ps.set_view_center(ps.get_view_center(), fly_to=True)
 
         ps.set_window_size(800, 600)
         self.assertEqual(ps.get_window_size(), (800,600))

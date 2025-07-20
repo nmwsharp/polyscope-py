@@ -163,6 +163,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_view_camera_parameters", &ps::view::setViewToCamera);
   m.def("set_camera_view_matrix", [](Eigen::Matrix4f mat) { ps::view::setCameraViewMatrix(eigen2glm(mat)); });
   m.def("get_camera_view_matrix", []() { return glm2eigen(ps::view::getCameraViewMatrix()); });
+  m.def("set_view_center", [](glm::vec3 pos, bool flyTo) { ps::view::setViewCenter(pos, flyTo); });
+  m.def("get_view_center", &ps::view::getViewCenter);
   m.def("set_window_size", &ps::view::setWindowSize);
   m.def("get_window_size", &ps::view::getWindowSize);
   m.def("get_buffer_size", &ps::view::getBufferSize);
