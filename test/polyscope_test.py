@@ -231,6 +231,7 @@ class TestCore(unittest.TestCase):
 
         ps.screenshot()
         ps.screenshot(transparent_bg=False)
+        ps.screenshot(include_UI=True)
         ps.screenshot("test_shot.png", transparent_bg=True)
         
         ps.set_screenshot_extension(".jpg")
@@ -239,6 +240,8 @@ class TestCore(unittest.TestCase):
         buff = ps.screenshot_to_buffer(False)
         w, h = ps.get_buffer_size()
         self.assertEqual(buff.shape, (h,w,4))
+        
+        buff = ps.screenshot_to_buffer(False, include_UI=True)
     
         ps.show(3)
 

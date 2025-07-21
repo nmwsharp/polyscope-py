@@ -100,12 +100,17 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
   
   // === Screenshots
-  m.def("screenshot", overload_cast_<bool>()(&ps::screenshot), "Take a screenshot");
-  m.def("screenshot_to_buffer", [](bool transparent_bg) { 
-      std::vector<unsigned char> buff = ps::screenshotToBuffer(transparent_bg);
+  py::class_<ps::ScreenshotOptions>(m, "ScreenshotOptions")
+   .def(py::init<>())
+   .def_readwrite("include_UI", &ps::ScreenshotOptions::includeUI)
+   .def_readwrite("transparent_background", &ps::ScreenshotOptions::transparentBackground)
+  ;
+  m.def("screenshot", overload_cast_<const ps::ScreenshotOptions&>()(&ps::screenshot), "Take a screenshot");
+  m.def("screenshot_to_buffer", [](const ps::ScreenshotOptions& opts) { 
+      std::vector<unsigned char> buff = ps::screenshotToBuffer(opts);
       return py::array(buff.size(), buff.data());
     }, "Take a screenshot to buffer");
-  m.def("named_screenshot", overload_cast_<std::string, bool>()(&ps::screenshot), "Take a screenshot");
+  m.def("named_screenshot", overload_cast_<std::string, const ps::ScreenshotOptions&>()(&ps::screenshot), "Take a screenshot");
   m.def("set_screenshot_extension", [](std::string x) { ps::options::screenshotExtension = x; });
 
   // === Small options

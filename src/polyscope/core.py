@@ -66,19 +66,28 @@ def remove_all_structures():
 
 
 ### Screenshots
-def screenshot(filename=None, transparent_bg=True):
+def screenshot(filename=None, transparent_bg=True, include_UI=False):
+
+    opts = psb.ScreenshotOptions()
+    opts.include_UI = include_UI
+    opts.transparent_background = transparent_bg
 
     if filename is None:
-        psb.screenshot(transparent_bg)
+        psb.screenshot(opts)
     else:
-        psb.named_screenshot(filename, transparent_bg)
+        psb.named_screenshot(filename, opts)
 
 def set_screenshot_extension(ext):
     psb.set_screenshot_extension(ext)
 
 
-def screenshot_to_buffer(transparent_bg=True, vertical_flip=True):
-    buff = psb.screenshot_to_buffer(transparent_bg)
+def screenshot_to_buffer(transparent_bg=True, vertical_flip=True, include_UI=False):
+
+    opts = psb.ScreenshotOptions()
+    opts.include_UI = include_UI
+    opts.transparent_background = transparent_bg
+
+    buff = psb.screenshot_to_buffer(opts)
     w, h = get_buffer_size()
     buff = buff.reshape(h, w, 4)
     if(vertical_flip):
