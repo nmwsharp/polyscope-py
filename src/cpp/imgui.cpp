@@ -1,37 +1,35 @@
 #include "imgui.h"
+#include "implot.h"
 
 #include <pybind11/functional.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-namespace py = pybind11;
+#include "Eigen/Dense"
 
-// Type translations between Python and ImGui.  Prefer native Python types (tuples, arrays), translating into ImGui
-// equivalents.
-using Vec2T = std::tuple<float, float>;
-using Vec4T = std::tuple<float, float, float, float>;
+#include "utils.h"
+#include "imgui_utils.h"
 
-ImVec2 to_vec2(const Vec2T& v) { return ImVec2(std::get<0>(v), std::get<1>(v)); }
-ImVec4 to_vec4(const Vec4T& v) { return ImVec4(std::get<0>(v), std::get<1>(v), std::get<2>(v), std::get<3>(v)); }
 
-Vec2T from_vec2(const ImVec2& v) { return std::make_tuple(v.x, v.y); }
-Vec4T from_vec4(const ImVec4& v) { return std::make_tuple(v.x, v.y, v.z, v.w); }
+void bind_imgui_structs(py::module& m);
+void bind_imgui_methods(py::module& m);
+void bind_imgui_enums(py::module& m);
+
+void bind_imgui(py::module& m) {
+  auto imgui_module = m.def_submodule("imgui", "ImGui bindings");
+  bind_imgui_structs(imgui_module);
+  bind_imgui_methods(imgui_module);
+  bind_imgui_enums(imgui_module);
+}
+
+// clang-format off
 
 struct InputTextCallback_UserData {
   std::string* str;
   ImGuiInputTextCallback chain_callback;
   void* chain_callback_user_data;
 };
-
-std::vector<const char*> convert_string_items(const std::vector<std::string>& items) {
-  auto _items = std::vector<const char*>();
-  _items.reserve(items.size());
-  for (const auto& item : items) {
-    _items.push_back(item.data());
-  }
-  return _items;
-}
 
 static int input_text_callback(ImGuiInputTextCallbackData* data) {
   auto* user_data = reinterpret_cast<InputTextCallback_UserData*>(data->UserData);
@@ -50,20 +48,6 @@ static int input_text_callback(ImGuiInputTextCallbackData* data) {
   }
   return 0;
 }
-
-
-void bind_imgui_structs(py::module& m);
-void bind_imgui_methods(py::module& m);
-void bind_imgui_enums(py::module& m);
-
-void bind_imgui(py::module& m) {
-  auto imgui_module = m.def_submodule("imgui", "ImGui bindings");
-  bind_imgui_structs(imgui_module);
-  bind_imgui_methods(imgui_module);
-  bind_imgui_enums(imgui_module);
-}
-
-// clang-format off
 
 
 // clang-format off
@@ -2322,3 +2306,5 @@ void bind_imgui_enums(py::module& m) {
   m.attr("ImGuiCond_FirstUseEver") = static_cast<int>(ImGuiCond_FirstUseEver);
   m.attr("ImGuiCond_Appearing") = static_cast<int>(ImGuiCond_Appearing);
 }
+
+
