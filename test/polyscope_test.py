@@ -598,7 +598,7 @@ class TestImGuiBindings(unittest.TestCase):
             # PlotPieChart
             psim.SetCursorPos((0,0))
             if psimplot.BeginPlot("test pie chart plot"):
-                psimplot.PlotPieChart(["cat1", "cat2"], np.random.rand(2,1))
+                psimplot.PlotPieChart(["cat1", "cat2"], np.random.rand(2), 0.5, 0.5, 0.5)
                 psimplot.PlotPieChart(["cat1", "cat2"], np.random.rand(2), x=2., y=3., radius=4.)
                 psimplot.PlotPieChart(["cat1", "cat2"], np.random.rand(2), 2., 3., 4., flags=psimplot.ImPlotPieChartFlags_Exploding)
                 psimplot.EndPlot()
