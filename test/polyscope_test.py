@@ -2513,6 +2513,8 @@ if __name__ == '__main__':
                 ps_backend = a[len("backend="):]
                 sys.argv.remove(a)
 
+    print(f"Testing polyscope version: {ps.__version__}  test_backend: {ps_backend}")
+
     # Really global setup.
     # Note that since these tests depend on the bound object's global state, 
     # we generally cannot continue past the first failed test.

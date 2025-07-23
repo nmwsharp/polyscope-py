@@ -1,3 +1,16 @@
+## Track the __version__ attribute 
+try:
+    from importlib.metadata import version, PackageNotFoundError
+except ImportError:
+    # Python < 3.8
+    from importlib_metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("polyscope")
+except PackageNotFoundError:
+    # Package is not installed, fall back to a default
+    __version__ = "unknown"
+
 from polyscope.core import *
 
 from polyscope.structure import *
