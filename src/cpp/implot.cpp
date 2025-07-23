@@ -277,10 +277,74 @@ void bind_implot_methods(py::module& m) {
         py::arg("flags") = 0
     );
 
-    // PlotStairs TODO
+    // PlotStairs
+
+    m.def(
+        "PlotStairs",
+        [](const char* label_id, const Eigen::VectorXd& values, double xscale, double xstart, ImPlotStairsFlags flags) {
+            ImPlot::PlotStairs(label_id, values.data(), values.size(), xscale, xstart, flags);
+        },
+        py::arg("label_id"),
+        py::arg("values"),
+        py::arg("xscale")=1.,
+        py::arg("xstart")=0.,
+        py::arg("flags")=0
+    );
     
+    m.def(
+        "PlotStairs",
+        [](const char* label_id, const Eigen::VectorXd& xs, const Eigen::VectorXd& ys, ImPlotStairsFlags flags) {
+            if(xs.size() != ys.size()) throw std::runtime_error("invalid input sizes");
+            ImPlot::PlotStairs(label_id, xs.data(), ys.data(), xs.size(), flags);
+        },
+        py::arg("label_id"),
+        py::arg("xs"),
+        py::arg("ys"),
+        py::arg("flags") = 0
+    );
+
     // PlotShaded TODO
     
+    m.def(
+        "PlotShaded",
+        [](const char* label_id, const Eigen::VectorXd& values, double yref, double xscale, double xstart, ImPlotShadedFlags flags) {
+            ImPlot::PlotShaded(label_id, values.data(), values.size(), yref, xscale, xstart, flags);
+        },
+        py::arg("label_id"),
+        py::arg("values"),
+        py::arg("yref")=0.,
+        py::arg("xscale")=1.,
+        py::arg("xstart")=0.,
+        py::arg("flags")=0
+    );
+    
+    m.def(
+        "PlotShaded",
+        [](const char* label_id, const Eigen::VectorXd& xs, const Eigen::VectorXd& ys, double yref, ImPlotShadedFlags flags) {
+            if(xs.size() != ys.size()) throw std::runtime_error("invalid input sizes");
+            ImPlot::PlotShaded(label_id, xs.data(), ys.data(), xs.size(), yref, flags);
+        },
+        py::arg("label_id"),
+        py::arg("xs"),
+        py::arg("ys"),
+        py::arg("yref")=0.,
+        py::arg("flags") = 0
+    );
+    
+    m.def(
+        "PlotShaded",
+        [](const char* label_id, const Eigen::VectorXd& xs, const Eigen::VectorXd& ys1, const Eigen::VectorXd& ys2, ImPlotShadedFlags flags) {
+            if(xs.size() != ys1.size()) throw std::runtime_error("invalid input sizes");
+            if(xs.size() != ys2.size()) throw std::runtime_error("invalid input sizes");
+            ImPlot::PlotShaded(label_id, xs.data(), ys1.data(), ys2.data(), xs.size(), flags);
+        },
+        py::arg("label_id"),
+        py::arg("xs"),
+        py::arg("ys1"),
+        py::arg("ys2"),
+        py::arg("flags") = 0
+    );
+
     // PlotBars TODO
     
     // PlotBarGroups TODO
@@ -304,7 +368,7 @@ void bind_implot_methods(py::module& m) {
     // PlotPieChart
     m.def(
         "PlotPieChart",
-        [](const std::vector<std::string>& label_ids, const Eigen::VectorXd& values, double x, double y, double radius, double angle0, const char* label_fmt, ImPlotPieChartFlags flags) {
+        [](const std::vector<std::string>& label_ids, const Eigen::VectorXd& values, double x, double y, double radius, const char* label_fmt, double angle0, ImPlotPieChartFlags flags) {
             if(label_ids.size() != values.size()) throw std::runtime_error("input sizes don't match");
             const auto _label_ids = convert_string_items(label_ids);
             ImPlot::PlotPieChart(_label_ids.data(), values.data(), values.size(), x, y, radius, label_fmt, angle0, flags);

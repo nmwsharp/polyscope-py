@@ -18,6 +18,7 @@ else:
 
 import polyscope as ps
 import polyscope.imgui as psim
+import polyscope.implot as psimplot
 
 # Path to test assets
 assets_prefix = path.join(path.dirname(__file__), "assets/")
@@ -542,7 +543,89 @@ class TestImGuiBindings(unittest.TestCase):
         ps.show(3)
         
         ps.clear_user_callback()
+    
+    def test_implot(self):
 
+        # smoke tests for implot
+        def imgui_callback():
+
+            # PlotLine
+            psim.SetCursorPos((0,0)) # these calls ensure it's not clipped out and disabled
+            if psimplot.BeginPlot("test line plot"):
+                psimplot.PlotLine("line plot1", np.random.rand(10))
+                psimplot.PlotLine("line plot2", np.random.rand(10), np.random.rand(10))
+                psimplot.PlotLine("line plot3", np.random.rand(10), psimplot.ImPlotLineFlags_Shaded + psimplot.ImPlotLineFlags_Loop)
+
+                # test inf lines while we're at it
+                psimplot.PlotInfLines("inf line v", np.random.rand(3))
+                psimplot.PlotInfLines("inf line h", np.random.rand(3), psimplot.ImPlotInfLinesFlags_Horizontal)
+
+                psimplot.EndPlot()
+
+            # PlotScatter
+            psim.SetCursorPos((0,0))
+            if psimplot.BeginPlot("test scatter plot"):
+                psimplot.PlotScatter("scatter plot1", np.random.rand(10))
+                psimplot.PlotScatter("scatter plot2", np.random.rand(10), np.random.rand(10))
+                psimplot.PlotScatter("scatter plot3", np.random.rand(10), psimplot.ImPlotScatterFlags_NoClip)
+                psimplot.EndPlot()
+            
+            # PlotStairs
+            psim.SetCursorPos((0,0))
+            if psimplot.BeginPlot("test stairs plot"):
+                psimplot.PlotStairs("stairs plot1", np.random.rand(10))
+                psimplot.PlotStairs("stairs plot2", np.random.rand(10), np.random.rand(10))
+                psimplot.PlotStairs("stairs plot3", np.random.rand(10), psimplot.ImPlotStairsFlags_Shaded)
+                psimplot.EndPlot()
+            
+            # PlotShaded
+            psim.SetCursorPos((0,0))
+            if psimplot.BeginPlot("test shaded plot"):
+                psimplot.PlotShaded("shaded plot1", np.random.rand(10))
+                psimplot.PlotShaded("shaded plot1", np.random.rand(10), yref=1.0)
+                psimplot.PlotShaded("shaded plot2", np.random.rand(10), np.random.rand(10), psimplot.ImPlotShadedFlags_None)
+                psimplot.PlotShaded("shaded plot3", np.random.rand(10), np.random.rand(10), np.random.rand(10))
+                psimplot.EndPlot()
+            
+            # PlotBars TODO
+            
+            # PlotBarGroups TODO
+            
+            # PlotErrorBars TODO
+            
+            # PlotStems TODO
+
+            # PlotPieChart
+            psim.SetCursorPos((0,0))
+            if psimplot.BeginPlot("test pie chart plot"):
+                psimplot.PlotPieChart(["cat1", "cat2"], np.random.rand(2,1))
+                psimplot.PlotPieChart(["cat1", "cat2"], np.random.rand(2), x=2., y=3., radius=4.)
+                psimplot.PlotPieChart(["cat1", "cat2"], np.random.rand(2), 2., 3., 4., flags=psimplot.ImPlotPieChartFlags_Exploding)
+                psimplot.EndPlot()
+
+            # PlotHeatMap TODO
+            
+            # PlotHistorgram
+            psim.SetCursorPos((0,0))
+            if psimplot.BeginPlot("test historgram plot"):
+                psimplot.PlotHistogram("hist", np.random.rand(10))
+                psimplot.PlotHistogram("hist2", np.random.rand(10), 3, range=(-2., 2.), flags=psimplot.ImPlotHistogramFlags_NoOutliers)
+                psimplot.EndPlot()
+            
+            # Subplots
+            psim.SetCursorPos((0,0))
+            if psimplot.BeginSubplots("test subplot", 2, 3, (800,400)):
+                for i in range(6):
+                    if psimplot.BeginPlot(f"test subplot_{i}"):
+                        psimplot.PlotLine("line plot", np.random.rand(10))
+
+                        psimplot.EndPlot()
+
+                psimplot.EndSubplots()
+        
+        ps.set_user_callback(imgui_callback)
+        ps.show(3)
+        ps.clear_user_callback()
 
 class TestStructureManagement(unittest.TestCase):
 
