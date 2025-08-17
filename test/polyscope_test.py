@@ -156,6 +156,9 @@ class TestCore(unittest.TestCase):
         ps.set_front_dir("neg_z_front")
         ps.set_front_dir(ps.get_front_dir())
         
+        ps.set_vertical_fov_degrees(50.)
+        self.assertEqual(ps.get_vertical_fov_degrees(), 50.)
+        
         ps.set_view_projection_mode("orthographic")
         ps.set_view_projection_mode("perspective")
         

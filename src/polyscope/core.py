@@ -189,6 +189,11 @@ def set_front_dir(d):
 def get_front_dir():
     return frontdir_to_str(psb.get_front_dir())
 
+def set_vertical_fov_degrees(f):
+    psb.set_vertical_fov_degrees(f)
+def get_vertical_fov_degrees():
+    return psb.get_vertical_fov_degrees()
+
 ### Scene extents
 
 def set_automatically_compute_scene_extents(b):
