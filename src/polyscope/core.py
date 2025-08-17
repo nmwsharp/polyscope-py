@@ -129,6 +129,9 @@ def get_redraw_requested():
 def set_always_redraw(v):
     psb.set_always_redraw(v)
 
+def set_frame_tick_limit_fps_mode(v):
+    psb.set_frame_tick_limit_fps_mode(str_to_enum(v, psb.LimitFPSMode))
+
 def set_enable_render_error_checks(b):
     psb.set_enable_render_error_checks(b)
 

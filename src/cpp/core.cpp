@@ -126,6 +126,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("request_redraw", []() { ps::requestRedraw(); });
   m.def("get_redraw_requested", []() { return ps::redrawRequested(); });
   m.def("set_always_redraw", [](bool x) { ps::options::alwaysRedraw = x; });
+  m.def("set_frame_tick_limit_fps_mode", [](ps::LimitFPSMode x) { ps::options::frameTickLimitFPSMode = x; });
   m.def("set_enable_render_error_checks", [](bool x) { ps::options::enableRenderErrorChecks = x; });
   m.def("set_egl_device_index", [](int x) { ps::options::eglDeviceIndex = x; });
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
@@ -455,6 +456,12 @@ PYBIND11_MODULE(polyscope_bindings, m) {
     .value("different", ps::BackFacePolicy::Different)
     .value("custom", ps::BackFacePolicy::Custom)
     .value("cull", ps::BackFacePolicy::Cull)
+    ; 
+  
+  py::enum_<ps::LimitFPSMode>(m, "LimitFPSMode")
+    .value("ignore_limits", ps::LimitFPSMode::IgnoreLimits)
+    .value("block_to_hit_target", ps::LimitFPSMode::BlockToHitTarget)
+    .value("skip_frames_to_hit_target", ps::LimitFPSMode::SkipFramesToHitTarget)
     ; 
   
   py::enum_<ps::GroundPlaneMode>(m, "GroundPlaneMode")

@@ -86,6 +86,9 @@ class TestCore(unittest.TestCase):
         ps.request_redraw()
         self.assertTrue(ps.get_redraw_requested())
         ps.set_always_redraw(False)
+        ps.set_frame_tick_limit_fps_mode('ignore_limits')
+        ps.set_frame_tick_limit_fps_mode('block_to_hit_target')
+        ps.set_frame_tick_limit_fps_mode('skip_frames_to_hit_target')
 
         ps.set_build_gui(True)
         ps.set_render_scene(True)
@@ -100,6 +103,10 @@ class TestCore(unittest.TestCase):
         ps.get_final_scene_color_texture_native_handle()
         
         ps.show(3)
+        
+        # these makes tests run a little faster 
+        ps.set_max_fps(-1)
+        ps.set_enable_vsync(False)
 
     def test_callbacks(self):
 
