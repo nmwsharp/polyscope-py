@@ -194,6 +194,9 @@ def set_vertical_fov_degrees(f):
 def get_vertical_fov_degrees():
     return psb.get_vertical_fov_degrees()
 
+def get_aspect_ratio_width_over_height():
+    return psb.get_aspect_ratio_width_over_height()
+
 ### Scene extents
 
 def set_automatically_compute_scene_extents(b):

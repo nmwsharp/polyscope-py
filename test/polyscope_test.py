@@ -158,6 +158,7 @@ class TestCore(unittest.TestCase):
         
         ps.set_vertical_fov_degrees(50.)
         self.assertEqual(ps.get_vertical_fov_degrees(), 50.)
+        self.assertGreater(ps.get_aspect_ratio_width_over_height(), 0.01)
         
         ps.set_view_projection_mode("orthographic")
         ps.set_view_projection_mode("perspective")

@@ -159,6 +159,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("get_front_dir", ps::view::getFrontDir);
   m.def("set_vertical_fov_degrees", ps::view::setVerticalFieldOfViewDegrees);
   m.def("get_vertical_fov_degrees", ps::view::getVerticalFieldOfViewDegrees);
+  m.def("get_aspect_ratio_width_over_height", ps::view::getAspectRatioWidthOverHeight);
   m.def("reset_camera_to_home_view", ps::view::resetCameraToHomeView);
   m.def("look_at", [](glm::vec3 location, glm::vec3 target, bool flyTo) { 
       ps::view::lookAt(location, target, flyTo); 
