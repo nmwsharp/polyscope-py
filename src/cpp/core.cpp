@@ -225,6 +225,7 @@ PYBIND11_MODULE(polyscope_bindings, m) {
    .def_readonly("structure_handle", &ps::PickResult::structureHandle)
    .def_readonly("structure_type", &ps::PickResult::structureType)
    .def_readonly("structure_name", &ps::PickResult::structureName)
+   .def_readonly("quantity_name", &ps::PickResult::quantityName)
    .def_readonly("screen_coords", &ps::PickResult::screenCoords)
    .def_readonly("buffer_inds", &ps::PickResult::bufferInds)
    .def_readonly("position", &ps::PickResult::position)

@@ -363,6 +363,7 @@ class PickResult:
         self.is_hit = bound_pick_result.is_hit
         self.structure_type_name = bound_pick_result.structure_type
         self.structure_name = bound_pick_result.structure_name
+        self.quantity_name = bound_pick_result.quantity_name
         self.screen_coords = bound_pick_result.screen_coords.as_tuple()
         self.buffer_inds = bound_pick_result.buffer_inds.as_tuple()
         self.position = np.array(bound_pick_result.position.as_tuple())
@@ -399,6 +400,7 @@ PickResult(
     is_hit={self.is_hit},
     structure_type_name={self.structure_type_name},
     structure_name={self.structure_name},
+    quantity_name={self.quantity_name},
     screen_coords={self.screen_coords},
     buffer_inds={self.buffer_inds},
     position={self.position},
