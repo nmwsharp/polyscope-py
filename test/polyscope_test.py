@@ -1275,6 +1275,8 @@ class TestSurfaceMesh(unittest.TestCase):
 
     def test_options(self):
 
+        print("mesh options")
+
         p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
 
         # Set enabled
@@ -1284,6 +1286,7 @@ class TestSurfaceMesh(unittest.TestCase):
         self.assertTrue(p.is_enabled())
     
         # Color
+        print("A")
         color = (0.3, 0.3, 0.5)
         p.set_color(color)
         ret_color = p.get_color()
@@ -1300,6 +1303,8 @@ class TestSurfaceMesh(unittest.TestCase):
         ps.show(3)
 
         # Smooth shade
+
+        print("B")
         p.set_smooth_shade(True)
         ps.show(3)
         self.assertTrue(p.get_smooth_shade())
@@ -1312,6 +1317,7 @@ class TestSurfaceMesh(unittest.TestCase):
         self.assertAlmostEqual(p.get_edge_width(), 1.5)
 
         # Selection mode
+        print("C")
         p.set_selection_mode('auto')
         p.set_selection_mode('vertices_only')
         p.set_selection_mode('faces_only')
@@ -1323,6 +1329,7 @@ class TestSurfaceMesh(unittest.TestCase):
         p.set_material("clay")
         
         # Back face 
+        print("D")
         p.set_back_face_policy("different")
         self.assertEqual("different", p.get_back_face_policy())
         p.set_back_face_policy("custom")
@@ -1337,6 +1344,7 @@ class TestSurfaceMesh(unittest.TestCase):
      
         # Mark elements as used
         # p.set_corner_permutation(np.random.permutation(p.n_corners())) # not required
+        print("E")
         p.mark_corners_as_used()
         p.set_edge_permutation(np.random.permutation(p.n_edges()))
         p.mark_edges_as_used()
@@ -1355,6 +1363,8 @@ class TestSurfaceMesh(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
+        
+        print("done mesh options")
     
     def test_transform(self):
 
