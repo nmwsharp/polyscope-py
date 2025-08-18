@@ -1275,7 +1275,7 @@ class TestSurfaceMesh(unittest.TestCase):
 
     def test_options(self):
 
-        print("mesh options")
+        print("mesh options", flush=True)
 
         p = ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
 
@@ -1286,7 +1286,7 @@ class TestSurfaceMesh(unittest.TestCase):
         self.assertTrue(p.is_enabled())
     
         # Color
-        print("A")
+        print("A", flush=True)
         color = (0.3, 0.3, 0.5)
         p.set_color(color)
         ret_color = p.get_color()
@@ -1344,7 +1344,7 @@ class TestSurfaceMesh(unittest.TestCase):
      
         # Mark elements as used
         # p.set_corner_permutation(np.random.permutation(p.n_corners())) # not required
-        print("E")
+        print("E", flush=True)
         p.mark_corners_as_used()
         p.set_edge_permutation(np.random.permutation(p.n_edges()))
         p.mark_edges_as_used()
@@ -1364,7 +1364,7 @@ class TestSurfaceMesh(unittest.TestCase):
         ps.remove_all_structures()
         ps.set_transparency_mode('none')
         
-        print("done mesh options")
+        print("done mesh options", flush=True)
     
     def test_transform(self):
 
@@ -1566,12 +1566,12 @@ class TestSurfaceMesh(unittest.TestCase):
 
     def test_parameterization(self):
 
-        print("begin test")
+        print("begin test", flush=True)
 
         ps.register_surface_mesh("test_mesh", self.generate_verts(), self.generate_faces())
         p = ps.get_surface_mesh("test_mesh")
         
-        print("registered")
+        print("registered", flush=True)
 
         for on in ['vertices', 'corners']:
         
@@ -1585,61 +1585,61 @@ class TestSurfaceMesh(unittest.TestCase):
             cA = (0.1, 0.2, 0.3)
             cB = (0.4, 0.5, 0.6)
 
-            print("test_vals1")
+            print("test_vals1", flush=True)
             p.add_parameterization_quantity("test_vals1", vals, defined_on=on, enabled=True)
 
-            print("test_vals2")
+            print("test_vals2", flush=True)
             p.add_parameterization_quantity("test_vals2", vals, defined_on=on, coords_type='world')
-            print("test_vals3")
+            print("test_vals3", flush=True)
             p.add_parameterization_quantity("test_vals3", vals, defined_on=on, coords_type='unit')
 
-            print("test_vals4")
+            print("test_vals4", flush=True)
             p.add_parameterization_quantity("test_vals4", vals, defined_on=on, viz_style='checker')
-            print("test_vals5")
+            print("test_vals5", flush=True)
             p.add_parameterization_quantity("test_vals5", vals, defined_on=on, viz_style='grid')
-            print("test_vals6")
+            print("test_vals6", flush=True)
             p.add_parameterization_quantity("test_vals6", vals, defined_on=on, viz_style='local_check')
-            print("test_vals7")
+            print("test_vals7", flush=True)
             p.add_parameterization_quantity("test_vals7", vals, defined_on=on, viz_style='local_rad')
 
-            print("test_vals8")
+            print("test_vals8", flush=True)
             p.add_parameterization_quantity("test_vals8", vals, defined_on=on, grid_colors=(cA, cB))
-            print("test_vals9")
+            print("test_vals9", flush=True)
             p.add_parameterization_quantity("test_vals9", vals, defined_on=on, checker_colors=(cA, cB))
-            print("test_vals10")
+            print("test_vals10", flush=True)
             p.add_parameterization_quantity("test_vals10", vals, defined_on=on, checker_size=0.1)
-            print("test_vals11")
+            print("test_vals11", flush=True)
             p.add_parameterization_quantity("test_vals11", vals, defined_on=on, cmap='blues')
 
-            print("show")
+            print("show", flush=True)
             ps.show(3)
-            print("done show")
+            print("done show", flush=True)
 
             # Test island labels
             island_labels = np.random.randint(0, 10, size=p.n_faces())
-            print("test_vals_check_islands")
+            print("test_vals_check_islands", flush=True)
             p.add_parameterization_quantity("test_vals_check_islands",vals, defined_on=on, enabled=True, 
                                              viz_style='checker_islands', island_labels=island_labels)
-            print("show")
+            print("show", flush=True)
             ps.show(3)
-            print("done show")
+            print("done show", flush=True)
             
             # Test curve network from seams
-            print("test_vals_curve_network")
+            print("test_vals_curve_network", flush=True)
             p.add_parameterization_quantity("test_vals_curve_network", vals, defined_on=on, enabled=True, 
                                              create_curve_network_from_seams="")
-            print("test_vals_curve_network 2")
+            print("test_vals_curve_network 2", flush=True)
             p.add_parameterization_quantity("test_vals_curve_network", vals, defined_on=on, enabled=True, 
                                              create_curve_network_from_seams="my network")
-            print("show")
+            print("show", flush=True)
             ps.show(3)
-            print("done show")
+            print("done show", flush=True)
 
-            print("remove q")
+            print("remove q", flush=True)
             p.remove_all_quantities()
-            print("done remove q")
+            print("done remove q", flush=True)
 
-        print("remove s")
+        print("remove s", flush=True)
         ps.remove_all_structures()
         print("done remove s")
     
