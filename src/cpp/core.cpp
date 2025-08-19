@@ -131,6 +131,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_egl_device_index", [](int x) { ps::options::eglDeviceIndex = x; });
   m.def("set_autocenter_structures", [](bool x) { ps::options::autocenterStructures = x; });
   m.def("set_autoscale_structures", [](bool x) { ps::options::autoscaleStructures = x; });
+  m.def("set_ui_scale", [](float x) { ps::options::uiScale = x; });
+  m.def("get_ui_scale", []() { return ps::options::uiScale; });
   m.def("set_build_gui", [](bool x) { ps::options::buildGui = x; });
   m.def("set_user_gui_is_on_right_side", [](bool x) { ps::options::userGuiIsOnRightSide = x; });
   m.def("set_build_default_gui_panels", [](bool x) { ps::options::buildDefaultGuiPanels = x; });

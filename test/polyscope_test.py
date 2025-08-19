@@ -89,6 +89,9 @@ class TestCore(unittest.TestCase):
         ps.set_frame_tick_limit_fps_mode('ignore_limits')
         ps.set_frame_tick_limit_fps_mode('block_to_hit_target')
         ps.set_frame_tick_limit_fps_mode('skip_frames_to_hit_target')
+        
+        ps.set_ui_scale(0.8)
+        self.assertAlmostEqual(ps.get_ui_scale(), 0.8)
 
         ps.set_build_gui(True)
         ps.set_render_scene(True)

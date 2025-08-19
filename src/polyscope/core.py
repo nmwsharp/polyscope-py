@@ -144,6 +144,12 @@ def set_autocenter_structures(b):
 def set_autoscale_structures(b):
     psb.set_autoscale_structures(b)
 
+def set_ui_scale(s):
+    psb.set_ui_scale(s)
+
+def get_ui_scale():
+    return psb.get_ui_scale()
+
 def set_build_gui(b):
     psb.set_build_gui(b)
 
