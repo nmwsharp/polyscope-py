@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.15.0) # minimum imposed by scikit-build-core
 project(polyscope LANGUAGES CXX)
 
-option(POLYSCOPE_PY_UNITY_BUILD "Enable Unity builds" ON)
-
 ## Gather dependencies
 
 # Eigen
@@ -37,26 +35,5 @@ set_target_properties(polyscope_bindings PROPERTIES CXX_VISIBILITY_PRESET "defau
 
 target_include_directories(polyscope_bindings PUBLIC "${EIGEN3_INCLUDE_DIR}")
 target_link_libraries(polyscope_bindings PRIVATE polyscope)
-
-if(POLYSCOPE_PY_UNITY_BUILD)
-
-  # NOTE: these are not perfect, sometimes the explicit template 
-  # instantiations get messed up and cause compile errors. The current
-  # batch sizes were chosen because they happen to work around that.
-  # 
-  # However, this does give a nearly 50% speedup, so it can be worth using 
-  # for long-running CI builds.
-
-  set_target_properties(polyscope PROPERTIES
-      UNITY_BUILD ON
-      UNITY_BUILD_BATCH_SIZE 5
-  )
-
-  set_target_properties(polyscope_bindings PROPERTIES
-      UNITY_BUILD ON
-      UNITY_BUILD_BATCH_SIZE 4
-  )
-
-endif()
 
 install(TARGETS polyscope_bindings LIBRARY DESTINATION .)
