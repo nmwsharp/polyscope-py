@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15.0) # minimum imposed by scikit-build-core
 project(polyscope LANGUAGES CXX)
 
-option(POLYSCOPE_PY_UNITY_BUILD "Enable Unity builds" OFF)
+option(POLYSCOPE_PY_UNITY_BUILD "Enable Unity builds" ON)
 
 ## Gather dependencies
 
