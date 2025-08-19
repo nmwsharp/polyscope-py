@@ -40,7 +40,7 @@ jobs:
           config-file: ".github/workflows/cibuildwheel_config.toml"
 
       - name: Copy source distribution into wheelhouse
-        if: runner.os == 'Linux'
+        if: matrix.os == 'ubuntu-latest'
         run: mv dist/*.tar.gz wheelhouse/
 
       # Upload binaries to the github artifact store
