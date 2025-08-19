@@ -34,3 +34,7 @@ build-backend = "scikit_build_core.build"
 [tool.scikit-build]
 build.verbose = true
 logging.level = "INFO"
+
+[tool.cibuildwheel]
+# for cibuildwheel only, use unity builds by default
+environment = {POLYSCOPE_PY_UNITY_BUILD="ON"}
