@@ -209,10 +209,7 @@ py::class_<ScalarQ> bindScalarQuantity(py::module& m, std::string name) {
 
 template <typename VolumeMeshVertexScalarQuantity>
 py::class_<VolumeMeshVertexScalarQuantity> bindVMVScalarQuantity(py::module& m, std::string name) {
-  return bindQuantity<VolumeMeshVertexScalarQuantity>(m, name.c_str())
-      .def("set_color_map", &VolumeMeshVertexScalarQuantity::setColorMap, "Set color map")
-      .def("set_map_range", &VolumeMeshVertexScalarQuantity::setMapRange, "Set map range")
-      .def("set_isoline_width", &VolumeMeshVertexScalarQuantity::setIsolineWidth, "Set isoline width")
+  return bindScalarQuantity<VolumeMeshVertexScalarQuantity>(m, name.c_str())
       .def("set_level_set_enable", &VolumeMeshVertexScalarQuantity::setEnabledLevelSet,
            "Set level set rendering enabled")
       .def("set_level_set_value", &VolumeMeshVertexScalarQuantity::setLevelSetValue, "Set level set value")
