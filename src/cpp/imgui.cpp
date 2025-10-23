@@ -558,6 +558,42 @@ void bind_imgui_methods(py::module& m) {
         py::arg("size_arg") = std::make_tuple(-1.f, 0.f));
     m.def("Bullet", []() { ImGui::Bullet(); });
 
+    // Widgets: Image
+    m.def(
+        "Image",
+        [](ImTextureID user_texture_id, const Vec2T& image_size, const Vec2T& uv0, const Vec2T& uv1) {
+            ImGui::Image(user_texture_id, to_vec2(image_size), to_vec2(uv0), to_vec2(uv1));
+        },
+        py::arg("user_texture_id"),
+        py::arg("image_size"),
+        py::arg("uv0") = Vec2T(0.0f, 0.0f),
+        py::arg("uv1") = Vec2T(1.0f, 1.0f));
+    m.def(
+        "ImageWithBg",
+        [](ImTextureID user_texture_id, const Vec2T& image_size, const Vec2T& uv0, const Vec2T& uv1, const Vec4T& bg_col, const Vec4T& tint_col) {
+            ImGui::ImageWithBg(user_texture_id, to_vec2(image_size), to_vec2(uv0), to_vec2(uv1), to_vec4(bg_col), to_vec4(tint_col));
+        },
+        py::arg("user_texture_id"),
+        py::arg("image_size"),
+        py::arg("uv0") = Vec2T(0.0f, 0.0f),
+        py::arg("uv1") = Vec2T(1.0f, 1.0f),
+        py::arg("bg_col") = Vec4T(0.0f, 0.0f, 0.0f, 0.0f),
+        py::arg("tint_col") = Vec4T(1.0f, 1.0f, 1.0f, 1.0f));
+
+    m.def(
+        "ImageButton",
+        [](const char* str_id, ImTextureID user_texture_id, const Vec2T& image_size, const Vec2T& uv0, const Vec2T& uv1, const Vec4T& bg_col, const Vec4T& tint_col) {
+            return ImGui::ImageButton(str_id, user_texture_id, to_vec2(image_size), to_vec2(uv0), to_vec2(uv1), to_vec4(bg_col), to_vec4(tint_col));
+        },
+        py::arg("str_id"),
+        py::arg("user_texture_id"),
+        py::arg("image_size"),
+        py::arg("uv0") = Vec2T(0.0f, 0.0f),
+        py::arg("uv1") = Vec2T(1.0f, 1.0f),
+        py::arg("bg_col") = Vec4T(0.0f, 0.0f, 0.0f, 0.0f),
+        py::arg("tint_col") = Vec4T(1.0f, 1.0f, 1.0f, 1.0f));
+
+
     // Widgets: Combo Box
     m.def(
         "BeginCombo",
