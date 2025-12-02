@@ -1394,11 +1394,11 @@ void bind_imgui_methods(py::module& m) {
     m.def( "EndTable", []() { ImGui::EndTable(); } );
     m.def(
         "TableNextRow",
-        [](float min_row_height, ImGuiTableRowFlags flags) {
+        [](ImGuiTableRowFlags flags, float min_row_height) {
             ImGui::TableNextRow(flags, min_row_height);
         },
-        py::arg("min_row_height") = 0.f,
-        py::arg("flags") = 0
+        py::arg("flags") = 0,
+        py::arg("min_row_height") = 0.f
     );
     m.def(
         "TableNextColumn",
@@ -1414,9 +1414,10 @@ void bind_imgui_methods(py::module& m) {
         py::arg("column_n")
     );
 
+    // Table headers and columns
     m.def(
         "TableSetupColumn",
-        [](const char* label, ImGuiTableColumnFlags flags, float init_width_or_height, unsigned int user_id) {
+        [](const char* label, ImGuiTableColumnFlags flags, float init_width_or_height, ImGuiID user_id) {
             ImGui::TableSetupColumn(label, flags, init_width_or_height, user_id);
         },
         py::arg("label"),
@@ -1440,23 +1441,28 @@ void bind_imgui_methods(py::module& m) {
         py::arg("label")
     );
     m.def("TableHeadersRow", []() { ImGui::TableHeadersRow(); });
+    m.def("TableAngledHeadersRow", []() { ImGui::TableAngledHeadersRow(); });
 
-    m.def("TableGetColumnCount", []() { return ImGui::TableGetColumnCount(); });
-    m.def("TableGetColumnIndex", []() { return ImGui::TableGetColumnIndex(); });
-    m.def("TableGetRowIndex", []() { return ImGui::TableGetRowIndex(); });
+    // Table miscellaneous functions
+    /* TableSortSpecs not included: structure using pointers. */
+    m.def("TableGetColumnCount", []() -> int { return ImGui::TableGetColumnCount(); });
+    m.def("TableGetColumnIndex", []() -> int { return ImGui::TableGetColumnIndex(); });
+    m.def("TableGetRowIndex", []() -> int { return ImGui::TableGetRowIndex(); });
     m.def(
         "TableGetColumnName",
         [](int column_n) { return py::str(ImGui::TableGetColumnName(column_n)); },
         py::arg("column_n") = -1
     );
+    /* TableGetColumnFlags not included for the same reasons. */
     m.def(
         "TableSetColumnEnabled",
         [](int column_n, bool enable) { return ImGui::TableSetColumnEnabled(column_n, enable); },
         py::arg("column_n"),
         py::arg("v")
     );
+    m.def("TableGetHoveredColumn", []() -> int { return ImGui::TableGetHoveredColumn(); });
     m.def(
-        "TableSetBackgroundColor",
+        "TableSetBgColor",
         [](ImGuiTableBgTarget target, ImU32 color, int column_n) {
           return ImGui::TableSetBgColor(target, color, column_n);
         },
@@ -2121,6 +2127,39 @@ void bind_imgui_enums(py::module& m) {
   m.attr("ImGuiTabItemFlags_NoCloseWithMiddleMouseButton") =
       static_cast<int>(ImGuiTabItemFlags_NoCloseWithMiddleMouseButton);
   m.attr("ImGuiTabItemFlags_NoPushId") = static_cast<int>(ImGuiTabItemFlags_NoPushId);
+
+  m.attr("ImGuiTableBgTarget_None") = static_cast<int>(ImGuiTableBgTarget_None);
+  m.attr("ImGuiTableBgTarget_RowBg0") = static_cast<int>(ImGuiTableBgTarget_RowBg0);
+  m.attr("ImGuiTableBgTarget_RowBg1") = static_cast<int>(ImGuiTableBgTarget_RowBg1);
+  m.attr("ImGuiTableBgTarget_CellBg") = static_cast<int>(ImGuiTableBgTarget_CellBg);
+
+  m.attr("ImGuiTableRowFlags_None") = static_cast<int>(ImGuiTableRowFlags_None);
+  m.attr("ImGuiTableRowFlags_Headers") = static_cast<int>(ImGuiTableRowFlags_Headers);
+
+  m.attr("ImGuiTableColumnFlags_None") = static_cast<int>(ImGuiTableColumnFlags_None);
+  m.attr("ImGuiTableColumnFlags_Disabled") = static_cast<int>(ImGuiTableColumnFlags_Disabled);
+  m.attr("ImGuiTableColumnFlags_DefaultHide") = static_cast<int>(ImGuiTableColumnFlags_DefaultHide);
+  m.attr("ImGuiTableColumnFlags_DefaultSort") = static_cast<int>(ImGuiTableColumnFlags_DefaultSort);
+  m.attr("ImGuiTableColumnFlags_WidthStretch") = static_cast<int>(ImGuiTableColumnFlags_WidthStretch);
+  m.attr("ImGuiTableColumnFlags_WidthFixed") = static_cast<int>(ImGuiTableColumnFlags_WidthFixed);
+  m.attr("ImGuiTableColumnFlags_NoResize") = static_cast<int>(ImGuiTableColumnFlags_NoResize);
+  m.attr("ImGuiTableColumnFlags_NoReorder") = static_cast<int>(ImGuiTableColumnFlags_NoReorder);
+  m.attr("ImGuiTableColumnFlags_NoHide") = static_cast<int>(ImGuiTableColumnFlags_NoHide);
+  m.attr("ImGuiTableColumnFlags_NoClip") = static_cast<int>(ImGuiTableColumnFlags_NoClip);
+  m.attr("ImGuiTableColumnFlags_NoSort") = static_cast<int>(ImGuiTableColumnFlags_NoSort);
+  m.attr("ImGuiTableColumnFlags_NoSortAscending") = static_cast<int>(ImGuiTableColumnFlags_NoSortAscending);
+  m.attr("ImGuiTableColumnFlags_NoSortDescending") = static_cast<int>(ImGuiTableColumnFlags_NoSortDescending);
+  m.attr("ImGuiTableColumnFlags_NoHeaderLabel") = static_cast<int>(ImGuiTableColumnFlags_NoHeaderLabel);
+  m.attr("ImGuiTableColumnFlags_NoHeaderWidth") = static_cast<int>(ImGuiTableColumnFlags_NoHeaderWidth);
+  m.attr("ImGuiTableColumnFlags_PreferSortAscending") = static_cast<int>(ImGuiTableColumnFlags_PreferSortAscending);
+  m.attr("ImGuiTableColumnFlags_PreferSortDescending") = static_cast<int>(ImGuiTableColumnFlags_PreferSortDescending);
+  m.attr("ImGuiTableColumnFlags_IndentEnable") = static_cast<int>(ImGuiTableColumnFlags_IndentEnable);
+  m.attr("ImGuiTableColumnFlags_IndentDisable") = static_cast<int>(ImGuiTableColumnFlags_IndentDisable);
+  m.attr("ImGuiTableColumnFlags_AngledHeader") = static_cast<int>(ImGuiTableColumnFlags_AngledHeader);
+  m.attr("ImGuiTableColumnFlags_IsEnabled") = static_cast<int>(ImGuiTableColumnFlags_IsEnabled);
+  m.attr("ImGuiTableColumnFlags_IsVisible") = static_cast<int>(ImGuiTableColumnFlags_IsVisible);
+  m.attr("ImGuiTableColumnFlags_IsSorted") = static_cast<int>(ImGuiTableColumnFlags_IsSorted);
+  m.attr("ImGuiTableColumnFlags_IsHovered") = static_cast<int>(ImGuiTableColumnFlags_IsHovered);
 
   m.attr("ImGuiFocusedFlags_None") = static_cast<int>(ImGuiFocusedFlags_None);
   m.attr("ImGuiFocusedFlags_ChildWindows") = static_cast<int>(ImGuiFocusedFlags_ChildWindows);
