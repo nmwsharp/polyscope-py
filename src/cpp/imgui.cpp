@@ -157,12 +157,109 @@ void bind_imgui_structs(py::module& m) {
     .def_readonly("SortDirection", &ImGuiTableColumnSortSpecs::SortDirection)
     ;
 
+    #define VEC2_PROPERTY(name)                            \
+        def_property(#name, [](const ImGuiStyle& style) {  \
+            return from_vec2(style.name);                  \
+        }, [](ImGuiStyle& style, const Vec2T& value) {     \
+            style.name = to_vec2(value);                   \
+        })
+
+
+    // Style
+    py::class_<ImGuiStyle>(m, "ImGuiStyle")
+        .def_readwrite("Alpha", &ImGuiStyle::Alpha)                                        // float
+        .def_readwrite("DisabledAlpha", &ImGuiStyle::DisabledAlpha)                        // float
+        .VEC2_PROPERTY(WindowPadding)                                                      // ImVec2
+        .def_readwrite("WindowRounding", &ImGuiStyle::WindowRounding)                      // float
+        .def_readwrite("WindowBorderSize", &ImGuiStyle::WindowBorderSize)                  // float
+        .def_readwrite("WindowBorderHoverPadding", &ImGuiStyle::WindowBorderHoverPadding)  // float
+        .VEC2_PROPERTY(WindowMinSize)                                                      // ImVec2
+        .VEC2_PROPERTY(WindowTitleAlign)                                                   // ImVec2
+        .def_readwrite("WindowMenuButtonPosition", &ImGuiStyle::WindowMenuButtonPosition)  // ImGuiDir
+        .def_readwrite("ChildRounding", &ImGuiStyle::ChildRounding)                        // float
+        .def_readwrite("ChildBorderSize", &ImGuiStyle::ChildBorderSize)                    // float
+        .def_readwrite("PopupRounding", &ImGuiStyle::PopupRounding)                        // float
+        .def_readwrite("PopupBorderSize", &ImGuiStyle::PopupBorderSize)                    // float
+        .VEC2_PROPERTY(FramePadding)                                                       // ImVec2
+        .def_readwrite("FrameRounding", &ImGuiStyle::FrameRounding)                        // float
+        .def_readwrite("FrameBorderSize", &ImGuiStyle::FrameBorderSize)                    // float
+        .VEC2_PROPERTY(ItemSpacing)                                                        // ImVec2
+        .VEC2_PROPERTY(ItemInnerSpacing)                                                   // ImVec2
+        .VEC2_PROPERTY(CellPadding)                                                        // ImVec2
+        .VEC2_PROPERTY(TouchExtraPadding)                                                  // ImVec2
+        .def_readwrite("IndentSpacing", &ImGuiStyle::IndentSpacing)                        // float
+        .def_readwrite("ColumnsMinSpacing", &ImGuiStyle::ColumnsMinSpacing)                // float
+        .def_readwrite("ScrollbarSize", &ImGuiStyle::ScrollbarSize)                        // float
+        .def_readwrite("ScrollbarRounding", &ImGuiStyle::ScrollbarRounding)                // float
+        .def_readwrite("GrabMinSize", &ImGuiStyle::GrabMinSize)                            // float
+        .def_readwrite("GrabRounding", &ImGuiStyle::GrabRounding)                          // float
+        .def_readwrite("LogSliderDeadzone", &ImGuiStyle::LogSliderDeadzone)                // float
+        .def_readwrite("ImageBorderSize", &ImGuiStyle::ImageBorderSize)                    // float
+        .def_readwrite("TabRounding", &ImGuiStyle::TabRounding)                            // float
+        .def_readwrite("TabBorderSize", &ImGuiStyle::TabBorderSize)                        // float
+        .def_readwrite("TabCloseButtonMinWidthSelected", &ImGuiStyle::TabCloseButtonMinWidthSelected)      // float
+        .def_readwrite("TabCloseButtonMinWidthUnselected", &ImGuiStyle::TabCloseButtonMinWidthUnselected)  // float
+        .def_readwrite("TabBarBorderSize", &ImGuiStyle::TabBarBorderSize)                  // float
+        .def_readwrite("TabBarOverlineSize", &ImGuiStyle::TabBarOverlineSize)              // float
+        .def_readwrite("TableAngledHeadersAngle", &ImGuiStyle::TableAngledHeadersAngle)    // float
+        .VEC2_PROPERTY(TableAngledHeadersTextAlign)                                        // ImVec2
+        .def_readwrite("ColorButtonPosition", &ImGuiStyle::ColorButtonPosition)            // ImGuiDir
+        .VEC2_PROPERTY(ButtonTextAlign)                                                    // ImVec2
+        .VEC2_PROPERTY(SelectableTextAlign)                                                // ImVec2
+        .def_readwrite("SeparatorTextBorderSize", &ImGuiStyle::SeparatorTextBorderSize)    // float
+        .VEC2_PROPERTY(SeparatorTextAlign)                                                 // ImVec2
+        .VEC2_PROPERTY(SeparatorTextPadding)                                               // ImVec2
+        .VEC2_PROPERTY(DisplayWindowPadding)                                               // ImVec2
+        .VEC2_PROPERTY(DisplaySafeAreaPadding)                                             // ImVec2
+        .def_readwrite("MouseCursorScale", &ImGuiStyle::MouseCursorScale)                  // float
+        .def_readwrite("AntiAliasedLines", &ImGuiStyle::AntiAliasedLines)                  // bool
+        .def_readwrite("AntiAliasedLinesUseTex", &ImGuiStyle::AntiAliasedLinesUseTex)      // bool
+        .def_readwrite("AntiAliasedFill", &ImGuiStyle::AntiAliasedFill)                    // bool
+        .def_readwrite("CurveTessellationTol", &ImGuiStyle::CurveTessellationTol)          // float
+        .def_readwrite("CircleTessellationMaxError", &ImGuiStyle::CircleTessellationMaxError)  // float
+
+        // Colors (ImVec4[ImGuiCol_COUNT])
+        // Note: having explicit getter and setter functions for colors will avoid accidental no-ops such as:
+        //     style.Colors[2] = ...
+        .def("GetColors", [](const ImGuiStyle &o) {
+            py::list colors;
+            for (int i = 0; i < ImGuiCol_COUNT; i++) {
+                colors.append(from_vec4(o.Colors[i]));
+            }
+            return colors;
+        })
+        .def("SetColors", [](ImGuiStyle &o, const py::list& colors) {
+            if (colors.size() != ImGuiCol_COUNT) {
+                throw std::runtime_error("Expected " + std::to_string(ImGuiCol_COUNT) 
+                                         + " colors, got " + std::to_string(colors.size()));
+            }
+            for (int i = 0; i < ImGuiCol_COUNT; i++) {
+                if (py::len(colors[i]) != 4) {
+                    throw std::runtime_error("Expected 4 elements for color " + std::to_string(i) 
+                                             + ", got " + std::to_string(py::len(colors[i])));
+                }
+                o.Colors[i] = to_vec4(py::cast<Vec4T>(colors[i]));
+            }
+        }, py::arg("colors"))
+
+        // Behaviors
+        // (It is possible to modify those fields mid-frame if specific behavior need it, unlike e.g. configuration fields in ImGuiIO)
+        .def_readwrite("HoverStationaryDelay", &ImGuiStyle::HoverStationaryDelay)           // float
+        .def_readwrite("HoverDelayShort", &ImGuiStyle::HoverDelayShort)                     // float
+        .def_readwrite("HoverDelayNormal", &ImGuiStyle::HoverDelayNormal)                   // float
+        .def_readwrite("HoverFlagsForTooltipMouse", &ImGuiStyle::HoverFlagsForTooltipMouse) // ImGuiHoveredFlags
+        .def_readwrite("HoverFlagsForTooltipNav", &ImGuiStyle::HoverFlagsForTooltipNav)     // ImGuiHoveredFlags
+
+        .def("ScaleAllSizes", &ImGuiStyle::ScaleAllSizes);
+
+    #undef VEC2_PROPERTY
 }
 
 void bind_imgui_methods(py::module& m) {
 
     // Main
     m.def("GetIO", &ImGui::GetIO, py::return_value_policy::reference);
+    m.def("GetStyle", &ImGui::GetStyle, py::return_value_policy::reference);
 
     // Windows
     m.def(
@@ -2625,4 +2722,3 @@ void bind_imgui_enums(py::module& m) {
   m.attr("ImDrawFlags_RoundCornersAll") = static_cast<int>(ImDrawFlags_RoundCornersAll);
 
 }
-
