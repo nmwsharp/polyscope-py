@@ -186,6 +186,12 @@ def get_configure_imgui_style_callback():
 def set_configure_imgui_style_callback(f):
     return psb.set_configure_imgui_style_callback(f)
 
+def get_files_dropped_callback():
+    return psb.get_files_dropped_callback()
+
+def set_files_dropped_callback(f):
+    return psb.set_files_dropped_callback(f)
+
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))
 def get_navigation_style():

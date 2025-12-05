@@ -145,6 +145,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_display_message_popups", [](bool x) { ps::options::displayMessagePopups = x; });
   m.def("get_configure_imgui_style_callback", []() { return ps::options::configureImGuiStyleCallback; });
   m.def("set_configure_imgui_style_callback", [](std::function<void()> x) { ps::options::configureImGuiStyleCallback = x; });
+  m.def("get_files_dropped_callback", []() { return ps::options::filesDroppedCallback; });
+  m.def("set_files_dropped_callback", [](std::function<void(const std::vector<std::string>&)> x) { ps::options::filesDroppedCallback = x; });
 
 
   // === Scene extents
