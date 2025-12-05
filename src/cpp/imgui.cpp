@@ -592,6 +592,10 @@ void bind_imgui_methods(py::module& m) {
         "BulletText",
         [](const char* fmt) { ImGui::BulletText("%s", fmt); },
         py::arg("text"));
+    m.def(
+        "SeparatorText",
+        [](const char* label) { ImGui::SeparatorText(label); },
+        py::arg("label"));
 
     // Widgets: Main
     m.def(
