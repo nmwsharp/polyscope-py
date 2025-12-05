@@ -143,6 +143,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_hide_window_after_show", [](bool x) { ps::options::hideWindowAfterShow = x; });
   m.def("set_warn_for_invalid_values", [](bool x) { ps::options::warnForInvalidValues = x; });
   m.def("set_display_message_popups", [](bool x) { ps::options::displayMessagePopups = x; });
+  m.def("get_configure_imgui_style_callback", []() { return ps::options::configureImGuiStyleCallback; });
+  m.def("set_configure_imgui_style_callback", [](std::function<void()> x) { ps::options::configureImGuiStyleCallback = x; });
 
 
   // === Scene extents
