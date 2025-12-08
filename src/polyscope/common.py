@@ -1,6 +1,6 @@
 import polyscope_bindings as psb
 
-from polyscope.core import str_to_datatype, str_to_vectortype, glm3, str_to_point_render_mode, point_render_mode_to_str, str_to_filter_mode, str_to_param_viz_style, str_to_isoline_style
+from polyscope.core import str_to_datatype, str_to_vectortype, glm2, glm3, str_to_point_render_mode, point_render_mode_to_str, str_to_filter_mode, str_to_param_viz_style, str_to_isoline_style
 
 
 def check_is_scalar_image(values):
@@ -62,6 +62,14 @@ def process_scalar_args(structure, quantity, scalar_args):
     val = check_and_pop_arg(scalar_args, 'cmap')
     if val is not None:
         quantity.set_color_map(val)
+    
+    val = check_and_pop_arg(scalar_args, 'onscreen_colorbar_enabled')
+    if val is not None:
+        quantity.set_onscreen_colorbar_enabled(val)
+    
+    val = check_and_pop_arg(scalar_args, 'onscreen_colorbar_location')
+    if val is not None:
+        quantity.set_onscreen_colorbar_location(glm2(val))
     
     val = check_and_pop_arg(scalar_args, 'isolines_enabled')
     if val is not None:
