@@ -201,6 +201,7 @@ py::class_<ScalarQ> bindScalarQuantity(py::module& m, std::string name) {
       .def("set_map_range", &ScalarQ::setMapRange, "Set map range")
       .def("set_onscreen_colorbar_enabled", &ScalarQ::setOnscreenColorbarEnabled, "Set onscreen color bar enabled")
       .def("set_onscreen_colorbar_location", &ScalarQ::setOnscreenColorbarLocation, "Set onscreen color bar location")
+      // TODO add exportColorMapToSVG()
       .def("set_map_range", &ScalarQ::setMapRange, "Set map range")
       .def("set_isolines_enabled", &ScalarQ::setIsolinesEnabled)
       .def("set_isoline_style", &ScalarQ::setIsolineStyle)
