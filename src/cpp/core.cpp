@@ -340,7 +340,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
    .def("get_volume_mesh_to_inspect", &ps::SlicePlane::getVolumeMeshToInspect, "get name of inspected volume mesh");
 
   m.def("add_scene_slice_plane", ps::addSceneSlicePlane, "add a slice plane", py::return_value_policy::reference);
-  m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene plane");
+  m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene slice plane");
+  m.def("remove_all_slice_planes", ps::removeAllSlicePlanes, "remove all scene slice plane");
   
   // === Camera Parameters
   py::class_<ps::CameraIntrinsics>(m, "CameraIntrinsics")

@@ -578,6 +578,9 @@ def add_scene_slice_plane():
 def remove_last_scene_slice_plane():
     psb.remove_last_scene_slice_plane()
 
+def remove_all_slice_planes():
+    psb.remove_all_slice_planes()
+
 ### Camera Parameters
 
 class CameraIntrinsics:
