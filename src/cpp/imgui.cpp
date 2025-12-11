@@ -135,6 +135,28 @@ void bind_imgui_structs(py::module& m) {
       
       ;
 
+
+    // Table sorting
+    py::class_<ImGuiTableSortSpecs>(m, "ImGuiTableSortSpecs")
+    .def("Specs", [](py::object& ob) { 
+        ImGuiTableSortSpecs& o = ob.cast<ImGuiTableSortSpecs&>(); 
+        std::vector<ImGuiTableColumnSortSpecs> specs;
+        for (int i = 0; i < o.SpecsCount; i++) {
+            specs.push_back(o.Specs[i]);
+        }
+        return specs;}
+    )
+    .def_readonly("SpecsCount", &ImGuiTableSortSpecs::SpecsCount)
+    .def_readwrite("SpecsDirty", &ImGuiTableSortSpecs::SpecsDirty)
+    ;
+
+    py::class_<ImGuiTableColumnSortSpecs>(m, "ImGuiTableColumnSortSpecs")
+    .def_readonly("ColumnUserID", &ImGuiTableColumnSortSpecs::ColumnUserID)
+    .def_readonly("ColumnIndex", &ImGuiTableColumnSortSpecs::ColumnIndex)
+    .def_readonly("SortOrder", &ImGuiTableColumnSortSpecs::SortOrder)
+    .def_readonly("SortDirection", &ImGuiTableColumnSortSpecs::SortDirection)
+    ;
+
 }
 
 void bind_imgui_methods(py::module& m) {
@@ -1444,7 +1466,10 @@ void bind_imgui_methods(py::module& m) {
     m.def("TableAngledHeadersRow", []() { ImGui::TableAngledHeadersRow(); });
 
     // Table miscellaneous functions
-    /* TableSortSpecs not included: structure using pointers. */
+         
+    // warning! this function returns a pointer which is only valid for a short time, within the same frame and before next call to BeginTable() (see imgui docs)
+    // you will get undefined behavior if you try to use it later
+    m.def("TableGetSortSpecs", []() -> ImGuiTableSortSpecs* { return ImGui::TableGetSortSpecs(); }, py::return_value_policy::reference);
     m.def("TableGetColumnCount", []() -> int { return ImGui::TableGetColumnCount(); });
     m.def("TableGetColumnIndex", []() -> int { return ImGui::TableGetColumnIndex(); });
     m.def("TableGetRowIndex", []() -> int { return ImGui::TableGetRowIndex(); });
