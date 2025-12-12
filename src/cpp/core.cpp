@@ -143,6 +143,10 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_hide_window_after_show", [](bool x) { ps::options::hideWindowAfterShow = x; });
   m.def("set_warn_for_invalid_values", [](bool x) { ps::options::warnForInvalidValues = x; });
   m.def("set_display_message_popups", [](bool x) { ps::options::displayMessagePopups = x; });
+  m.def("get_configure_imgui_style_callback", []() { return ps::options::configureImGuiStyleCallback; });
+  m.def("set_configure_imgui_style_callback", [](std::function<void()> x) { ps::options::configureImGuiStyleCallback = x; });
+  m.def("get_files_dropped_callback", []() { return ps::options::filesDroppedCallback; });
+  m.def("set_files_dropped_callback", [](std::function<void(const std::vector<std::string>&)> x) { ps::options::filesDroppedCallback = x; });
 
 
   // === Scene extents
@@ -325,6 +329,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   py::class_<ps::SlicePlane>(m, "SlicePlane")
    .def(py::init<std::string>())
    .def_readonly("name", &ps::SlicePlane::name) 
+   .def("get_center", &ps::SlicePlane::getCenter, "get plane center")
+   .def("get_normal", &ps::SlicePlane::getNormal, "get plane normal")
    .def("set_pose", &ps::SlicePlane::setPose, "set pose")
    .def("set_active", &ps::SlicePlane::setActive, "set active")
    .def("get_active", &ps::SlicePlane::getActive, "get active")
@@ -336,7 +342,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
    .def("get_volume_mesh_to_inspect", &ps::SlicePlane::getVolumeMeshToInspect, "get name of inspected volume mesh");
 
   m.def("add_scene_slice_plane", ps::addSceneSlicePlane, "add a slice plane", py::return_value_policy::reference);
-  m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene plane");
+  m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene slice plane");
+  m.def("remove_all_slice_planes", ps::removeAllSlicePlanes, "remove all scene slice plane");
   
   // === Camera Parameters
   py::class_<ps::CameraIntrinsics>(m, "CameraIntrinsics")

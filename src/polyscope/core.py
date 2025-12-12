@@ -180,6 +180,18 @@ def set_warn_for_invalid_values(b):
 def set_display_message_popups(b):
     psb.set_display_message_popups(b)
 
+def get_configure_imgui_style_callback():
+    return psb.get_configure_imgui_style_callback()
+
+def set_configure_imgui_style_callback(f):
+    return psb.set_configure_imgui_style_callback(f)
+
+def get_files_dropped_callback():
+    return psb.get_files_dropped_callback()
+
+def set_files_dropped_callback(f):
+    return psb.set_files_dropped_callback(f)
+
 def set_navigation_style(s):
     psb.set_navigation_style(str_to_navigate_style(s))
 def get_navigation_style():
@@ -532,6 +544,15 @@ class SlicePlane:
     def get_name(self):
         return self.bound_slice_plane.name
 
+    def get_center(self):
+        return self.bound_slice_plane.get_center()
+
+    def get_normal(self):
+        return self.bound_slice_plane.get_normal()
+
+    def get_pose(self):
+        return (self.bound_slice_plane.get_center(), self.bound_slice_plane.get_normal())
+
     def set_pose(self, plane_position, plane_normal):
         self.bound_slice_plane.set_pose(glm3(plane_position), glm3(plane_normal))
     
@@ -565,6 +586,9 @@ def add_scene_slice_plane():
 
 def remove_last_scene_slice_plane():
     psb.remove_last_scene_slice_plane()
+
+def remove_all_slice_planes():
+    psb.remove_all_slice_planes()
 
 ### Camera Parameters
 
