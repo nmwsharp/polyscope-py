@@ -531,16 +531,49 @@ class SlicePlane:
     
     def get_name(self):
         return self.bound_slice_plane.name
-
-    def set_pose(self, plane_position, plane_normal):
-        self.bound_slice_plane.set_pose(glm3(plane_position), glm3(plane_normal))
     
+    def remove(self):
+        self.bound_slice_plane.remove()
+    
+    def set_enabled(self, val):
+        self.bound_slice_plane.set_enabled(val)
+    
+    def get_enabled(self):
+        return self.bound_slice_plane.get_enabled()
+
     def set_active(self, val):
         self.bound_slice_plane.set_active(val)
     
     def get_active(self):
         return self.bound_slice_plane.get_active()
     
+    def set_pose(self, plane_position, plane_normal):
+        self.bound_slice_plane.set_pose(glm3(plane_position), glm3(plane_normal))
+    
+    def get_center(self):
+        return self.bound_slice_plane.get_center()
+    
+    def get_normal(self):
+        return self.bound_slice_plane.get_normal()
+    
+    def set_color(self, val):
+        self.bound_slice_plane.set_color(glm3(val))
+    
+    def get_color(self):
+        return self.bound_slice_plane.get_color()
+   
+    def set_grid_line_color(self, val):
+        self.bound_slice_plane.set_grid_line_color(glm3(val))
+    
+    def get_grid_line_color(self):
+        return self.bound_slice_plane.get_grid_line_color()
+    
+    def set_transparency(self, val):
+        self.bound_slice_plane.set_transparency(val)
+    
+    def get_transparency(self):
+        return self.bound_slice_plane.get_transparency()
+
     def set_draw_plane(self, val):
         self.bound_slice_plane.set_draw_plane(val)
     
@@ -559,11 +592,31 @@ class SlicePlane:
     def get_volume_mesh_to_inspect(self):
         return self.bound_slice_plane.get_volume_mesh_to_inspect()
 
+def add_slice_plane(name=None):
+    if name is None:
+        instance = psb.add_slice_plane()
+    else:
+        instance = psb.add_slice_plane(name)
+
+    return SlicePlane(instance)
+
+def get_slice_plane(name):
+    instance = psb.get_slice_plane(name)
+    return SlicePlane(instance)
+
+def remove_slice_plane(name):
+    psb.remove_slice_plane(name)
+
+def remove_all_slice_planes():
+    psb.remove_all_slice_planes()
+
 def add_scene_slice_plane():
+    # deprecated
     instance = psb.add_scene_slice_plane(False)
     return SlicePlane(instance)
 
 def remove_last_scene_slice_plane():
+    # deprecated
     psb.remove_last_scene_slice_plane()
 
 ### Camera Parameters

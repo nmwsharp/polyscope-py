@@ -270,24 +270,97 @@ class TestCore(unittest.TestCase):
     
     def test_slice_plane(self):
 
+        # Test deprecated add_scene_slice_plane() function
         plane1 = ps.add_scene_slice_plane()
         plane2 = ps.add_scene_slice_plane()
 
+        # Test set_enabled / get_enabled
+        plane2.set_enabled(True)
+        self.assertEqual(True, plane2.get_enabled())
+        plane2.set_enabled(False)
+        self.assertEqual(False, plane2.get_enabled())
+        
+        # Test set_pose with tuple
         plane1.set_pose((-.5, 0., 0.), (1., 1., 1.)) 
 
+        # Test set_active / get_active
         plane1.set_active(False)
         self.assertEqual(False, plane1.get_active())
+        plane1.set_active(True)
+        self.assertEqual(True, plane1.get_active())
         
+        # Test set_draw_plane / get_draw_plane
         plane1.set_draw_plane(False)
         self.assertEqual(False, plane1.get_draw_plane())
+        plane1.set_draw_plane(True)
+        self.assertEqual(True, plane1.get_draw_plane())
         
+        # Test set_draw_widget / get_draw_widget
         plane1.set_draw_widget(False)
         self.assertEqual(False, plane1.get_draw_widget())
+        plane1.set_draw_widget(True)
+        self.assertEqual(True, plane1.get_draw_widget())
 
         ps.show(3)
 
         ps.remove_last_scene_slice_plane()
         ps.remove_last_scene_slice_plane()
+
+        # add with custom names 
+        plane3 = ps.add_slice_plane("custom_plane_1")
+        self.assertEqual(plane3.get_name(), "custom_plane_1")
+        
+        plane4 = ps.add_slice_plane("custom_plane_2")
+        self.assertEqual(plane4.get_name(), "custom_plane_2")
+        
+        # Test get_slice_plane
+        retrieved_plane = ps.get_slice_plane("custom_plane_1")
+        self.assertEqual(retrieved_plane.get_name(), "custom_plane_1")
+        
+        # Test set_color / get_color
+        plane3.set_color((0.5, 0.6, 0.7))
+        color = plane3.get_color()
+        for i in range(3):
+            self.assertAlmostEqual(color[i], [0.5, 0.6, 0.7][i], places=5)
+        
+        # Test set_grid_line_color / get_grid_line_color
+        plane3.set_grid_line_color((0.1, 0.2, 0.3))
+        grid_color = plane3.get_grid_line_color()
+        for i in range(3):
+            self.assertAlmostEqual(grid_color[i], [0.1, 0.2, 0.3][i], places=5)
+        
+        # Test set_transparency / get_transparency
+        plane3.set_transparency(0.5)
+        self.assertAlmostEqual(0.5, plane3.get_transparency())
+        plane3.set_transparency(0.0)
+        self.assertAlmostEqual(0.0, plane3.get_transparency())
+        plane3.set_transparency(1.0)
+        self.assertAlmostEqual(1.0, plane3.get_transparency())
+        
+        # Test set_pose with numpy array
+        plane4.set_pose(np.array([0.5, 0.5, 0.5]), np.array([0.0, 0.0, 1.0]))
+        
+        # Test get_center and get_normal
+        center = plane4.get_center()
+        self.assertIsNotNone(center)
+        self.assertEqual(len(center), 3)
+        
+        normal = plane4.get_normal()
+        self.assertIsNotNone(normal)
+        self.assertEqual(len(normal), 3)
+        
+        ps.show(3)
+        
+        # Test remove_slice_plane
+        ps.remove_slice_plane("custom_plane_1")
+        
+        # Test plane.remove() method
+        plane4.remove()
+        
+        # Test remove_all_slice_planes
+        ps.add_slice_plane("test1")
+        ps.add_slice_plane("test2")
+        ps.remove_all_slice_planes()
 
 
     def test_load_material(self):
@@ -813,6 +886,8 @@ class TestPointCloud(unittest.TestCase):
     def test_slice_plane(self):
 
         p = ps.register_point_cloud("test_cloud", self.generate_points())
+
+
 
         plane = ps.add_scene_slice_plane()
         p.set_cull_whole_elements(True)

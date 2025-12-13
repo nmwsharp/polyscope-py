@@ -325,17 +325,37 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   py::class_<ps::SlicePlane>(m, "SlicePlane")
    .def(py::init<std::string>())
    .def_readonly("name", &ps::SlicePlane::name) 
-   .def("set_pose", &ps::SlicePlane::setPose, "set pose")
-   .def("set_active", &ps::SlicePlane::setActive, "set active")
+   .def("remove", &ps::SlicePlane::remove, "remove")
+   .def("set_enabled", &ps::SlicePlane::setEnabled, "set enabled")
+   .def("get_enabled", &ps::SlicePlane::getEnabled, "get enabled")
+   .def("set_active", &ps::SlicePlane::setActive, "set active") // should have been called 'enabled'
    .def("get_active", &ps::SlicePlane::getActive, "get active")
+   .def("set_pose", &ps::SlicePlane::setPose, "set pose")
+   .def("get_center", [](ps::SlicePlane& s) { return glm2eigen(s.getCenter()); })
+   .def("get_normal", [](ps::SlicePlane& s) { return glm2eigen(s.getNormal()); })
+   .def("set_color", &ps::SlicePlane::setColor, "set color")
+   .def("get_color", [](ps::SlicePlane& s) { return glm2eigen(s.getColor()); })
+   .def("set_grid_line_color", &ps::SlicePlane::setGridLineColor, "set grid line color")
+   .def("get_grid_line_color", [](ps::SlicePlane& s) { return glm2eigen(s.getGridLineColor()); })
+   .def("set_transparency", &ps::SlicePlane::setTransparency, "set transparency")
+   .def("get_transparency", &ps::SlicePlane::getTransparency, "get transparency")
    .def("set_draw_plane", &ps::SlicePlane::setDrawPlane, "set draw plane")
    .def("get_draw_plane", &ps::SlicePlane::getDrawPlane, "get draw plane")
    .def("set_draw_widget", &ps::SlicePlane::setDrawWidget, "set draw widget")
    .def("get_draw_widget", &ps::SlicePlane::getDrawWidget, "get draw widget")
    .def("set_volume_mesh_to_inspect", &ps::SlicePlane::setVolumeMeshToInspect, "set name of inspected volume mesh")
    .def("get_volume_mesh_to_inspect", &ps::SlicePlane::getVolumeMeshToInspect, "get name of inspected volume mesh");
+  
+  
+  m.def("add_slice_plane", overload_cast_<>()(&ps::addSlicePlane), "add a slice plane", py::return_value_policy::reference);
+  m.def("add_slice_plane", overload_cast_<std::string>()(&ps::addSlicePlane), "add a slice plane", py::return_value_policy::reference);
+  m.def("get_slice_plane", &ps::getSlicePlane, "get a slice plane by name", py::return_value_policy::reference);
+  m.def("remove_slice_plane", overload_cast_<std::string>()(&ps::removeSlicePlane), "remove a slice plane by name");
+  m.def("remove_all_slice_planes", &ps::removeAllSlicePlanes, "remove all slice planes");
 
-  m.def("add_scene_slice_plane", ps::addSceneSlicePlane, "add a slice plane", py::return_value_policy::reference);
+
+  // deprecated, but still supprorted for now
+  m.def("add_scene_slice_plane", ps::addSceneSlicePlane, "add a slice plane", py::return_value_policy::reference); 
   m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene plane");
   
   // === Camera Parameters
