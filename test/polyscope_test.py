@@ -121,18 +121,22 @@ class TestCore(unittest.TestCase):
 
         ps.set_user_callback(sample_callback)
         ps.show(3)
-       
-        # Make sure the callback got called
-        self.assertEqual(3, counts[0])
-
+        self.assertEqual(3, counts[0]) # Make sure the callback got called
         ps.clear_user_callback()
         ps.show(3)
-        
-        # Make sure the callback didn't get called any more
-        self.assertEqual(3, counts[0])
-        
-        # Make sure clearing twice is ok
-        ps.clear_user_callback()
+        self.assertEqual(3, counts[0]) # Make sure the callback didn't get called any more
+        ps.clear_user_callback() # Make sure clearing twice is ok
+
+
+        ## Test other callback functions
+        def do_nothing_callback():
+            pass
+        ps.set_configure_imgui_style_callback(do_nothing_callback)
+        ps.clear_configure_imgui_style_callback()
+        def do_nothing_callback_2(arg):
+            pass
+        ps.set_files_dropped_callback(do_nothing_callback)
+        ps.clear_files_dropped_callback()
     
     def test_view_options(self):
 
