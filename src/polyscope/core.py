@@ -544,15 +544,6 @@ class SlicePlane:
     def get_name(self):
         return self.bound_slice_plane.name
 
-    def get_center(self):
-        return self.bound_slice_plane.get_center()
-
-    def get_normal(self):
-        return self.bound_slice_plane.get_normal()
-
-    def get_pose(self):
-        return (self.bound_slice_plane.get_center(), self.bound_slice_plane.get_normal())
-
     def set_pose(self, plane_position, plane_normal):
         self.bound_slice_plane.set_pose(glm3(plane_position), glm3(plane_normal))
     

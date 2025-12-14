@@ -329,8 +329,6 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   py::class_<ps::SlicePlane>(m, "SlicePlane")
    .def(py::init<std::string>())
    .def_readonly("name", &ps::SlicePlane::name) 
-   .def("get_center", &ps::SlicePlane::getCenter, "get plane center")
-   .def("get_normal", &ps::SlicePlane::getNormal, "get plane normal")
    .def("set_pose", &ps::SlicePlane::setPose, "set pose")
    .def("set_active", &ps::SlicePlane::setActive, "set active")
    .def("get_active", &ps::SlicePlane::getActive, "get active")
