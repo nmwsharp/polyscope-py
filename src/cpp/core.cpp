@@ -9,6 +9,7 @@
 #include "polyscope/affine_remapper.h"
 #include "polyscope/camera_parameters.h"
 #include "polyscope/curve_network.h"
+#include "polyscope/imgui_config.h"
 #include "polyscope/messages.h"
 #include "polyscope/pick.h"
 #include "polyscope/point_cloud.h"
@@ -143,6 +144,10 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("set_hide_window_after_show", [](bool x) { ps::options::hideWindowAfterShow = x; });
   m.def("set_warn_for_invalid_values", [](bool x) { ps::options::warnForInvalidValues = x; });
   m.def("set_display_message_popups", [](bool x) { ps::options::displayMessagePopups = x; });
+  m.def("set_configure_imgui_style_callback", [](std::function<void()> x) { ps::options::configureImGuiStyleCallback = x; });
+  m.def("clear_configure_imgui_style_callback", []() {ps::options::configureImGuiStyleCallback = polyscope::configureImGuiStyle;});
+  m.def("set_files_dropped_callback", [](std::function<void(const std::vector<std::string>&)> x) { ps::state::filesDroppedCallback = x; });
+  m.def("clear_files_dropped_callback", []() {ps::state::filesDroppedCallback = nullptr;});
 
 
   // === Scene extents
