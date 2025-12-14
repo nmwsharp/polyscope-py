@@ -180,14 +180,8 @@ def set_warn_for_invalid_values(b):
 def set_display_message_popups(b):
     psb.set_display_message_popups(b)
 
-def get_configure_imgui_style_callback():
-    return psb.get_configure_imgui_style_callback()
-
 def set_configure_imgui_style_callback(f):
     return psb.set_configure_imgui_style_callback(f)
-
-def get_files_dropped_callback():
-    return psb.get_files_dropped_callback()
 
 def set_files_dropped_callback(f):
     return psb.set_files_dropped_callback(f)
