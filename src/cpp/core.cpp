@@ -363,6 +363,35 @@ PYBIND11_MODULE(polyscope_bindings, m) {
   m.def("add_scene_slice_plane", ps::addSceneSlicePlane, "add a slice plane", py::return_value_policy::reference); 
   m.def("remove_last_scene_slice_plane", ps::removeLastSceneSlicePlane, "remove last scene plane");
   
+  // === Transformation Gizmos
+
+  py::class_<ps::TransformationGizmo>(m, "TransformationGizmo")
+   .def(py::init<std::string>())
+   .def_readonly("name", &ps::TransformationGizmo::name) 
+   .def("remove", &ps::TransformationGizmo::remove, "remove")
+   .def("set_enabled", &ps::TransformationGizmo::setEnabled, "set enabled")
+   .def("get_enabled", &ps::TransformationGizmo::getEnabled, "get enabled")
+   .def("set_transform", [] (ps::TransformationGizmo& g, const Eigen::Matrix4d& T) { g.setTransform(eigen2glm(T)); }, "set transform")
+   .def("get_transform", [](ps::TransformationGizmo& g) { return glm2eigen(g.getTransform()); })
+   .def("set_allow_translation", &ps::TransformationGizmo::setAllowTranslation, "set allow translation")
+   .def("get_allow_translation", &ps::TransformationGizmo::getAllowTranslation, "get allow translation")
+   .def("set_allow_rotation", &ps::TransformationGizmo::setAllowRotation, "set allow rotation")
+   .def("get_allow_rotation", &ps::TransformationGizmo::getAllowRotation, "get allow rotation")
+   .def("set_allow_scaling", &ps::TransformationGizmo::setAllowScaling, "set allow scaling")
+   .def("get_allow_scaling", &ps::TransformationGizmo::getAllowScaling, "get allow scaling")
+   .def("get_interact_in_local_space", &ps::TransformationGizmo::getInteractInLocalSpace, "get interact in local space")
+   .def("set_interact_in_local_space", &ps::TransformationGizmo::setInteractInLocalSpace, "set interact in local space")
+   .def("get_gizmo_size", &ps::TransformationGizmo::getGizmoSize, "get gizmo size")
+   .def("set_gizmo_size", &ps::TransformationGizmo::setGizmoSize, "set gizmo size")
+   .def("build_inline_transform_ui", &ps::TransformationGizmo::buildInlineTransformUI, "build inline transform UI")
+  ;
+  
+  m.def("add_transformation_gizmo", [](std::string name) {return ps::addTransformationGizmo(name); }, "add a transformation gizmo", py::return_value_policy::reference);
+  m.def("get_transformation_gizmo", &ps::getTransformationGizmo, "get a transformation gizmo", py::return_value_policy::reference);
+  m.def("remove_transformation_gizmo", overload_cast_<std::string>()(&ps::removeTransformationGizmo), "remove a transformation gizmo by name");
+  m.def("remove_transformation_gizmo", overload_cast_<ps::TransformationGizmo*>()(&ps::removeTransformationGizmo), "remove a transformation gizmo by ptr");
+  m.def("remove_all_transformation_gizmos", &ps::removeAllTransformationGizmos, "remove all transformation gizmos");
+  
   // === Camera Parameters
   py::class_<ps::CameraIntrinsics>(m, "CameraIntrinsics")
    .def(py::init<>())
