@@ -662,6 +662,12 @@ class TransformationGizmo:
     def get_transform(self):
         return self.bound_gizmo.get_transform()
     
+    def set_position(self, p):
+        self.bound_gizmo.set_position(glm3(p))
+    
+    def get_position(self):
+        return self.bound_gizmo.get_position()
+    
     def set_allow_translation(self, val):
         self.bound_gizmo.set_allow_translation(val)
 

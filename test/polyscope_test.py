@@ -395,6 +395,10 @@ class TestCore(unittest.TestCase):
         g1.set_transform(T2)
         self.assertTrue(np.allclose(g1.get_transform(), T2))
 
+        # Get/set position
+        g1.set_position(np.array((1.0, 2.0, 3.0)))
+        self.assertTrue(np.allclose(g1.get_position(), np.array((1.0, 2.0, 3.0))))
+
         # Allow toggles
         g1.set_allow_translation(True)
         self.assertEqual(True, g1.get_allow_translation())
