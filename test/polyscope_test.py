@@ -414,6 +414,11 @@ class TestCore(unittest.TestCase):
         self.assertEqual(True, g1.get_allow_scaling())
         g1.set_allow_scaling(False)
         self.assertEqual(False, g1.get_allow_scaling())
+        
+        g1.set_allow_nonuniform_scaling(True)
+        self.assertEqual(True, g1.get_allow_nonuniform_scaling())
+        g1.set_allow_nonuniform_scaling(False)
+        self.assertEqual(False, g1.get_allow_nonuniform_scaling())
 
         # Local-space interaction toggle
         g1.set_interact_in_local_space(True)

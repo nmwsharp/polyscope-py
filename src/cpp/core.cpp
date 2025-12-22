@@ -381,6 +381,8 @@ PYBIND11_MODULE(polyscope_bindings, m) {
    .def("get_allow_rotation", &ps::TransformationGizmo::getAllowRotation, "get allow rotation")
    .def("set_allow_scaling", &ps::TransformationGizmo::setAllowScaling, "set allow scaling")
    .def("get_allow_scaling", &ps::TransformationGizmo::getAllowScaling, "get allow scaling")
+   .def("set_allow_nonuniform_scaling", &ps::TransformationGizmo::setAllowNonUniformScaling, "set allow non-uniform scaling")
+   .def("get_allow_nonuniform_scaling", &ps::TransformationGizmo::getAllowNonUniformScaling, "get allow non-uniform scaling")
    .def("get_interact_in_local_space", &ps::TransformationGizmo::getInteractInLocalSpace, "get interact in local space")
    .def("set_interact_in_local_space", &ps::TransformationGizmo::setInteractInLocalSpace, "set interact in local space")
    .def("get_gizmo_size", &ps::TransformationGizmo::getGizmoSize, "get gizmo size")

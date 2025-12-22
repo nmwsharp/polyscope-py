@@ -686,6 +686,12 @@ class TransformationGizmo:
     def get_allow_scaling(self):
         return self.bound_gizmo.get_allow_scaling()
     
+    def set_allow_nonuniform_scaling(self, val):
+        self.bound_gizmo.set_allow_nonuniform_scaling(val)
+
+    def get_allow_nonuniform_scaling(self):
+        return self.bound_gizmo.get_allow_nonuniform_scaling()
+    
     def get_interact_in_local_space(self):
         return self.bound_gizmo.get_interact_in_local_space()
     
