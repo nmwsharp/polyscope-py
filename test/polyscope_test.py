@@ -366,6 +366,93 @@ class TestCore(unittest.TestCase):
         ps.add_slice_plane("test2")
         ps.remove_all_slice_planes()
 
+    def test_transformation_gizmo(self):
+
+        # Create a gizmo
+        g1 = ps.add_transformation_gizmo("gizmo_1")
+        self.assertEqual(g1.get_name(), "gizmo_1")
+
+        # Enable/disable
+        g1.set_enabled(True)
+        self.assertEqual(True, g1.get_enabled())
+        g1.set_enabled(False)
+        self.assertEqual(False, g1.get_enabled())
+
+        # Set/get transform
+        T_I = np.eye(4)
+        g1.set_transform(T_I)
+        T_ret = g1.get_transform()
+        self.assertTrue(isinstance(T_ret, np.ndarray))
+        self.assertEqual(T_ret.shape, (4,4))
+        self.assertTrue(np.allclose(T_ret, T_I))
+
+        T2 = np.array([
+            [1., 0., 0., 3.],
+            [0., 0., -1., -2.],
+            [0., 1., 0., 5.],
+            [0., 0., 0., 1.]
+        ])
+        g1.set_transform(T2)
+        self.assertTrue(np.allclose(g1.get_transform(), T2))
+
+        # Get/set position
+        g1.set_position(np.array((1.0, 2.0, 3.0)))
+        self.assertTrue(np.allclose(g1.get_position(), np.array((1.0, 2.0, 3.0))))
+
+        # Allow toggles
+        g1.set_allow_translation(True)
+        self.assertEqual(True, g1.get_allow_translation())
+        g1.set_allow_translation(False)
+        self.assertEqual(False, g1.get_allow_translation())
+
+        g1.set_allow_rotation(True)
+        self.assertEqual(True, g1.get_allow_rotation())
+        g1.set_allow_rotation(False)
+        self.assertEqual(False, g1.get_allow_rotation())
+
+        g1.set_allow_scaling(True)
+        self.assertEqual(True, g1.get_allow_scaling())
+        g1.set_allow_scaling(False)
+        self.assertEqual(False, g1.get_allow_scaling())
+
+        # Local-space interaction toggle
+        g1.set_interact_in_local_space(True)
+        self.assertEqual(True, g1.get_interact_in_local_space())
+        g1.set_interact_in_local_space(False)
+        self.assertEqual(False, g1.get_interact_in_local_space())
+
+        # Gizmo size (scale) getter/setter
+        g1.set_gizmo_scale(0.75)
+        self.assertAlmostEqual(0.75, g1.get_gizmo_scale())
+
+        # Retrieve by name
+        g1b = ps.get_transformation_gizmo("gizmo_1")
+        self.assertEqual(g1b.get_name(), "gizmo_1")
+
+        ps.show(3)
+
+        # Remove by name
+        ps.remove_transformation_gizmo("gizmo_1")
+
+        # Create another and remove via instance method
+        g2 = ps.add_transformation_gizmo("gizmo_2")
+        self.assertEqual(g2.get_name(), "gizmo_2")
+        g2.remove()
+        
+        # Add with auto-naming 
+        ps.add_transformation_gizmo()
+        ps.add_transformation_gizmo()
+
+        # Add a couple and clear all
+        ps.add_transformation_gizmo("gizmo_B")
+        ps.remove_all_transformation_gizmos()
+
+        # Get the reference for a structure
+        pt_cloud_0 = ps.register_point_cloud("cloud0", np.zeros((10,3)))
+        gizmo = pt_cloud_0.get_transformation_gizmo()
+        self.assertIsInstance(gizmo, ps.TransformationGizmo)
+        gizmo.set_allow_rotation(False)
+        ps.remove_all_structures()
 
     def test_load_material(self):
 

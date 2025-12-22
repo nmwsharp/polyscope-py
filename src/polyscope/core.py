@@ -631,6 +631,98 @@ def remove_last_scene_slice_plane():
     # deprecated
     psb.remove_last_scene_slice_plane()
 
+## Transformation Gizmo
+
+class TransformationGizmo:
+    # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
+
+    # End users should not call this constrctor, use add_transformation_gizmo() instead
+    def __init__(self, instance):
+
+        # Wrap an existing instance
+        self.bound_gizmo = instance
+    
+    def get_name(self):
+        return self.bound_gizmo.name
+    
+    def remove(self):
+        self.bound_gizmo.remove()
+    
+    def set_enabled(self, val):
+        self.bound_gizmo.set_enabled(val)
+    
+    def get_enabled(self):
+        return self.bound_gizmo.get_enabled()
+    
+    def set_transform(self, T):
+        if not isinstance(T, np.ndarray) or T.shape != (4, 4):
+            raise ValueError("T should be a 4x4 numpy matrix")
+        self.bound_gizmo.set_transform(T)
+    
+    def get_transform(self):
+        return self.bound_gizmo.get_transform()
+    
+    def set_position(self, p):
+        self.bound_gizmo.set_position(glm3(p))
+    
+    def get_position(self):
+        return self.bound_gizmo.get_position()
+    
+    def set_allow_translation(self, val):
+        self.bound_gizmo.set_allow_translation(val)
+
+    def get_allow_translation(self):
+        return self.bound_gizmo.get_allow_translation()
+
+    def set_allow_rotation(self, val):
+        self.bound_gizmo.set_allow_rotation(val)
+
+    def get_allow_rotation(self):
+        return self.bound_gizmo.get_allow_rotation()
+    
+    def set_allow_scaling(self, val):
+        self.bound_gizmo.set_allow_scaling(val)
+
+    def get_allow_scaling(self):
+        return self.bound_gizmo.get_allow_scaling()
+    
+    def get_interact_in_local_space(self):
+        return self.bound_gizmo.get_interact_in_local_space()
+    
+    def set_interact_in_local_space(self, val):
+        self.bound_gizmo.set_interact_in_local_space(val)
+
+    def get_gizmo_scale(self):
+        # underlying binding uses "size"
+        return self.bound_gizmo.get_gizmo_size()
+    
+    def set_gizmo_scale(self, val):
+        # underlying binding uses "size"
+        self.bound_gizmo.set_gizmo_size(float(val))
+
+    def build_inline_transform_ui(self):
+        self.bound_gizmo.build_inline_transform_ui()
+
+def add_transformation_gizmo(name=None):
+    if name is None:
+        # name gets automatically set internally; pass empty string
+        instance = psb.add_transformation_gizmo("")
+    else:
+        instance = psb.add_transformation_gizmo(name)
+
+    return TransformationGizmo(instance)
+
+def get_transformation_gizmo(name):
+    instance = psb.get_transformation_gizmo(name)
+    return TransformationGizmo(instance)
+
+def remove_transformation_gizmo(name):
+    psb.remove_transformation_gizmo(name)
+
+def remove_all_transformation_gizmos():
+    psb.remove_all_transformation_gizmos()
+
+
 ### Camera Parameters
 
 class CameraIntrinsics:

@@ -2,6 +2,7 @@ import polyscope_bindings as psb
 
 from polyscope.floating_quantities import add_scalar_image_quantity, add_color_image_quantity, add_color_alpha_image_quantity, add_depth_render_image_quantity, add_color_render_image_quantity, add_scalar_render_image_quantity, add_raw_color_render_image_quantity, add_raw_color_alpha_render_image_quantity
 from polyscope.managed_buffer import ManagedBuffer
+from polyscope.core import TransformationGizmo
 
 # Base class for common properties and methods on structures
 class Structure:
@@ -62,6 +63,8 @@ class Structure:
         self.bound_instance.set_transform_gizmo_enabled(val)
     def get_transform_gizmo_enabled(self):
         return self.bound_instance.get_transform_gizmo_enabled()
+    def get_transformation_gizmo(self):
+        return TransformationGizmo(self.bound_instance.get_transformation_gizmo())
     
     ## Managed Buffers
     
