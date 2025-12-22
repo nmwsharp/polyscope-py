@@ -447,6 +447,12 @@ class TestCore(unittest.TestCase):
         ps.add_transformation_gizmo("gizmo_B")
         ps.remove_all_transformation_gizmos()
 
+        # Get the reference for a structure
+        pt_cloud_0 = ps.register_point_cloud("cloud0", np.zeros((10,3)))
+        gizmo = pt_cloud_0.get_transformation_gizmo()
+        self.assertIsInstance(gizmo, ps.TransformationGizmo)
+        gizmo.set_allow_rotation(False)
+        ps.remove_all_structures()
 
     def test_load_material(self):
 
