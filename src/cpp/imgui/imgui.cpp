@@ -3,7 +3,7 @@
 
 #include "Eigen/Dense"
 
-#include "utils.h"
+#include "../utils.h"
 #include "imgui_utils.h"
 
 #include <nanobind/stl/array.h> 

@@ -3,7 +3,7 @@
 
 #include "Eigen/Dense"
 
-#include "utils.h"
+#include "../utils.h"
 #include "imgui_utils.h"
 
 void bind_implot_structs(nb::module_& m);
