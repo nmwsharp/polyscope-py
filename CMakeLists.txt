@@ -1,20 +1,37 @@
 cmake_minimum_required(VERSION 3.15.0) # minimum imposed by scikit-build-core
 project(polyscope LANGUAGES CXX)
 
+# Default to release build
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD 20)
+
 ## Gather dependencies
 
-# Eigen
+# == Eigen
 set(EIGEN3_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/deps/eigen/")
 
-# Recurse in to pybind
-set(PYBIND11_NEWPYTHON ON)
-add_subdirectory(deps/pybind11)
+# == Nanobind
+if (CMAKE_VERSION VERSION_LESS 3.18)
+  set(DEV_MODULE Development)
+else()
+  set(DEV_MODULE Development.Module)
+endif()
 
-# We need polyscope
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# find python version to target for bindings
+find_package(Python 3.9 COMPONENTS Interpreter ${DEV_MODULE} REQUIRED)
+
+# recurse into nanobind
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/nanobind)
+
+# == polyscope
 add_subdirectory(deps/polyscope)
 
-pybind11_add_module(polyscope_bindings 
+nanobind_add_module(polyscope_bindings 
   src/cpp/core.cpp
   src/cpp/surface_mesh.cpp
   src/cpp/point_cloud.cpp
@@ -25,6 +42,7 @@ pybind11_add_module(polyscope_bindings
   src/cpp/floating_quantities.cpp
   src/cpp/implicit_helpers.cpp
   src/cpp/managed_buffer.cpp
+
   src/cpp/imgui.cpp
   src/cpp/implot.cpp
 

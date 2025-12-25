@@ -1,7 +1,8 @@
 #pragma once
 
-namespace py = pybind11;
 namespace ps = polyscope;
+namespace nb = nanobind;
+using namespace nb::literals;
 
 // Type translations between Python and ImGui.  Prefer native Python types (tuples, arrays), translating into ImGui
 // equivalents.

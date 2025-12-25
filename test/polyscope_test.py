@@ -2739,6 +2739,13 @@ class TestManagedBuffers(unittest.TestCase):
         ps_scalar = ps_cloud.add_scalar_quantity("test_vals", generate_scalar())
         ps.show(3)
 
+        # test a quantity buffer of float
+        scalar_buf = ps_cloud.get_quantity_buffer("test_vals", "values")
+        self.assertEqual(scalar_buf.size(), 10)
+        self.assertTrue(scalar_buf.has_data())
+        scalar_buf.get_value(3)
+        scalar_buf.update_data(generate_scalar())
+        
         # test a structure buffer of vec3
         pos_buf = ps_cloud.get_buffer("points")
         self.assertEqual(pos_buf.size(), 10)
@@ -2746,14 +2753,6 @@ class TestManagedBuffers(unittest.TestCase):
         pos_buf.summary_string()
         pos_buf.get_value(3)
         pos_buf.update_data(generate_points())
-        
-        # test a quantity buffer of float
-        scalar_buf = ps_cloud.get_quantity_buffer("test_vals", "values")
-        self.assertEqual(scalar_buf.size(), 10)
-        self.assertTrue(scalar_buf.has_data())
-        scalar_buf.summary_string()
-        scalar_buf.get_value(3)
-        scalar_buf.update_data(generate_scalar())
 
         ps.show(3)
 

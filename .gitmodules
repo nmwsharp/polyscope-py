@@ -1,9 +1,9 @@
-[submodule "deps/pybind11"]
-	path = deps/pybind11
-	url = https://github.com/pybind/pybind11.git
 [submodule "deps/polyscope"]
 	path = deps/polyscope
 	url = https://github.com/nmwsharp/polyscope.git
 [submodule "deps/eigen"]
 	path = deps/eigen
 	url = https://gitlab.com/libeigen/eigen.git
+[submodule "deps/nanobind"]
+	path = deps/nanobind
+	url = https://github.com/wjakob/nanobind

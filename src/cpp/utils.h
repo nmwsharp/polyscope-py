@@ -1,8 +1,13 @@
 #pragma once
 
-#include <pybind11/eigen.h>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/stl/pair.h>
+#include <nanobind/stl/vector.h>
+#include <nanobind/stl/function.h>
+#include <nanobind/ndarray.h>
+#include <nanobind/eigen/dense.h>
 
 #include <glm/glm.hpp>
 
@@ -10,12 +15,9 @@
 
 #include "polyscope/image_quantity.h"
 
-namespace py = pybind11;
+namespace nb = nanobind;
+using namespace nb::literals;
 namespace ps = polyscope;
-
-// For overloaded functions, with C++11 compiler only
-template <typename... Args>
-using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
 
 // Some conversion helpers
 template <typename T, int m, int n>
@@ -61,7 +63,7 @@ void def_get_managed_buffer(C& c, std::string postfix) {
         [](StructureT& s, std::string buffer_name) -> ps::render::ManagedBuffer<T>& {
           return s.template getManagedBuffer<T>(buffer_name);
         },
-        "get managed buffer", py::return_value_policy::reference);
+        "get managed buffer", nb::rv_policy::reference);
 }
 
 template <typename StructureT, typename T, typename C>
@@ -82,7 +84,7 @@ void def_get_quantity_managed_buffer(C& c, std::string postfix) {
           // here, to silence warnings
           throw std::logic_error("structure has no such quantity");
         },
-        "get quantity managed buffer", py::return_value_policy::reference);
+        "get quantity managed buffer", nb::rv_policy::reference);
 }
 
 
@@ -95,14 +97,13 @@ void def_all_managed_buffer_funcs(C& c, ps::ManagedBufferType t) {
 
 // Add common bindings for structures
 template <typename StructureT>
-py::class_<StructureT> bindStructure(py::module& m, std::string name) {
+nb::class_<StructureT, ps::Structure> bindStructure(nb::module_& m, std::string name) {
 
-  py::class_<StructureT, ps::Structure> s(m, name.c_str());
+  nb::class_<StructureT, ps::Structure> s(m, name.c_str());
 
   // structure basics
   s.def("remove", &StructureT::remove, "Remove the structure")
-      .def(
-          "get_name", [](StructureT& s) { return s.name; }, "Ge the name")
+      .def("get_name", [](StructureT& s) { return s.name; }, "Ge the name")
       .def("get_unique_prefix", &StructureT::uniquePrefix, "Get unique prefix")
       .def("set_enabled", &StructureT::setEnabled, "Enable the structure")
       .def("enable_isolate", &StructureT::enableIsolate, "Enable the structure, disable all of same type")
@@ -111,7 +112,7 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("get_transparency", &StructureT::getTransparency, "Get transparency alpha")
 
       // group things
-      .def("add_to_group", overload_cast_<std::string>()(&StructureT::addToGroup), "Add to group")
+      .def("add_to_group", nb::overload_cast<std::string>(&StructureT::addToGroup), "Add to group")
 
       // slice plane things
       .def("set_ignore_slice_plane", &StructureT::setIgnoreSlicePlane, "Set ignore slice plane")
@@ -121,7 +122,7 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
 
       // quantites
       .def("remove_all_quantities", &StructureT::removeAllQuantities, "Remove all quantities")
-      .def("remove_quantity", &StructureT::removeQuantity, py::arg("name"), py::arg("errorIfAbsent") = false,
+      .def("remove_quantity", &StructureT::removeQuantity, nb::arg("name"), nb::arg("errorIfAbsent") = false,
            "Remove a quantity")
 
       // transform management
@@ -136,17 +137,17 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
       .def("get_position", [](StructureT& s) { return glm2eigen(s.getPosition()); }, "get the position of the shape origin after transform")
       .def("set_transform_gizmo_enabled", &StructureT::setTransformGizmoEnabled)
       .def("get_transform_gizmo_enabled", &StructureT::getTransformGizmoEnabled)
-      .def("get_transformation_gizmo", &StructureT::getTransformGizmo, py::return_value_policy::reference, "Get the TransformationGizmo associated with this structure")
+      .def("get_transformation_gizmo", &StructureT::getTransformGizmo, nb::rv_policy::reference, "Get the TransformationGizmo associated with this structure")
       
       // floating quantites
-      .def("add_scalar_image_quantity", &StructureT::template addScalarImageQuantity<Eigen::VectorXf>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::arg("type")=ps::DataType::STANDARD, py::return_value_policy::reference)
-      .def("add_color_image_quantity", &StructureT::template addColorImageQuantity<Eigen::MatrixXf>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values_rgb"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
-      .def("add_color_alpha_image_quantity", &StructureT::template addColorAlphaImageQuantity<Eigen::MatrixXf>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("values_rgba"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
-      .def("add_depth_render_image_quantity", &StructureT::template addDepthRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
-      .def("add_color_render_image_quantity", &StructureT::template addColorRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf, Eigen::MatrixXf>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("colorData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
-      .def("add_scalar_render_image_quantity", &StructureT::template addScalarRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf, Eigen::VectorXf>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("normalData"), py::arg("scalarData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::arg("type")=ps::DataType::STANDARD, py::return_value_policy::reference)
-      .def("add_raw_color_render_image_quantity", &StructureT::template addRawColorRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("colorData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
-      .def("add_raw_color_alpha_render_image_quantity", &StructureT::template addRawColorAlphaRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, py::arg("name"), py::arg("dimX"), py::arg("dimY"), py::arg("depthData"), py::arg("colorData"), py::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, py::return_value_policy::reference)
+      .def("add_scalar_image_quantity", &StructureT::template addScalarImageQuantity<Eigen::VectorXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("values"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::arg("type")=ps::DataType::STANDARD, nb::rv_policy::reference)
+      .def("add_color_image_quantity", &StructureT::template addColorImageQuantity<Eigen::MatrixXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("values_rgb"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::rv_policy::reference)
+      .def("add_color_alpha_image_quantity", &StructureT::template addColorAlphaImageQuantity<Eigen::MatrixXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("values_rgba"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::rv_policy::reference)
+      .def("add_depth_render_image_quantity", &StructureT::template addDepthRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("depthData"), nb::arg("normalData"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::rv_policy::reference)
+      .def("add_color_render_image_quantity", &StructureT::template addColorRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf, Eigen::MatrixXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("depthData"), nb::arg("normalData"), nb::arg("colorData"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::rv_policy::reference)
+      .def("add_scalar_render_image_quantity", &StructureT::template addScalarRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf, Eigen::VectorXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("depthData"), nb::arg("normalData"), nb::arg("scalarData"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::arg("type")=ps::DataType::STANDARD, nb::rv_policy::reference)
+      .def("add_raw_color_render_image_quantity", &StructureT::template addRawColorRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("depthData"), nb::arg("colorData"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::rv_policy::reference)
+      .def("add_raw_color_alpha_render_image_quantity", &StructureT::template addRawColorAlphaRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("depthData"), nb::arg("colorData"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::rv_policy::reference)
 
       ;
 
@@ -189,21 +190,20 @@ py::class_<StructureT> bindStructure(py::module& m, std::string name) {
 
 // Common bindings for quantities that do not fall in to a more specific quantity below
 template <typename Q>
-py::class_<Q> bindQuantity(py::module& m, std::string name) {
-  return py::class_<Q>(m, name.c_str()).def("set_enabled", &Q::setEnabled, "Set enabled");
+nb::class_<Q> bindQuantity(nb::module_& m, std::string name) {
+  return nb::class_<Q>(m, name.c_str()).def("set_enabled", &Q::setEnabled, "Set enabled");
 }
 
 
 // Add common bindings for all scalar quantities
 template <typename ScalarQ>
-py::class_<ScalarQ> bindScalarQuantity(py::module& m, std::string name) {
+nb::class_<ScalarQ> bindScalarQuantity(nb::module_& m, std::string name) {
   return bindQuantity<ScalarQ>(m, name.c_str())
       .def("set_color_map", &ScalarQ::setColorMap, "Set color map")
-      .def("set_map_range", &ScalarQ::setMapRange, "Set map range")
+      .def("set_map_range", [] (ScalarQ& self, std::tuple<float,float> vals) { self.setMapRange({std::get<0>(vals), std::get<1>(vals)}); }, "Set map range")
       .def("set_onscreen_colorbar_enabled", &ScalarQ::setOnscreenColorbarEnabled, "Set onscreen color bar enabled")
       .def("set_onscreen_colorbar_location", &ScalarQ::setOnscreenColorbarLocation, "Set onscreen color bar location")
       // TODO add exportColorMapToSVG()
-      .def("set_map_range", &ScalarQ::setMapRange, "Set map range")
       .def("set_isolines_enabled", &ScalarQ::setIsolinesEnabled)
       .def("set_isoline_style", &ScalarQ::setIsolineStyle)
       .def("set_isoline_period", &ScalarQ::setIsolinePeriod, "Set isoline period")
@@ -213,7 +213,7 @@ py::class_<ScalarQ> bindScalarQuantity(py::module& m, std::string name) {
 }
 
 template <typename VolumeMeshVertexScalarQuantity>
-py::class_<VolumeMeshVertexScalarQuantity> bindVMVScalarQuantity(py::module& m, std::string name) {
+nb::class_<VolumeMeshVertexScalarQuantity> bindVMVScalarQuantity(nb::module_& m, std::string name) {
   return bindScalarQuantity<VolumeMeshVertexScalarQuantity>(m, name.c_str())
       .def("set_level_set_enable", &VolumeMeshVertexScalarQuantity::setEnabledLevelSet,
            "Set level set rendering enabled")
@@ -224,13 +224,13 @@ py::class_<VolumeMeshVertexScalarQuantity> bindVMVScalarQuantity(py::module& m, 
 
 // Add common bindings for all color quantities
 template <typename ColorQ>
-py::class_<ColorQ> bindColorQuantity(py::module& m, std::string name) {
+nb::class_<ColorQ> bindColorQuantity(nb::module_& m, std::string name) {
   return bindQuantity<ColorQ>(m, name.c_str());
 }
 
 // Add common bindings for all vector quantities
 template <typename VectorQ>
-py::class_<VectorQ> bindVectorQuantity(py::module& m, std::string name) {
+nb::class_<VectorQ> bindVectorQuantity(nb::module_& m, std::string name) {
   return bindQuantity<VectorQ>(m, name.c_str())
       .def("set_length", &VectorQ::setVectorLengthScale, "Set length")
       .def("set_radius", &VectorQ::setVectorRadius, "Set radius")
@@ -241,14 +241,14 @@ py::class_<VectorQ> bindVectorQuantity(py::module& m, std::string name) {
 // Add common bindings for all texture map quantities
 // (this one is 'additive', )
 template <typename TextureQ>
-void addTextureMapQuantityBindings(py::class_<TextureQ>& boundTextureQ) {
+void addTextureMapQuantityBindings(nb::class_<TextureQ>& boundTextureQ) {
   boundTextureQ.def("set_filter_mode", &TextureQ::setFilterMode, "Set filter mode");
 }
 
 // Add common image options
 // Note: unlike the others above, this adds methods to an existing quantity rather than binding a new one.
 template <typename ImageQ>
-void addImageQuantityBindings(py::class_<ImageQ>& imageQ) {
+void addImageQuantityBindings(nb::class_<ImageQ>& imageQ) {
 
   imageQ.def("set_show_fullscreen", &ImageQ::setShowFullscreen);
   imageQ.def("get_show_fullscreen", &ImageQ::getShowFullscreen);

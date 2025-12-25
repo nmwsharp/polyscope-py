@@ -1,8 +1,3 @@
-#include <pybind11/eigen.h>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
 #include "Eigen/Dense"
 
 #include "polyscope/polyscope.h"
@@ -11,19 +6,15 @@
 
 #include "utils.h"
 
-namespace py = pybind11;
-namespace ps = polyscope;
-
-
-void bind_surface_mesh(py::module& m) {
+void bind_surface_mesh(nb::module_& m) {
 
 
   // == Helper classes
-  py::class_<ps::SurfaceMeshPickResult>(m, "SurfaceMeshPickResult")
-   .def(py::init<>())
-   .def_readonly("element_type", &ps::SurfaceMeshPickResult::elementType)
-   .def_readonly("index", &ps::SurfaceMeshPickResult::index)
-   .def_readonly("bary_coords", &ps::SurfaceMeshPickResult::baryCoords)
+  nb::class_<ps::SurfaceMeshPickResult>(m, "SurfaceMeshPickResult")
+   .def(nb::init<>())
+   .def_ro("element_type", &ps::SurfaceMeshPickResult::elementType)
+   .def_ro("index", &ps::SurfaceMeshPickResult::index)
+   .def_ro("bary_coords", &ps::SurfaceMeshPickResult::baryCoords)
   ;
 
 
@@ -33,20 +24,20 @@ void bind_surface_mesh(py::module& m) {
   bindScalarQuantity<ps::SurfaceEdgeScalarQuantity>(m, "SurfaceEdgeScalarQuantity");
   bindScalarQuantity<ps::SurfaceHalfedgeScalarQuantity>(m, "SurfaceHalfedgeScalarQuantity");
   bindScalarQuantity<ps::SurfaceCornerScalarQuantity>(m, "SurfaceCornerScalarQuantity");
-  py::class_<ps::SurfaceTextureScalarQuantity> boundScalarQ = 
+  nb::class_<ps::SurfaceTextureScalarQuantity> boundScalarQ = 
      bindScalarQuantity<ps::SurfaceTextureScalarQuantity>(m, "SurfaceTextureScalarQuantity");
   addTextureMapQuantityBindings<ps::SurfaceTextureScalarQuantity>(boundScalarQ);
 
   // Color quantities
   bindColorQuantity<ps::SurfaceVertexColorQuantity>(m, "SurfaceVertexColorQuantity");
   bindColorQuantity<ps::SurfaceFaceColorQuantity>(m, "SurfaceFaceColorQuantity");
-  py::class_<ps::SurfaceTextureColorQuantity> boundColorQ = 
+  nb::class_<ps::SurfaceTextureColorQuantity> boundColorQ = 
      bindColorQuantity<ps::SurfaceTextureColorQuantity>(m, "SurfaceTextureColorQuantity");
   addTextureMapQuantityBindings<ps::SurfaceTextureColorQuantity>(boundColorQ);
 
 
   // Parameterization quantities
-  py::class_<ps::SurfaceCornerParameterizationQuantity>(m, "SurfaceCornerParameterizationQuantity")
+  nb::class_<ps::SurfaceCornerParameterizationQuantity>(m, "SurfaceCornerParameterizationQuantity")
       .def("set_enabled", &ps::SurfaceCornerParameterizationQuantity::setEnabled, "Set enabled")
       .def("set_style", &ps::SurfaceCornerParameterizationQuantity::setStyle, "Set style")
       .def("set_grid_colors", &ps::SurfaceCornerParameterizationQuantity::setGridColors, "Set grid colors")
@@ -54,8 +45,8 @@ void bind_surface_mesh(py::module& m) {
       .def("set_checker_size", &ps::SurfaceCornerParameterizationQuantity::setCheckerSize, "Set checker size")
       .def("set_color_map", &ps::SurfaceCornerParameterizationQuantity::setColorMap, "Set color map")
       .def("set_island_labels", &ps::SurfaceCornerParameterizationQuantity::setIslandLabels<Eigen::VectorXf>)
-      .def("create_curve_network_from_seams", &ps::SurfaceCornerParameterizationQuantity::createCurveNetworkFromSeams, py::return_value_policy::reference);
-  py::class_<ps::SurfaceVertexParameterizationQuantity>(m, "SurfaceVertexParameterizationQuantity")
+      .def("create_curve_network_from_seams", &ps::SurfaceCornerParameterizationQuantity::createCurveNetworkFromSeams, nb::rv_policy::reference);
+  nb::class_<ps::SurfaceVertexParameterizationQuantity>(m, "SurfaceVertexParameterizationQuantity")
       .def("set_enabled", &ps::SurfaceVertexParameterizationQuantity::setEnabled, "Set enabled")
       .def("set_style", &ps::SurfaceVertexParameterizationQuantity::setStyle, "Set style")
       .def("set_grid_colors", &ps::SurfaceVertexParameterizationQuantity::setGridColors, "Set grid colors")
@@ -63,7 +54,7 @@ void bind_surface_mesh(py::module& m) {
       .def("set_checker_size", &ps::SurfaceVertexParameterizationQuantity::setCheckerSize, "Set checker size")
       .def("set_color_map", &ps::SurfaceVertexParameterizationQuantity::setColorMap, "Set color map")
       .def("set_island_labels", &ps::SurfaceVertexParameterizationQuantity::setIslandLabels<Eigen::VectorXf>)
-      .def("create_curve_network_from_seams", &ps::SurfaceVertexParameterizationQuantity::createCurveNetworkFromSeams, py::return_value_policy::reference);
+      .def("create_curve_network_from_seams", &ps::SurfaceVertexParameterizationQuantity::createCurveNetworkFromSeams, nb::rv_policy::reference);
 
   // Vector quantities
   bindVectorQuantity<ps::SurfaceVertexVectorQuantity>(m, "SurfaceVertexVectorQuantity");
@@ -122,91 +113,91 @@ void bind_surface_mesh(py::module& m) {
 
       // scalar transparency
       .def("set_transparency_quantity", 
-          overload_cast_<std::string>()(&ps::SurfaceMesh::setTransparencyQuantity), py::arg("quantity_name"))
+          nb::overload_cast<std::string>(&ps::SurfaceMesh::setTransparencyQuantity), nb::arg("quantity_name"))
       .def("clear_transparency_quantity", &ps::SurfaceMesh::clearTransparencyQuantity)
 
       // = quantities
 
       // Scalars
       .def("add_vertex_scalar_quantity", &ps::SurfaceMesh::addVertexScalarQuantity<Eigen::VectorXf>,
-           "Add a scalar function at vertices", py::arg("name"), py::arg("values"),
-           py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
+           "Add a scalar function at vertices", nb::arg("name"), nb::arg("values"),
+           nb::arg("data_type") = ps::DataType::STANDARD, nb::rv_policy::reference)
       .def("add_face_scalar_quantity", &ps::SurfaceMesh::addFaceScalarQuantity<Eigen::VectorXf>,
-           "Add a scalar function at faces", py::arg("name"), py::arg("values"),
-           py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
+           "Add a scalar function at faces", nb::arg("name"), nb::arg("values"),
+           nb::arg("data_type") = ps::DataType::STANDARD, nb::rv_policy::reference)
       .def("add_edge_scalar_quantity", &ps::SurfaceMesh::addEdgeScalarQuantity<Eigen::VectorXf>,
-           "Add a scalar function at edges", py::arg("name"), py::arg("values"),
-           py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
+           "Add a scalar function at edges", nb::arg("name"), nb::arg("values"),
+           nb::arg("data_type") = ps::DataType::STANDARD, nb::rv_policy::reference)
       .def("add_halfedge_scalar_quantity", &ps::SurfaceMesh::addHalfedgeScalarQuantity<Eigen::VectorXf>,
-           "Add a scalar function at halfedges", py::arg("name"), py::arg("values"),
-           py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
+           "Add a scalar function at halfedges", nb::arg("name"), nb::arg("values"),
+           nb::arg("data_type") = ps::DataType::STANDARD, nb::rv_policy::reference)
       .def("add_corner_scalar_quantity", &ps::SurfaceMesh::addCornerScalarQuantity<Eigen::VectorXf>,
-           "Add a scalar function at corners", py::arg("name"), py::arg("values"),
-           py::arg("data_type") = ps::DataType::STANDARD, py::return_value_policy::reference)
+           "Add a scalar function at corners", nb::arg("name"), nb::arg("values"),
+           nb::arg("data_type") = ps::DataType::STANDARD, nb::rv_policy::reference)
       .def("add_texture_scalar_quantity",
-           overload_cast_<std::string, std::string, size_t, size_t, const Eigen::VectorXf&, ps::ImageOrigin,
-                          polyscope::DataType>()(&ps::SurfaceMesh::addTextureScalarQuantity<Eigen::VectorXf>),
-           "Add a scalar function from a texture map", py::arg("name"), py::arg("param_name"), py::arg("dimX"),
-           py::arg("dimY"), py::arg("values"), py::arg("image_origin"), py::arg("data_type") = ps::DataType::STANDARD,
-           py::return_value_policy::reference)
+           nb::overload_cast<std::string, std::string, size_t, size_t, const Eigen::VectorXf&, ps::ImageOrigin,
+                          polyscope::DataType>(&ps::SurfaceMesh::addTextureScalarQuantity<Eigen::VectorXf>),
+           "Add a scalar function from a texture map", nb::arg("name"), nb::arg("param_name"), nb::arg("dimX"),
+           nb::arg("dimY"), nb::arg("values"), nb::arg("image_origin"), nb::arg("data_type") = ps::DataType::STANDARD,
+           nb::rv_policy::reference)
 
       // Colors
       .def("add_vertex_color_quantity", &ps::SurfaceMesh::addVertexColorQuantity<Eigen::MatrixXf>,
-           "Add a color value at vertices", py::return_value_policy::reference)
+           "Add a color value at vertices", nb::rv_policy::reference)
       .def("add_face_color_quantity", &ps::SurfaceMesh::addFaceColorQuantity<Eigen::MatrixXf>,
-           "Add a color value at faces", py::return_value_policy::reference)
+           "Add a color value at faces", nb::rv_policy::reference)
       .def("add_texture_color_quantity",
-           overload_cast_<std::string, std::string, size_t, size_t, const Eigen::MatrixXf&, ps::ImageOrigin>()(
+           nb::overload_cast<std::string, std::string, size_t, size_t, const Eigen::MatrixXf&, ps::ImageOrigin>(
                &ps::SurfaceMesh::addTextureColorQuantity<Eigen::MatrixXf>),
-           "Add a color function from a texture map", py::arg("name"), py::arg("param_name"), py::arg("dimX"),
-           py::arg("dimY"), py::arg("colors"), py::arg("image_origin"), py::return_value_policy::reference)
+           "Add a color function from a texture map", nb::arg("name"), nb::arg("param_name"), nb::arg("dimX"),
+           nb::arg("dimY"), nb::arg("colors"), nb::arg("image_origin"), nb::rv_policy::reference)
 
       // Distance
       .def("add_vertex_distance_quantity", &ps::SurfaceMesh::addVertexDistanceQuantity<Eigen::VectorXf>,
-           "Add a distance function at vertices", py::return_value_policy::reference)
+           "Add a distance function at vertices", nb::rv_policy::reference)
       .def("add_vertex_signed_distance_quantity", &ps::SurfaceMesh::addVertexSignedDistanceQuantity<Eigen::VectorXf>,
-           "Add a signed distance function at vertices", py::return_value_policy::reference)
+           "Add a signed distance function at vertices", nb::rv_policy::reference)
 
       // Parameterization
       .def("add_corner_parameterization_quantity", &ps::SurfaceMesh::addParameterizationQuantity<Eigen::MatrixXf>,
-           "Add a parameterization at corners", py::return_value_policy::reference)
+           "Add a parameterization at corners", nb::rv_policy::reference)
       .def("add_vertex_parameterization_quantity", &ps::SurfaceMesh::addVertexParameterizationQuantity<Eigen::MatrixXf>,
-           "Add a parameterization at vertices", py::return_value_policy::reference)
+           "Add a parameterization at vertices", nb::rv_policy::reference)
 
       // Vector
       .def("add_vertex_vector_quantity", &ps::SurfaceMesh::addVertexVectorQuantity<Eigen::MatrixXf>,
-           "Add a vertex vector quantity", py::return_value_policy::reference)
+           "Add a vertex vector quantity", nb::rv_policy::reference)
       .def("add_face_vector_quantity", &ps::SurfaceMesh::addFaceVectorQuantity<Eigen::MatrixXf>,
-           "Add a face vector quantity", py::return_value_policy::reference)
+           "Add a face vector quantity", nb::rv_policy::reference)
       .def("add_vertex_vector_quantity2D", &ps::SurfaceMesh::addVertexVectorQuantity2D<Eigen::MatrixXf>,
-           "Add a vertex 2D vector quantity", py::return_value_policy::reference)
+           "Add a vertex 2D vector quantity", nb::rv_policy::reference)
       .def("add_face_vector_quantity2D", &ps::SurfaceMesh::addFaceVectorQuantity2D<Eigen::MatrixXf>,
-           "Add a face 2D vector quantity", py::return_value_policy::reference)
+           "Add a face 2D vector quantity", nb::rv_policy::reference)
       .def("add_vertex_tangent_vector_quantity",
            &ps::SurfaceMesh::addVertexTangentVectorQuantity<Eigen::MatrixXf, Eigen::MatrixXf, Eigen::MatrixXf>,
-           "Add a vertex tangent vector quantity", py::return_value_policy::reference)
+           "Add a vertex tangent vector quantity", nb::rv_policy::reference)
       .def("add_face_tangent_vector_quantity",
            &ps::SurfaceMesh::addFaceTangentVectorQuantity<Eigen::MatrixXf, Eigen::MatrixXf, Eigen::MatrixXf>,
-           "Add a face tangent vector quantity", py::return_value_policy::reference)
+           "Add a face tangent vector quantity", nb::rv_policy::reference)
       .def("add_one_form_tangent_vector_quantity",
            &ps::SurfaceMesh::addOneFormTangentVectorQuantity<Eigen::VectorXf, Eigen::Matrix<bool, Eigen::Dynamic, 1>>,
-           "Add a one form tangent vector quantity", py::return_value_policy::reference);
+           "Add a one form tangent vector quantity", nb::rv_policy::reference);
 
 
   // Static adders and getters
-  m.def("register_surface_mesh", &ps::registerSurfaceMesh<Eigen::MatrixXf, Eigen::MatrixXi>, py::arg("name"),
-        py::arg("vertices"), py::arg("faces"), "Register a surface mesh", py::return_value_policy::reference);
-  m.def("register_surface_mesh2D", &ps::registerSurfaceMesh2D<Eigen::MatrixXf, Eigen::MatrixXi>, py::arg("name"),
-        py::arg("vertices"), py::arg("faces"), "Register a surface mesh", py::return_value_policy::reference);
+  m.def("register_surface_mesh", &ps::registerSurfaceMesh<Eigen::MatrixXf, Eigen::MatrixXi>, nb::arg("name"),
+        nb::arg("vertices"), nb::arg("faces"), "Register a surface mesh", nb::rv_policy::reference);
+  m.def("register_surface_mesh2D", &ps::registerSurfaceMesh2D<Eigen::MatrixXf, Eigen::MatrixXi>, nb::arg("name"),
+        nb::arg("vertices"), nb::arg("faces"), "Register a surface mesh", nb::rv_policy::reference);
   m.def("register_surface_mesh_list", &ps::registerSurfaceMesh<Eigen::MatrixXf, std::vector<std::vector<size_t>>>,
-        py::arg("name"), py::arg("vertices"), py::arg("faces"), "Register a surface mesh from a nested list",
-        py::return_value_policy::reference);
+        nb::arg("name"), nb::arg("vertices"), nb::arg("faces"), "Register a surface mesh from a nested list",
+        nb::rv_policy::reference);
   m.def("register_surface_mesh_list2D", &ps::registerSurfaceMesh2D<Eigen::MatrixXf, std::vector<std::vector<size_t>>>,
-        py::arg("name"), py::arg("vertices"), py::arg("faces"), "Register a surface mesh from a nested list",
-        py::return_value_policy::reference);
+        nb::arg("name"), nb::arg("vertices"), nb::arg("faces"), "Register a surface mesh from a nested list",
+        nb::rv_policy::reference);
 
   m.def("remove_surface_mesh", &polyscope::removeSurfaceMesh, "Remove a surface mesh by name");
   m.def("get_surface_mesh", &polyscope::getSurfaceMesh, "Get a surface mesh by name",
-        py::return_value_policy::reference);
+        nb::rv_policy::reference);
   m.def("has_surface_mesh", &polyscope::hasSurfaceMesh, "Check for a surface mesh by name");
 }

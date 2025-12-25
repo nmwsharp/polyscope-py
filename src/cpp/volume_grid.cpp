@@ -1,9 +1,3 @@
-#include <pybind11/eigen.h>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <pybind11/functional.h>
-
 #include "Eigen/Dense"
 
 #include "polyscope/polyscope.h"
@@ -11,17 +5,14 @@
 
 #include "utils.h"
 
-namespace py = pybind11;
-namespace ps = polyscope;
 
-
-void bind_volume_grid(py::module& m) {
+void bind_volume_grid(nb::module_& m) {
 
   // == Helper classes
-  py::class_<ps::VolumeGridPickResult>(m, "VolumeGridPickResult")
-   .def(py::init<>())
-   .def_readonly("element_type", &ps::VolumeGridPickResult::elementType)
-   .def_readonly("index", &ps::VolumeGridPickResult::index)
+  nb::class_<ps::VolumeGridPickResult>(m, "VolumeGridPickResult")
+   .def(nb::init<>())
+   .def_ro("element_type", &ps::VolumeGridPickResult::elementType)
+   .def_ro("index", &ps::VolumeGridPickResult::index)
   ;
 
   // Scalar quantities
@@ -33,7 +24,7 @@ void bind_volume_grid(py::module& m) {
     .def("set_slice_planes_affect_isosurface", &ps::VolumeGridNodeScalarQuantity::setSlicePlanesAffectIsosurface)
     .def("register_isosurface_as_mesh_with_name", 
         [](ps::VolumeGridNodeScalarQuantity& x, std::string name) { return x.registerIsosurfaceAsMesh(name); }, 
-        py::return_value_policy::reference)
+        nb::rv_policy::reference)
     ;
 
   bindScalarQuantity<ps::VolumeGridCellScalarQuantity>(m, "VolumeGridCellScalarQuantity")
@@ -74,12 +65,12 @@ void bind_volume_grid(py::module& m) {
 
       // Scalars
       .def("add_node_scalar_quantity", &ps::VolumeGrid::addNodeScalarQuantity<Eigen::VectorXf>, 
-          py::arg("name"), py::arg("values"), py::arg("data_type") = ps::DataType::STANDARD, 
-          py::return_value_policy::reference)
+          nb::arg("name"), nb::arg("values"), nb::arg("data_type") = ps::DataType::STANDARD, 
+          nb::rv_policy::reference)
 
       .def("add_cell_scalar_quantity", &ps::VolumeGrid::addCellScalarQuantity<Eigen::VectorXf>,
-          py::arg("name"), py::arg("values"), py::arg("data_type") = ps::DataType::STANDARD, 
-          py::return_value_policy::reference)
+          nb::arg("name"), nb::arg("values"), nb::arg("data_type") = ps::DataType::STANDARD, 
+          nb::rv_policy::reference)
       
       // add from a callable lambda
       .def("add_node_scalar_quantity_from_callable", [](
@@ -88,7 +79,7 @@ void bind_volume_grid(py::module& m) {
             const std::function<Eigen::VectorXf(const Eigen::Ref<const Eigen::MatrixXf>)>& func,
             ps::DataType data_type) { 
 
-          // Polyscope's API uses raw buffer pointers, but we use Eigen mats for pybind11.
+          // Polyscope's API uses raw buffer pointers, but we use Eigen mats for numpy<->eigen interop with python.
           // Create a wrapper function that goes to/from the Eigen mats
           auto wrapped_func = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
             Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);
@@ -98,8 +89,8 @@ void bind_volume_grid(py::module& m) {
 
           return grid.addNodeScalarQuantityFromBatchCallable(name, wrapped_func, data_type);
       }, 
-      py::arg("name"), py::arg("values"), py::arg("data_type") = ps::DataType::STANDARD,
-      py::return_value_policy::reference)
+      nb::arg("name"), nb::arg("values"), nb::arg("data_type") = ps::DataType::STANDARD,
+      nb::rv_policy::reference)
       
       .def("add_cell_scalar_quantity_from_callable", [](
             ps::VolumeGrid& grid,
@@ -107,7 +98,7 @@ void bind_volume_grid(py::module& m) {
             const std::function<Eigen::VectorXf(const Eigen::Ref<const Eigen::MatrixXf>)>& func,
             ps::DataType data_type) { 
 
-          // Polyscope's API uses raw buffer pointers, but we use Eigen mats for pybind11.
+          // Polyscope's API uses raw buffer pointers, but we use Eigen mats for numpy<->eigen interop with python.
           // Create a wrapper function that goes to/from the Eigen mats
           auto wrapped_func = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
             Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);
@@ -117,8 +108,8 @@ void bind_volume_grid(py::module& m) {
 
           return grid.addNodeScalarQuantityFromBatchCallable(name, wrapped_func, data_type);
       }, 
-      py::arg("name"), py::arg("values"), py::arg("data_type") = ps::DataType::STANDARD,
-      py::return_value_policy::reference)
+      nb::arg("name"), nb::arg("values"), nb::arg("data_type") = ps::DataType::STANDARD,
+      nb::rv_policy::reference)
 
       // Colors
 
@@ -127,10 +118,10 @@ void bind_volume_grid(py::module& m) {
     ;
 
   // Static adders and getters
-  m.def("register_volume_grid", overload_cast_<std::string, glm::uvec3, glm::vec3, glm::vec3>()(&ps::registerVolumeGrid), py::arg("name"),
-        py::arg("gridNodeDim"), py::arg("boundMin"), py::arg("boundMax"), py::return_value_policy::reference);
+  m.def("register_volume_grid", nb::overload_cast<std::string, glm::uvec3, glm::vec3, glm::vec3>(&ps::registerVolumeGrid), nb::arg("name"),
+        nb::arg("gridNodeDim"), nb::arg("boundMin"), nb::arg("boundMax"), nb::rv_policy::reference);
 
   m.def("remove_volume_grid", &polyscope::removeVolumeGrid);
-  m.def("get_volume_grid", &polyscope::getVolumeGrid, py::return_value_policy::reference);
+  m.def("get_volume_grid", &polyscope::getVolumeGrid, nb::rv_policy::reference);
   m.def("has_volume_grid", &polyscope::hasVolumeGrid);
 }

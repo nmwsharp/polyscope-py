@@ -1,23 +1,16 @@
 #include "imgui.h"
 #include "implot.h"
 
-#include <pybind11/functional.h>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
 #include "Eigen/Dense"
 
 #include "utils.h"
 #include "imgui_utils.h"
 
-namespace py = pybind11;
+void bind_implot_structs(nb::module_& m);
+void bind_implot_methods(nb::module_& m);
+void bind_implot_enums(nb::module_& m);
 
-void bind_implot_structs(py::module& m);
-void bind_implot_methods(py::module& m);
-void bind_implot_enums(py::module& m);
-
-void bind_implot(py::module& m) {
+void bind_implot(nb::module_& m) {
   auto implot_module = m.def_submodule("implot", "ImPlot bindings");
 
   bind_implot_structs(implot_module);
@@ -27,13 +20,13 @@ void bind_implot(py::module& m) {
 
 // clang-format off
 
-void bind_implot_structs(py::module& m) {
+void bind_implot_structs(nb::module_& m) {
 
 
 
 }
 
-void bind_implot_methods(py::module& m) {
+void bind_implot_methods(nb::module_& m) {
     
     //-----------------------------------------------------------------------------
     // [SECTION] Begin/End Plot
@@ -44,9 +37,9 @@ void bind_implot_methods(py::module& m) {
         [](const char* title_id, const Vec2T& size, ImPlotFlags flags) {
             return ImPlot::BeginPlot(title_id, to_vec2(size), flags);
         },
-        py::arg("title_id"),
-        py::arg("size") = std::make_tuple(-1.f, 0.f),
-        py::arg("flags") = 0
+        nb::arg("title_id"),
+        nb::arg("size") = std::make_tuple(-1.f, 0.f),
+        nb::arg("flags") = 0
     );
 
     m.def("EndPlot", []() { ImPlot::EndPlot(); });
@@ -68,13 +61,13 @@ void bind_implot_methods(py::module& m) {
 
             return ImPlot::BeginSubplots(title_id, rows, cols, to_vec2(size), flags, row_ratios_ptr, col_ratios_ptr);
         },
-        py::arg("title_id"),
-        py::arg("rows"),
-        py::arg("cols"),
-        py::arg("size") = std::make_tuple(-1.f, 0.f),
-        py::arg("flags") = 0,
-        py::arg("row_ratios") = std::vector<float>(),
-        py::arg("col_ratios") = std::vector<float>()
+        nb::arg("title_id"),
+        nb::arg("rows"),
+        nb::arg("cols"),
+        nb::arg("size") = std::make_tuple(-1.f, 0.f),
+        nb::arg("flags") = 0,
+        nb::arg("row_ratios") = std::vector<float>(),
+        nb::arg("col_ratios") = std::vector<float>()
     );
 
     m.def("EndSubplots", []() { ImPlot::EndSubplots(); });
@@ -89,9 +82,9 @@ void bind_implot_methods(py::module& m) {
         [](ImAxis axis, const char* label, ImPlotAxisFlags flags) {
             ImPlot::SetupAxis(axis, label, flags);
         },
-        py::arg("axis"),
-        py::arg("label") = "",
-        py::arg("flags") = 0
+        nb::arg("axis"),
+        nb::arg("label") = "",
+        nb::arg("flags") = 0
     );
 
     m.def(
@@ -99,10 +92,10 @@ void bind_implot_methods(py::module& m) {
         [](ImAxis axis, double v_min, double v_max, ImPlotCond cond) {
             ImPlot::SetupAxisLimits(axis, v_min, v_max, cond);
         },
-        py::arg("axis"),
-        py::arg("vmin"),
-        py::arg("vmax"),
-        py::arg("cond") = (int)ImPlotCond_Once
+        nb::arg("axis"),
+        nb::arg("vmin"),
+        nb::arg("vmax"),
+        nb::arg("cond") = (int)ImPlotCond_Once
     );
 
     m.def(
@@ -110,8 +103,8 @@ void bind_implot_methods(py::module& m) {
         [](ImAxis axis, const char* fmt) {
             ImPlot::SetupAxisFormat(axis, fmt);
         },
-        py::arg("axis"),
-        py::arg("fmt")
+        nb::arg("axis"),
+        nb::arg("fmt")
     );
 
     m.def(
@@ -121,10 +114,10 @@ void bind_implot_methods(py::module& m) {
             const auto _labels = convert_string_items(labels);
             ImPlot::SetupAxisTicks(axis, values.data(), values.size(), labels.size() == 0 ? nullptr : _labels.data(), keep_default);
         },
-        py::arg("axis"),
-        py::arg("values"),
-        py::arg("labels") = std::vector<std::string>(),
-        py::arg("keep_default") = false
+        nb::arg("axis"),
+        nb::arg("values"),
+        nb::arg("labels") = std::vector<std::string>(),
+        nb::arg("keep_default") = false
     );
 
     m.def(
@@ -134,12 +127,12 @@ void bind_implot_methods(py::module& m) {
             const auto _labels = convert_string_items(labels);
             ImPlot::SetupAxisTicks(axis, v_min, v_max, n_ticks, labels.size() == 0 ? nullptr : _labels.data(), keep_default);
         },
-        py::arg("axis"),
-        py::arg("v_min"),
-        py::arg("v_max"),
-        py::arg("n_ticks"),
-        py::arg("labels") = std::vector<std::string>(),
-        py::arg("keep_default") = false
+        nb::arg("axis"),
+        nb::arg("v_min"),
+        nb::arg("v_max"),
+        nb::arg("n_ticks"),
+        nb::arg("labels") = std::vector<std::string>(),
+        nb::arg("keep_default") = false
     );
 
     m.def(
@@ -147,8 +140,8 @@ void bind_implot_methods(py::module& m) {
         [](ImAxis axis, ImPlotScale scale) {
             ImPlot::SetupAxisScale(axis, scale);
         },
-        py::arg("axis"),
-        py::arg("scale")
+        nb::arg("axis"),
+        nb::arg("scale")
     );
 
     m.def(
@@ -156,9 +149,9 @@ void bind_implot_methods(py::module& m) {
         [](ImAxis axis, double v_min, double v_max) {
             ImPlot::SetupAxisLimitsConstraints(axis, v_min, v_max);
         },
-        py::arg("axis"),
-        py::arg("v_min"),
-        py::arg("v_max")
+        nb::arg("axis"),
+        nb::arg("v_min"),
+        nb::arg("v_max")
     );
 
     m.def(
@@ -166,9 +159,9 @@ void bind_implot_methods(py::module& m) {
         [](ImAxis axis, double z_min, double z_max) {
             ImPlot::SetupAxisZoomConstraints(axis, z_min, z_max);
         },
-        py::arg("axis"),
-        py::arg("z_min"),
-        py::arg("z_max")
+        nb::arg("axis"),
+        nb::arg("z_min"),
+        nb::arg("z_max")
     );
 
     m.def(
@@ -176,10 +169,10 @@ void bind_implot_methods(py::module& m) {
         [](const char* x_label, const char* y_label, ImPlotAxisFlags x_flags, ImPlotAxisFlags y_flags) {
             ImPlot::SetupAxes(x_label, y_label, x_flags, y_flags);
         },
-        py::arg("x_label"),
-        py::arg("y_label"),
-        py::arg("x_flags") = 0,
-        py::arg("y_flags") = 0
+        nb::arg("x_label"),
+        nb::arg("y_label"),
+        nb::arg("x_flags") = 0,
+        nb::arg("y_flags") = 0
     );
 
     m.def(
@@ -187,11 +180,11 @@ void bind_implot_methods(py::module& m) {
         [](double x_min, double x_max, double y_min, double y_max, ImPlotCond cond) {
             ImPlot::SetupAxesLimits(x_min, x_max, y_min, y_max, cond);
         },
-        py::arg("x_min"),
-        py::arg("x_max"),
-        py::arg("y_min"),
-        py::arg("y_max"),
-        py::arg("cond") = (int)ImPlotCond_Once
+        nb::arg("x_min"),
+        nb::arg("x_max"),
+        nb::arg("y_min"),
+        nb::arg("y_max"),
+        nb::arg("cond") = (int)ImPlotCond_Once
     );
 
     m.def(
@@ -199,8 +192,8 @@ void bind_implot_methods(py::module& m) {
         [](ImPlotLocation location, ImPlotLegendFlags flags) {
             ImPlot::SetupLegend(location, flags);
         },
-        py::arg("location"),
-        py::arg("flags") = 0
+        nb::arg("location"),
+        nb::arg("flags") = 0
     );
 
     m.def(
@@ -208,8 +201,8 @@ void bind_implot_methods(py::module& m) {
         [](ImPlotLocation location, ImPlotMouseTextFlags flags) {
             ImPlot::SetupMouseText(location, flags);
         },
-        py::arg("location"),
-        py::arg("flags") = 0
+        nb::arg("location"),
+        nb::arg("flags") = 0
     );
 
 
@@ -232,11 +225,11 @@ void bind_implot_methods(py::module& m) {
         [](const char* label_id, const Eigen::VectorXd& values, double xscale, double xstart, ImPlotLineFlags flags) {
             ImPlot::PlotLine(label_id, values.data(), values.size(), xscale, xstart, flags);
         },
-        py::arg("label_id"),
-        py::arg("values"),
-        py::arg("xscale")=1.,
-        py::arg("xstart")=0.,
-        py::arg("flags")=0
+        nb::arg("label_id"),
+        nb::arg("values"),
+        nb::arg("xscale")=1.,
+        nb::arg("xstart")=0.,
+        nb::arg("flags")=0
     );
     
     m.def(
@@ -245,10 +238,10 @@ void bind_implot_methods(py::module& m) {
             if(xs.size() != ys.size()) throw std::runtime_error("invalid input sizes");
             ImPlot::PlotLine(label_id, xs.data(), ys.data(), xs.size(), flags);
         },
-        py::arg("label_id"),
-        py::arg("xs"),
-        py::arg("ys"),
-        py::arg("flags") = 0
+        nb::arg("label_id"),
+        nb::arg("xs"),
+        nb::arg("ys"),
+        nb::arg("flags") = 0
     );
     
     // PlotScatter
@@ -258,11 +251,11 @@ void bind_implot_methods(py::module& m) {
         [](const char* label_id, const Eigen::VectorXd& values, double xscale, double xstart, ImPlotScatterFlags flags) {
             ImPlot::PlotScatter(label_id, values.data(), values.size(), xscale, xstart, flags);
         },
-        py::arg("label_id"),
-        py::arg("values"),
-        py::arg("xscale")=1.,
-        py::arg("xstart")=0.,
-        py::arg("flags")=0
+        nb::arg("label_id"),
+        nb::arg("values"),
+        nb::arg("xscale")=1.,
+        nb::arg("xstart")=0.,
+        nb::arg("flags")=0
     );
     
     m.def(
@@ -271,10 +264,10 @@ void bind_implot_methods(py::module& m) {
             if(xs.size() != ys.size()) throw std::runtime_error("invalid input sizes");
             ImPlot::PlotScatter(label_id, xs.data(), ys.data(), xs.size(), flags);
         },
-        py::arg("label_id"),
-        py::arg("xs"),
-        py::arg("ys"),
-        py::arg("flags") = 0
+        nb::arg("label_id"),
+        nb::arg("xs"),
+        nb::arg("ys"),
+        nb::arg("flags") = 0
     );
 
     // PlotStairs
@@ -284,11 +277,11 @@ void bind_implot_methods(py::module& m) {
         [](const char* label_id, const Eigen::VectorXd& values, double xscale, double xstart, ImPlotStairsFlags flags) {
             ImPlot::PlotStairs(label_id, values.data(), values.size(), xscale, xstart, flags);
         },
-        py::arg("label_id"),
-        py::arg("values"),
-        py::arg("xscale")=1.,
-        py::arg("xstart")=0.,
-        py::arg("flags")=0
+        nb::arg("label_id"),
+        nb::arg("values"),
+        nb::arg("xscale")=1.,
+        nb::arg("xstart")=0.,
+        nb::arg("flags")=0
     );
     
     m.def(
@@ -297,10 +290,10 @@ void bind_implot_methods(py::module& m) {
             if(xs.size() != ys.size()) throw std::runtime_error("invalid input sizes");
             ImPlot::PlotStairs(label_id, xs.data(), ys.data(), xs.size(), flags);
         },
-        py::arg("label_id"),
-        py::arg("xs"),
-        py::arg("ys"),
-        py::arg("flags") = 0
+        nb::arg("label_id"),
+        nb::arg("xs"),
+        nb::arg("ys"),
+        nb::arg("flags") = 0
     );
 
     // PlotShaded TODO
@@ -310,12 +303,12 @@ void bind_implot_methods(py::module& m) {
         [](const char* label_id, const Eigen::VectorXd& values, double yref, double xscale, double xstart, ImPlotShadedFlags flags) {
             ImPlot::PlotShaded(label_id, values.data(), values.size(), yref, xscale, xstart, flags);
         },
-        py::arg("label_id"),
-        py::arg("values"),
-        py::arg("yref")=0.,
-        py::arg("xscale")=1.,
-        py::arg("xstart")=0.,
-        py::arg("flags")=0
+        nb::arg("label_id"),
+        nb::arg("values"),
+        nb::arg("yref")=0.,
+        nb::arg("xscale")=1.,
+        nb::arg("xstart")=0.,
+        nb::arg("flags")=0
     );
     
     m.def(
@@ -324,11 +317,11 @@ void bind_implot_methods(py::module& m) {
             if(xs.size() != ys.size()) throw std::runtime_error("invalid input sizes");
             ImPlot::PlotShaded(label_id, xs.data(), ys.data(), xs.size(), yref, flags);
         },
-        py::arg("label_id"),
-        py::arg("xs"),
-        py::arg("ys"),
-        py::arg("yref")=0.,
-        py::arg("flags") = 0
+        nb::arg("label_id"),
+        nb::arg("xs"),
+        nb::arg("ys"),
+        nb::arg("yref")=0.,
+        nb::arg("flags") = 0
     );
     
     m.def(
@@ -338,11 +331,11 @@ void bind_implot_methods(py::module& m) {
             if(xs.size() != ys2.size()) throw std::runtime_error("invalid input sizes");
             ImPlot::PlotShaded(label_id, xs.data(), ys1.data(), ys2.data(), xs.size(), flags);
         },
-        py::arg("label_id"),
-        py::arg("xs"),
-        py::arg("ys1"),
-        py::arg("ys2"),
-        py::arg("flags") = 0
+        nb::arg("label_id"),
+        nb::arg("xs"),
+        nb::arg("ys1"),
+        nb::arg("ys2"),
+        nb::arg("flags") = 0
     );
 
     // PlotBars TODO
@@ -360,9 +353,9 @@ void bind_implot_methods(py::module& m) {
         [](const char* label_id, const Eigen::VectorXd& values, ImPlotInfLinesFlags flags) {
             ImPlot::PlotInfLines(label_id, values.data(), values.size(), flags);
         },
-        py::arg("label_id"),
-        py::arg("values"),
-        py::arg("flags")=0
+        nb::arg("label_id"),
+        nb::arg("values"),
+        nb::arg("flags")=0
     );
     
     // PlotPieChart
@@ -373,14 +366,14 @@ void bind_implot_methods(py::module& m) {
             const auto _label_ids = convert_string_items(label_ids);
             ImPlot::PlotPieChart(_label_ids.data(), values.data(), values.size(), x, y, radius, label_fmt, angle0, flags);
         },
-        py::arg("label_ids"),
-        py::arg("values"),
-        py::arg("x"),
-        py::arg("y"),
-        py::arg("radius"),
-        py::arg("label_fmt") = "%.1f",
-        py::arg("angle0") = 90,
-        py::arg("flags") = 0
+        nb::arg("label_ids"),
+        nb::arg("values"),
+        nb::arg("x"),
+        nb::arg("y"),
+        nb::arg("radius"),
+        nb::arg("label_fmt") = "%.1f",
+        nb::arg("angle0") = 90,
+        nb::arg("flags") = 0
     );
     
 
@@ -394,12 +387,12 @@ void bind_implot_methods(py::module& m) {
             ImPlotRange imrange(std::get<0>(range), std::get<1>(range));
             ImPlot::PlotHistogram(label_id, values.data(), values.size(), bins, bar_scale, imrange, flags);
         },
-        py::arg("label_id"),
-        py::arg("values"),
-        py::arg("bins") = (int)ImPlotBin_Sturges,
-        py::arg("bar_scale") = 1.0,
-        py::arg("range") = std::make_tuple(0.f, 0.f),
-        py::arg("flags") = 0
+        nb::arg("label_id"),
+        nb::arg("values"),
+        nb::arg("bins") = (int)ImPlotBin_Sturges,
+        nb::arg("bar_scale") = 1.0,
+        nb::arg("range") = std::make_tuple(0.f, 0.f),
+        nb::arg("flags") = 0
     );
     
     // PlotHistogram2D TODO
@@ -442,7 +435,7 @@ void bind_implot_methods(py::module& m) {
     //-----------------------------------------------------------------------------
 }
 
-void bind_implot_enums(py::module& m) {
+void bind_implot_enums(nb::module_& m) {
 
     // ImAxis
     m.attr("ImAxis_X1") = static_cast<int>(ImAxis_X1);

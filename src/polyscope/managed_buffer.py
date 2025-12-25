@@ -37,6 +37,10 @@ class ManagedBuffer:
 
         return self.bound_buffer.size()
     
+    def shape(self):
+        self.check_ref_still_valid()
+        return tuple(self.bound_buffer.data_shape())
+    
     def get_texture_size(self):
         self.check_ref_still_valid()
 
@@ -63,9 +67,6 @@ class ManagedBuffer:
 
     def update_data(self, new_vals):
         self.check_ref_still_valid()
-
-        new_vals = new_vals.reshape((self.size(),-1))
-
         self.update_data_from_host(new_vals)
 
     def update_data_from_host(self, new_vals):

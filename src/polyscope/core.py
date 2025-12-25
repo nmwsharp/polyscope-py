@@ -342,7 +342,10 @@ def terminating_error(message):
 
 ### Callback
 def set_user_callback(func):
-    psb.set_user_callback(func)
+    if func is None:
+        psb.clear_user_callback()
+    else:
+        psb.set_user_callback(func)
 
 def clear_user_callback():
     psb.clear_user_callback()
@@ -1259,6 +1262,6 @@ def get_key_code(k):
         k = k.upper()
 
     if k not in keycode_dict:
-        raise ValueError(f"character {k} not in keycode mapping. Keys which have multiple characters on them, try the other character (like @ vs 2). Alternately, don't use this function, look up the appropriate enum from the imgui documentation, use them like polyscope.imgui.ImGuiKey_Semicolon")
+        raise ValueError(f"character {k} not in keycode mapping. For keys which have multiple characters on them, try the other character (like @ vs 2). Alternately, don't use this function, look up the appropriate enum from the imgui documentation, use them like polyscope.imgui.ImGuiKey_Semicolon")
 
     return keycode_dict[k]

@@ -1,8 +1,3 @@
-#include <pybind11/eigen.h>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
 #include "Eigen/Dense"
 
 #include "polyscope/polyscope.h"
@@ -12,13 +7,10 @@
 
 #include "utils.h"
 
-namespace py = pybind11;
-namespace ps = polyscope;
-
 template <typename T>
-py::class_<ps::render::ManagedBuffer<T>> bind_managed_buffer_T(py::module& m, ps::ManagedBufferType t) {
+nb::class_<ps::render::ManagedBuffer<T>> bind_managed_buffer_T(nb::module_& m, ps::ManagedBufferType t) {
 
-  return py::class_<ps::render::ManagedBuffer<T>>(m, ("ManagedBuffer_" + ps::typeName(t)).c_str())
+  return nb::class_<ps::render::ManagedBuffer<T>>(m, ("ManagedBuffer_" + ps::typeName(t)).c_str())
       .def("size", &ps::render::ManagedBuffer<T>::size)
       .def("get_texture_size", &ps::render::ManagedBuffer<T>::getTextureSize)
       .def("has_data", &ps::render::ManagedBuffer<T>::hasData)
@@ -28,9 +20,9 @@ py::class_<ps::render::ManagedBuffer<T>> bind_managed_buffer_T(py::module& m, ps
            [](ps::render::ManagedBuffer<T>& s) {
              return s.getGenericWeakHandle();
            } /* intentionally let Python manage ownership */)
-      .def("get_value", overload_cast_<size_t>()(&ps::render::ManagedBuffer<T>::getValue))
-      .def("get_value", overload_cast_<size_t, size_t>()(&ps::render::ManagedBuffer<T>::getValue))
-      .def("get_value", overload_cast_<size_t, size_t, size_t>()(&ps::render::ManagedBuffer<T>::getValue))
+      .def("get_value", nb::overload_cast<size_t>(&ps::render::ManagedBuffer<T>::getValue))
+      .def("get_value", nb::overload_cast<size_t, size_t>(&ps::render::ManagedBuffer<T>::getValue))
+      .def("get_value", nb::overload_cast<size_t, size_t, size_t>(&ps::render::ManagedBuffer<T>::getValue))
       .def("mark_host_buffer_updated", &ps::render::ManagedBuffer<T>::markHostBufferUpdated)
       .def("get_device_buffer_size_in_bytes",
            [](ps::render::ManagedBuffer<T>& s) {
@@ -64,7 +56,7 @@ py::class_<ps::render::ManagedBuffer<T>> bind_managed_buffer_T(py::module& m, ps
 }
 
 // clang-format off
-void bind_managed_buffer(py::module& m) {
+void bind_managed_buffer(nb::module_& m) {
 
   // explicit template instantiations
   

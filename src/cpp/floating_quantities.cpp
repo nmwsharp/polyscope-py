@@ -1,7 +1,3 @@
-#include <pybind11/eigen.h>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-
 #include "Eigen/Dense"
 
 #include "polyscope/polyscope.h"
@@ -11,17 +7,14 @@
 
 #include "utils.h"
 
-namespace py = pybind11;
-namespace ps = polyscope;
-
 // clang-format off
-void bind_floating_quantities(py::module& m) {
+void bind_floating_quantities(nb::module_& m) {
 
   // == Global floating quantity management
 
   // global floating quantity structure
   bindStructure<ps::FloatingQuantityStructure >(m, "FloatingQuantityStructure");
-  m.def("get_global_floating_quantity_structure", &ps::getGlobalFloatingQuantityStructure, py::return_value_policy::reference);
+  m.def("get_global_floating_quantity_structure", &ps::getGlobalFloatingQuantityStructure, nb::rv_policy::reference);
 
   m.def("remove_floating_quantity", &ps::removeFloatingQuantity);
   m.def("remove_all_floating_quantities", &ps::removeAllFloatingQuantities);
@@ -37,11 +30,11 @@ void bind_floating_quantities(py::module& m) {
 
   // global / free-floating adders
   m.def("add_scalar_image_quantity", &ps::addScalarImageQuantity<Eigen::VectorXf>, 
-        py::return_value_policy::reference);
+        nb::rv_policy::reference);
   m.def("add_color_image_quantity", &ps::addColorImageQuantity<Eigen::MatrixXf>, 
-        py::return_value_policy::reference);
+        nb::rv_policy::reference);
   m.def("add_color_alpha_image_quantity", &ps::addColorAlphaImageQuantity<Eigen::MatrixXf>,
-        py::return_value_policy::reference);
+        nb::rv_policy::reference);
 
   // == Render image floating quantities
  
@@ -72,15 +65,15 @@ void bind_floating_quantities(py::module& m) {
   
   // global / free-floating adders
   m.def("add_depth_render_image_quantity", &ps::addDepthRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, 
-      py::return_value_policy::reference);
+      nb::rv_policy::reference);
   m.def("add_color_render_image_quantity", &ps::addColorRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf, Eigen::MatrixXf>, 
-      py::return_value_policy::reference);
+      nb::rv_policy::reference);
   m.def("add_scalar_render_image_quantity", &ps::addScalarRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf, Eigen::VectorXf>, 
-      py::return_value_policy::reference);
+      nb::rv_policy::reference);
   m.def("add_raw_color_render_image_quantity", &ps::addRawColorRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, 
-      py::return_value_policy::reference);
+      nb::rv_policy::reference);
   m.def("add_raw_color_alpha_render_image_quantity", &ps::addRawColorAlphaRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, 
-      py::return_value_policy::reference);
+      nb::rv_policy::reference);
 
 }
 
