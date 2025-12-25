@@ -79,7 +79,7 @@ void bind_volume_grid(nb::module_& m) {
             const std::function<Eigen::VectorXf(const Eigen::Ref<const Eigen::MatrixXf>)>& func,
             ps::DataType data_type) { 
 
-          // Polyscope's API uses raw buffer pointers, but we use Eigen mats for pybind11.
+          // Polyscope's API uses raw buffer pointers, but we use Eigen mats for numpy<->eigen interop with python.
           // Create a wrapper function that goes to/from the Eigen mats
           auto wrapped_func = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
             Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);
@@ -98,7 +98,7 @@ void bind_volume_grid(nb::module_& m) {
             const std::function<Eigen::VectorXf(const Eigen::Ref<const Eigen::MatrixXf>)>& func,
             ps::DataType data_type) { 
 
-          // Polyscope's API uses raw buffer pointers, but we use Eigen mats for pybind11.
+          // Polyscope's API uses raw buffer pointers, but we use Eigen mats for numpy<->eigen interop with python.
           // Create a wrapper function that goes to/from the Eigen mats
           auto wrapped_func = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
             Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);

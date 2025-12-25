@@ -37,7 +37,7 @@ void bind_implicit_helpers(nb::module_& m) {
         ps::ImplicitRenderMode mode, ps::ImplicitRenderOpts opts, ps::CameraView* cameraView
       ) { 
 
-      // Polyscope's API uses raw buffer pointers, but we use Eigen mats for pybind11.
+      // Polyscope's API uses raw buffer pointers, but we use Eigen mats for numpy<->eigen interop with python.
       // Create a wrapper function that goes to/from the Eigen mats
       auto wrapped_func = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
         Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);
@@ -66,7 +66,7 @@ void bind_implicit_helpers(nb::module_& m) {
         ps::ImplicitRenderMode mode, ps::ImplicitRenderOpts opts, ps::CameraView* cameraView
       ) { 
 
-      // Polyscope's API uses raw buffer pointers, but we use Eigen mats for pybind11.
+      // Polyscope's API uses raw buffer pointers, but we use Eigen mats for numpy<->eigen interop with python.
       // Create a wrapper function that goes to/from the Eigen mats
       auto wrapped_func = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
         Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);
@@ -101,7 +101,7 @@ void bind_implicit_helpers(nb::module_& m) {
         ps::ImplicitRenderMode mode, ps::ImplicitRenderOpts opts, ps::CameraView* cameraView
       ) { 
 
-      // Polyscope's API uses raw buffer pointers, but we use Eigen mats for pybind11.
+      // Polyscope's API uses raw buffer pointers, but we use Eigen mats for numpy<->eigen interop with python.
       // Create a wrapper function that goes to/from the Eigen mats
       auto wrapped_func = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
         Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);
@@ -135,7 +135,7 @@ void bind_implicit_helpers(nb::module_& m) {
         ps::ImplicitRenderMode mode, ps::ImplicitRenderOpts opts, ps::CameraView* cameraView
       ) { 
 
-      // Polyscope's API uses raw buffer pointers, but we use Eigen mats for pybind11.
+      // Polyscope's API uses raw buffer pointers, but we use Eigen mats for numpy<->eigen interop with python.
       // Create a wrapper function that goes to/from the Eigen mats
       auto wrapped_func = [&](const float* pos_ptr, float* result_ptr, uint64_t size) {
         Eigen::Map<const Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>> mapped_pos(pos_ptr, size, 3);
