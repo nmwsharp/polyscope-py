@@ -1,7 +1,3 @@
-#include <pybind11/eigen.h>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-
 #include "Eigen/Dense"
 
 #include "polyscope/point_cloud.h"
@@ -9,21 +5,13 @@
 
 #include "utils.h"
 
-namespace py = pybind11;
-namespace ps = polyscope;
-
-// For overloaded functions, with C++11 compiler only
-template <typename... Args>
-using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
-
-
 // clang-format off
-void bind_point_cloud(py::module& m) {
+void bind_point_cloud(nb::module_& m) {
 
   // == Helper classes
-  py::class_<ps::PointCloudPickResult>(m, "PointCloudPickResult")
-   .def(py::init<>())
-   .def_readonly("index", &ps::PointCloudPickResult::index)
+  nb::class_<ps::PointCloudPickResult>(m, "PointCloudPickResult")
+   .def(nb::init<>())
+   .def_ro("index", &ps::PointCloudPickResult::index)
   ;
 
   // Scalar quantities
@@ -36,7 +24,7 @@ void bind_point_cloud(py::module& m) {
   bindVectorQuantity<ps::PointCloudVectorQuantity>(m, "PointCloudVectorQuantity");
 
   // Parameterization quantities
-  py::class_<ps::PointCloudParameterizationQuantity>(m, "PointCloudParameterizationQuantity")
+  nb::class_<ps::PointCloudParameterizationQuantity>(m, "PointCloudParameterizationQuantity")
       .def("set_enabled", &ps::PointCloudParameterizationQuantity::setEnabled, "Set enabled")
       .def("set_style", &ps::PointCloudParameterizationQuantity::setStyle, "Set style")
       .def("set_grid_colors", &ps::PointCloudParameterizationQuantity::setGridColors, "Set grid colors")
@@ -68,36 +56,36 @@ void bind_point_cloud(py::module& m) {
 
     // variable radius
     .def("set_point_radius_quantity", 
-        overload_cast_<std::string, bool>()(&ps::PointCloud::setPointRadiusQuantity), 
-        "Use a scalar to set radius by name", py::arg("quantity_name"), py::arg("autoscale")=true)
+        nb::overload_cast<std::string, bool>(&ps::PointCloud::setPointRadiusQuantity), 
+        "Use a scalar to set radius by name", nb::arg("quantity_name"), nb::arg("autoscale")=true)
     .def("clear_point_radius_quantity", &ps::PointCloud::clearPointRadiusQuantity, "Clear any quantity setting the radius")
     
     // scalar transparency
     .def("set_transparency_quantity", 
-        overload_cast_<std::string>()(&ps::PointCloud::setTransparencyQuantity), py::arg("quantity_name"))
+        nb::overload_cast<std::string>(&ps::PointCloud::setTransparencyQuantity), nb::arg("quantity_name"))
     .def("clear_transparency_quantity", &ps::PointCloud::clearTransparencyQuantity)
         
     // quantities
     .def("add_color_quantity", &ps::PointCloud::addColorQuantity<Eigen::MatrixXf>, "Add a color function at points",
-        py::arg("name"), py::arg("values"), py::return_value_policy::reference)
+        nb::arg("name"), nb::arg("values"), nb::rv_policy::reference)
     .def("add_scalar_quantity", &ps::PointCloud::addScalarQuantity<Eigen::VectorXf>, "Add a scalar function at points",
-        py::arg("name"), py::arg("values"), py::arg("data_type")=ps::DataType::STANDARD, py::return_value_policy::reference)
+        nb::arg("name"), nb::arg("values"), nb::arg("data_type")=ps::DataType::STANDARD, nb::rv_policy::reference)
     .def("add_vector_quantity", &ps::PointCloud::addVectorQuantity<Eigen::MatrixXf>, "Add a vector function at points",
-        py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference)
+        nb::arg("name"), nb::arg("values"), nb::arg("vector_type")=ps::VectorType::STANDARD, nb::rv_policy::reference)
     .def("add_vector_quantity2D", &ps::PointCloud::addVectorQuantity2D<Eigen::MatrixXf>, "Add a vector function at points",
-        py::arg("name"), py::arg("values"), py::arg("vector_type")=ps::VectorType::STANDARD, py::return_value_policy::reference)
+        nb::arg("name"), nb::arg("values"), nb::arg("vector_type")=ps::VectorType::STANDARD, nb::rv_policy::reference)
     .def("add_parameterization_quantity", &ps::PointCloud::addParameterizationQuantity<Eigen::MatrixXf>, 
-        py::return_value_policy::reference)
+        nb::rv_policy::reference)
 
     ;
 
   // Static adders and getters
   m.def("register_point_cloud", &ps::registerPointCloud<Eigen::MatrixXf>, 
-      py::arg("name"), py::arg("values"), "Register a point cloud", py::return_value_policy::reference);
+      nb::arg("name"), nb::arg("values"), "Register a point cloud", nb::rv_policy::reference);
   m.def("register_point_cloud2D", &ps::registerPointCloud2D<Eigen::MatrixXf>, 
-      py::arg("name"), py::arg("values"), "Register a point cloud", py::return_value_policy::reference);
+      nb::arg("name"), nb::arg("values"), "Register a point cloud", nb::rv_policy::reference);
   m.def("remove_point_cloud", &polyscope::removePointCloud, "Remove a point cloud by name");
-  m.def("get_point_cloud", &polyscope::getPointCloud, "Get a point cloud by name", py::return_value_policy::reference);
+  m.def("get_point_cloud", &polyscope::getPointCloud, "Get a point cloud by name", nb::rv_policy::reference);
   m.def("has_point_cloud", &polyscope::hasPointCloud, "Check for a point cloud by name");
 
 }

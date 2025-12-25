@@ -1,7 +1,3 @@
-#include <pybind11/eigen.h>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-
 #include "Eigen/Dense"
 
 #include "polyscope/camera_view.h"
@@ -9,12 +5,8 @@
 
 #include "utils.h"
 
-namespace py = pybind11;
-namespace ps = polyscope;
-
-
 // clang-format off
-void bind_camera_view(py::module& m) {
+void bind_camera_view(nb::module_& m) {
 
   // == Helper quantity classes
 
@@ -40,9 +32,9 @@ void bind_camera_view(py::module& m) {
 
   // Static adders and getters
   m.def("register_camera_view", &ps::registerCameraView,
-      py::arg("name"), py::arg("parameters"), "Register a camera view", py::return_value_policy::reference);
+      nb::arg("name"), nb::arg("parameters"), "Register a camera view", nb::rv_policy::reference);
   m.def("remove_camera_view", &ps::removeCameraView, "Remove a camera view by name");
-  m.def("get_camera_view", &ps::getCameraView, "Get a camera view by name", py::return_value_policy::reference);
+  m.def("get_camera_view", &ps::getCameraView, "Get a camera view by name", nb::rv_policy::reference);
   m.def("has_camera_view", &ps::hasCameraView, "Check for a camera view by name");
 
 }
