@@ -70,8 +70,9 @@ if __name__ == '__main__':
     ps.init(ps_backend) 
 
     # Discover tests in the default 'tests' folder
+    tests_folder_path = path.join(path.dirname(__file__), 'tests')
     loader = unittest.TestLoader()
-    suite = loader.discover(start_dir='tests', pattern='test*.py')
+    suite = loader.discover(start_dir=tests_folder_path, pattern='test*.py')
     print_discovered_tests_summary(suite, full_listing=False)
 
     # unittest.main()# Run the discovered tests
