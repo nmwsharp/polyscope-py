@@ -1,12 +1,20 @@
 #pragma once
 
+// Include opaque type declarations FIRST, before any other headers
+// Forward declarations of ImGui types
+struct ImGuiContext;
+// Include nanobind header to get NB_MAKE_OPAQUE macro
+#include <nanobind/nanobind.h>
+// Declare opaque types before any other nanobind template instantiations
+// This must happen before including any headers that bind functions using these types
+NB_MAKE_OPAQUE(ImGuiContext);
+
 #include "imgui.h"
 #include "implot.h"
 
 #include "Eigen/Dense"
 
 #include "../utils.h"
-
 #include <nanobind/stl/array.h>
 
 namespace ps = polyscope;

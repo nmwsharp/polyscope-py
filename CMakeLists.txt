@@ -48,6 +48,9 @@ nanobind_add_module(polyscope_bindings
   # ImGui related things
   src/cpp/imgui/imgui_enums.cpp
   src/cpp/imgui/imgui_structs.cpp
+  src/cpp/imgui/imgui_structs_io.cpp
+  src/cpp/imgui/imgui_structs_style.cpp
+  src/cpp/imgui/imgui_structs_drawlist.cpp
 
   src/cpp/imgui/imgui_api_main.cpp
   src/cpp/imgui/imgui_api_context_creation.cpp
