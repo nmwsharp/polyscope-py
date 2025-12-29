@@ -12,26 +12,9 @@
 // clang-format off
 void bind_imgui_structs(nb::module_& m) {
 
-    // NOTE: opaque structs like ImGuiContext are not bound here,
-    // see imgui_utils.h for where we mark them Opaque, which is sufficient
-    // to make them usable.
-    
-
-    nb::class_<ImFontAtlas>(m, "ImFontAtlas")
-      .def("AddFontFromFileTTF",
-          [](ImFontAtlas& o, std::string filename, float size_pixels) { 
-            return o.AddFontFromFileTTF(filename.c_str(), size_pixels);}, 
-          nb::rv_policy::reference)
-
-      // TODO add bindings to the rest of the font functions
-      
-      ;
-
-    nb::class_<ImFont>(m, "ImFont")
-      // TODO add bindings to the rest of the font functions
-      
-      ;
-
+    // NOTE: opaque structs like ImGuiContext are not bound here.
+    // We pass them using nb::capsule, see
+    // imgui_api_context_creation.cpp for an example.
 
     // Table sorting
     nb::class_<ImGuiTableSortSpecs>(m, "ImGuiTableSortSpecs")

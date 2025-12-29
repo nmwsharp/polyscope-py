@@ -50,6 +50,7 @@ nanobind_add_module(polyscope_bindings
 
   src/cpp/imgui/imgui_enums.cpp
   src/cpp/imgui/imgui_structs.cpp
+  src/cpp/imgui/imgui_structs_fonts.cpp
   src/cpp/imgui/imgui_macros.cpp
   src/cpp/imgui/imgui_structs_io.cpp
   src/cpp/imgui/imgui_structs_style.cpp

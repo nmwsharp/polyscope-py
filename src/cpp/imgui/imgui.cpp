@@ -14,6 +14,7 @@ void bind_imgui_macros(nb::module_& m);
 void bind_imgui_io(nb::module_& m);
 void bind_imgui_style(nb::module_& m);
 void bind_imgui_drawlist(nb::module_& m);
+void bind_imgui_fonts(nb::module_& m);
 
 void bind_imgui_api_main(nb::module_& m);
 void bind_imgui_api_context_creation(nb::module_& m);
@@ -73,6 +74,7 @@ void bind_imgui(nb::module_& m) {
   bind_imgui_io(imgui_module);
   bind_imgui_style(imgui_module);
   bind_imgui_drawlist(imgui_module);
+  bind_imgui_fonts(imgui_module);
 
   bind_imgui_api_main(imgui_module);
   bind_imgui_api_context_creation(imgui_module);
