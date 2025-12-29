@@ -4,22 +4,28 @@
 
 // clang-format off
 
-void bind_misc_utils(nb::module_& m) {
-    // Rectangle visibility testing
+void bind_imgui_api_misc_utils(nb::module_& m) {
+    // IMGUI_API bool          IsRectVisible(const ImVec2& size);                                  // test if rectangle (of given size, starting from cursor position) is visible / not clipped.
     m.def("IsRectVisible", nb::overload_cast<const ImVec2&>(&ImGui::IsRectVisible), nb::arg("size"));
+
+    // IMGUI_API bool          IsRectVisible(const ImVec2& rect_min, const ImVec2& rect_max);      // test if rectangle (in screen space) is visible / not clipped. to perform coarse clipping on user's side.
     m.def("IsRectVisible", nb::overload_cast<const ImVec2&, const ImVec2&>(&ImGui::IsRectVisible), nb::arg("rect_min"), nb::arg("rect_max"));
 
-    // Time and frame count
+    // IMGUI_API double        GetTime();                                                          // get global imgui time. incremented by io.DeltaTime every frame.
     m.def("GetTime", &ImGui::GetTime);
+
+    // IMGUI_API int           GetFrameCount();                                                    // get global imgui frame count. incremented by 1 every frame.
     m.def("GetFrameCount", &ImGui::GetFrameCount);
 
-    // Draw list shared data
-    m.def("GetDrawListSharedData", &ImGui::GetDrawListSharedData, nb::rv_policy::reference);
+    // IMGUI_API ImDrawListSharedData* GetDrawListSharedData();                                    // you may use this when creating your own ImDrawList instances.
+    // Not bound, this is only useful to create your own ImDrawList instances, which we do not support
 
-    // Style color name
+    // IMGUI_API const char*   GetStyleColorName(ImGuiCol idx);                                    // get a string corresponding to the enum value (for display, saving, etc.).
     m.def("GetStyleColorName", &ImGui::GetStyleColorName, nb::arg("idx"));
 
-    // State storage
+    // IMGUI_API void          SetStateStorage(ImGuiStorage* storage);                             // replace current window storage with our own (if you want to manipulate it yourself, typically clear subsection of it)
     m.def("SetStateStorage", &ImGui::SetStateStorage, nb::arg("storage"));
+
+    // IMGUI_API ImGuiStorage* GetStateStorage();
     m.def("GetStateStorage", &ImGui::GetStateStorage, nb::rv_policy::reference);
 }

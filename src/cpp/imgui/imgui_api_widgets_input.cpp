@@ -16,7 +16,7 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
     // IMGUI_API bool          InputText(const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
     m.def(
         "InputText",
-        [](const char* label, const std::string& buf, ImGuiInputTextFlags flags, int32_t max_str_len=1024) {
+        [](const char* label, const std::string& buf, ImGuiInputTextFlags flags, int32_t max_str_len) {
             std::string buffer = buf;
             buffer.resize(max_str_len);  // Reserve space for editing
             bool result = ImGui::InputText(label, buffer.data(), buffer.capacity(), flags);
@@ -26,13 +26,15 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
         },
         nb::arg("label"),
         nb::arg("buf"),
-        nb::arg("flags") = 0);
+        nb::arg("flags") = 0,
+        nb::arg("max_str_len") = 1024
+    );
     // TODO: Callback version not bound
 
     // IMGUI_API bool          InputTextMultiline(const char* label, char* buf, size_t buf_size, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
     m.def(
         "InputTextMultiline",
-        [](const char* label, const std::string& buf, const Vec2T& size, ImGuiInputTextFlags flags, int32_t max_str_len=4096) {
+        [](const char* label, const std::string& buf, const Vec2T& size, ImGuiInputTextFlags flags, int32_t max_str_len) {
             std::string buffer = buf;
             buffer.resize(max_str_len);  // Reserve larger space for multiline
             bool result = ImGui::InputTextMultiline(label, buffer.data(), buffer.capacity(), to_vec2(size), flags);
@@ -42,13 +44,15 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
         nb::arg("label"),
         nb::arg("buf"),
         nb::arg("size") = Vec2T(0.f, 0.f),
-        nb::arg("flags") = 0);
+        nb::arg("flags") = 0,
+        nb::arg("max_str_len") = 4096
+    );
     // TODO: Callback version not bound
 
     // IMGUI_API bool          InputTextWithHint(const char* label, const char* hint, char* buf, size_t buf_size, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
     m.def(
         "InputTextWithHint",
-        [](const char* label, const char* hint, const std::string& buf, ImGuiInputTextFlags flags, int32_t max_str_len=1024) {
+        [](const char* label, const char* hint, const std::string& buf, ImGuiInputTextFlags flags, int32_t max_str_len) {
             std::string buffer = buf;
             buffer.resize(max_str_len);
             bool result = ImGui::InputTextWithHint(label, hint, buffer.data(), buffer.capacity(), flags);
@@ -58,7 +62,9 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
         nb::arg("label"),
         nb::arg("hint"),
         nb::arg("buf"),
-        nb::arg("flags") = 0);
+        nb::arg("flags") = 0,
+        nb::arg("max_str_len") = 1024
+    );
     // TODO: Callback version not bound
 
     // IMGUI_API bool          InputFloat(const char* label, float* v, float step = 0.0f, float step_fast = 0.0f, const char* format = "%.3f", ImGuiInputTextFlags flags = 0);

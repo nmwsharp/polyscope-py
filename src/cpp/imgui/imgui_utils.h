@@ -1,25 +1,33 @@
 #pragma once
 
-// Include opaque type declarations FIRST, before any other headers
-// Forward declarations of ImGui types
-struct ImGuiContext;
-// Include nanobind header to get NB_MAKE_OPAQUE macro
+#include <nanobind/eigen/dense.h>
 #include <nanobind/nanobind.h>
-// Declare opaque types before any other nanobind template instantiations
-// This must happen before including any headers that bind functions using these types
-NB_MAKE_OPAQUE(ImGuiContext);
+#include <nanobind/ndarray.h>
+#include <nanobind/stl/array.h>
+#include <nanobind/stl/function.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/pair.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/stl/vector.h>
 
 #include "imgui.h"
 #include "implot.h"
+// #include "imgui_internal.h"
+
+// Opaque types
+// NB_MAKE_OPAQUE(ImGuiContext);
+NB_MAKE_OPAQUE(ImPlotContext);
+NB_MAKE_OPAQUE(ImDrawListSharedData);
+
 
 #include "Eigen/Dense"
 
-#include "../utils.h"
-#include <nanobind/stl/array.h>
+// #include "../utils.h"
 
-namespace ps = polyscope;
 namespace nb = nanobind;
 using namespace nb::literals;
+
 
 // Type translations between Python and ImGui.  Prefer native Python types (tuples, arrays), translating into ImGui
 // equivalents.
