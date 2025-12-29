@@ -46,8 +46,59 @@ nanobind_add_module(polyscope_bindings
   src/cpp/utils.h
 
   # ImGui related things
-  src/cpp/imgui/imgui.cpp
   src/cpp/imgui/imgui_enums.cpp
+  src/cpp/imgui/imgui_structs.cpp
+
+  src/cpp/imgui/imgui_api_main.cpp
+  src/cpp/imgui/imgui_api_context_creation.cpp
+  src/cpp/imgui/imgui_api_demo_debug.cpp
+  src/cpp/imgui/imgui_api_styles.cpp
+  src/cpp/imgui/imgui_api_windows.cpp
+  src/cpp/imgui/imgui_api_child_windows.cpp
+  src/cpp/imgui/imgui_api_window_utilities.cpp
+  src/cpp/imgui/imgui_api_window_manipulation.cpp
+  src/cpp/imgui/imgui_api_scrolling.cpp
+  src/cpp/imgui/imgui_api_parameter_stacks.cpp
+  src/cpp/imgui/imgui_api_style_read.cpp
+  src/cpp/imgui/imgui_api_cursor_layout.cpp
+  src/cpp/imgui/imgui_api_id_stack.cpp
+  src/cpp/imgui/imgui_api_widgets_text.cpp
+  src/cpp/imgui/imgui_api_widgets_main.cpp
+  src/cpp/imgui/imgui_api_widgets_images.cpp
+  src/cpp/imgui/imgui_api_widgets_combo.cpp
+  src/cpp/imgui/imgui_api_widgets_drag.cpp
+  src/cpp/imgui/imgui_api_widgets_sliders.cpp
+  src/cpp/imgui/imgui_api_widgets_input.cpp
+  src/cpp/imgui/imgui_api_widgets_color.cpp
+  src/cpp/imgui/imgui_api_widgets_trees.cpp
+  src/cpp/imgui/imgui_api_widgets_selectables.cpp
+  src/cpp/imgui/imgui_api_widgets_listbox.cpp
+  src/cpp/imgui/imgui_api_data_plotting.cpp
+  src/cpp/imgui/imgui_api_menus.cpp
+  src/cpp/imgui/imgui_api_tooltips.cpp
+  src/cpp/imgui/imgui_api_popups.cpp
+  src/cpp/imgui/imgui_api_tables.cpp
+  src/cpp/imgui/imgui_api_columns_legacy.cpp
+  src/cpp/imgui/imgui_api_tab_bars.cpp
+  src/cpp/imgui/imgui_api_logging.cpp
+  src/cpp/imgui/imgui_api_drag_drop.cpp
+  src/cpp/imgui/imgui_api_disabling.cpp
+  src/cpp/imgui/imgui_api_clipping.cpp
+  src/cpp/imgui/imgui_api_focus_activation.cpp
+  src/cpp/imgui/imgui_api_overlapping_items.cpp
+  src/cpp/imgui/imgui_api_item_query.cpp
+  src/cpp/imgui/imgui_api_viewports.cpp
+  src/cpp/imgui/imgui_api_draw_lists.cpp
+  src/cpp/imgui/imgui_api_misc_utils.cpp
+  src/cpp/imgui/imgui_api_text_utils.cpp
+  src/cpp/imgui/imgui_api_color_utils.cpp
+  src/cpp/imgui/imgui_api_inputs_keyboard.cpp
+  src/cpp/imgui/imgui_api_inputs_mouse.cpp
+  src/cpp/imgui/imgui_api_clipboard.cpp
+  src/cpp/imgui/imgui_api_settings.cpp
+  src/cpp/imgui/imgui_api_debug.cpp
+  src/cpp/imgui/imgui_api_allocators.cpp
+
   src/cpp/imgui/implot.cpp
 
   src/cpp/imgui/imgui_utils.h

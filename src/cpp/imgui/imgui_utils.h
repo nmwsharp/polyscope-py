@@ -1,5 +1,14 @@
 #pragma once
 
+#include "imgui.h"
+#include "implot.h"
+
+#include "Eigen/Dense"
+
+#include "../utils.h"
+
+#include <nanobind/stl/array.h>
+
 namespace ps = polyscope;
 namespace nb = nanobind;
 using namespace nb::literals;
