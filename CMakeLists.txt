@@ -116,4 +116,36 @@ set_target_properties(polyscope_bindings PROPERTIES CXX_VISIBILITY_PRESET "defau
 target_include_directories(polyscope_bindings PUBLIC "${EIGEN3_INCLUDE_DIR}")
 target_link_libraries(polyscope_bindings PRIVATE polyscope)
 
+# Generate type stubs
+nanobind_add_stub(
+  polyscope_stub
+  MODULE polyscope_bindings
+
+  PYTHON_PATH $<TARGET_FILE_DIR:polyscope_bindings>
+  DEPENDS polyscope_bindings
+
+  MARKER_FILE py.typed
+
+  RECURSIVE
+
+  OUTPUT_PATH .
+  OUTPUT
+      __init__.pyi
+      imgui.pyi
+      implot.pyi
+)
+
+# Copy stub files into the appropriate place in the source directory after build
+set(STUB_FILES __init__.pyi imgui.pyi implot.pyi)
+foreach(STUB_FILE ${STUB_FILES})
+  add_custom_command(
+    TARGET polyscope_stub POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_CURRENT_BINARY_DIR}/polyscope_bindings/${STUB_FILE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/polyscope_bindings/${STUB_FILE}
+    VERBATIM
+  )
+endforeach()
+
+
 install(TARGETS polyscope_bindings LIBRARY DESTINATION .)

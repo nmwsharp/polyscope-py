@@ -8,4 +8,5 @@ recursive-include deps/pybind11 *.h CMakeLists.txt *.cmake
 recursive-include src *.cpp *.h
 recursive-include src/polyscope *.py *.pyi
 recursive-include src/polyscope_bindings *.py *.pyi
+global-include py.typed
 exclude dist
