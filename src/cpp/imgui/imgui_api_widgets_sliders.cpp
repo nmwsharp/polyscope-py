@@ -31,7 +31,7 @@ void bind_imgui_api_widgets_sliders(nb::module_& m) {
         "SliderFloat2",
         [](const char* label, std::array<float, 2> v, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
             bool result = ImGui::SliderFloat2(label, v.data(), v_min, v_max, format, flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -45,7 +45,7 @@ void bind_imgui_api_widgets_sliders(nb::module_& m) {
         "SliderFloat3",
         [](const char* label, std::array<float, 3> v, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
             bool result = ImGui::SliderFloat3(label, v.data(), v_min, v_max, format, flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1], v[2]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -59,7 +59,7 @@ void bind_imgui_api_widgets_sliders(nb::module_& m) {
         "SliderFloat4",
         [](const char* label, std::array<float, 4> v, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
             bool result = ImGui::SliderFloat4(label, v.data(), v_min, v_max, format, flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1], v[2], v[3]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -101,7 +101,7 @@ void bind_imgui_api_widgets_sliders(nb::module_& m) {
         "SliderInt2",
         [](const char* label, std::array<int, 2> v, int v_min, int v_max, const char* format, ImGuiSliderFlags flags) {
             bool result = ImGui::SliderInt2(label, v.data(), v_min, v_max, format, flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -115,7 +115,7 @@ void bind_imgui_api_widgets_sliders(nb::module_& m) {
         "SliderInt3",
         [](const char* label, std::array<int, 3> v, int v_min, int v_max, const char* format, ImGuiSliderFlags flags) {
             bool result = ImGui::SliderInt3(label, v.data(), v_min, v_max, format, flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1], v[2]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -129,7 +129,7 @@ void bind_imgui_api_widgets_sliders(nb::module_& m) {
         "SliderInt4",
         [](const char* label, std::array<int, 4> v, int v_min, int v_max, const char* format, ImGuiSliderFlags flags) {
             bool result = ImGui::SliderInt4(label, v.data(), v_min, v_max, format, flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1], v[2], v[3]));
         },
         nb::arg("label"),
         nb::arg("v"),

@@ -183,25 +183,24 @@ void bind_imgui_drawlist(nb::module_& m) {
         // Text
         .def(
             "AddText",
-            [](ImDrawList& self, const Vec2T& pos, ImU32 col, const char* text_begin, const char* text_end) {
-                self.AddText(to_vec2(pos), col, text_begin, text_end);
+            [](ImDrawList& self, const Vec2T& pos, ImU32 col, std::string text) {
+                self.AddText(to_vec2(pos), col, text.c_str());
             },
             nb::arg("pos"),
             nb::arg("col"),
-            nb::arg("text_begin"),
-            nb::arg("text_end") = nullptr
+            nb::arg("text")
         )
+
         .def(
             "AddText",
-            [](ImDrawList& self, ImFont* font, float font_size, const Vec2T& pos, ImU32 col, const char* text_begin, const char* text_end, float wrap_width) {
-                self.AddText(font, font_size, to_vec2(pos), col, text_begin, text_end, wrap_width);
+            [](ImDrawList& self, ImFont* font, float font_size, const Vec2T& pos, ImU32 col, std::string text, float wrap_width) {
+                self.AddText(font, font_size, to_vec2(pos), col, text.c_str(), nullptr, wrap_width);
             },
             nb::arg("font"),
             nb::arg("font_size"),
             nb::arg("pos"),
             nb::arg("col"),
             nb::arg("text_begin"),
-            nb::arg("text_end") = nullptr,
             nb::arg("wrap_width") = 0.0f
         )
 
@@ -235,12 +234,13 @@ void bind_imgui_drawlist(nb::module_& m) {
         // General Polygon
         .def(
             "AddPolyline",
-            [](ImDrawList& self, const std::vector<Vec2T>& points, ImU32 col, ImDrawFlags flags, float thickness) {
-                std::vector<ImVec2> points_vec2(points.size());
-                for (size_t i = 0; i < points.size(); i++) {
-                    points_vec2[i] = to_vec2(points[i]);
+            [](ImDrawList& self, const Eigen::MatrixXf& points, ImU32 col, ImDrawFlags flags, float thickness) {
+                if(points.cols() != 2) throw std::runtime_error("Points array must have shape (N, 2)");
+                std::vector<ImVec2> points_vec2(points.rows());
+                for (size_t i = 0; i < points.rows(); i++) {
+                    points_vec2[i] = {points(i, 0), points(i, 1)};
                 }
-                self.AddPolyline(points_vec2.data(), static_cast<int>(points.size()), col, flags, thickness);
+                self.AddPolyline(points_vec2.data(), static_cast<int>(points.rows()), col, flags, thickness);
             },
             nb::arg("points"),
             nb::arg("col"),
@@ -249,10 +249,11 @@ void bind_imgui_drawlist(nb::module_& m) {
         )
         .def(
             "AddConvexPolyFilled",
-            [](ImDrawList& self, const std::vector<Vec2T>& points, ImU32 col) {
-                std::vector<ImVec2> points_vec2(points.size());
-                for (size_t i = 0; i < points.size(); i++) {
-                    points_vec2[i] = to_vec2(points[i]);
+            [](ImDrawList& self, const Eigen::MatrixXf& points, ImU32 col) {
+                if(points.cols() != 2) throw std::runtime_error("Points array must have shape (N, 2)");
+                std::vector<ImVec2> points_vec2(points.rows());
+                for (size_t i = 0; i < points.rows(); i++) {
+                    points_vec2[i] = {points(i, 0), points(i, 1)};
                 }
                 self.AddConvexPolyFilled(points_vec2.data(), static_cast<int>(points.size()), col);
             },
@@ -261,10 +262,11 @@ void bind_imgui_drawlist(nb::module_& m) {
         )
         .def(
             "AddConcavePolyFilled",
-            [](ImDrawList& self, const std::vector<Vec2T>& points, ImU32 col) {
-                std::vector<ImVec2> points_vec2(points.size());
-                for (size_t i = 0; i < points.size(); i++) {
-                    points_vec2[i] = to_vec2(points[i]);
+            [](ImDrawList& self, const Eigen::MatrixXf& points, ImU32 col) {
+                if(points.cols() != 2) throw std::runtime_error("Points array must have shape (N, 2)");
+                std::vector<ImVec2> points_vec2(points.rows());
+                for (size_t i = 0; i < points.rows(); i++) {
+                    points_vec2[i] = {points(i, 0), points(i, 1)};
                 }
                 self.AddConcavePolyFilled(points_vec2.data(), static_cast<int>(points.size()), col);
             },

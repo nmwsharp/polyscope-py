@@ -86,7 +86,7 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
         "InputFloat2",
         [](const char* label, std::array<float, 2> v, const char* format, ImGuiInputTextFlags flags) {
             bool result = ImGui::InputFloat2(label, v.data(), format, flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -98,7 +98,7 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
         "InputFloat3",
         [](const char* label, std::array<float, 3> v, const char* format, ImGuiInputTextFlags flags) {
             bool result = ImGui::InputFloat3(label, v.data(), format, flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1], v[2]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -110,7 +110,7 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
         "InputFloat4",
         [](const char* label, std::array<float, 4> v, const char* format, ImGuiInputTextFlags flags) {
             bool result = ImGui::InputFloat4(label, v.data(), format, flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1], v[2], v[3]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -135,7 +135,7 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
         "InputInt2",
         [](const char* label, std::array<int, 2> v, ImGuiInputTextFlags flags) {
             bool result = ImGui::InputInt2(label, v.data(), flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -146,7 +146,7 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
         "InputInt3",
         [](const char* label, std::array<int, 3> v, ImGuiInputTextFlags flags) {
             bool result = ImGui::InputInt3(label, v.data(), flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1], v[2]));
         },
         nb::arg("label"),
         nb::arg("v"),
@@ -157,7 +157,7 @@ void bind_imgui_api_widgets_input(nb::module_& m) {
         "InputInt4",
         [](const char* label, std::array<int, 4> v, ImGuiInputTextFlags flags) {
             bool result = ImGui::InputInt4(label, v.data(), flags);
-            return std::make_tuple(result, v);
+            return std::make_tuple(result, std::make_tuple(v[0], v[1], v[2], v[3]));
         },
         nb::arg("label"),
         nb::arg("v"),

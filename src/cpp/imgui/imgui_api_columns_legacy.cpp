@@ -17,7 +17,7 @@ void bind_imgui_api_columns_legacy(nb::module_& m) {
         "Columns",
         [](int count, const char* id, bool borders) { ImGui::Columns(count, id, borders); },
         nb::arg("count") = 1,
-        nb::arg("id") = nullptr,
+        nb::arg("id") = nb::none(),
         nb::arg("borders") = true);
 
     // IMGUI_API void          NextColumn();

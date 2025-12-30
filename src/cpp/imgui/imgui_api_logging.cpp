@@ -23,7 +23,7 @@ void bind_imgui_api_logging(nb::module_& m) {
         "LogToFile",
         [](int auto_open_depth, const char* filename) { ImGui::LogToFile(auto_open_depth, filename); },
         nb::arg("auto_open_depth") = -1,
-        nb::arg("filename") = nullptr);
+        nb::arg("filename") = nb::none());
 
     // IMGUI_API void          LogToClipboard(int auto_open_depth = -1);
     m.def(

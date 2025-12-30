@@ -97,6 +97,7 @@ void bind_imgui_style(nb::module_& m) {
         .def_rw("CircleTessellationMaxError", &ImGuiStyle::CircleTessellationMaxError)
 
         // Colors
+        // TODO think about making this more similar to the C++ style
         // Provide indexed access to color array
         .def("GetColor", [](const ImGuiStyle& style, int idx) {
             if (idx < 0 || idx >= ImGuiCol_COUNT) {
@@ -112,8 +113,8 @@ void bind_imgui_style(nb::module_& m) {
             style.Colors[idx] = to_vec4(color);
         }, nb::arg("idx"), nb::arg("color"), "Set color by index")
 
-        .def("GetColorCount", []() {
-            return ImGuiCol_COUNT;
+        .def("GetColorCount", [](ImGuiStyle& style) {
+            return static_cast<uint32_t>(ImGuiCol_COUNT);
         }, "Get total number of colors")
 
         // Behaviors

@@ -40,16 +40,22 @@ void bind_imgui_api_inputs_mouse(nb::module_& m) {
     m.def("IsAnyMouseDown", &ImGui::IsAnyMouseDown);
 
     // IMGUI_API ImVec2        GetMousePos();                                                      // shortcut to ImGui::GetIO().MousePos provided by user, to be consistent with other calls
-    m.def("GetMousePos", &ImGui::GetMousePos);
+    m.def("GetMousePos", []() {
+        return from_vec2(ImGui::GetMousePos());
+    });
 
     // IMGUI_API ImVec2        GetMousePosOnOpeningCurrentPopup();                                 // retrieve mouse position at the time of opening popup we have BeginPopup() into (helper to avoid user backing that value themselves)
-    m.def("GetMousePosOnOpeningCurrentPopup", &ImGui::GetMousePosOnOpeningCurrentPopup);
+    m.def("GetMousePosOnOpeningCurrentPopup", []() {
+        return from_vec2(ImGui::GetMousePosOnOpeningCurrentPopup());
+    });
 
     // IMGUI_API bool          IsMouseDragging(ImGuiMouseButton button, float lock_threshold = -1.0f);         // is mouse dragging? (if lock_threshold < -1.0f, uses io.MouseDraggingThreshold)
     m.def("IsMouseDragging", &ImGui::IsMouseDragging, nb::arg("button"), nb::arg("lock_threshold") = -1.0f);
 
     // IMGUI_API ImVec2        GetMouseDragDelta(ImGuiMouseButton button = 0, float lock_threshold = -1.0f);   // return the delta from the initial clicking position while the mouse button is pressed or was just released. This is locked and return 0.0f until the mouse moves past a distance threshold at least once (if lock_threshold < -1.0f, uses io.MouseDraggingThreshold)
-    m.def("GetMouseDragDelta", &ImGui::GetMouseDragDelta, nb::arg("button") = 0, nb::arg("lock_threshold") = -1.0f);
+    m.def("GetMouseDragDelta", [](ImGuiMouseButton button, float lock_threshold) {
+        return from_vec2(ImGui::GetMouseDragDelta(button, lock_threshold));
+    }, nb::arg("button") = 0, nb::arg("lock_threshold") = -1.0f);
 
     // IMGUI_API void          ResetMouseDragDelta(ImGuiMouseButton button = 0);                   //
     m.def("ResetMouseDragDelta", &ImGui::ResetMouseDragDelta, nb::arg("button") = 0);

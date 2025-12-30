@@ -15,6 +15,14 @@ void bind_imgui_api_windows(nb::module_& m) {
     // IMGUI_API bool          Begin(const char* name, bool* p_open = NULL, ImGuiWindowFlags flags = 0);
     m.def(
         "Begin",
+        [](const char* name, ImGuiWindowFlags flags) {
+            const auto clicked = ImGui::Begin(name, nullptr, flags);
+            return clicked;
+        },
+        nb::arg("name"),
+        nb::arg("flags") = 0);
+    m.def(
+        "Begin",
         [](const char* name, bool open, ImGuiWindowFlags flags) {
             const auto clicked = ImGui::Begin(name, &open, flags);
             return std::make_tuple(clicked, open);

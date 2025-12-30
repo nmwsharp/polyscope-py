@@ -6,10 +6,14 @@
 
 void bind_imgui_api_misc_utils(nb::module_& m) {
     // IMGUI_API bool          IsRectVisible(const ImVec2& size);                                  // test if rectangle (of given size, starting from cursor position) is visible / not clipped.
-    m.def("IsRectVisible", nb::overload_cast<const ImVec2&>(&ImGui::IsRectVisible), nb::arg("size"));
+    m.def("IsRectVisible", [](const Vec2T& size) {
+        return ImGui::IsRectVisible(to_vec2(size));
+    }, nb::arg("size"));
 
     // IMGUI_API bool          IsRectVisible(const ImVec2& rect_min, const ImVec2& rect_max);      // test if rectangle (in screen space) is visible / not clipped. to perform coarse clipping on user's side.
-    m.def("IsRectVisible", nb::overload_cast<const ImVec2&, const ImVec2&>(&ImGui::IsRectVisible), nb::arg("rect_min"), nb::arg("rect_max"));
+    m.def("IsRectVisible", [](const Vec2T& rect_min, const Vec2T& rect_max) {
+        return ImGui::IsRectVisible(to_vec2(rect_min), to_vec2(rect_max));
+    }, nb::arg("rect_min"), nb::arg("rect_max"));
 
     // IMGUI_API double        GetTime();                                                          // get global imgui time. incremented by io.DeltaTime every frame.
     m.def("GetTime", &ImGui::GetTime);

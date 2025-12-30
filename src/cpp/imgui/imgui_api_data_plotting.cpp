@@ -22,7 +22,7 @@ void bind_imgui_api_data_plotting(nb::module_& m) {
         nb::arg("label"),
         nb::arg("values"),
         nb::arg("values_offset") = 0,
-        nb::arg("overlay_text") = nullptr,
+        nb::arg("overlay_text") = nb::none(),
         nb::arg("scale_min") = FLT_MAX,
         nb::arg("scale_max") = FLT_MAX,
         nb::arg("graph_size") = Vec2T(0.f, 0.f));
@@ -39,7 +39,7 @@ void bind_imgui_api_data_plotting(nb::module_& m) {
         nb::arg("label"),
         nb::arg("values"),
         nb::arg("values_offset") = 0,
-        nb::arg("overlay_text") = nullptr,
+        nb::arg("overlay_text") = nb::none(),
         nb::arg("scale_min") = FLT_MAX,
         nb::arg("scale_max") = FLT_MAX,
         nb::arg("graph_size") = Vec2T(0.f, 0.f));
@@ -74,7 +74,7 @@ void bind_imgui_api_data_plotting(nb::module_& m) {
         [](const char* prefix, float v, const char* float_format) { ImGui::Value(prefix, v, float_format); },
         nb::arg("prefix"),
         nb::arg("v"),
-        nb::arg("float_format") = nullptr);
+        nb::arg("float_format") = nb::none());
 
 }
 // clang-format on

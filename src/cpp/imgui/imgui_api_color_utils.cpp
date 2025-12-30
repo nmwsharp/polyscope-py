@@ -6,10 +6,14 @@
 
 void bind_imgui_api_color_utils(nb::module_& m) {
     // IMGUI_API ImVec4        ColorConvertU32ToFloat4(ImU32 in);
-    m.def("ColorConvertU32ToFloat4", &ImGui::ColorConvertU32ToFloat4, nb::arg("in"));
+    m.def("ColorConvertU32ToFloat4", [](ImU32 in) {
+        return from_vec4(ImGui::ColorConvertU32ToFloat4(in));
+    }, nb::arg("in"));
 
     // IMGUI_API ImU32         ColorConvertFloat4ToU32(const ImVec4& in);
-    m.def("ColorConvertFloat4ToU32", &ImGui::ColorConvertFloat4ToU32, nb::arg("in"));
+    m.def("ColorConvertFloat4ToU32", [](const Vec4T& in) {
+        return ImGui::ColorConvertFloat4ToU32(to_vec4(in));
+    }, nb::arg("in"));
 
     // IMGUI_API void          ColorConvertRGBtoHSV(float r, float g, float b, float& out_h, float& out_s, float& out_v);
     m.def("ColorConvertRGBtoHSV", [](float r, float g, float b) {

@@ -95,12 +95,12 @@ void bind_imgui_api_widgets_main(nb::module_& m) {
     // IMGUI_API void          ProgressBar(float fraction, const ImVec2& size_arg = ImVec2(-FLT_MIN, 0), const char* overlay = NULL);
     m.def(
         "ProgressBar",
-        [](float fraction, const Vec2T& size_arg, const char* overlay) {
-            ImGui::ProgressBar(fraction, to_vec2(size_arg), overlay);
+        [](float fraction, const Vec2T& size_arg, std::string overlay) {
+            ImGui::ProgressBar(fraction, to_vec2(size_arg), overlay.empty() ? nullptr : overlay.c_str());
         },
         nb::arg("fraction"),
         nb::arg("size_arg") = Vec2T(-FLT_MIN, 0.f),
-        nb::arg("overlay") = nullptr);
+        nb::arg("overlay") = "");
 
     // IMGUI_API void          Bullet();
     m.def("Bullet", []() { ImGui::Bullet(); });

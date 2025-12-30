@@ -29,6 +29,14 @@ void bind_imgui_api_popups(nb::module_& m) {
         nb::arg("name"),
         nb::arg("p_open"),
         nb::arg("flags") = 0);
+    m.def(
+        "BeginPopupModal",
+        [](const char* name, ImGuiWindowFlags flags) {
+            bool result = ImGui::BeginPopupModal(name, nullptr, flags);
+            return result;
+        },
+        nb::arg("name"),
+        nb::arg("flags") = 0);
 
     // IMGUI_API void          EndPopup();
     m.def("EndPopup", []() { ImGui::EndPopup(); });
@@ -52,7 +60,7 @@ void bind_imgui_api_popups(nb::module_& m) {
     m.def(
         "OpenPopupOnItemClick",
         [](const char* str_id, ImGuiPopupFlags popup_flags) { ImGui::OpenPopupOnItemClick(str_id, popup_flags); },
-        nb::arg("str_id") = nullptr,
+        nb::arg("str_id") = nb::none(),
         nb::arg("popup_flags") = 1);
 
     // IMGUI_API void          CloseCurrentPopup();
@@ -65,7 +73,7 @@ void bind_imgui_api_popups(nb::module_& m) {
         [](const char* str_id, ImGuiPopupFlags popup_flags) {
             return ImGui::BeginPopupContextItem(str_id, popup_flags);
         },
-        nb::arg("str_id") = nullptr,
+        nb::arg("str_id") = nb::none(),
         nb::arg("popup_flags") = 1);
 
     // IMGUI_API bool          BeginPopupContextWindow(const char* str_id = NULL, ImGuiPopupFlags popup_flags = 1);
@@ -74,7 +82,7 @@ void bind_imgui_api_popups(nb::module_& m) {
         [](const char* str_id, ImGuiPopupFlags popup_flags) {
             return ImGui::BeginPopupContextWindow(str_id, popup_flags);
         },
-        nb::arg("str_id") = nullptr,
+        nb::arg("str_id") = nb::none(),
         nb::arg("popup_flags") = 1);
 
     // IMGUI_API bool          BeginPopupContextVoid(const char* str_id = NULL, ImGuiPopupFlags popup_flags = 1);
@@ -83,7 +91,7 @@ void bind_imgui_api_popups(nb::module_& m) {
         [](const char* str_id, ImGuiPopupFlags popup_flags) {
             return ImGui::BeginPopupContextVoid(str_id, popup_flags);
         },
-        nb::arg("str_id") = nullptr,
+        nb::arg("str_id") = nb::none(),
         nb::arg("popup_flags") = 1);
 
     // Popups: query functions

@@ -11,7 +11,9 @@ void bind_imgui_io(nb::module_& m) {
         // Configuration
         .def_rw("ConfigFlags", &ImGuiIO::ConfigFlags)
         .def_rw("BackendFlags", &ImGuiIO::BackendFlags)
-        .def_rw("DisplaySize", &ImGuiIO::DisplaySize)
+        .def_prop_rw("DisplaySize",
+            [](ImGuiIO& o) { return from_vec2(o.DisplaySize); },
+            [](ImGuiIO& o, const Vec2T& v) { o.DisplaySize = to_vec2(v); })
         .def_rw("DeltaTime", &ImGuiIO::DeltaTime)
         .def_rw("IniSavingRate", &ImGuiIO::IniSavingRate)
         .def_rw("IniFilename", &ImGuiIO::IniFilename)
@@ -22,7 +24,9 @@ void bind_imgui_io(nb::module_& m) {
         .def_rw("FontGlobalScale", &ImGuiIO::FontGlobalScale)
         .def_rw("FontAllowUserScaling", &ImGuiIO::FontAllowUserScaling)
         .def_rw("FontDefault", &ImGuiIO::FontDefault)
-        .def_rw("DisplayFramebufferScale", &ImGuiIO::DisplayFramebufferScale)
+        .def_prop_rw("DisplayFramebufferScale",
+            [](ImGuiIO& o) { return from_vec2(o.DisplayFramebufferScale); },
+            [](ImGuiIO& o, const Vec2T& v) { o.DisplayFramebufferScale = to_vec2(v); })
 
         // Keyboard/Gamepad Navigation options
         .def_rw("ConfigNavSwapGamepadButtons", &ImGuiIO::ConfigNavSwapGamepadButtons)
@@ -117,8 +121,16 @@ void bind_imgui_io(nb::module_& m) {
         // Other state
         .def_rw("KeyMods", &ImGuiIO::KeyMods)
         .def_rw("WantCaptureMouseUnlessPopupClose", &ImGuiIO::WantCaptureMouseUnlessPopupClose)
-        .def_rw("MousePosPrev", &ImGuiIO::MousePosPrev)
-        .def_prop_ro("MouseClickedPos", [](ImGuiIO& o) { return std::to_array(o.MouseClickedPos); })
+        .def_prop_rw("MousePosPrev",
+            [](ImGuiIO& o) { return from_vec2(o.MousePosPrev); },
+            [](ImGuiIO& o, const Vec2T& v) { o.MousePosPrev = to_vec2(v); })
+        .def_prop_ro("MouseClickedPos", [](ImGuiIO& o) {
+            std::array<Vec2T, 5> result;
+            for (int i = 0; i < 5; i++) {
+                result[i] = from_vec2(o.MouseClickedPos[i]);
+            }
+            return result;
+        })
         .def_prop_ro("MouseClickedTime", [](ImGuiIO& o) { return std::to_array(o.MouseClickedTime); })
         .def_prop_ro("MouseClicked", [](ImGuiIO& o) { return std::to_array(o.MouseClicked); })
         .def_prop_ro("MouseDoubleClicked", [](ImGuiIO& o) { return std::to_array(o.MouseDoubleClicked); })

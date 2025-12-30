@@ -17,7 +17,7 @@ void bind_imgui_api_widgets_color(nb::module_& m) {
         "ColorEdit3",
         [](const char* label, std::array<float, 3> col, ImGuiColorEditFlags flags) {
             bool result = ImGui::ColorEdit3(label, col.data(), flags);
-            return std::make_tuple(result, col);
+            return std::make_tuple(result, std::make_tuple(col[0], col[1], col[2]));
         },
         nb::arg("label"),
         nb::arg("col"),
@@ -28,7 +28,7 @@ void bind_imgui_api_widgets_color(nb::module_& m) {
         "ColorEdit4",
         [](const char* label, std::array<float, 4> col, ImGuiColorEditFlags flags) {
             bool result = ImGui::ColorEdit4(label, col.data(), flags);
-            return std::make_tuple(result, col);
+            return std::make_tuple(result, std::make_tuple(col[0], col[1], col[2], col[3]));
         },
         nb::arg("label"),
         nb::arg("col"),
@@ -39,7 +39,7 @@ void bind_imgui_api_widgets_color(nb::module_& m) {
         "ColorPicker3",
         [](const char* label, std::array<float, 3> col, ImGuiColorEditFlags flags) {
             bool result = ImGui::ColorPicker3(label, col.data(), flags);
-            return std::make_tuple(result, col);
+            return std::make_tuple(result, std::make_tuple(col[0], col[1], col[2]));
         },
         nb::arg("label"),
         nb::arg("col"),
@@ -50,7 +50,7 @@ void bind_imgui_api_widgets_color(nb::module_& m) {
         "ColorPicker4",
         [](const char* label, std::array<float, 4> col, ImGuiColorEditFlags flags) {
             bool result = ImGui::ColorPicker4(label, col.data(), flags);
-            return std::make_tuple(result, col);
+            return std::make_tuple(result, std::make_tuple(col[0], col[1], col[2], col[3]));
         },
         nb::arg("label"),
         nb::arg("col"),

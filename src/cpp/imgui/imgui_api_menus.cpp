@@ -41,7 +41,7 @@ void bind_imgui_api_menus(nb::module_& m) {
             return ImGui::MenuItem(label, shortcut, selected, enabled);
         },
         nb::arg("label"),
-        nb::arg("shortcut") = nullptr,
+        nb::arg("shortcut") = nb::none(),
         nb::arg("selected") = false,
         nb::arg("enabled") = true);
 
