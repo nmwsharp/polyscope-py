@@ -76,5 +76,5 @@ if __name__ == '__main__':
     print_discovered_tests_summary(suite, full_listing=False)
 
     # unittest.main()# Run the discovered tests
-    runner = unittest.TextTestRunner()
+    runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
