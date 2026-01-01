@@ -12,14 +12,24 @@
 void bind_imgui_api_parameter_stacks(nb::module_& m) {
 
     // Parameters stacks (shared)
-    // IMGUI_API void          PushFont(ImFont* font);
+    // IMGUI_API void          PushFont(ImFont* font, float font_size_base_unscaled);          // Use NULL as a shortcut to keep current font. Use 0.0f to keep current size.
     m.def(
         "PushFont",
-        [](ImFont* font) { ImGui::PushFont(font); },
-        nb::arg("font"));
+        [](ImFont* font, float font_size_base_unscaled) { ImGui::PushFont(font); },
+        nb::arg("font")=nb::none(),
+        nb::arg("font_size_base_unscaled")=0.0f);
 
     // IMGUI_API void          PopFont();
     m.def("PopFont", []() { ImGui::PopFont(); });
+    
+    // IMGUI_API ImFont*       GetFont();                                                      // get current font
+    m.def("GetFont", []() { return ImGui::GetFont(); }, nb::rv_policy::reference, "Get current font");
+
+    // IMGUI_API float         GetFontSize();
+    m.def("GetFontSize", []() { return ImGui::GetFontSize(); }, "Get current scaled font size (height in pixels) after global scale factors applied");
+
+    // IMGUI_API ImFontBaked*  GetFontBaked();
+    m.def("GetFontBaked", []() { return ImGui::GetFontBaked(); }, nb::rv_policy::reference, "Get current font baked at current size");
 
     // IMGUI_API void          PushStyleColor(ImGuiCol idx, ImU32 col);
     m.def(

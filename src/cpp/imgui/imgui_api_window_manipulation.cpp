@@ -91,12 +91,6 @@ void bind_imgui_api_window_manipulation(nb::module_& m) {
     // IMGUI_API void          SetWindowFocus();
     m.def("SetWindowFocus", []() { ImGui::SetWindowFocus(); });
 
-    // IMGUI_API void          SetWindowFontScale(float scale);
-    m.def(
-        "SetWindowFontScale",
-        [](float scale) { ImGui::SetWindowFontScale(scale); },
-        nb::arg("scale"));
-
     // IMGUI_API void          SetWindowPos(const char* name, const ImVec2& pos, ImGuiCond cond = 0);
     m.def(
         "SetWindowPos",

@@ -108,15 +108,17 @@ void bind_imgui_api_widgets_main(nb::module_& m) {
     // IMGUI_API bool          TextLink(const char* label);
     m.def(
         "TextLink",
-        [](const char* label) { return ImGui::TextLink(label); },
+        [](std::string label) { return ImGui::TextLink(label.c_str()); },
         nb::arg("label"));
 
     // IMGUI_API void          TextLinkOpenURL(const char* label, const char* url = NULL);
     m.def(
         "TextLinkOpenURL",
-        [](const char* label, const char* url) { ImGui::TextLinkOpenURL(label, url); },
+        [](std::string label, std::string url) { 
+            return ImGui::TextLinkOpenURL(label.c_str(), url.empty() ? nullptr : url.c_str()); 
+        },
         nb::arg("label"),
-        nb::arg("url") = nullptr);
+        nb::arg("url") = "");
 
 }
 // clang-format on

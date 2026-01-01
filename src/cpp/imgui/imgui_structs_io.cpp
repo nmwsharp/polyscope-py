@@ -21,7 +21,7 @@ void bind_imgui_io(nb::module_& m) {
 
         // Font system
         .def_rw("Fonts", &ImGuiIO::Fonts)
-        .def_rw("FontGlobalScale", &ImGuiIO::FontGlobalScale)
+        .def_rw("FontDefault", &ImGuiIO::FontDefault, nb::arg().none())
         .def_rw("FontAllowUserScaling", &ImGuiIO::FontAllowUserScaling)
         .def_rw("FontDefault", &ImGuiIO::FontDefault)
         .def_prop_rw("DisplayFramebufferScale",

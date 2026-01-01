@@ -46,14 +46,12 @@ void bind_imgui_enums(nb::module_& m) {
     e.value("ImGuiWindowFlags_NoBringToFrontOnFocus",  ImGuiWindowFlags_NoBringToFrontOnFocus);  m.attr("ImGuiWindowFlags_NoBringToFrontOnFocus")  = static_cast<int>(ImGuiWindowFlags_NoBringToFrontOnFocus);
     e.value("ImGuiWindowFlags_AlwaysVerticalScrollbar", ImGuiWindowFlags_AlwaysVerticalScrollbar); m.attr("ImGuiWindowFlags_AlwaysVerticalScrollbar") = static_cast<int>(ImGuiWindowFlags_AlwaysVerticalScrollbar);
     e.value("ImGuiWindowFlags_AlwaysHorizontalScrollbar", ImGuiWindowFlags_AlwaysHorizontalScrollbar); m.attr("ImGuiWindowFlags_AlwaysHorizontalScrollbar") = static_cast<int>(ImGuiWindowFlags_AlwaysHorizontalScrollbar);
-    e.value("ImGuiWindowFlags_AlwaysUseWindowPadding", ImGuiWindowFlags_AlwaysUseWindowPadding); m.attr("ImGuiWindowFlags_AlwaysUseWindowPadding") = static_cast<int>(ImGuiWindowFlags_AlwaysUseWindowPadding);
     e.value("ImGuiWindowFlags_NoNavInputs",            ImGuiWindowFlags_NoNavInputs);            m.attr("ImGuiWindowFlags_NoNavInputs")            = static_cast<int>(ImGuiWindowFlags_NoNavInputs);
     e.value("ImGuiWindowFlags_NoNavFocus",             ImGuiWindowFlags_NoNavFocus);             m.attr("ImGuiWindowFlags_NoNavFocus")             = static_cast<int>(ImGuiWindowFlags_NoNavFocus);
     e.value("ImGuiWindowFlags_UnsavedDocument",        ImGuiWindowFlags_UnsavedDocument);        m.attr("ImGuiWindowFlags_UnsavedDocument")        = static_cast<int>(ImGuiWindowFlags_UnsavedDocument);
     e.value("ImGuiWindowFlags_NoNav",                  ImGuiWindowFlags_NoNav);                  m.attr("ImGuiWindowFlags_NoNav")                  = static_cast<int>(ImGuiWindowFlags_NoNav);
     e.value("ImGuiWindowFlags_NoDecoration",           ImGuiWindowFlags_NoDecoration);           m.attr("ImGuiWindowFlags_NoDecoration")           = static_cast<int>(ImGuiWindowFlags_NoDecoration);
     e.value("ImGuiWindowFlags_NoInputs",               ImGuiWindowFlags_NoInputs);               m.attr("ImGuiWindowFlags_NoInputs")               = static_cast<int>(ImGuiWindowFlags_NoInputs);
-    e.value("ImGuiWindowFlags_NavFlattened",           ImGuiWindowFlags_NavFlattened);           m.attr("ImGuiWindowFlags_NavFlattened")           = static_cast<int>(ImGuiWindowFlags_NavFlattened);
     e.value("ImGuiWindowFlags_ChildWindow",            ImGuiWindowFlags_ChildWindow);            m.attr("ImGuiWindowFlags_ChildWindow")            = static_cast<int>(ImGuiWindowFlags_ChildWindow);
     e.value("ImGuiWindowFlags_Tooltip",                ImGuiWindowFlags_Tooltip);                m.attr("ImGuiWindowFlags_Tooltip")                = static_cast<int>(ImGuiWindowFlags_Tooltip);
     e.value("ImGuiWindowFlags_Popup",                  ImGuiWindowFlags_Popup);                  m.attr("ImGuiWindowFlags_Popup")                  = static_cast<int>(ImGuiWindowFlags_Popup);
@@ -116,6 +114,7 @@ void bind_imgui_enums(nb::module_& m) {
     e.value("ImGuiInputTextFlags_CallbackCharFilter",  ImGuiInputTextFlags_CallbackCharFilter);  m.attr("ImGuiInputTextFlags_CallbackCharFilter")  = static_cast<int>(ImGuiInputTextFlags_CallbackCharFilter);
     e.value("ImGuiInputTextFlags_CallbackResize",      ImGuiInputTextFlags_CallbackResize);      m.attr("ImGuiInputTextFlags_CallbackResize")      = static_cast<int>(ImGuiInputTextFlags_CallbackResize);
     e.value("ImGuiInputTextFlags_CallbackEdit",        ImGuiInputTextFlags_CallbackEdit);        m.attr("ImGuiInputTextFlags_CallbackEdit")        = static_cast<int>(ImGuiInputTextFlags_CallbackEdit);
+    e.value("ImGuiInputTextFlags_WordWrap",            ImGuiInputTextFlags_WordWrap);            m.attr("ImGuiInputTextFlags_WordWrap")            = static_cast<int>(ImGuiInputTextFlags_WordWrap);
   ;
   }
 
@@ -124,7 +123,7 @@ void bind_imgui_enums(nb::module_& m) {
     e.value("ImGuiTreeNodeFlags_None",                 ImGuiTreeNodeFlags_None);                 m.attr("ImGuiTreeNodeFlags_None")                 = static_cast<int>(ImGuiTreeNodeFlags_None);
     e.value("ImGuiTreeNodeFlags_Selected",             ImGuiTreeNodeFlags_Selected);             m.attr("ImGuiTreeNodeFlags_Selected")             = static_cast<int>(ImGuiTreeNodeFlags_Selected);
     e.value("ImGuiTreeNodeFlags_Framed",               ImGuiTreeNodeFlags_Framed);               m.attr("ImGuiTreeNodeFlags_Framed")               = static_cast<int>(ImGuiTreeNodeFlags_Framed);
-    e.value("ImGuiTreeNodeFlags_AllowItemOverlap",     ImGuiTreeNodeFlags_AllowItemOverlap);     m.attr("ImGuiTreeNodeFlags_AllowItemOverlap")     = static_cast<int>(ImGuiTreeNodeFlags_AllowItemOverlap);
+    e.value("ImGuiTreeNodeFlags_AllowOverlap",         ImGuiTreeNodeFlags_AllowOverlap);         m.attr("ImGuiTreeNodeFlags_AllowOverlap")         = static_cast<int>(ImGuiTreeNodeFlags_AllowOverlap);
     e.value("ImGuiTreeNodeFlags_NoTreePushOnOpen",     ImGuiTreeNodeFlags_NoTreePushOnOpen);     m.attr("ImGuiTreeNodeFlags_NoTreePushOnOpen")     = static_cast<int>(ImGuiTreeNodeFlags_NoTreePushOnOpen);
     e.value("ImGuiTreeNodeFlags_NoAutoOpenOnLog",      ImGuiTreeNodeFlags_NoAutoOpenOnLog);      m.attr("ImGuiTreeNodeFlags_NoAutoOpenOnLog")      = static_cast<int>(ImGuiTreeNodeFlags_NoAutoOpenOnLog);
     e.value("ImGuiTreeNodeFlags_DefaultOpen",          ImGuiTreeNodeFlags_DefaultOpen);          m.attr("ImGuiTreeNodeFlags_DefaultOpen")          = static_cast<int>(ImGuiTreeNodeFlags_DefaultOpen);
@@ -135,8 +134,21 @@ void bind_imgui_enums(nb::module_& m) {
     e.value("ImGuiTreeNodeFlags_FramePadding",         ImGuiTreeNodeFlags_FramePadding);         m.attr("ImGuiTreeNodeFlags_FramePadding")         = static_cast<int>(ImGuiTreeNodeFlags_FramePadding);
     e.value("ImGuiTreeNodeFlags_SpanAvailWidth",       ImGuiTreeNodeFlags_SpanAvailWidth);       m.attr("ImGuiTreeNodeFlags_SpanAvailWidth")       = static_cast<int>(ImGuiTreeNodeFlags_SpanAvailWidth);
     e.value("ImGuiTreeNodeFlags_SpanFullWidth",        ImGuiTreeNodeFlags_SpanFullWidth);        m.attr("ImGuiTreeNodeFlags_SpanFullWidth")        = static_cast<int>(ImGuiTreeNodeFlags_SpanFullWidth);
-    e.value("ImGuiTreeNodeFlags_NavLeftJumpsBackHere", ImGuiTreeNodeFlags_NavLeftJumpsBackHere); m.attr("ImGuiTreeNodeFlags_NavLeftJumpsBackHere") = static_cast<int>(ImGuiTreeNodeFlags_NavLeftJumpsBackHere);
+    e.value("ImGuiTreeNodeFlags_SpanLabelWidth",       ImGuiTreeNodeFlags_SpanLabelWidth);       m.attr("ImGuiTreeNodeFlags_SpanLabelWidth")       = static_cast<int>(ImGuiTreeNodeFlags_SpanLabelWidth);
+    e.value("ImGuiTreeNodeFlags_SpanAllColumns",       ImGuiTreeNodeFlags_SpanAllColumns);       m.attr("ImGuiTreeNodeFlags_SpanAllColumns")       = static_cast<int>(ImGuiTreeNodeFlags_SpanAllColumns);
+    e.value("ImGuiTreeNodeFlags_LabelSpanAllColumns",  ImGuiTreeNodeFlags_LabelSpanAllColumns);  m.attr("ImGuiTreeNodeFlags_LabelSpanAllColumns")  = static_cast<int>(ImGuiTreeNodeFlags_LabelSpanAllColumns);
+    e.value("ImGuiTreeNodeFlags_NavLeftJumpsToParent", ImGuiTreeNodeFlags_NavLeftJumpsToParent); m.attr("ImGuiTreeNodeFlags_NavLeftJumpsToParent") = static_cast<int>(ImGuiTreeNodeFlags_NavLeftJumpsToParent);
     e.value("ImGuiTreeNodeFlags_CollapsingHeader",     ImGuiTreeNodeFlags_CollapsingHeader);     m.attr("ImGuiTreeNodeFlags_CollapsingHeader")     = static_cast<int>(ImGuiTreeNodeFlags_CollapsingHeader);
+    e.value("ImGuiTreeNodeFlags_DrawLinesNone",        ImGuiTreeNodeFlags_DrawLinesNone);        m.attr("ImGuiTreeNodeFlags_DrawLinesNone")        = static_cast<int>(ImGuiTreeNodeFlags_DrawLinesNone);
+    e.value("ImGuiTreeNodeFlags_DrawLinesFull",        ImGuiTreeNodeFlags_DrawLinesFull);        m.attr("ImGuiTreeNodeFlags_DrawLinesFull")        = static_cast<int>(ImGuiTreeNodeFlags_DrawLinesFull);
+    e.value("ImGuiTreeNodeFlags_DrawLinesToNodes",     ImGuiTreeNodeFlags_DrawLinesToNodes);     m.attr("ImGuiTreeNodeFlags_DrawLinesToNodes")     = static_cast<int>(ImGuiTreeNodeFlags_DrawLinesToNodes);
+  ;
+  }
+
+  { // ImGuiListClipperFlags ImGuiListClipperFlags_
+  auto e = nb::enum_<ImGuiListClipperFlags_>(m, "ImGuiListClipperFlags");
+    e.value("ImGuiListClipperFlags_None",                  ImGuiListClipperFlags_None);                  m.attr("ImGuiListClipperFlags_None")                  = static_cast<int>(ImGuiListClipperFlags_None);
+    e.value("ImGuiListClipperFlags_NoSetTableRowCounters", ImGuiListClipperFlags_NoSetTableRowCounters); m.attr("ImGuiListClipperFlags_NoSetTableRowCounters") = static_cast<int>(ImGuiListClipperFlags_NoSetTableRowCounters);
   ;
   }
 
@@ -157,6 +169,29 @@ void bind_imgui_enums(nb::module_& m) {
   ;
   }
 
+  { // ImGuiMultiSelectFlags ImGuiMultiSelectFlags_
+  auto e = nb::enum_<ImGuiMultiSelectFlags_>(m, "ImGuiMultiSelectFlags");
+    e.value("ImGuiMultiSelectFlags_None",                  ImGuiMultiSelectFlags_None);                  m.attr("ImGuiMultiSelectFlags_None")                  = static_cast<int>(ImGuiMultiSelectFlags_None);
+    e.value("ImGuiMultiSelectFlags_SingleSelect",          ImGuiMultiSelectFlags_SingleSelect);          m.attr("ImGuiMultiSelectFlags_SingleSelect")          = static_cast<int>(ImGuiMultiSelectFlags_SingleSelect);
+    e.value("ImGuiMultiSelectFlags_NoSelectAll",           ImGuiMultiSelectFlags_NoSelectAll);           m.attr("ImGuiMultiSelectFlags_NoSelectAll")           = static_cast<int>(ImGuiMultiSelectFlags_NoSelectAll);
+    e.value("ImGuiMultiSelectFlags_NoRangeSelect",         ImGuiMultiSelectFlags_NoRangeSelect);         m.attr("ImGuiMultiSelectFlags_NoRangeSelect")         = static_cast<int>(ImGuiMultiSelectFlags_NoRangeSelect);
+    e.value("ImGuiMultiSelectFlags_NoAutoSelect",          ImGuiMultiSelectFlags_NoAutoSelect);          m.attr("ImGuiMultiSelectFlags_NoAutoSelect")          = static_cast<int>(ImGuiMultiSelectFlags_NoAutoSelect);
+    e.value("ImGuiMultiSelectFlags_NoAutoClear",           ImGuiMultiSelectFlags_NoAutoClear);           m.attr("ImGuiMultiSelectFlags_NoAutoClear")           = static_cast<int>(ImGuiMultiSelectFlags_NoAutoClear);
+    e.value("ImGuiMultiSelectFlags_NoAutoClearOnReselect", ImGuiMultiSelectFlags_NoAutoClearOnReselect); m.attr("ImGuiMultiSelectFlags_NoAutoClearOnReselect") = static_cast<int>(ImGuiMultiSelectFlags_NoAutoClearOnReselect);
+    e.value("ImGuiMultiSelectFlags_BoxSelect1d",           ImGuiMultiSelectFlags_BoxSelect1d);           m.attr("ImGuiMultiSelectFlags_BoxSelect1d")           = static_cast<int>(ImGuiMultiSelectFlags_BoxSelect1d);
+    e.value("ImGuiMultiSelectFlags_BoxSelect2d",           ImGuiMultiSelectFlags_BoxSelect2d);           m.attr("ImGuiMultiSelectFlags_BoxSelect2d")           = static_cast<int>(ImGuiMultiSelectFlags_BoxSelect2d);
+    e.value("ImGuiMultiSelectFlags_BoxSelectNoScroll",     ImGuiMultiSelectFlags_BoxSelectNoScroll);     m.attr("ImGuiMultiSelectFlags_BoxSelectNoScroll")     = static_cast<int>(ImGuiMultiSelectFlags_BoxSelectNoScroll);
+    e.value("ImGuiMultiSelectFlags_ClearOnEscape",         ImGuiMultiSelectFlags_ClearOnEscape);         m.attr("ImGuiMultiSelectFlags_ClearOnEscape")         = static_cast<int>(ImGuiMultiSelectFlags_ClearOnEscape);
+    e.value("ImGuiMultiSelectFlags_ClearOnClickVoid",      ImGuiMultiSelectFlags_ClearOnClickVoid);      m.attr("ImGuiMultiSelectFlags_ClearOnClickVoid")      = static_cast<int>(ImGuiMultiSelectFlags_ClearOnClickVoid);
+    e.value("ImGuiMultiSelectFlags_ScopeWindow",           ImGuiMultiSelectFlags_ScopeWindow);           m.attr("ImGuiMultiSelectFlags_ScopeWindow")           = static_cast<int>(ImGuiMultiSelectFlags_ScopeWindow);
+    e.value("ImGuiMultiSelectFlags_ScopeRect",             ImGuiMultiSelectFlags_ScopeRect);             m.attr("ImGuiMultiSelectFlags_ScopeRect")             = static_cast<int>(ImGuiMultiSelectFlags_ScopeRect);
+    e.value("ImGuiMultiSelectFlags_SelectOnClick",         ImGuiMultiSelectFlags_SelectOnClick);         m.attr("ImGuiMultiSelectFlags_SelectOnClick")         = static_cast<int>(ImGuiMultiSelectFlags_SelectOnClick);
+    e.value("ImGuiMultiSelectFlags_SelectOnClickRelease",  ImGuiMultiSelectFlags_SelectOnClickRelease);  m.attr("ImGuiMultiSelectFlags_SelectOnClickRelease")  = static_cast<int>(ImGuiMultiSelectFlags_SelectOnClickRelease);
+    e.value("ImGuiMultiSelectFlags_NavWrapX",              ImGuiMultiSelectFlags_NavWrapX);              m.attr("ImGuiMultiSelectFlags_NavWrapX")              = static_cast<int>(ImGuiMultiSelectFlags_NavWrapX);
+    e.value("ImGuiMultiSelectFlags_NoSelectOnRightClick",  ImGuiMultiSelectFlags_NoSelectOnRightClick);  m.attr("ImGuiMultiSelectFlags_NoSelectOnRightClick")  = static_cast<int>(ImGuiMultiSelectFlags_NoSelectOnRightClick);
+  ;
+  }
+
   { // ImGuiSelectableFlags ImGuiSelectableFlags_
   auto e = nb::enum_<ImGuiSelectableFlags_>(m, "ImGuiSelectableFlags");
     e.value("ImGuiSelectableFlags_None",               ImGuiSelectableFlags_None);               m.attr("ImGuiSelectableFlags_None")               = static_cast<int>(ImGuiSelectableFlags_None);
@@ -164,7 +199,7 @@ void bind_imgui_enums(nb::module_& m) {
     e.value("ImGuiSelectableFlags_SpanAllColumns",     ImGuiSelectableFlags_SpanAllColumns);     m.attr("ImGuiSelectableFlags_SpanAllColumns")     = static_cast<int>(ImGuiSelectableFlags_SpanAllColumns);
     e.value("ImGuiSelectableFlags_AllowDoubleClick",   ImGuiSelectableFlags_AllowDoubleClick);   m.attr("ImGuiSelectableFlags_AllowDoubleClick")   = static_cast<int>(ImGuiSelectableFlags_AllowDoubleClick);
     e.value("ImGuiSelectableFlags_Disabled",           ImGuiSelectableFlags_Disabled);           m.attr("ImGuiSelectableFlags_Disabled")           = static_cast<int>(ImGuiSelectableFlags_Disabled);
-    e.value("ImGuiSelectableFlags_AllowItemOverlap",   ImGuiSelectableFlags_AllowItemOverlap);   m.attr("ImGuiSelectableFlags_AllowItemOverlap")   = static_cast<int>(ImGuiSelectableFlags_AllowItemOverlap);
+    e.value("ImGuiSelectableFlags_AllowOverlap",       ImGuiSelectableFlags_AllowOverlap);       m.attr("ImGuiSelectableFlags_AllowOverlap")       = static_cast<int>(ImGuiSelectableFlags_AllowOverlap);
   ;
   }
 
@@ -191,7 +226,8 @@ void bind_imgui_enums(nb::module_& m) {
     e.value("ImGuiTabBarFlags_NoCloseWithMiddleMouseButton", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton); m.attr("ImGuiTabBarFlags_NoCloseWithMiddleMouseButton") = static_cast<int>(ImGuiTabBarFlags_NoCloseWithMiddleMouseButton);
     e.value("ImGuiTabBarFlags_NoTabListScrollingButtons", ImGuiTabBarFlags_NoTabListScrollingButtons); m.attr("ImGuiTabBarFlags_NoTabListScrollingButtons") = static_cast<int>(ImGuiTabBarFlags_NoTabListScrollingButtons);
     e.value("ImGuiTabBarFlags_NoTooltip",              ImGuiTabBarFlags_NoTooltip);              m.attr("ImGuiTabBarFlags_NoTooltip")              = static_cast<int>(ImGuiTabBarFlags_NoTooltip);
-    e.value("ImGuiTabBarFlags_FittingPolicyResizeDown", ImGuiTabBarFlags_FittingPolicyResizeDown); m.attr("ImGuiTabBarFlags_FittingPolicyResizeDown") = static_cast<int>(ImGuiTabBarFlags_FittingPolicyResizeDown);
+    e.value("ImGuiTabBarFlags_FittingPolicyMixed",     ImGuiTabBarFlags_FittingPolicyMixed);     m.attr("ImGuiTabBarFlags_FittingPolicyMixed")     = static_cast<int>(ImGuiTabBarFlags_FittingPolicyMixed);
+    e.value("ImGuiTabBarFlags_FittingPolicyShrink",    ImGuiTabBarFlags_FittingPolicyShrink);    m.attr("ImGuiTabBarFlags_FittingPolicyShrink")    = static_cast<int>(ImGuiTabBarFlags_FittingPolicyShrink);
     e.value("ImGuiTabBarFlags_FittingPolicyScroll",    ImGuiTabBarFlags_FittingPolicyScroll);    m.attr("ImGuiTabBarFlags_FittingPolicyScroll")    = static_cast<int>(ImGuiTabBarFlags_FittingPolicyScroll);
     e.value("ImGuiTabBarFlags_FittingPolicyMask_",     ImGuiTabBarFlags_FittingPolicyMask_);     m.attr("ImGuiTabBarFlags_FittingPolicyMask_")     = static_cast<int>(ImGuiTabBarFlags_FittingPolicyMask_);
     e.value("ImGuiTabBarFlags_FittingPolicyDefault_",  ImGuiTabBarFlags_FittingPolicyDefault_);  m.attr("ImGuiTabBarFlags_FittingPolicyDefault_")  = static_cast<int>(ImGuiTabBarFlags_FittingPolicyDefault_);
@@ -235,17 +271,18 @@ void bind_imgui_enums(nb::module_& m) {
 
   { // ImGuiDragDropFlags ImGuiDragDropFlags_
   auto e = nb::enum_<ImGuiDragDropFlags_>(m, "ImGuiDragDropFlags");
-    e.value("ImGuiDragDropFlags_None",                 ImGuiDragDropFlags_None);                 m.attr("ImGuiDragDropFlags_None")                 = static_cast<int>(ImGuiDragDropFlags_None);
-    e.value("ImGuiDragDropFlags_SourceNoPreviewTooltip", ImGuiDragDropFlags_SourceNoPreviewTooltip); m.attr("ImGuiDragDropFlags_SourceNoPreviewTooltip") = static_cast<int>(ImGuiDragDropFlags_SourceNoPreviewTooltip);
-    e.value("ImGuiDragDropFlags_SourceNoDisableHover", ImGuiDragDropFlags_SourceNoDisableHover); m.attr("ImGuiDragDropFlags_SourceNoDisableHover") = static_cast<int>(ImGuiDragDropFlags_SourceNoDisableHover);
-    e.value("ImGuiDragDropFlags_SourceNoHoldToOpenOthers", ImGuiDragDropFlags_SourceNoHoldToOpenOthers); m.attr("ImGuiDragDropFlags_SourceNoHoldToOpenOthers") = static_cast<int>(ImGuiDragDropFlags_SourceNoHoldToOpenOthers);
-    e.value("ImGuiDragDropFlags_SourceAllowNullID",    ImGuiDragDropFlags_SourceAllowNullID);    m.attr("ImGuiDragDropFlags_SourceAllowNullID")    = static_cast<int>(ImGuiDragDropFlags_SourceAllowNullID);
-    e.value("ImGuiDragDropFlags_SourceExtern",         ImGuiDragDropFlags_SourceExtern);         m.attr("ImGuiDragDropFlags_SourceExtern")         = static_cast<int>(ImGuiDragDropFlags_SourceExtern);
-    e.value("ImGuiDragDropFlags_SourceAutoExpirePayload", ImGuiDragDropFlags_SourceAutoExpirePayload); m.attr("ImGuiDragDropFlags_SourceAutoExpirePayload") = static_cast<int>(ImGuiDragDropFlags_SourceAutoExpirePayload);
-    e.value("ImGuiDragDropFlags_AcceptBeforeDelivery", ImGuiDragDropFlags_AcceptBeforeDelivery); m.attr("ImGuiDragDropFlags_AcceptBeforeDelivery") = static_cast<int>(ImGuiDragDropFlags_AcceptBeforeDelivery);
-    e.value("ImGuiDragDropFlags_AcceptNoDrawDefaultRect", ImGuiDragDropFlags_AcceptNoDrawDefaultRect); m.attr("ImGuiDragDropFlags_AcceptNoDrawDefaultRect") = static_cast<int>(ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
-    e.value("ImGuiDragDropFlags_AcceptNoPreviewTooltip", ImGuiDragDropFlags_AcceptNoPreviewTooltip); m.attr("ImGuiDragDropFlags_AcceptNoPreviewTooltip") = static_cast<int>(ImGuiDragDropFlags_AcceptNoPreviewTooltip);
-    e.value("ImGuiDragDropFlags_AcceptPeekOnly",       ImGuiDragDropFlags_AcceptPeekOnly);       m.attr("ImGuiDragDropFlags_AcceptPeekOnly")       = static_cast<int>(ImGuiDragDropFlags_AcceptPeekOnly);
+    e.value("ImGuiDragDropFlags_None",                      ImGuiDragDropFlags_None);                       m.attr("ImGuiDragDropFlags_None")                       = static_cast<int>(ImGuiDragDropFlags_None);
+    e.value("ImGuiDragDropFlags_SourceNoPreviewTooltip",    ImGuiDragDropFlags_SourceNoPreviewTooltip);     m.attr("ImGuiDragDropFlags_SourceNoPreviewTooltip")     = static_cast<int>(ImGuiDragDropFlags_SourceNoPreviewTooltip);
+    e.value("ImGuiDragDropFlags_SourceNoDisableHover",      ImGuiDragDropFlags_SourceNoDisableHover);       m.attr("ImGuiDragDropFlags_SourceNoDisableHover")       = static_cast<int>(ImGuiDragDropFlags_SourceNoDisableHover);
+    e.value("ImGuiDragDropFlags_SourceNoHoldToOpenOthers",  ImGuiDragDropFlags_SourceNoHoldToOpenOthers);   m.attr("ImGuiDragDropFlags_SourceNoHoldToOpenOthers")   = static_cast<int>(ImGuiDragDropFlags_SourceNoHoldToOpenOthers);
+    e.value("ImGuiDragDropFlags_SourceAllowNullID",         ImGuiDragDropFlags_SourceAllowNullID);          m.attr("ImGuiDragDropFlags_SourceAllowNullID")          = static_cast<int>(ImGuiDragDropFlags_SourceAllowNullID);
+    e.value("ImGuiDragDropFlags_SourceExtern",              ImGuiDragDropFlags_SourceExtern);               m.attr("ImGuiDragDropFlags_SourceExtern")               = static_cast<int>(ImGuiDragDropFlags_SourceExtern);
+    e.value("ImGuiDragDropFlags_SourceAutoExpirePayload",   ImGuiDragDropFlags_SourceAutoExpirePayload);    m.attr("ImGuiDragDropFlags_SourceAutoExpirePayload")    = static_cast<int>(ImGuiDragDropFlags_SourceAutoExpirePayload);
+    e.value("ImGuiDragDropFlags_AcceptBeforeDelivery",      ImGuiDragDropFlags_AcceptBeforeDelivery);       m.attr("ImGuiDragDropFlags_AcceptBeforeDelivery")       = static_cast<int>(ImGuiDragDropFlags_AcceptBeforeDelivery);
+    e.value("ImGuiDragDropFlags_AcceptNoDrawDefaultRect",   ImGuiDragDropFlags_AcceptNoDrawDefaultRect);    m.attr("ImGuiDragDropFlags_AcceptNoDrawDefaultRect")    = static_cast<int>(ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
+    e.value("ImGuiDragDropFlags_AcceptNoPreviewTooltip",    ImGuiDragDropFlags_AcceptNoPreviewTooltip);     m.attr("ImGuiDragDropFlags_AcceptNoPreviewTooltip")     = static_cast<int>(ImGuiDragDropFlags_AcceptNoPreviewTooltip);
+    e.value("ImGuiDragDropFlags_AcceptDrawAsHovered",       ImGuiDragDropFlags_AcceptDrawAsHovered);        m.attr("ImGuiDragDropFlags_AcceptDrawAsHovered")        = static_cast<int>(ImGuiDragDropFlags_AcceptDrawAsHovered);
+    e.value("ImGuiDragDropFlags_AcceptPeekOnly",            ImGuiDragDropFlags_AcceptPeekOnly);             m.attr("ImGuiDragDropFlags_AcceptPeekOnly")             = static_cast<int>(ImGuiDragDropFlags_AcceptPeekOnly);
   ;
   }
 
@@ -335,13 +372,14 @@ void bind_imgui_enums(nb::module_& m) {
     e.value("ImGuiCol_HeaderHovered",                  ImGuiCol_HeaderHovered);                  m.attr("ImGuiCol_HeaderHovered")                  = static_cast<int>(ImGuiCol_HeaderHovered);
     e.value("ImGuiCol_HeaderActive",                   ImGuiCol_HeaderActive);                   m.attr("ImGuiCol_HeaderActive")                   = static_cast<int>(ImGuiCol_HeaderActive);
     e.value("ImGuiCol_Separator",                      ImGuiCol_Separator);                      m.attr("ImGuiCol_Separator")                      = static_cast<int>(ImGuiCol_Separator);
-    e.value("ImGuiCol_SeparatorHovered",               ImGuiCol_SeparatorHovered);               m.attr("ImGuiCol_SeparatorHovered")               = static_cast<int>(ImGuiCol_SeparatorHovered);
+    e.value("ImGuiConl_SeparatorHovered",              ImGuiCol_SeparatorHovered);               m.attr("ImGuiCol_SeparatorHovered")               = static_cast<int>(ImGuiCol_SeparatorHovered);
     e.value("ImGuiCol_SeparatorActive",                ImGuiCol_SeparatorActive);                m.attr("ImGuiCol_SeparatorActive")                = static_cast<int>(ImGuiCol_SeparatorActive);
     e.value("ImGuiCol_ResizeGrip",                     ImGuiCol_ResizeGrip);                     m.attr("ImGuiCol_ResizeGrip")                     = static_cast<int>(ImGuiCol_ResizeGrip);
     e.value("ImGuiCol_ResizeGripHovered",              ImGuiCol_ResizeGripHovered);              m.attr("ImGuiCol_ResizeGripHovered")              = static_cast<int>(ImGuiCol_ResizeGripHovered);
     e.value("ImGuiCol_ResizeGripActive",               ImGuiCol_ResizeGripActive);               m.attr("ImGuiCol_ResizeGripActive")               = static_cast<int>(ImGuiCol_ResizeGripActive);
-    e.value("ImGuiCol_Tab",                            ImGuiCol_Tab);                            m.attr("ImGuiCol_Tab")                            = static_cast<int>(ImGuiCol_Tab);
+    e.value("ImGuiCol_InputTextCursor",                ImGuiCol_InputTextCursor);                m.attr("ImGuiCol_InputTextCursor")                = static_cast<int>(ImGuiCol_InputTextCursor);
     e.value("ImGuiCol_TabHovered",                     ImGuiCol_TabHovered);                     m.attr("ImGuiCol_TabHovered")                     = static_cast<int>(ImGuiCol_TabHovered);
+    e.value("ImGuiCol_Tab",                            ImGuiCol_Tab);                            m.attr("ImGuiCol_Tab")                            = static_cast<int>(ImGuiCol_Tab);
     e.value("ImGuiCol_TabSelected",                    ImGuiCol_TabSelected);                    m.attr("ImGuiCol_TabSelected")                    = static_cast<int>(ImGuiCol_TabSelected);
     e.value("ImGuiCol_TabSelectedOverline",            ImGuiCol_TabSelectedOverline);            m.attr("ImGuiCol_TabSelectedOverline")            = static_cast<int>(ImGuiCol_TabSelectedOverline);
     e.value("ImGuiCol_TabDimmed",                      ImGuiCol_TabDimmed);                      m.attr("ImGuiCol_TabDimmed")                      = static_cast<int>(ImGuiCol_TabDimmed);
@@ -371,30 +409,45 @@ void bind_imgui_enums(nb::module_& m) {
 
   { // ImGuiStyleVar ImGuiStyleVar_
   auto e = nb::enum_<ImGuiStyleVar_>(m, "ImGuiStyleVar");
-    e.value("ImGuiStyleVar_Alpha",                     ImGuiStyleVar_Alpha);                     m.attr("ImGuiStyleVar_Alpha")                     = static_cast<int>(ImGuiStyleVar_Alpha);
-    e.value("ImGuiStyleVar_WindowPadding",             ImGuiStyleVar_WindowPadding);             m.attr("ImGuiStyleVar_WindowPadding")             = static_cast<int>(ImGuiStyleVar_WindowPadding);
-    e.value("ImGuiStyleVar_WindowRounding",            ImGuiStyleVar_WindowRounding);            m.attr("ImGuiStyleVar_WindowRounding")            = static_cast<int>(ImGuiStyleVar_WindowRounding);
-    e.value("ImGuiStyleVar_WindowBorderSize",          ImGuiStyleVar_WindowBorderSize);          m.attr("ImGuiStyleVar_WindowBorderSize")          = static_cast<int>(ImGuiStyleVar_WindowBorderSize);
-    e.value("ImGuiStyleVar_WindowMinSize",             ImGuiStyleVar_WindowMinSize);             m.attr("ImGuiStyleVar_WindowMinSize")             = static_cast<int>(ImGuiStyleVar_WindowMinSize);
-    e.value("ImGuiStyleVar_WindowTitleAlign",          ImGuiStyleVar_WindowTitleAlign);          m.attr("ImGuiStyleVar_WindowTitleAlign")          = static_cast<int>(ImGuiStyleVar_WindowTitleAlign);
-    e.value("ImGuiStyleVar_ChildRounding",             ImGuiStyleVar_ChildRounding);             m.attr("ImGuiStyleVar_ChildRounding")             = static_cast<int>(ImGuiStyleVar_ChildRounding);
-    e.value("ImGuiStyleVar_ChildBorderSize",           ImGuiStyleVar_ChildBorderSize);           m.attr("ImGuiStyleVar_ChildBorderSize")           = static_cast<int>(ImGuiStyleVar_ChildBorderSize);
-    e.value("ImGuiStyleVar_PopupRounding",             ImGuiStyleVar_PopupRounding);             m.attr("ImGuiStyleVar_PopupRounding")             = static_cast<int>(ImGuiStyleVar_PopupRounding);
-    e.value("ImGuiStyleVar_PopupBorderSize",           ImGuiStyleVar_PopupBorderSize);           m.attr("ImGuiStyleVar_PopupBorderSize")           = static_cast<int>(ImGuiStyleVar_PopupBorderSize);
-    e.value("ImGuiStyleVar_FramePadding",              ImGuiStyleVar_FramePadding);              m.attr("ImGuiStyleVar_FramePadding")              = static_cast<int>(ImGuiStyleVar_FramePadding);
-    e.value("ImGuiStyleVar_FrameRounding",             ImGuiStyleVar_FrameRounding);             m.attr("ImGuiStyleVar_FrameRounding")             = static_cast<int>(ImGuiStyleVar_FrameRounding);
-    e.value("ImGuiStyleVar_FrameBorderSize",           ImGuiStyleVar_FrameBorderSize);           m.attr("ImGuiStyleVar_FrameBorderSize")           = static_cast<int>(ImGuiStyleVar_FrameBorderSize);
-    e.value("ImGuiStyleVar_ItemSpacing",               ImGuiStyleVar_ItemSpacing);               m.attr("ImGuiStyleVar_ItemSpacing")               = static_cast<int>(ImGuiStyleVar_ItemSpacing);
-    e.value("ImGuiStyleVar_ItemInnerSpacing",          ImGuiStyleVar_ItemInnerSpacing);          m.attr("ImGuiStyleVar_ItemInnerSpacing")          = static_cast<int>(ImGuiStyleVar_ItemInnerSpacing);
-    e.value("ImGuiStyleVar_IndentSpacing",             ImGuiStyleVar_IndentSpacing);             m.attr("ImGuiStyleVar_IndentSpacing")             = static_cast<int>(ImGuiStyleVar_IndentSpacing);
-    e.value("ImGuiStyleVar_ScrollbarSize",             ImGuiStyleVar_ScrollbarSize);             m.attr("ImGuiStyleVar_ScrollbarSize")             = static_cast<int>(ImGuiStyleVar_ScrollbarSize);
-    e.value("ImGuiStyleVar_ScrollbarRounding",         ImGuiStyleVar_ScrollbarRounding);         m.attr("ImGuiStyleVar_ScrollbarRounding")         = static_cast<int>(ImGuiStyleVar_ScrollbarRounding);
-    e.value("ImGuiStyleVar_GrabMinSize",               ImGuiStyleVar_GrabMinSize);               m.attr("ImGuiStyleVar_GrabMinSize")               = static_cast<int>(ImGuiStyleVar_GrabMinSize);
-    e.value("ImGuiStyleVar_GrabRounding",              ImGuiStyleVar_GrabRounding);              m.attr("ImGuiStyleVar_GrabRounding")              = static_cast<int>(ImGuiStyleVar_GrabRounding);
-    e.value("ImGuiStyleVar_TabRounding",               ImGuiStyleVar_TabRounding);               m.attr("ImGuiStyleVar_TabRounding")               = static_cast<int>(ImGuiStyleVar_TabRounding);
-    e.value("ImGuiStyleVar_ButtonTextAlign",           ImGuiStyleVar_ButtonTextAlign);           m.attr("ImGuiStyleVar_ButtonTextAlign")           = static_cast<int>(ImGuiStyleVar_ButtonTextAlign);
-    e.value("ImGuiStyleVar_SelectableTextAlign",       ImGuiStyleVar_SelectableTextAlign);       m.attr("ImGuiStyleVar_SelectableTextAlign")       = static_cast<int>(ImGuiStyleVar_SelectableTextAlign);
-    e.value("ImGuiStyleVar_COUNT",                     ImGuiStyleVar_COUNT);                     m.attr("ImGuiStyleVar_COUNT")                     = static_cast<int>(ImGuiStyleVar_COUNT);
+    e.value("ImGuiStyleVar_Alpha",                         ImGuiStyleVar_Alpha);                         m.attr("ImGuiStyleVar_Alpha")                         = static_cast<int>(ImGuiStyleVar_Alpha);
+    e.value("ImGuiStyleVar_DisabledAlpha",                 ImGuiStyleVar_DisabledAlpha);                 m.attr("ImGuiStyleVar_DisabledAlpha")                 = static_cast<int>(ImGuiStyleVar_DisabledAlpha);
+    e.value("ImGuiStyleVar_WindowPadding",                 ImGuiStyleVar_WindowPadding);                 m.attr("ImGuiStyleVar_WindowPadding")                 = static_cast<int>(ImGuiStyleVar_WindowPadding);
+    e.value("ImGuiStyleVar_WindowRounding",                ImGuiStyleVar_WindowRounding);                m.attr("ImGuiStyleVar_WindowRounding")                = static_cast<int>(ImGuiStyleVar_WindowRounding);
+    e.value("ImGuiStyleVar_WindowBorderSize",              ImGuiStyleVar_WindowBorderSize);              m.attr("ImGuiStyleVar_WindowBorderSize")              = static_cast<int>(ImGuiStyleVar_WindowBorderSize);
+    e.value("ImGuiStyleVar_WindowMinSize",                 ImGuiStyleVar_WindowMinSize);                 m.attr("ImGuiStyleVar_WindowMinSize")                 = static_cast<int>(ImGuiStyleVar_WindowMinSize);
+    e.value("ImGuiStyleVar_WindowTitleAlign",              ImGuiStyleVar_WindowTitleAlign);              m.attr("ImGuiStyleVar_WindowTitleAlign")              = static_cast<int>(ImGuiStyleVar_WindowTitleAlign);
+    e.value("ImGuiStyleVar_ChildRounding",                 ImGuiStyleVar_ChildRounding);                 m.attr("ImGuiStyleVar_ChildRounding")                 = static_cast<int>(ImGuiStyleVar_ChildRounding);
+    e.value("ImGuiStyleVar_ChildBorderSize",               ImGuiStyleVar_ChildBorderSize);               m.attr("ImGuiStyleVar_ChildBorderSize")               = static_cast<int>(ImGuiStyleVar_ChildBorderSize);
+    e.value("ImGuiStyleVar_PopupRounding",                 ImGuiStyleVar_PopupRounding);                 m.attr("ImGuiStyleVar_PopupRounding")                 = static_cast<int>(ImGuiStyleVar_PopupRounding);
+    e.value("ImGuiStyleVar_PopupBorderSize",               ImGuiStyleVar_PopupBorderSize);               m.attr("ImGuiStyleVar_PopupBorderSize")               = static_cast<int>(ImGuiStyleVar_PopupBorderSize);
+    e.value("ImGuiStyleVar_FramePadding",                  ImGuiStyleVar_FramePadding);                  m.attr("ImGuiStyleVar_FramePadding")                  = static_cast<int>(ImGuiStyleVar_FramePadding);
+    e.value("ImGuiStyleVar_FrameRounding",                 ImGuiStyleVar_FrameRounding);                 m.attr("ImGuiStyleVar_FrameRounding")                 = static_cast<int>(ImGuiStyleVar_FrameRounding);
+    e.value("ImGuiStyleVar_FrameBorderSize",               ImGuiStyleVar_FrameBorderSize);               m.attr("ImGuiStyleVar_FrameBorderSize")               = static_cast<int>(ImGuiStyleVar_FrameBorderSize);
+    e.value("ImGuiStyleVar_ItemSpacing",                   ImGuiStyleVar_ItemSpacing);                   m.attr("ImGuiStyleVar_ItemSpacing")                   = static_cast<int>(ImGuiStyleVar_ItemSpacing);
+    e.value("ImGuiStyleVar_ItemInnerSpacing",              ImGuiStyleVar_ItemInnerSpacing);              m.attr("ImGuiStyleVar_ItemInnerSpacing")              = static_cast<int>(ImGuiStyleVar_ItemInnerSpacing);
+    e.value("ImGuiStyleVar_IndentSpacing",                 ImGuiStyleVar_IndentSpacing);                 m.attr("ImGuiStyleVar_IndentSpacing")                 = static_cast<int>(ImGuiStyleVar_IndentSpacing);
+    e.value("ImGuiStyleVar_CellPadding",                   ImGuiStyleVar_CellPadding);                   m.attr("ImGuiStyleVar_CellPadding")                   = static_cast<int>(ImGuiStyleVar_CellPadding);
+    e.value("ImGuiStyleVar_ScrollbarSize",                 ImGuiStyleVar_ScrollbarSize);                 m.attr("ImGuiStyleVar_ScrollbarSize")                 = static_cast<int>(ImGuiStyleVar_ScrollbarSize);
+    e.value("ImGuiStyleVar_ScrollbarRounding",             ImGuiStyleVar_ScrollbarRounding);             m.attr("ImGuiStyleVar_ScrollbarRounding")             = static_cast<int>(ImGuiStyleVar_ScrollbarRounding);
+    e.value("ImGuiStyleVar_ScrollbarPadding",              ImGuiStyleVar_ScrollbarPadding);              m.attr("ImGuiStyleVar_ScrollbarPadding")              = static_cast<int>(ImGuiStyleVar_ScrollbarPadding);
+    e.value("ImGuiStyleVar_GrabMinSize",                   ImGuiStyleVar_GrabMinSize);                   m.attr("ImGuiStyleVar_GrabMinSize")                   = static_cast<int>(ImGuiStyleVar_GrabMinSize);
+    e.value("ImGuiStyleVar_GrabRounding",                  ImGuiStyleVar_GrabRounding);                  m.attr("ImGuiStyleVar_GrabRounding")                  = static_cast<int>(ImGuiStyleVar_GrabRounding);
+    e.value("ImGuiStyleVar_ImageBorderSize",               ImGuiStyleVar_ImageBorderSize);               m.attr("ImGuiStyleVar_ImageBorderSize")               = static_cast<int>(ImGuiStyleVar_ImageBorderSize);
+    e.value("ImGuiStyleVar_TabRounding",                   ImGuiStyleVar_TabRounding);                   m.attr("ImGuiStyleVar_TabRounding")                   = static_cast<int>(ImGuiStyleVar_TabRounding);
+    e.value("ImGuiStyleVar_TabBorderSize",                 ImGuiStyleVar_TabBorderSize);                 m.attr("ImGuiStyleVar_TabBorderSize")                 = static_cast<int>(ImGuiStyleVar_TabBorderSize);
+    e.value("ImGuiStyleVar_TabMinWidthBase",               ImGuiStyleVar_TabMinWidthBase);               m.attr("ImGuiStyleVar_TabMinWidthBase")               = static_cast<int>(ImGuiStyleVar_TabMinWidthBase);
+    e.value("ImGuiStyleVar_TabMinWidthShrink",             ImGuiStyleVar_TabMinWidthShrink);             m.attr("ImGuiStyleVar_TabMinWidthShrink")             = static_cast<int>(ImGuiStyleVar_TabMinWidthShrink);
+    e.value("ImGuiStyleVar_TabBarBorderSize",              ImGuiStyleVar_TabBarBorderSize);              m.attr("ImGuiStyleVar_TabBarBorderSize")              = static_cast<int>(ImGuiStyleVar_TabBarBorderSize);
+    e.value("ImGuiStyleVar_TabBarOverlineSize",            ImGuiStyleVar_TabBarOverlineSize);            m.attr("ImGuiStyleVar_TabBarOverlineSize")            = static_cast<int>(ImGuiStyleVar_TabBarOverlineSize);
+    e.value("ImGuiStyleVar_TableAngledHeadersAngle",       ImGuiStyleVar_TableAngledHeadersAngle);       m.attr("ImGuiStyleVar_TableAngledHeadersAngle")       = static_cast<int>(ImGuiStyleVar_TableAngledHeadersAngle);
+    e.value("ImGuiStyleVar_TableAngledHeadersTextAlign",   ImGuiStyleVar_TableAngledHeadersTextAlign);   m.attr("ImGuiStyleVar_TableAngledHeadersTextAlign")   = static_cast<int>(ImGuiStyleVar_TableAngledHeadersTextAlign);
+    e.value("ImGuiStyleVar_TreeLinesSize",                 ImGuiStyleVar_TreeLinesSize);                 m.attr("ImGuiStyleVar_TreeLinesSize")                 = static_cast<int>(ImGuiStyleVar_TreeLinesSize);
+    e.value("ImGuiStyleVar_TreeLinesRounding",             ImGuiStyleVar_TreeLinesRounding);             m.attr("ImGuiStyleVar_TreeLinesRounding")             = static_cast<int>(ImGuiStyleVar_TreeLinesRounding);
+    e.value("ImGuiStyleVar_ButtonTextAlign",               ImGuiStyleVar_ButtonTextAlign);               m.attr("ImGuiStyleVar_ButtonTextAlign")               = static_cast<int>(ImGuiStyleVar_ButtonTextAlign);
+    e.value("ImGuiStyleVar_SelectableTextAlign",           ImGuiStyleVar_SelectableTextAlign);           m.attr("ImGuiStyleVar_SelectableTextAlign")           = static_cast<int>(ImGuiStyleVar_SelectableTextAlign);
+    e.value("ImGuiStyleVar_SeparatorTextBorderSize",       ImGuiStyleVar_SeparatorTextBorderSize);       m.attr("ImGuiStyleVar_SeparatorTextBorderSize")       = static_cast<int>(ImGuiStyleVar_SeparatorTextBorderSize);
+    e.value("ImGuiStyleVar_SeparatorTextAlign",            ImGuiStyleVar_SeparatorTextAlign);            m.attr("ImGuiStyleVar_SeparatorTextAlign")            = static_cast<int>(ImGuiStyleVar_SeparatorTextAlign);
+    e.value("ImGuiStyleVar_SeparatorTextPadding",          ImGuiStyleVar_SeparatorTextPadding);          m.attr("ImGuiStyleVar_SeparatorTextPadding")          = static_cast<int>(ImGuiStyleVar_SeparatorTextPadding);
   ;
   }
 
@@ -745,10 +798,6 @@ void bind_imgui_enums(nb::module_& m) {
     e.value("ImGuiKey_GamepadRStickDown",              ImGuiKey_GamepadRStickDown);              m.attr("ImGuiKey_GamepadRStickDown")              = static_cast<int>(ImGuiKey_GamepadRStickDown);
     e.value("ImGuiKey_GamepadRStickLeft",              ImGuiKey_GamepadRStickLeft);              m.attr("ImGuiKey_GamepadRStickLeft")              = static_cast<int>(ImGuiKey_GamepadRStickLeft);
     e.value("ImGuiKey_GamepadRStickRight",             ImGuiKey_GamepadRStickRight);             m.attr("ImGuiKey_GamepadRStickRight")             = static_cast<int>(ImGuiKey_GamepadRStickRight);
-    e.value("ImGuiKey_ModCtrl",                        ImGuiKey_ModCtrl);                        m.attr("ImGuiKey_ModCtrl")                        = static_cast<int>(ImGuiKey_ModCtrl);
-    e.value("ImGuiKey_ModShift",                       ImGuiKey_ModShift);                       m.attr("ImGuiKey_ModShift")                       = static_cast<int>(ImGuiKey_ModShift);
-    e.value("ImGuiKey_ModAlt",                         ImGuiKey_ModAlt);                         m.attr("ImGuiKey_ModAlt")                         = static_cast<int>(ImGuiKey_ModAlt);
-    e.value("ImGuiKey_ModSuper",                       ImGuiKey_ModSuper);                       m.attr("ImGuiKey_ModSuper")                       = static_cast<int>(ImGuiKey_ModSuper);
     e.value("ImGuiMod_None",                           ImGuiMod_None);                           m.attr("ImGuiMod_None")                           = static_cast<int>(ImGuiMod_None);
     e.value("ImGuiMod_Ctrl",                           ImGuiMod_Ctrl);                           m.attr("ImGuiMod_Ctrl")                           = static_cast<int>(ImGuiMod_Ctrl);
     e.value("ImGuiMod_Shift",                          ImGuiMod_Shift);                          m.attr("ImGuiMod_Shift")                          = static_cast<int>(ImGuiMod_Shift);
@@ -758,4 +807,47 @@ void bind_imgui_enums(nb::module_& m) {
   ;
   }
 
+  { // ImTextureFormat
+  auto e = nb::enum_<ImTextureFormat>(m, "ImTextureFormat");
+    e.value("ImTextureFormat_RGBA32", ImTextureFormat_RGBA32); m.attr("ImTextureFormat_RGBA32") = static_cast<int>(ImTextureFormat_RGBA32);
+    e.value("ImTextureFormat_Alpha8", ImTextureFormat_Alpha8); m.attr("ImTextureFormat_Alpha8") = static_cast<int>(ImTextureFormat_Alpha8);
+  ;
+  }
+
+  { // ImTextureStatus
+  auto e = nb::enum_<ImTextureStatus>(m, "ImTextureStatus");
+    e.value("ImTextureStatus_OK",          ImTextureStatus_OK);          m.attr("ImTextureStatus_OK")          = static_cast<int>(ImTextureStatus_OK);
+    e.value("ImTextureStatus_Destroyed",   ImTextureStatus_Destroyed);   m.attr("ImTextureStatus_Destroyed")   = static_cast<int>(ImTextureStatus_Destroyed);
+    e.value("ImTextureStatus_WantCreate",  ImTextureStatus_WantCreate);  m.attr("ImTextureStatus_WantCreate")  = static_cast<int>(ImTextureStatus_WantCreate);
+    e.value("ImTextureStatus_WantUpdates", ImTextureStatus_WantUpdates); m.attr("ImTextureStatus_WantUpdates") = static_cast<int>(ImTextureStatus_WantUpdates);
+    e.value("ImTextureStatus_WantDestroy", ImTextureStatus_WantDestroy); m.attr("ImTextureStatus_WantDestroy") = static_cast<int>(ImTextureStatus_WantDestroy);
+  ;
+  }
+
+  { // ImFontAtlasFlags ImFontAtlasFlags_
+  auto e = nb::enum_<ImFontAtlasFlags_>(m, "ImFontAtlasFlags");
+    e.value("ImFontAtlasFlags_None",               ImFontAtlasFlags_None);               m.attr("ImFontAtlasFlags_None")               = static_cast<int>(ImFontAtlasFlags_None);
+    e.value("ImFontAtlasFlags_NoPowerOfTwoHeight", ImFontAtlasFlags_NoPowerOfTwoHeight); m.attr("ImFontAtlasFlags_NoPowerOfTwoHeight") = static_cast<int>(ImFontAtlasFlags_NoPowerOfTwoHeight);
+    e.value("ImFontAtlasFlags_NoMouseCursors",     ImFontAtlasFlags_NoMouseCursors);     m.attr("ImFontAtlasFlags_NoMouseCursors")     = static_cast<int>(ImFontAtlasFlags_NoMouseCursors);
+    e.value("ImFontAtlasFlags_NoBakedLines",       ImFontAtlasFlags_NoBakedLines);       m.attr("ImFontAtlasFlags_NoBakedLines")       = static_cast<int>(ImFontAtlasFlags_NoBakedLines);
+  ;
+  }
+
+  { // ImFontFlags ImFontFlags_
+  auto e = nb::enum_<ImFontFlags_>(m, "ImFontFlags");
+    e.value("ImFontFlags_None",            ImFontFlags_None);            m.attr("ImFontFlags_None")            = static_cast<int>(ImFontFlags_None);
+    e.value("ImFontFlags_NoLoadError",     ImFontFlags_NoLoadError);     m.attr("ImFontFlags_NoLoadError")     = static_cast<int>(ImFontFlags_NoLoadError);
+    e.value("ImFontFlags_NoLoadGlyphs",    ImFontFlags_NoLoadGlyphs);    m.attr("ImFontFlags_NoLoadGlyphs")    = static_cast<int>(ImFontFlags_NoLoadGlyphs);
+    e.value("ImFontFlags_LockBakedSizes",  ImFontFlags_LockBakedSizes);  m.attr("ImFontFlags_LockBakedSizes")  = static_cast<int>(ImFontFlags_LockBakedSizes);
+  ;
+  }
+
+  { // ImGuiViewportFlags ImGuiViewportFlags_
+  auto e = nb::enum_<ImGuiViewportFlags_>(m, "ImGuiViewportFlags");
+    e.value("ImGuiViewportFlags_None",              ImGuiViewportFlags_None);              m.attr("ImGuiViewportFlags_None")              = static_cast<int>(ImGuiViewportFlags_None);
+    e.value("ImGuiViewportFlags_IsPlatformWindow",  ImGuiViewportFlags_IsPlatformWindow);  m.attr("ImGuiViewportFlags_IsPlatformWindow")  = static_cast<int>(ImGuiViewportFlags_IsPlatformWindow);
+    e.value("ImGuiViewportFlags_IsPlatformMonitor", ImGuiViewportFlags_IsPlatformMonitor); m.attr("ImGuiViewportFlags_IsPlatformMonitor") = static_cast<int>(ImGuiViewportFlags_IsPlatformMonitor);
+    e.value("ImGuiViewportFlags_OwnedByApp",        ImGuiViewportFlags_OwnedByApp);        m.attr("ImGuiViewportFlags_OwnedByApp")        = static_cast<int>(ImGuiViewportFlags_OwnedByApp);
+  ;
+  }
 }

@@ -6,6 +6,32 @@
 
 void bind_imgui_fonts(nb::module_& m) {
 
+    // ImFontBaked - Font runtime data for a given size
+    nb::class_<ImFontBaked>(m, "ImFontBaked")
+        // IMGUI_API void              ClearOutputData();
+        .def("ClearOutputData", &ImFontBaked::ClearOutputData, "Clear output data")
+
+        // IMGUI_API ImFontGlyph*      FindGlyph(ImWchar c);
+        // Not bound - returns pointer to glyph data
+
+        // IMGUI_API ImFontGlyph*      FindGlyphNoFallback(ImWchar c);
+        // Not bound - returns pointer to glyph data
+
+        // IMGUI_API float             GetCharAdvance(ImWchar c);
+        .def("GetCharAdvance", &ImFontBaked::GetCharAdvance, nb::arg("c"), "Get character advance")
+
+        // IMGUI_API bool              IsGlyphLoaded(ImWchar c);
+        .def("IsGlyphLoaded", &ImFontBaked::IsGlyphLoaded, nb::arg("c"), "Check if glyph is loaded")
+
+        // Properties
+        .def_ro("FallbackAdvanceX", &ImFontBaked::FallbackAdvanceX, "Fallback character advance")
+        .def_ro("Size", &ImFontBaked::Size, "Font size in pixels")
+        .def_ro("RasterizerDensity", &ImFontBaked::RasterizerDensity, "Density this is baked at")
+        .def_ro("Ascent", &ImFontBaked::Ascent, "Ascent: distance from top to bottom of e.g. 'A'")
+        .def_ro("Descent", &ImFontBaked::Descent, "Descent")
+        .def_ro("OwnerFont", &ImFontBaked::OwnerFont, nb::rv_policy::reference, "Parent font")
+    ;
+
     // ImFontAtlas - Font atlas for loading and building fonts
     nb::class_<ImFontAtlas>(m, "ImFontAtlas")
         // IMGUI_API ImFont*           AddFont(const ImFontConfig* font_cfg);
@@ -26,60 +52,22 @@ void bind_imgui_fonts(nb::module_& m) {
             return atlas.AddFontFromMemoryCompressedBase85TTF(compressed_font_data_base85, size_pixels, nullptr, nullptr);
         }, nb::arg("compressed_font_data_base85"), nb::arg("size_pixels"), nb::rv_policy::reference, "Add font from compressed base85 data")
 
-        // IMGUI_API void              ClearInputData();           // Clear input data (all ImFontConfig structures including sizes, TTF data, glyph ranges, etc.) = all the data used to build the texture and fonts.
-        .def("ClearInputData", &ImFontAtlas::ClearInputData, "Clear input data")
-
-        // IMGUI_API void              ClearFonts();               // Clear input+output font data (same as ClearInputData() + glyphs storage, UV coordinates).
-        .def("ClearFonts", &ImFontAtlas::ClearFonts, "Clear fonts")
-
-        // IMGUI_API void              ClearTexData();             // Clear output texture data (CPU side). Saves RAM once the texture has been copied to graphics memory.
-        .def("ClearTexData", &ImFontAtlas::ClearTexData, "Clear texture data")
+        // IMGUI_API void              RemoveFont(ImFont* font);
+        .def("RemoveFont", &ImFontAtlas::RemoveFont, nb::arg("font"), "Remove font from atlas")
 
         // IMGUI_API void              Clear();                    // Clear all input and output.
         .def("Clear", &ImFontAtlas::Clear, "Clear all")
 
+        // IMGUI_API void              CompactCache();             // Compact cached glyphs and texture.
+        .def("CompactCache", &ImFontAtlas::CompactCache, "Compact cache")
+
         // IMGUI_API bool              Build();                    // Build pixels data. This is called automatically for you by the GetTexData*** functions.
         .def("Build", &ImFontAtlas::Build, "Build atlas")
 
-        // bool                        IsBuilt() const             { return Fonts.Size > 0 && TexReady; }
-        .def("IsBuilt", &ImFontAtlas::IsBuilt, "Check if atlas is built")
-
-        // void                        SetTexID(ImTextureID id)    { TexID = id; }
-        // Not bound - ImTextureID is a void* pointer
-
-        // IMGUI_API const ImWchar*    GetGlyphRangesDefault();
-        // Not bound - returns pointer to static data, difficult to use from Python
-
-        // IMGUI_API const ImWchar*    GetGlyphRangesGreek();
-        // Not bound - returns pointer to static data
-
-        // IMGUI_API const ImWchar*    GetGlyphRangesKorean();
-        // Not bound - returns pointer to static data
-
-        // IMGUI_API const ImWchar*    GetGlyphRangesJapanese();
-        // Not bound - returns pointer to static data
-
-        // IMGUI_API const ImWchar*    GetGlyphRangesChineseFull();
-        // Not bound - returns pointer to static data
-
-        // IMGUI_API const ImWchar*    GetGlyphRangesChineseSimplifiedCommon();
-        // Not bound - returns pointer to static data
-
-        // IMGUI_API const ImWchar*    GetGlyphRangesCyrillic();
-        // Not bound - returns pointer to static data
-
-        // IMGUI_API const ImWchar*    GetGlyphRangesThai();
-        // Not bound - returns pointer to static data
-
-        // IMGUI_API const ImWchar*    GetGlyphRangesVietnamese();
-        // Not bound - returns pointer to static data
-
         // Properties
         .def_rw("Flags", &ImFontAtlas::Flags, "Build flags")
-        .def_rw("TexDesiredWidth", &ImFontAtlas::TexDesiredWidth, "Texture width desired by user before Build()")
+        .def_rw("Flags", &ImFontAtlas::Flags, "Build flags")
         .def_rw("TexGlyphPadding", &ImFontAtlas::TexGlyphPadding, "Padding between glyphs within texture in pixels")
-        .def_ro("TexWidth", &ImFontAtlas::TexWidth, "Texture width calculated during Build()")
-        .def_ro("TexHeight", &ImFontAtlas::TexHeight, "Texture height calculated during Build()")
         .def_prop_ro("TexUvScale", [](const ImFontAtlas& atlas) { return from_vec2(atlas.TexUvScale); }, "Texture UV scale")
         .def_prop_ro("TexUvWhitePixel", [](const ImFontAtlas& atlas) { return from_vec2(atlas.TexUvWhitePixel); }, "Texture coordinates to a white pixel")
     ;
@@ -92,9 +80,6 @@ void bind_imgui_fonts(nb::module_& m) {
         // IMGUI_API ImFontGlyph*      FindGlyphNoFallback(ImWchar c);
         // Not bound - returns pointer to glyph data
 
-        // float                       GetCharAdvance(ImWchar c)       { return ((int)c < IndexAdvanceX.Size) ? IndexAdvanceX[(int)c] : FallbackAdvanceX; }
-        .def("GetCharAdvance", &ImFont::GetCharAdvance, nb::arg("c"), "Get character advance")
-
         // bool                        IsLoaded() const                { return ContainerAtlas != NULL; }
         .def("IsLoaded", &ImFont::IsLoaded, "Check if font is loaded")
 
@@ -106,12 +91,17 @@ void bind_imgui_fonts(nb::module_& m) {
             return from_vec2(font.CalcTextSizeA(size, max_width, wrap_width, text_begin, nullptr, nullptr));
         }, nb::arg("size"), nb::arg("max_width"), nb::arg("wrap_width"), nb::arg("text_begin"), "Calculate text size")
 
+        // IMGUI_API const char*       CalcWordWrapPosition(float size, const char* text, const char* text_end, float wrap_width);
+        .def("CalcWordWrapPosition", [](ImFont& font, float size, std::string text, float wrap_width) {
+            return font.CalcWordWrapPosition(size, text.c_str(), nullptr, wrap_width);
+        }, nb::arg("size"), nb::arg("text"), nb::arg("wrap_width"), "Calculate word wrap position")
+
+        // IMGUI_API ImFontBaked*      GetFontBaked(float font_size, float density = -1.0f);
+        .def("GetFontBaked", &ImFont::GetFontBaked, nb::arg("font_size"), nb::arg("density") = -1.0f, nb::rv_policy::reference, "Get or create baked data for given size")
+
         // Properties
-        .def_ro("FontSize", &ImFont::FontSize, "Height of characters/line, set during loading")
         .def_rw("Scale", &ImFont::Scale, "Base font scale, multiplied by the per-window font scale")
-        .def_ro("Ascent", &ImFont::Ascent, "Ascent: distance from top to bottom of e.g. 'A'")
-        .def_ro("Descent", &ImFont::Descent, "Descent")
-        .def_ro("ContainerAtlas", &ImFont::ContainerAtlas, nb::rv_policy::reference, "What we has been loaded into")
+        .def_ro("OwnerAtlas", &ImFont::OwnerAtlas, nb::rv_policy::reference, "What we have been loaded into")
     ;
 }
 

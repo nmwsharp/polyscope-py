@@ -12,11 +12,6 @@
 void bind_imgui_api_style_read(nb::module_& m) {
 
     // Style read access
-    // IMGUI_API ImFont*       GetFont();
-    m.def("GetFont", []() { return ImGui::GetFont(); }, nb::rv_policy::reference);
-
-    // IMGUI_API float         GetFontSize();
-    m.def("GetFontSize", []() { return ImGui::GetFontSize(); });
 
     // IMGUI_API ImVec2        GetFontTexUvWhitePixel();
     m.def("GetFontTexUvWhitePixel", []() { return from_vec2(ImGui::GetFontTexUvWhitePixel()); });

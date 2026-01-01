@@ -14,6 +14,12 @@ void bind_imgui_style(nb::module_& m) {
         })
 
     nb::class_<ImGuiStyle>(m, "ImGuiStyle")
+
+        // Font scaling
+        .def_rw("FontSizeBase", &ImGuiStyle::FontSizeBase)
+        .def_rw("FontScaleMain", &ImGuiStyle::FontScaleMain)
+        .def_rw("FontScaleDpi", &ImGuiStyle::FontScaleDpi)
+
         // Main
         .def_rw("Alpha", &ImGuiStyle::Alpha)
         .def_rw("DisabledAlpha", &ImGuiStyle::DisabledAlpha)
@@ -51,6 +57,7 @@ void bind_imgui_style(nb::module_& m) {
         // Scrollbars
         .def_rw("ScrollbarSize", &ImGuiStyle::ScrollbarSize)
         .def_rw("ScrollbarRounding", &ImGuiStyle::ScrollbarRounding)
+        .def_rw("ScrollbarPadding", &ImGuiStyle::ScrollbarPadding)
 
         // Grab handles
         .def_rw("GrabMinSize", &ImGuiStyle::GrabMinSize)
@@ -71,6 +78,16 @@ void bind_imgui_style(nb::module_& m) {
         // Tables
         .def_rw("TableAngledHeadersAngle", &ImGuiStyle::TableAngledHeadersAngle)
         .VEC2_PROPERTY(TableAngledHeadersTextAlign)
+
+        // Tree Lines
+        .def_rw("TreeLinesFlags", &ImGuiStyle::TreeLinesFlags)
+        .def_rw("TreeLinesSize", &ImGuiStyle::TreeLinesSize)
+        .def_rw("TreeLinesRounding", &ImGuiStyle::TreeLinesRounding)
+
+        // Drag and Drop
+        .def_rw("DragDropTargetRounding", &ImGuiStyle::DragDropTargetRounding)
+        .def_rw("DragDropTargetBorderSize", &ImGuiStyle::DragDropTargetBorderSize)
+        .def_rw("DragDropTargetPadding", &ImGuiStyle::DragDropTargetPadding)
 
         // Widgets
         .def_rw("ColorButtonPosition", &ImGuiStyle::ColorButtonPosition)

@@ -275,24 +275,26 @@ void bind_imgui_drawlist(nb::module_& m) {
         )
 
         // Image primitives
+        // IMGUI_API void  AddImage(ImTextureRef tex_ref, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min = ImVec2(0, 0), const ImVec2& uv_max = ImVec2(1, 1), ImU32 col = IM_COL32_WHITE);
         .def(
             "AddImage",
-            [](ImDrawList& self, ImTextureID user_texture_id, const Vec2T& p_min, const Vec2T& p_max, const Vec2T& uv_min, const Vec2T& uv_max, ImU32 col) {
-                self.AddImage(user_texture_id, to_vec2(p_min), to_vec2(p_max), to_vec2(uv_min), to_vec2(uv_max), col);
+            [](ImDrawList& self, ImTextureRef tex_ref, const Vec2T& p_min, const Vec2T& p_max, const Vec2T& uv_min, const Vec2T& uv_max, ImU32 col) {
+                self.AddImage(tex_ref, to_vec2(p_min), to_vec2(p_max), to_vec2(uv_min), to_vec2(uv_max), col);
             },
-            nb::arg("user_texture_id"),
+            nb::arg("user_texture_ref"),
             nb::arg("p_min"),
             nb::arg("p_max"),
             nb::arg("uv_min") = Vec2T{0, 0},
             nb::arg("uv_max") = Vec2T{1, 1},
             nb::arg("col") = IM_COL32_WHITE
         )
+        // IMGUI_API void  AddImageQuad(ImTextureRef tex_ref, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1 = ImVec2(0, 0), const ImVec2& uv2 = ImVec2(1, 0), const ImVec2& uv3 = ImVec2(1, 1), const ImVec2& uv4 = ImVec2(0, 1), ImU32 col = IM_COL32_WHITE);
         .def(
             "AddImageQuad",
-            [](ImDrawList& self, ImTextureID user_texture_id, const Vec2T& p1, const Vec2T& p2, const Vec2T& p3, const Vec2T& p4, const Vec2T& uv1, const Vec2T& uv2, const Vec2T& uv3, const Vec2T& uv4, ImU32 col) {
-                self.AddImageQuad(user_texture_id, to_vec2(p1), to_vec2(p2), to_vec2(p3), to_vec2(p4), to_vec2(uv1), to_vec2(uv2), to_vec2(uv3), to_vec2(uv4), col);
+            [](ImDrawList& self, ImTextureRef tex_ref, const Vec2T& p1, const Vec2T& p2, const Vec2T& p3, const Vec2T& p4, const Vec2T& uv1, const Vec2T& uv2, const Vec2T& uv3, const Vec2T& uv4, ImU32 col) {
+                self.AddImageQuad(tex_ref, to_vec2(p1), to_vec2(p2), to_vec2(p3), to_vec2(p4), to_vec2(uv1), to_vec2(uv2), to_vec2(uv3), to_vec2(uv4), col);
             },
-            nb::arg("user_texture_id"),
+            nb::arg("user_texture_ref"),
             nb::arg("p1"),
             nb::arg("p2"),
             nb::arg("p3"),
@@ -303,12 +305,13 @@ void bind_imgui_drawlist(nb::module_& m) {
             nb::arg("uv4") = Vec2T{0, 1},
             nb::arg("col") = IM_COL32_WHITE
         )
+        // IMGUI_API void  AddImageRounded(ImTextureRef tex_ref, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawFlags flags = 0);
         .def(
             "AddImageRounded",
-            [](ImDrawList& self, ImTextureID user_texture_id, const Vec2T& p_min, const Vec2T& p_max, const Vec2T& uv_min, const Vec2T& uv_max, ImU32 col, float rounding, ImDrawFlags flags) {
-                self.AddImageRounded(user_texture_id, to_vec2(p_min), to_vec2(p_max), to_vec2(uv_min), to_vec2(uv_max), col, rounding, flags);
+            [](ImDrawList& self, ImTextureRef tex_ref, const Vec2T& p_min, const Vec2T& p_max, const Vec2T& uv_min, const Vec2T& uv_max, ImU32 col, float rounding, ImDrawFlags flags) {
+                self.AddImageRounded(tex_ref, to_vec2(p_min), to_vec2(p_max), to_vec2(uv_min), to_vec2(uv_max), col, rounding, flags);
             },
-            nb::arg("user_texture_id"),
+            nb::arg("user_texture_ref"),
             nb::arg("p_min"),
             nb::arg("p_max"),
             nb::arg("uv_min"),

@@ -16,6 +16,14 @@ void bind_imgui_structs(nb::module_& m) {
     // We pass them using nb::capsule, see
     // imgui_api_context_creation.cpp for an example.
 
+    // ImTextureRef
+    nb::class_<ImTextureRef>(m, "ImTextureRef")
+    .def(nb::init<>())
+    .def(nb::init<ImTextureID>(), nb::arg("tex_id"))
+    .def(nb::init<void*>(), nb::arg("tex_ptr"))
+    .def("GetTexID", &ImTextureRef::GetTexID)
+    ;
+
     // Table sorting
     nb::class_<ImGuiTableSortSpecs>(m, "ImGuiTableSortSpecs")
     .def("Specs", [](ImGuiTableSortSpecs& o) {
