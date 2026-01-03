@@ -15,6 +15,10 @@ repair-wheel-command = "auditwheel repair --exclude libEGL.so.1 -w {dest_dir} {w
 [tool.cibuildwheel.environment.linux]
 CMAKE_ARGS = "DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON"
 
+# Nanobind requires C++17, which means we must target macOS 10.13 (partial support) or 10.14 (full support)
+[tool.cibuildwheel.environment.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "10.13"
+
 # musllinux builds on an Alpinx Linux image, need different package names
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
