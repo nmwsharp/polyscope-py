@@ -16,6 +16,7 @@ else:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 
 import polyscope as ps
+import argparse
 import polyscope.imgui as psim
 import polyscope.implot as psimplot
 
@@ -50,14 +51,11 @@ def print_discovered_tests_summary(suite, full_listing=False):
 
 if __name__ == '__main__':
 
-    # Parse out test-specific args (this is kinda poor design, but very useful)
-    ps_backend = "openGL_mock"
-    if len(sys.argv) > 1:
-        for a in sys.argv:
-            if a.startswith("backend="):
-                ps_backend = a[len("backend="):]
-                sys.argv.remove(a)
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--backend", default="openGL_mock", help="Backend to use for testing (default: openGL_mock)") 
+    args, remaining = parser.parse_known_args()
+    
+    ps_backend = args.backend
     print(f"Testing polyscope version: {ps.__version__}  test_backend: {ps_backend}")
 
     # Really global setup.
