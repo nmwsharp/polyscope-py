@@ -32,6 +32,10 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12' 
+
       - name: Package source distribution
         # make sure this only happens on one of the runners, not repeated on all
         if: matrix.os == 'ubuntu-latest'
