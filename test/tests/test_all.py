@@ -123,6 +123,11 @@ class TestCore(unittest.TestCase):
             pass
         ps.set_configure_imgui_style_callback(do_nothing_callback)
         ps.clear_configure_imgui_style_callback()
+        def do_nothing_font_callback(atlas):
+            # never actually gets called, but at least it has a reasonable signature
+            return None, None
+        ps.set_prepare_imgui_fonts_callback(do_nothing_font_callback)
+        ps.clear_prepare_imgui_fonts_callback()
         def do_nothing_callback_2(arg):
             pass
         ps.set_files_dropped_callback(do_nothing_callback)

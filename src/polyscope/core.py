@@ -186,6 +186,12 @@ def set_configure_imgui_style_callback(f):
 def clear_configure_imgui_style_callback():
     return psb.clear_configure_imgui_style_callback()
 
+def set_prepare_imgui_fonts_callback(f):
+    return psb.set_prepare_imgui_fonts_callback(f)
+
+def clear_prepare_imgui_fonts_callback():
+    return psb.clear_prepare_imgui_fonts_callback()
+
 def set_files_dropped_callback(f):
     return psb.set_files_dropped_callback(f)
 
