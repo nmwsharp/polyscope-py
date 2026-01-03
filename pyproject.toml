@@ -35,6 +35,8 @@ build-backend = "scikit_build_core.build"
 build.verbose = true
 logging.level = "INFO"
 
-# Nanobind requires C++17, which means we must target macOS 10.13 (partial support) or 10.14 (full support)
-# https://cibuildwheel.pypa.io/en/stable/cpp_standards/#macos-and-deployment-target-versions
+# Required by nanobind for C++17. Technically it should be 10.14 
+# for full support, but this seems to work and gets us somewhat older 
+# compatibility.
+# There is a matching setting in cibuildwheel_config.toml 
 cmake.args = ["-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13"]

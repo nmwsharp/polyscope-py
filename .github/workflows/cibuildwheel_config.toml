@@ -15,7 +15,11 @@ repair-wheel-command = "auditwheel repair --exclude libEGL.so.1 -w {dest_dir} {w
 [tool.cibuildwheel.environment.linux]
 CMAKE_ARGS = "DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON"
 
-# This matches the value in pyproject.toml
+# Required by nanobind for C++17. Technically it should be 10.14 
+# for full support, but this seems to work and gets us somewhat older 
+# compatibility.
+# There is a matching setting in pyproject.toml 
+# https://cibuildwheel.pypa.io/en/stable/cpp_standards/#macos-and-deployment-target-versions
 [tool.cibuildwheel.macos.environment]
 MACOSX_DEPLOYMENT_TARGET = "10.13"
 
