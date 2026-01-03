@@ -15,9 +15,11 @@ repair-wheel-command = "auditwheel repair --exclude libEGL.so.1 -w {dest_dir} {w
 [tool.cibuildwheel.environment.linux]
 CMAKE_ARGS = "DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON"
 
+# This matches the value in pyproject.toml
+[tool.cibuildwheel.environment.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "10.13"
 
 # musllinux builds on an Alpinx Linux image, need different package names
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
 before-all = "apk add libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev freeglut-dev mesa-dev mesa-gl mesa-egl"
-
