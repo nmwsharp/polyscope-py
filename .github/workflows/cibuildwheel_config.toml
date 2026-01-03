@@ -1,5 +1,4 @@
 [tool.cibuildwheel]
-skip = "cp36-*" # scikit-build-core requires >=3.7
 build-verbosity = 3
 
 [tool.cibuildwheel.linux]
@@ -14,6 +13,14 @@ repair-wheel-command = "auditwheel repair --exclude libEGL.so.1 -w {dest_dir} {w
 
 [tool.cibuildwheel.environment.linux]
 CMAKE_ARGS = "DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON"
+
+# Required by nanobind for C++17. Technically it should be 10.14 
+# for full support, but this seems to work and gets us somewhat older 
+# compatibility.
+# There is a matching setting in pyproject.toml 
+# https://cibuildwheel.pypa.io/en/stable/cpp_standards/#macos-and-deployment-target-versions
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "10.13"
 
 # musllinux builds on an Alpinx Linux image, need different package names
 [[tool.cibuildwheel.overrides]]

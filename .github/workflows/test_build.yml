@@ -1,4 +1,3 @@
-
 name: Test Build
 
 # NOTE: build logic is duplicated here and in publish.yml
@@ -22,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         # macos-13 is an intel runner, macos-14+ is apple silicon
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-13, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-15-intel, macos-latest]
 
     name: Build wheels ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -32,6 +31,10 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12' 
+
       - name: Package source distribution
         # make sure this only happens on one of the runners, not repeated on all
         if: matrix.os == 'ubuntu-latest'
@@ -40,7 +43,7 @@ jobs:
           python -m build --sdist
 
       - name: Run cibuildwheel
-        uses: pypa/cibuildwheel@v2.23.2
+        uses: pypa/cibuildwheel@v3.3.0
         with:
           config-file: ".github/workflows/cibuildwheel_config.toml"
 
