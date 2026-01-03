@@ -1,5 +1,5 @@
 [tool.cibuildwheel]
-skip = "cp36-*" # scikit-build-core requires >=3.7
+# skip = "cp36-*,cp37" # scikit-build-core requires >=3.7
 build-verbosity = 3
 
 [tool.cibuildwheel.linux]
