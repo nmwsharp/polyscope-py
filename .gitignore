@@ -9,6 +9,9 @@ __pycache__/
 .cache
 *.egg-info
 
+# Stubs that get generated as part of the build process
+src/polyscope_bindings/**.pyi
+
 # Editor and OS things
 imgui.ini
 .polyscope.ini

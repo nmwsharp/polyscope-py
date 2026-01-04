@@ -145,6 +145,8 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("clear_configure_imgui_style_callback", []() {ps::options::configureImGuiStyleCallback = polyscope::configureImGuiStyle;});
   m.def("set_files_dropped_callback", [](std::function<void(const std::vector<std::string>&)> x) { ps::state::filesDroppedCallback = x; });
   m.def("clear_files_dropped_callback", []() {ps::state::filesDroppedCallback = nullptr;});
+  m.def("set_prepare_imgui_fonts_callback", [](std::function<std::tuple<ImFont*, ImFont*>(ImFontAtlas*)> x) { ps::options::prepareImGuiFontsCallback = x; });
+  m.def("clear_prepare_imgui_fonts_callback", []() {ps::options::prepareImGuiFontsCallback = polyscope::loadBaseFonts;});
 
 
   // === Scene extents
