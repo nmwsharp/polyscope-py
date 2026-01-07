@@ -95,12 +95,12 @@ void bind_imgui_api_widgets_main(nb::module_& m) {
     // IMGUI_API void          ProgressBar(float fraction, const ImVec2& size_arg = ImVec2(-FLT_MIN, 0), const char* overlay = NULL);
     m.def(
         "ProgressBar",
-        [](float fraction, const Vec2T& size_arg, std::string overlay) {
-            ImGui::ProgressBar(fraction, to_vec2(size_arg), overlay.empty() ? nullptr : overlay.c_str());
+        [](float fraction, const Vec2T& size_arg, std::optional<std::string> overlay) {
+            ImGui::ProgressBar(fraction, to_vec2(size_arg), to_char_ptr(overlay));
         },
         nb::arg("fraction"),
         nb::arg("size_arg") = Vec2T(-FLT_MIN, 0.f),
-        nb::arg("overlay") = "");
+        nb::arg("overlay") = nb::none());
 
     // IMGUI_API void          Bullet();
     m.def("Bullet", []() { ImGui::Bullet(); });
@@ -114,11 +114,11 @@ void bind_imgui_api_widgets_main(nb::module_& m) {
     // IMGUI_API void          TextLinkOpenURL(const char* label, const char* url = NULL);
     m.def(
         "TextLinkOpenURL",
-        [](std::string label, std::string url) { 
-            return ImGui::TextLinkOpenURL(label.c_str(), url.empty() ? nullptr : url.c_str()); 
+        [](std::string label, std::optional<std::string> url) { 
+            return ImGui::TextLinkOpenURL(label.c_str(), to_char_ptr(url));
         },
         nb::arg("label"),
-        nb::arg("url") = "");
+        nb::arg("url") = nb::none());
 
 }
 // clang-format on

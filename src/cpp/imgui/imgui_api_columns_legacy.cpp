@@ -7,6 +7,8 @@
 #include "imgui_utils.h"
 
 #include <nanobind/stl/array.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/string.h>
 
 // clang-format off
 void bind_imgui_api_columns_legacy(nb::module_& m) {
@@ -15,7 +17,9 @@ void bind_imgui_api_columns_legacy(nb::module_& m) {
     // IMGUI_API void          Columns(int count = 1, const char* id = NULL, bool borders = true);
     m.def(
         "Columns",
-        [](int count, const char* id, bool borders) { ImGui::Columns(count, id, borders); },
+        [](int count, std::optional<std::string> id, bool borders) { 
+            ImGui::Columns(count, to_char_ptr(id), borders); 
+        },
         nb::arg("count") = 1,
         nb::arg("id") = nb::none(),
         nb::arg("borders") = true);
