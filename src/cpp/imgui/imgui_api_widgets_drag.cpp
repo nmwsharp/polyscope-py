@@ -7,6 +7,8 @@
 #include "imgui_utils.h"
 
 #include <nanobind/stl/array.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/string.h>
 
 // clang-format off
 void bind_imgui_api_widgets_drag(nb::module_& m) {
@@ -76,11 +78,7 @@ void bind_imgui_api_widgets_drag(nb::module_& m) {
     m.def(
         "DragFloatRange2",
         [](const char* label, float v_current_min, float v_current_max, float v_speed, float v_min, float v_max, std::string format, std::optional<std::string> format_max, ImGuiSliderFlags flags) {
-            const char* format_max_ptr = nullptr;
-            if(format_max.has_value()) {
-                format_max_ptr = format_max->c_str();
-            }
-            bool result = ImGui::DragFloatRange2(label, &v_current_min, &v_current_max, v_speed, v_min, v_max, format.c_str(), format_max_ptr, flags);
+            bool result = ImGui::DragFloatRange2(label, &v_current_min, &v_current_max, v_speed, v_min, v_max, format.c_str(), to_char_ptr(format_max), flags);
             return std::make_tuple(result, v_current_min, v_current_max);
         },
         nb::arg("label"),
@@ -156,8 +154,8 @@ void bind_imgui_api_widgets_drag(nb::module_& m) {
     // IMGUI_API bool          DragIntRange2(const char* label, int* v_current_min, int* v_current_max, float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", const char* format_max = NULL, ImGuiSliderFlags flags = 0);
     m.def(
         "DragIntRange2",
-        [](const char* label, int v_current_min, int v_current_max, float v_speed, int v_min, int v_max, const char* format, const char* format_max, ImGuiSliderFlags flags) {
-            bool result = ImGui::DragIntRange2(label, &v_current_min, &v_current_max, v_speed, v_min, v_max, format, format_max, flags);
+        [](const char* label, int v_current_min, int v_current_max, float v_speed, int v_min, int v_max, const char* format, std::optional<std::string> format_max, ImGuiSliderFlags flags) {
+            bool result = ImGui::DragIntRange2(label, &v_current_min, &v_current_max, v_speed, v_min, v_max, format, to_char_ptr(format_max), flags);
             return std::make_tuple(result, v_current_min, v_current_max);
         },
         nb::arg("label"),

@@ -255,4 +255,3 @@ def process_implicit_render_args(opts, implicit_args):
 def check_all_args_processed(structure, quantity, args):
     for arg,val in args.items():
         raise ValueError(f"Polyscope: Unrecognized quantity keyword argument {arg}: {val}")
-

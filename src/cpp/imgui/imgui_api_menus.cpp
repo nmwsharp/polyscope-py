@@ -7,6 +7,8 @@
 #include "imgui_utils.h"
 
 #include <nanobind/stl/array.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/string.h>
 
 // clang-format off
 void bind_imgui_api_menus(nb::module_& m) {
@@ -37,8 +39,8 @@ void bind_imgui_api_menus(nb::module_& m) {
     // IMGUI_API bool          MenuItem(const char* label, const char* shortcut = NULL, bool selected = false, bool enabled = true);
     m.def(
         "MenuItem",
-        [](const char* label, const char* shortcut, bool selected, bool enabled) {
-            return ImGui::MenuItem(label, shortcut, selected, enabled);
+        [](const char* label, std::optional<std::string> shortcut, bool selected, bool enabled) {
+            return ImGui::MenuItem(label, to_char_ptr(shortcut), selected, enabled);
         },
         nb::arg("label"),
         nb::arg("shortcut") = nb::none(),

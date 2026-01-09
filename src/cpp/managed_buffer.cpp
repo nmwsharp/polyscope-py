@@ -7,6 +7,8 @@
 
 #include "utils.h"
 
+#include <nanobind/stl/array.h>
+
 template <typename T>
 nb::class_<ps::render::ManagedBuffer<T>> bind_managed_buffer_T(nb::module_& m, ps::ManagedBufferType t) {
 

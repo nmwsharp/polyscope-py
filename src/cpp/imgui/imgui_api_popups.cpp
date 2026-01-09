@@ -7,6 +7,8 @@
 #include "imgui_utils.h"
 
 #include <nanobind/stl/array.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/string.h>
 
 // clang-format off
 void bind_imgui_api_popups(nb::module_& m) {
@@ -59,7 +61,7 @@ void bind_imgui_api_popups(nb::module_& m) {
     // IMGUI_API void          OpenPopupOnItemClick(const char* str_id = NULL, ImGuiPopupFlags popup_flags = 1);
     m.def(
         "OpenPopupOnItemClick",
-        [](const char* str_id, ImGuiPopupFlags popup_flags) { ImGui::OpenPopupOnItemClick(str_id, popup_flags); },
+        [](std::optional<std::string> str_id, ImGuiPopupFlags popup_flags) { ImGui::OpenPopupOnItemClick(to_char_ptr(str_id), popup_flags); },
         nb::arg("str_id") = nb::none(),
         nb::arg("popup_flags") = 1);
 
@@ -70,8 +72,8 @@ void bind_imgui_api_popups(nb::module_& m) {
     // IMGUI_API bool          BeginPopupContextItem(const char* str_id = NULL, ImGuiPopupFlags popup_flags = 1);
     m.def(
         "BeginPopupContextItem",
-        [](const char* str_id, ImGuiPopupFlags popup_flags) {
-            return ImGui::BeginPopupContextItem(str_id, popup_flags);
+        [](std::optional<std::string> str_id, ImGuiPopupFlags popup_flags) {
+            return ImGui::BeginPopupContextItem(to_char_ptr(str_id), popup_flags);
         },
         nb::arg("str_id") = nb::none(),
         nb::arg("popup_flags") = 1);
@@ -79,8 +81,8 @@ void bind_imgui_api_popups(nb::module_& m) {
     // IMGUI_API bool          BeginPopupContextWindow(const char* str_id = NULL, ImGuiPopupFlags popup_flags = 1);
     m.def(
         "BeginPopupContextWindow",
-        [](const char* str_id, ImGuiPopupFlags popup_flags) {
-            return ImGui::BeginPopupContextWindow(str_id, popup_flags);
+        [](std::optional<std::string> str_id, ImGuiPopupFlags popup_flags) {
+            return ImGui::BeginPopupContextWindow(to_char_ptr(str_id), popup_flags);
         },
         nb::arg("str_id") = nb::none(),
         nb::arg("popup_flags") = 1);
@@ -88,8 +90,8 @@ void bind_imgui_api_popups(nb::module_& m) {
     // IMGUI_API bool          BeginPopupContextVoid(const char* str_id = NULL, ImGuiPopupFlags popup_flags = 1);
     m.def(
         "BeginPopupContextVoid",
-        [](const char* str_id, ImGuiPopupFlags popup_flags) {
-            return ImGui::BeginPopupContextVoid(str_id, popup_flags);
+        [](std::optional<std::string> str_id, ImGuiPopupFlags popup_flags) {
+            return ImGui::BeginPopupContextVoid(to_char_ptr(str_id), popup_flags);
         },
         nb::arg("str_id") = nb::none(),
         nb::arg("popup_flags") = 1);
