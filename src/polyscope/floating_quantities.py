@@ -1,7 +1,9 @@
 import polyscope_bindings as psb
 
 from polyscope.common import check_is_scalar_image, check_is_image3, check_is_image4, check_image_dims_compatible, process_scalar_args, process_color_args, process_image_args, process_render_image_args, process_quantity_args, check_all_args_processed
-from polyscope.core import str_to_image_origin, str_to_datatype, glm3
+from polyscope.core import glm3
+from polyscope.enums import to_enum
+
 
 import numpy as np
 
@@ -27,10 +29,10 @@ def add_scalar_image_quantity(name, values, image_origin="upper_left", datatype=
     dimY = values.shape[0]
     dimX = values.shape[1]
 
-    values_flat = values.flatten()
+    values_flat = values.flatten().astype(np.float32)
         
     q = struct_instance_ref.add_scalar_image_quantity(name, dimX, dimY, values_flat,              
-                                             str_to_image_origin(image_origin), str_to_datatype(datatype))
+                                             to_enum(psb.ImageOrigin,image_origin), to_enum(psb.DataType, datatype))
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
@@ -47,10 +49,9 @@ def add_color_image_quantity(name, values, image_origin="upper_left", struct_ref
     dimY = values.shape[0]
     dimX = values.shape[1]
 
-    values_flat = values.reshape(-1,3)
+    values_flat = values.reshape(-1,3).astype(np.float32)
         
-    q = struct_instance_ref.add_color_image_quantity(name, dimX, dimY, values_flat,              
-                                             str_to_image_origin(image_origin))
+    q = struct_instance_ref.add_color_image_quantity(name, dimX, dimY, values_flat, to_enum(psb.ImageOrigin, image_origin))
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
@@ -68,10 +69,10 @@ def add_color_alpha_image_quantity(name, values, image_origin="upper_left", stru
     dimY = values.shape[0]
     dimX = values.shape[1]
 
-    values_flat = values.reshape(-1,4)
+    values_flat = values.reshape(-1,4).astype(np.float32)
         
     q = struct_instance_ref.add_color_alpha_image_quantity(name, dimX, dimY, values_flat,              
-                                             str_to_image_origin(image_origin))
+                                             to_enum(psb.ImageOrigin,image_origin))
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
@@ -94,12 +95,12 @@ def add_depth_render_image_quantity(name, depth_values, normal_values, image_ori
     dimY = depth_values.shape[0]
     dimX = depth_values.shape[1]
 
-    depth_values_flat = depth_values.flatten()
-    normal_values_flat = normal_values.reshape(-1,3)
+    depth_values_flat = depth_values.flatten().astype(np.float32)
+    normal_values_flat = normal_values.reshape(-1,3).astype(np.float32)
         
     q = struct_instance_ref.add_depth_render_image_quantity(name, dimX, dimY, 
                                                             depth_values_flat, normal_values_flat,
-                                                            str_to_image_origin(image_origin))
+                                                            to_enum(psb.ImageOrigin,image_origin))
     
     if color is not None:
         q.set_color(glm3(color))
@@ -132,7 +133,7 @@ def add_color_render_image_quantity(name, depth_values, normal_values, color_val
         
     q = struct_instance_ref.add_color_render_image_quantity(name, dimX, dimY, 
                                                             depth_values_flat, normal_values_flat, color_values_flat,
-                                                            str_to_image_origin(image_origin))
+                                                            to_enum(psb.ImageOrigin,image_origin))
     
 
     # process and act on additional arguments
@@ -158,13 +159,13 @@ def add_scalar_render_image_quantity(name, depth_values, normal_values, scalar_v
     dimY = depth_values.shape[0]
     dimX = depth_values.shape[1]
 
-    depth_values_flat = depth_values.flatten()
-    normal_values_flat = normal_values.reshape(-1,3)
-    scalar_values_flat = scalar_values.flatten()
+    depth_values_flat = depth_values.flatten().astype(np.float32)
+    normal_values_flat = normal_values.reshape(-1,3).astype(np.float32)
+    scalar_values_flat = scalar_values.flatten().astype(np.float32)
         
     q = struct_instance_ref.add_scalar_render_image_quantity(name, dimX, dimY, 
                                                             depth_values_flat, normal_values_flat, scalar_values_flat,
-                                                            str_to_image_origin(image_origin))
+                                                            to_enum(psb.ImageOrigin,image_origin))
     
 
     # process and act on additional arguments
@@ -185,12 +186,12 @@ def add_raw_color_render_image_quantity(name, depth_values, color_values, image_
     dimY = depth_values.shape[0]
     dimX = depth_values.shape[1]
 
-    depth_values_flat = depth_values.flatten()
-    color_values_flat = color_values.reshape(-1,3)
+    depth_values_flat = depth_values.flatten().astype(np.float32)
+    color_values_flat = color_values.reshape(-1,3).astype(np.float32)
         
     q = struct_instance_ref.add_raw_color_render_image_quantity(name, dimX, dimY, 
                                                                 depth_values_flat, color_values_flat,
-                                                                str_to_image_origin(image_origin))
+                                                                to_enum(psb.ImageOrigin,image_origin))
     
 
     # process and act on additional arguments
@@ -210,12 +211,12 @@ def add_raw_color_alpha_render_image_quantity(name, depth_values, color_values, 
     dimY = depth_values.shape[0]
     dimX = depth_values.shape[1]
 
-    depth_values_flat = depth_values.flatten()
-    color_values_flat = color_values.reshape(-1,4)
+    depth_values_flat = depth_values.flatten().astype(np.float32)
+    color_values_flat = color_values.reshape(-1,4).astype(np.float32)
         
     q = struct_instance_ref.add_raw_color_alpha_render_image_quantity(name, dimX, dimY, 
                                                                 depth_values_flat, color_values_flat,
-                                                                str_to_image_origin(image_origin))
+                                                                to_enum(psb.ImageOrigin,image_origin))
     
 
     # process and act on additional arguments

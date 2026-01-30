@@ -64,6 +64,7 @@ if __name__ == '__main__':
     ps.set_errors_throw_exceptions(True)
     ps.set_display_message_popups(False)
     ps.set_warn_for_invalid_values(False)
+    ps.set_hide_window_after_show(False)  # (makes tests run faster)
     ps.set_use_prefs_file(False)
     ps.init(ps_backend) 
 

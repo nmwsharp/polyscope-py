@@ -92,9 +92,6 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("is_headless", &ps::isHeadless);
   m.def("set_allow_headless_backends", [](bool x) { ps::options::allowHeadlessBackends = x; });
 
-  // === Structure management
-  m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
-  
   // === Screenshots
   nb::class_<ps::ScreenshotOptions>(m, "ScreenshotOptions")
    .def(nb::init<>())
@@ -280,10 +277,49 @@ NB_MODULE(polyscope_bindings, m) {
 
   // === Structure
 
-  // (this is the generic structure class, subtypes get bound in their respective files)
-  nb::class_<ps::Structure>(m, "Structure")
-   .def_ro("name", &ps::Structure::name) 
-  ;
+  // Structure management
+  m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
+ 
+  // Main structure class
+  { // (this is the generic structure class, subtypes get bound in their respective files)
+    nb::class_<ps::Structure> s = nb::class_<ps::Structure>(m, "Structure");
+    s.def_ro("name", &ps::Structure::name);
+
+    // Basics
+    s.def("remove", &ps::Structure::remove, "Remove the structure");
+    s.def("get_name", [](ps::Structure& s) { return s.name; }, "Ge the name");
+    s.def("get_unique_prefix", &ps::Structure::uniquePrefix, "Get unique prefix");
+    s.def("set_enabled", &ps::Structure::setEnabled, "Enable the structure");
+    s.def("enable_isolate", &ps::Structure::enableIsolate, "Enable the structure, disable all of same type");
+    s.def("is_enabled", &ps::Structure::isEnabled, "Check if the structure is enabled");
+    s.def("set_transparency", &ps::Structure::setTransparency, "Set transparency alpha");
+    s.def("get_transparency", &ps::Structure::getTransparency, "Get transparency alpha");
+
+    // group things
+    s.def("add_to_group", nb::overload_cast<std::string>(&ps::Structure::addToGroup), "Add to group");
+
+    // slice plane things
+    s.def("set_ignore_slice_plane", &ps::Structure::setIgnoreSlicePlane, "Set ignore slice plane");
+    s.def("get_ignore_slice_plane", &ps::Structure::getIgnoreSlicePlane, "Get ignore slice plane");
+    s.def("set_cull_whole_elements", &ps::Structure::setCullWholeElements, "Set cull whole elements");
+    s.def("get_cull_whole_elements", &ps::Structure::getCullWholeElements, "Get cull whole elememts");
+
+    // transform management
+    // clang-format off
+    s.def("center_bounding_box", &ps::Structure::centerBoundingBox, "center bounding box");
+    s.def("rescale_to_unit", &ps::Structure::rescaleToUnit, "set the transform so the object has length scale 1");
+    s.def("reset_transform", &ps::Structure::resetTransform, "reset the transform to the identity");
+    s.def("set_transform", [](ps::Structure& s, Eigen::Matrix4f T) { s.setTransform(eigen2glm(T)); }, "set the transform to the given 4x4 homogenous transform matrix");
+    s.def("set_position", [](ps::Structure& s, Eigen::Vector3f T) { s.setPosition(eigen2glm(T)); }, "set the translation component of the transform to the given position");
+    s.def("translate", [](ps::Structure& s, Eigen::Vector3f T) { s.translate(eigen2glm(T)); }, "apply the given translation to the shape, updating its position");
+    s.def("get_transform", [](ps::Structure& s) { return glm2eigen(s.getTransform()); }, "get the current 4x4 transform matrix");
+    s.def("get_position", [](ps::Structure& s) { return glm2eigen(s.getPosition()); }, "get the position of the shape origin after transform");
+    s.def("set_transform_gizmo_enabled", &ps::Structure::setTransformGizmoEnabled);
+    s.def("get_transform_gizmo_enabled", &ps::Structure::getTransformGizmoEnabled);
+    s.def("get_transformation_gizmo", &ps::Structure::getTransformGizmo, nb::rv_policy::reference, "Get the TransformationGizmo associated with this structure");
+    ;
+      
+  }
   
   // === Groups
  

@@ -100,45 +100,13 @@ template <typename StructureT>
 nb::class_<StructureT, ps::Structure> bindStructure(nb::module_& m, std::string name) {
 
   nb::class_<StructureT, ps::Structure> s(m, name.c_str());
-
-  // structure basics
-  s.def("remove", &StructureT::remove, "Remove the structure")
-      .def("get_name", [](StructureT& s) { return s.name; }, "Ge the name")
-      .def("get_unique_prefix", &StructureT::uniquePrefix, "Get unique prefix")
-      .def("set_enabled", &StructureT::setEnabled, "Enable the structure")
-      .def("enable_isolate", &StructureT::enableIsolate, "Enable the structure, disable all of same type")
-      .def("is_enabled", &StructureT::isEnabled, "Check if the structure is enabled")
-      .def("set_transparency", &StructureT::setTransparency, "Set transparency alpha")
-      .def("get_transparency", &StructureT::getTransparency, "Get transparency alpha")
-
-      // group things
-      .def("add_to_group", nb::overload_cast<std::string>(&StructureT::addToGroup), "Add to group")
-
-      // slice plane things
-      .def("set_ignore_slice_plane", &StructureT::setIgnoreSlicePlane, "Set ignore slice plane")
-      .def("get_ignore_slice_plane", &StructureT::getIgnoreSlicePlane, "Get ignore slice plane")
-      .def("set_cull_whole_elements", &StructureT::setCullWholeElements, "Set cull whole elements")
-      .def("get_cull_whole_elements", &StructureT::getCullWholeElements, "Get cull whole elememts")
-
+     s
       // quantites
       .def("remove_all_quantities", &StructureT::removeAllQuantities, "Remove all quantities")
       .def("remove_quantity", &StructureT::removeQuantity, nb::arg("name"), nb::arg("errorIfAbsent") = false,
-           "Remove a quantity")
+          "Remove a quantity")
 
-      // transform management
-      // clang-format off
-      .def("center_bounding_box", &StructureT::centerBoundingBox, "center bounding box")
-      .def("rescale_to_unit", &StructureT::rescaleToUnit, "set the transform so the object has length scale 1")
-      .def("reset_transform", &StructureT::resetTransform, "reset the transform to the identity")
-      .def("set_transform", [](StructureT& s, Eigen::Matrix4f T) { s.setTransform(eigen2glm(T)); }, "set the transform to the given 4x4 homogenous transform matrix")
-      .def("set_position", [](StructureT& s, Eigen::Vector3f T) { s.setPosition(eigen2glm(T)); }, "set the translation component of the transform to the given position")
-      .def("translate", [](StructureT& s, Eigen::Vector3f T) { s.translate(eigen2glm(T)); }, "apply the given translation to the shape, updating its position")
-      .def("get_transform", [](StructureT& s) { return glm2eigen(s.getTransform()); }, "get the current 4x4 transform matrix")
-      .def("get_position", [](StructureT& s) { return glm2eigen(s.getPosition()); }, "get the position of the shape origin after transform")
-      .def("set_transform_gizmo_enabled", &StructureT::setTransformGizmoEnabled)
-      .def("get_transform_gizmo_enabled", &StructureT::getTransformGizmoEnabled)
-      .def("get_transformation_gizmo", &StructureT::getTransformGizmo, nb::rv_policy::reference, "Get the TransformationGizmo associated with this structure")
-      
+
       // floating quantites
       .def("add_scalar_image_quantity", &StructureT::template addScalarImageQuantity<Eigen::VectorXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("values"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::arg("type")=ps::DataType::STANDARD, nb::rv_policy::reference)
       .def("add_color_image_quantity", &StructureT::template addColorImageQuantity<Eigen::MatrixXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("values_rgb"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::rv_policy::reference)
@@ -150,38 +118,39 @@ nb::class_<StructureT, ps::Structure> bindStructure(nb::module_& m, std::string 
       .def("add_raw_color_alpha_render_image_quantity", &StructureT::template addRawColorAlphaRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, nb::arg("name"), nb::arg("dimX"), nb::arg("dimY"), nb::arg("depthData"), nb::arg("colorData"), nb::arg("imageOrigin")=ps::ImageOrigin::UpperLeft, nb::rv_policy::reference)
 
       ;
-
+    
       // managed buffer things
-      def_all_managed_buffer_funcs<StructureT, float> (s, ps::ManagedBufferType::Float);
-      def_all_managed_buffer_funcs<StructureT, double>(s, ps::ManagedBufferType::Double);
-      
-      def_all_managed_buffer_funcs<StructureT, glm::vec2>(s, ps::ManagedBufferType::Vec2);
-      def_all_managed_buffer_funcs<StructureT, glm::vec3>(s, ps::ManagedBufferType::Vec3);
-      def_all_managed_buffer_funcs<StructureT, glm::vec4>(s, ps::ManagedBufferType::Vec4);
-      
-      def_all_managed_buffer_funcs<StructureT, std::array<glm::vec3,2>>(s, ps::ManagedBufferType::Arr2Vec3);
-      def_all_managed_buffer_funcs<StructureT, std::array<glm::vec3,3>>(s, ps::ManagedBufferType::Arr3Vec3);
-      def_all_managed_buffer_funcs<StructureT, std::array<glm::vec3,4>>(s, ps::ManagedBufferType::Arr4Vec3);
-      
-      def_all_managed_buffer_funcs<StructureT, uint32_t> (s, ps::ManagedBufferType::UInt32);
-      def_all_managed_buffer_funcs<StructureT, int32_t>  (s, ps::ManagedBufferType::Int32);
-      
-      def_all_managed_buffer_funcs<StructureT, glm::uvec2>(s, ps::ManagedBufferType::UVec2);
-      def_all_managed_buffer_funcs<StructureT, glm::uvec3>(s, ps::ManagedBufferType::UVec3);
-      def_all_managed_buffer_funcs<StructureT, glm::uvec4>(s, ps::ManagedBufferType::UVec4);
+    def_all_managed_buffer_funcs<StructureT, float> (s, ps::ManagedBufferType::Float);
+    def_all_managed_buffer_funcs<StructureT, double>(s, ps::ManagedBufferType::Double);
+    
+    def_all_managed_buffer_funcs<StructureT, glm::vec2>(s, ps::ManagedBufferType::Vec2);
+    def_all_managed_buffer_funcs<StructureT, glm::vec3>(s, ps::ManagedBufferType::Vec3);
+    def_all_managed_buffer_funcs<StructureT, glm::vec4>(s, ps::ManagedBufferType::Vec4);
+    
+    def_all_managed_buffer_funcs<StructureT, std::array<glm::vec3,2>>(s, ps::ManagedBufferType::Arr2Vec3);
+    def_all_managed_buffer_funcs<StructureT, std::array<glm::vec3,3>>(s, ps::ManagedBufferType::Arr3Vec3);
+    def_all_managed_buffer_funcs<StructureT, std::array<glm::vec3,4>>(s, ps::ManagedBufferType::Arr4Vec3);
+    
+    def_all_managed_buffer_funcs<StructureT, uint32_t> (s, ps::ManagedBufferType::UInt32);
+    def_all_managed_buffer_funcs<StructureT, int32_t>  (s, ps::ManagedBufferType::Int32);
+    
+    def_all_managed_buffer_funcs<StructureT, glm::uvec2>(s, ps::ManagedBufferType::UVec2);
+    def_all_managed_buffer_funcs<StructureT, glm::uvec3>(s, ps::ManagedBufferType::UVec3);
+    def_all_managed_buffer_funcs<StructureT, glm::uvec4>(s, ps::ManagedBufferType::UVec4);
 
-      s.def("has_buffer_type", &StructureT::hasManagedBufferType, "has managed buffer type");
-      s.def("has_quantity_buffer_type", [](StructureT& s, std::string quantity_name, std::string buffer_name) {
-          ps::Quantity* qPtr = s.getQuantity(quantity_name);
-          if (qPtr) {
-            return qPtr->hasManagedBufferType(buffer_name);
-          }
-          ps::FloatingQuantity* fqPtr = s.getFloatingQuantity(quantity_name);
-          if (fqPtr) {
-            return fqPtr->hasManagedBufferType(buffer_name);
-          }
-          return std::make_tuple(false, ps::ManagedBufferType::Float);
-        }, "has quantity managed buffer type");
+    s.def("has_buffer_type", &ps::Structure::hasManagedBufferType, "has managed buffer type");
+
+    s.def("has_quantity_buffer_type", [](StructureT& s, std::string quantity_name, std::string buffer_name) {
+        ps::Quantity* qPtr = s.getQuantity(quantity_name);
+        if (qPtr) {
+          return qPtr->hasManagedBufferType(buffer_name);
+        }
+        ps::FloatingQuantity* fqPtr = s.getFloatingQuantity(quantity_name);
+        if (fqPtr) {
+          return fqPtr->hasManagedBufferType(buffer_name);
+        }
+        return std::make_tuple(false, ps::ManagedBufferType::Float);
+      }, "has quantity managed buffer type");
 
 
   // clang-format on

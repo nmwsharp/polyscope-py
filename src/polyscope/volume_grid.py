@@ -1,7 +1,10 @@
 import polyscope_bindings as psb
-import numpy as np
 
-from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3, glm3u, enum_to_str
+import numpy as np
+from typing import Sequence
+
+from polyscope.core import glm3, glm3u
+from polyscope.enums import to_enum
 from polyscope.structure import Structure
 from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed, check_and_pop_arg
 
@@ -37,9 +40,16 @@ def process_volume_grid_scalar_args(structure, quantity, scalar_args, defined_on
 class VolumeGrid(Structure):
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
+    bound_instance: psb.VolumeGrid
 
     # End users should not call this constrctor, use register_volume_grid instead
-    def __init__(self, name=None, node_dims=None, bound_low=None, bound_high=None, instance=None):
+    def __init__(self, 
+                 name: str | None = None, 
+                 node_dims: Sequence[int] | None = None, 
+                 bound_low: Sequence[float] | None = None, 
+                 bound_high: Sequence[float] | None = None, 
+                 instance: psb.VolumeGrid | None = None
+            ):
         
         super().__init__()
 
@@ -50,11 +60,16 @@ class VolumeGrid(Structure):
         else:
             # Create a new instance
 
-            node_dims = glm3u(node_dims)
-            bound_low = glm3(bound_low)
-            bound_high = glm3(bound_high)
+            assert name is not None
+            assert node_dims is not None
+            assert bound_low is not None
+            assert bound_high is not None
 
-            self.bound_instance = psb.register_volume_grid(name, node_dims, bound_low, bound_high)
+            self.bound_instance = psb.register_volume_grid(name, 
+                                                           glm3u(node_dims),
+                                                           glm3(bound_low),
+                                                           glm3(bound_high)
+                                                          )
 
 
     def n_nodes(self):
@@ -117,7 +132,7 @@ class VolumeGrid(Structure):
     # Picking
     def append_pick_data(self, pick_result):
         struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
-        pick_result.structure_data["element_type"] = enum_to_str(struct_result.element_type)
+        pick_result.structure_data["element_type"] = struct_result.element_type
         pick_result.structure_data["index"] = struct_result.index
 
     ## Quantities
@@ -133,13 +148,13 @@ class VolumeGrid(Structure):
 
             if values.shape != self.get_grid_node_dim(): raise ValueError(f"'values' should be a {self.get_grid_node_dim()} array")
 
-            q = self.bound_instance.add_node_scalar_quantity(name, values.flatten('F'), str_to_datatype(datatype))
+            q = self.bound_instance.add_node_scalar_quantity(name, values.flatten('F'), to_enum(psb.DataType, datatype))
 
         elif defined_on == 'cells':
             
             if values.shape != self.get_grid_cell_dim(): raise ValueError(f"'values' should be a {self.get_grid_cell_dim()} array")
 
-            q = self.bound_instance.add_cell_scalar_quantity(name, values.flatten('F'), str_to_datatype(datatype))
+            q = self.bound_instance.add_cell_scalar_quantity(name, values.flatten('F'), to_enum(psb.DataType, datatype))
 
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'cells']".format(defined_on))
@@ -157,11 +172,11 @@ class VolumeGrid(Structure):
 
         if defined_on == 'nodes':
 
-            q = self.bound_instance.add_node_scalar_quantity_from_callable(name, func, str_to_datatype(datatype))
+            q = self.bound_instance.add_node_scalar_quantity_from_callable(name, func, to_enum(psb.DataType, datatype))
 
         elif defined_on == 'cells':
             
-            q = self.bound_instance.add_cell_scalar_quantity_from_callable(name, func, str_to_datatype(datatype))
+            q = self.bound_instance.add_cell_scalar_quantity_from_callable(name, func, to_enum(psb.DataType, datatype))
             
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['nodes', 'cells']".format(defined_on))

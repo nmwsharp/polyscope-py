@@ -1,16 +1,25 @@
 import polyscope_bindings as psb
 import numpy as np
 
-from polyscope.core import str_to_datatype, str_to_vectortype, str_to_param_coords_type, str_to_param_viz_style, glm3, enum_to_str
+from polyscope.core import glm3
+from polyscope.enums import to_enum
 from polyscope.structure import Structure
 from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed
 
 class VolumeMesh(Structure):
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
+    bound_instance: psb.VolumeMesh
 
     # End users should not call this constrctor, use register_volume_mesh instead
-    def __init__(self, name=None, vertices=None, tets=None, hexes=None, mixed_cells=None, instance=None):
+    def __init__(self, 
+                 name: str | None = None, 
+                 vertices: np.ndarray | None = None, 
+                 tets: np.ndarray | None = None, 
+                 hexes: np.ndarray | None = None, 
+                 mixed_cells: np.ndarray | None = None, 
+                 instance: psb.VolumeMesh | None = None
+                ):
         
         super().__init__()
 
@@ -21,6 +30,8 @@ class VolumeMesh(Structure):
         else:
             # Create a new instance
 
+            assert name is not None
+            assert vertices is not None
             self.check_shape(vertices)
             self.check_index_array(tets, 4, "tets")
             self.check_index_array(hexes, 8, "tets")
@@ -34,8 +45,10 @@ class VolumeMesh(Structure):
 
             else:
                 if tets is None:
+                    assert hexes is not None
                     self.bound_instance = psb.register_hex_mesh(name, vertices, hexes)
                 elif hexes is None:
+                    assert tets is not None
                     self.bound_instance = psb.register_tet_mesh(name, vertices, tets)
                 else:
                     self.bound_instance = psb.register_tet_hex_mesh(name, vertices, tets, hexes)
@@ -66,17 +79,17 @@ class VolumeMesh(Structure):
             raise ValueError("volume mesh {} array should have shape (N,{}); shape is {}".format(name, dim, str(arr.shape)))
 
 
-    def n_vertices(self):
+    def n_vertices(self) -> int:
         return self.bound_instance.n_vertices()
-    def n_faces(self):
+    def n_faces(self) -> int:
         return self.bound_instance.n_faces()
-    def n_cells(self):
+    def n_cells(self) -> int:
         return self.bound_instance.n_cells()
 
     ## Structure management
 
     # Update
-    def update_vertex_positions(self, vertices):
+    def update_vertex_positions(self, vertices) -> None:
         self.check_shape(vertices)
         self.bound_instance.update_vertex_positions(vertices)
 
@@ -116,7 +129,7 @@ class VolumeMesh(Structure):
     # Picking
     def append_pick_data(self, pick_result):
         struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
-        pick_result.structure_data["element_type"] = enum_to_str(struct_result.element_type)
+        pick_result.structure_data["element_type"] = struct_result.element_type
         pick_result.structure_data["index"] = struct_result.index
 
 
@@ -129,10 +142,10 @@ class VolumeMesh(Structure):
 
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_instance.add_vertex_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_vertex_scalar_quantity(name, values, to_enum(psb.DataType, datatype))
         elif defined_on == 'cells':
             if values.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
-            q = self.bound_instance.add_cell_scalar_quantity(name, values, str_to_datatype(datatype))
+            q = self.bound_instance.add_cell_scalar_quantity(name, values, to_enum(psb.DataType, datatype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
   
@@ -173,10 +186,10 @@ class VolumeMesh(Structure):
         
         if defined_on == 'vertices':
             if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_instance.add_vertex_vector_quantity(name, values, str_to_vectortype(vectortype))
+            q = self.bound_instance.add_vertex_vector_quantity(name, values, to_enum(psb.VectorType, vectortype))
         elif defined_on == 'cells':
             if values.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
-            q = self.bound_instance.add_cell_vector_quantity(name, values, str_to_vectortype(vectortype))
+            q = self.bound_instance.add_cell_vector_quantity(name, values, to_enum(psb.VectorType, vectortype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
 

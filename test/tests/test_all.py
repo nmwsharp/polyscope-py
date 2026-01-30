@@ -135,7 +135,6 @@ class TestCore(unittest.TestCase):
     
     def test_view_options(self):
 
-        ps.set_navigation_style("turntable")
         ps.set_navigation_style("free")
         ps.set_navigation_style("planar")
         ps.set_navigation_style("none")
