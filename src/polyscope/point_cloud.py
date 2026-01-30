@@ -1,7 +1,9 @@
+from typing import Any, Literal, overload
+
 import polyscope_bindings as psb
 
-from polyscope.core import  glm3
-from polyscope.enums import to_enum
+from polyscope.core import glm3
+from polyscope.enums import to_enum, from_enum
 from polyscope.structure import Structure
 from polyscope.common import (
     process_quantity_args,
@@ -13,10 +15,7 @@ from polyscope.common import (
 )
 
 import numpy as np
-
-from collections.abc import Sequence
-from typing import Any, overload
-from numpy.typing import NDArray
+from numpy.typing import NDArray, ArrayLike
 
 
 class PointCloud(Structure):
@@ -24,7 +23,7 @@ class PointCloud(Structure):
     bound_instance: psb.PointCloud
 
     @overload
-    def __init__(self, name: str, points: NDArray) -> None: ...
+    def __init__(self, name: str, points: ArrayLike) -> None: ...
 
     @overload
     def __init__(self, *, instance: psb.PointCloud) -> None: ...
@@ -33,7 +32,7 @@ class PointCloud(Structure):
     def __init__(
         self,
         name: str | None = None,
-        points: NDArray | None = None,
+        points: ArrayLike | None = None,
         instance: psb.PointCloud | None = None,
     ) -> None:
         super().__init__()
@@ -47,12 +46,13 @@ class PointCloud(Structure):
             assert name is not None
             assert points is not None
 
-            self.check_shape(points)
+            points_arr = np.asarray(points)
+            self.check_shape(points_arr)
 
-            if points.shape[1] == 3:
-                self.bound_instance = psb.register_point_cloud(name, points)
-            elif points.shape[1] == 2:
-                self.bound_instance = psb.register_point_cloud2D(name, points)
+            if points_arr.shape[1] == 3:
+                self.bound_instance = psb.register_point_cloud(name, points_arr)
+            elif points_arr.shape[1] == 2:
+                self.bound_instance = psb.register_point_cloud2D(name, points_arr)
             else:
                 raise ValueError("bad point cloud shape")
 
@@ -69,20 +69,21 @@ class PointCloud(Structure):
         return self.bound_instance.n_points()
 
     # Point render mode
-    def set_point_render_mode(self, val: str) -> None:
+    def set_point_render_mode(self, val: Literal["sphere", "quad"] | str) -> None:
         self.bound_instance.set_point_render_mode(to_enum(psb.PointRenderMode, val))
 
-    def get_point_render_mode(self) -> psb.PointRenderMode:
-        return self.bound_instance.get_point_render_mode()
+    def get_point_render_mode(self) -> str:
+        return from_enum(self.bound_instance.get_point_render_mode())
 
     # Update
-    def update_point_positions(self, points: NDArray) -> None:
-        self.check_shape(points)
+    def update_point_positions(self, points: ArrayLike) -> None:
+        points_arr = np.asarray(points)
+        self.check_shape(points_arr)
 
-        if points.shape[1] == 3:
-            self.bound_instance.update_point_positions(points)
-        elif points.shape[1] == 2:
-            self.bound_instance.update_point_positions2D(points)
+        if points_arr.shape[1] == 3:
+            self.bound_instance.update_point_positions(points_arr)
+        elif points_arr.shape[1] == 2:
+            self.bound_instance.update_point_positions2D(points_arr)
         else:
             raise ValueError("bad point cloud shape")
 
@@ -112,10 +113,10 @@ class PointCloud(Structure):
         return self.bound_instance.get_radius()
 
     # Point color
-    def set_color(self, val: Sequence[float]) -> None:
+    def set_color(self, val: ArrayLike) -> None:
         self.bound_instance.set_color(glm3(val))
 
-    def get_color(self) -> tuple:
+    def get_color(self) -> tuple[float, float, float]:
         return self.bound_instance.get_color().as_tuple()
 
     # Point material
@@ -135,13 +136,14 @@ class PointCloud(Structure):
 
     # Scalar
     def add_scalar_quantity(
-        self, name: str, values: NDArray, datatype: str = "standard", **scalar_args: Any
+        self, name: str, values: ArrayLike, datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard", **scalar_args: Any
     ) -> None:
-        if len(values.shape) != 1 or values.shape[0] != self.n_points():
+        values_arr = np.asarray(values)
+        if len(values_arr.shape) != 1 or values_arr.shape[0] != self.n_points():
             raise ValueError("'values' should be a length-N array")
 
         q = self.bound_instance.add_scalar_quantity(
-            name, values, to_enum(psb.DataType, datatype)
+            name, values_arr, to_enum(psb.DataType, datatype)
         )
 
         # process and act on additional arguments
@@ -151,15 +153,16 @@ class PointCloud(Structure):
         check_all_args_processed(self, q, scalar_args)
 
     # Color
-    def add_color_quantity(self, name: str, values: NDArray, **color_args: Any) -> None:
+    def add_color_quantity(self, name: str, values: ArrayLike, **color_args: Any) -> None:
+        values_arr = np.asarray(values)
         if (
-            len(values.shape) != 2
-            or values.shape[0] != self.n_points()
-            or values.shape[1] != 3
+            len(values_arr.shape) != 2
+            or values_arr.shape[0] != self.n_points()
+            or values_arr.shape[1] != 3
         ):
             raise ValueError("'values' should be an Nx3 array")
 
-        q = self.bound_instance.add_color_quantity(name, values)
+        q = self.bound_instance.add_color_quantity(name, values_arr)
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
@@ -171,24 +174,25 @@ class PointCloud(Structure):
     def add_vector_quantity(
         self,
         name: str,
-        values: NDArray,
-        vectortype: str = "standard",
+        values: ArrayLike,
+        vectortype: Literal["standard", "ambient"] | str = "standard",
         **vector_args: Any,
     ) -> None:
+        values_arr = np.asarray(values)
         if (
-            len(values.shape) != 2
-            or values.shape[0] != self.n_points()
-            or values.shape[1] not in [2, 3]
+            len(values_arr.shape) != 2
+            or values_arr.shape[0] != self.n_points()
+            or values_arr.shape[1] not in [2, 3]
         ):
             raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
 
-        if values.shape[1] == 2:
+        if values_arr.shape[1] == 2:
             q = self.bound_instance.add_vector_quantity2D(
-                name, values, to_enum(psb.VectorType, vectortype)
+                name, values_arr, to_enum(psb.VectorType, vectortype)
             )
-        elif values.shape[1] == 3:
+        elif values_arr.shape[1] == 3:
             q = self.bound_instance.add_vector_quantity(
-                name, values, to_enum(psb.VectorType, vectortype)
+                name, values_arr, to_enum(psb.VectorType, vectortype)
             )
 
         # process and act on additional arguments
@@ -201,14 +205,15 @@ class PointCloud(Structure):
     def add_parameterization_quantity(
         self,
         name: str,
-        values: NDArray,
-        coords_type: str = "unit",
+        values: ArrayLike,
+        coords_type: Literal["unit", "world"] | str = "unit",
         **parameterization_args: Any,
     ) -> None:
+        values_arr = np.asarray(values)
         if (
-            len(values.shape) != 2
-            or values.shape[0] != self.n_points()
-            or values.shape[1] != 2
+            len(values_arr.shape) != 2
+            or values_arr.shape[0] != self.n_points()
+            or values_arr.shape[1] != 2
         ):
             raise ValueError("'values' should be an Nx2 array")
 
@@ -216,7 +221,7 @@ class PointCloud(Structure):
         coords_type_enum = to_enum(psb.ParamCoordsType, coords_type)
 
         q = self.bound_instance.add_parameterization_quantity(
-            name, values, coords_type_enum
+            name, values_arr, coords_type_enum
         )
 
         # process and act on additional arguments
@@ -228,11 +233,11 @@ class PointCloud(Structure):
 
 def register_point_cloud(
     name: str,
-    points: NDArray,
+    points: ArrayLike,
     enabled: bool | None = None,
     radius: float | None = None,
-    point_render_mode: str | None = None,
-    color: Sequence | None = None,
+    point_render_mode: Literal["sphere", "quad"] | str | None = None,
+    color: ArrayLike | None = None,
     material: str | None = None,
     transparency: float | None = None,
 ) -> PointCloud:

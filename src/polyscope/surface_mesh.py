@@ -1,8 +1,9 @@
+from typing import Any, Literal, overload, cast
+
 import polyscope_bindings as psb
-import numpy as np
 
 from polyscope.core import glm3
-from polyscope.enums import to_enum
+from polyscope.enums import to_enum, from_enum
 from polyscope.structure import Structure
 from polyscope.common import (
     process_quantity_args,
@@ -15,21 +16,29 @@ from polyscope.common import (
     check_is_scalar_image,
     check_is_image3,
 )
-from collections.abc import Sequence
-from typing import Any
-from numpy.typing import NDArray
 
+import numpy as np
+from numpy.typing import NDArray, ArrayLike
+from collections.abc import Sequence
+
+RaggedList = Sequence[Sequence[int]]
 
 class SurfaceMesh(Structure):
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
     bound_instance: psb.SurfaceMesh
 
+    @overload
+    def __init__(self, name: str, vertices: ArrayLike, faces: ArrayLike) -> None: ...
+
+    @overload
+    def __init__(self, *, instance: psb.SurfaceMesh) -> None: ...
+
     # End users should not call this constrctor, use register_surface_mesh instead
     def __init__(
         self,
         name: str | None = None,
-        vertices: NDArray | None = None,
-        faces: Any | None = None,
+        vertices: ArrayLike | None = None,
+        faces: ArrayLike | RaggedList | None = None,
         instance: psb.SurfaceMesh | None = None,
     ) -> None:
         super().__init__()
@@ -44,40 +53,50 @@ class SurfaceMesh(Structure):
             assert vertices is not None
             assert faces is not None
 
-            self.check_shape(vertices)
+            vertices_arr = np.asarray(vertices)
+            self.check_shape(vertices_arr)
 
-            if isinstance(faces, np.ndarray):
-                # Faces is a numpy array
+            # Check if the faces list is a rectangular array or
+            # a ragged array    
+            try:
+                faces_arr = np.asarray(faces, dtype=np.int32)
+                is_rectangular_arr = True
+            except ValueError:
+                # ValueError raised here by asarray() if ragged
+                faces_ragged = cast(Sequence[Sequence[int]], faces)
+                is_rectangular_arr = False
 
-                if len(faces.shape) != 2:
+            if is_rectangular_arr:
+
+                if len(faces_arr.shape) != 2:
                     raise ValueError(
                         "surface mesh face array should have shape (F,D) for some D; shape is "
-                        + str(faces.shape)
+                        + str(faces_arr.shape)
                     )
 
-                if vertices.shape[1] == 3:
+                if vertices_arr.shape[1] == 3:
                     self.bound_instance = psb.register_surface_mesh(
-                        name, vertices, faces
+                        name, vertices_arr, faces_arr
                     )
-                elif vertices.shape[1] == 2:
+                elif vertices_arr.shape[1] == 2:
                     self.bound_instance = psb.register_surface_mesh2D(
-                        name, vertices, faces
+                        name, vertices_arr, faces_arr
                     )
 
             else:
                 # Faces is something else, try to iterate through it to build a list of lists
                 faces_copy = []
-                for f in faces:
+                for f in faces_ragged:
                     f_copy = [v for v in f]
                     faces_copy.append(f_copy)
 
-                if vertices.shape[1] == 3:
+                if vertices_arr.shape[1] == 3:
                     self.bound_instance = psb.register_surface_mesh_list(
-                        name, vertices, faces
+                        name, vertices_arr, faces_ragged
                     )
-                elif vertices.shape[1] == 2:
+                elif vertices_arr.shape[1] == 2:
                     self.bound_instance = psb.register_surface_mesh_list2D(
-                        name, vertices, faces
+                        name, vertices_arr, faces_ragged
                     )
 
     def check_shape(self, points: NDArray) -> None:
@@ -104,13 +123,14 @@ class SurfaceMesh(Structure):
         return self.bound_instance.n_corners()
 
     # Update
-    def update_vertex_positions(self, vertices: NDArray) -> None:
-        self.check_shape(vertices)
+    def update_vertex_positions(self, vertices: ArrayLike) -> None:
+        vertices_arr = np.asarray(vertices)
+        self.check_shape(vertices_arr)
 
-        if vertices.shape[1] == 3:
-            self.bound_instance.update_vertex_positions(vertices)
-        elif vertices.shape[1] == 2:
-            self.bound_instance.update_vertex_positions2D(vertices)
+        if vertices_arr.shape[1] == 3:
+            self.bound_instance.update_vertex_positions(vertices_arr)
+        elif vertices_arr.shape[1] == 2:
+            self.bound_instance.update_vertex_positions2D(vertices_arr)
         else:
             raise ValueError("bad vertex shape")
 
@@ -126,10 +146,7 @@ class SurfaceMesh(Structure):
         struct_result = self.bound_instance.interpret_pick_result(
             pick_result.raw_result
         )
-        pick_result.structure_data["element_type"] = to_enum(
-            psb.MeshElement,
-            struct_result.element_type
-        )
+        pick_result.structure_data["element_type"] = from_enum(struct_result.element_type)
         pick_result.structure_data["index"] = struct_result.index
         bary_coords = np.array(struct_result.bary_coords.as_tuple())
         if not (bary_coords == np.array((-1, -1, -1))).all():
@@ -138,17 +155,17 @@ class SurfaceMesh(Structure):
     ## Options
 
     # Color
-    def set_color(self, val: Sequence) -> None:
+    def set_color(self, val: ArrayLike) -> None:
         self.bound_instance.set_color(glm3(val))
 
-    def get_color(self) -> tuple:
+    def get_color(self) -> tuple[float, float, float]:
         return self.bound_instance.get_color().as_tuple()
 
     # Edge Color
-    def set_edge_color(self, val: Sequence) -> None:
+    def set_edge_color(self, val: ArrayLike) -> None:
         self.bound_instance.set_edge_color(glm3(val))
 
-    def get_edge_color(self) -> tuple:
+    def get_edge_color(self) -> tuple[float, float, float]:
         return self.bound_instance.get_edge_color().as_tuple()
 
     # Edge width
@@ -166,11 +183,11 @@ class SurfaceMesh(Structure):
         return self.bound_instance.get_smooth_shade()
 
     # Selection Mode
-    def set_selection_mode(self, val: str) -> None:
+    def set_selection_mode(self, val: Literal["auto", "vertices_only", "faces_only"] | str) -> None:
         self.bound_instance.set_selection_mode(to_enum(psb.MeshSelectionMode, val))
 
-    def get_selection_mode(self) -> psb.MeshSelectionMode:
-        return self.bound_instance.get_selection_mode()
+    def get_selection_mode(self) -> str:
+        return from_enum(self.bound_instance.get_selection_mode())
 
     # Material
     def set_material(self, mat: str) -> None:
@@ -179,18 +196,18 @@ class SurfaceMesh(Structure):
     def get_material(self) -> str:
         return self.bound_instance.get_material()
 
-    # Color
-    def set_back_face_policy(self, val: str) -> None:
+    # Back face policy
+    def set_back_face_policy(self, val: Literal["identical", "different", "custom", "cull"] | str) -> None:
         self.bound_instance.set_back_face_policy(to_enum(psb.BackFacePolicy, val))
 
-    def get_back_face_policy(self) -> psb.BackFacePolicy:
-        return self.bound_instance.get_back_face_policy()
+    def get_back_face_policy(self) -> str:
+        return from_enum(self.bound_instance.get_back_face_policy())
 
     # Back face color
-    def set_back_face_color(self, val: Sequence) -> None:
+    def set_back_face_color(self, val: ArrayLike) -> None:
         self.bound_instance.set_back_face_color(glm3(val))
 
-    def get_back_face_color(self) -> tuple:
+    def get_back_face_color(self) -> tuple[float, float, float]:
         return self.bound_instance.get_back_face_color().as_tuple()
 
     def mark_edges_as_used(self) -> None:
@@ -205,43 +222,46 @@ class SurfaceMesh(Structure):
     ## Permutations and bases
 
     def set_edge_permutation(
-        self, perm: NDArray, expected_size: int | None = None
+        self, perm: ArrayLike, expected_size: int | None = None
     ) -> None:
-        if len(perm.shape) != 1 or perm.shape[0] != self.n_edges():
+        perm_arr = np.asarray(perm)
+        if len(perm_arr.shape) != 1 or perm_arr.shape[0] != self.n_edges():
             raise ValueError("'perm' should be an array with one entry per edge")
         if expected_size is None:
             expected_size = 0
-        self.bound_instance.set_edge_permutation(perm, expected_size)
+        self.bound_instance.set_edge_permutation(perm_arr, expected_size)
 
     def set_corner_permutation(
-        self, perm: NDArray, expected_size: int | None = None
+        self, perm: ArrayLike, expected_size: int | None = None
     ) -> None:
-        if len(perm.shape) != 1 or perm.shape[0] != self.n_corners():
+        perm_arr = np.asarray(perm)
+        if len(perm_arr.shape) != 1 or perm_arr.shape[0] != self.n_corners():
             raise ValueError("'perm' should be an array with one entry per corner")
         if expected_size is None:
             expected_size = 0
-        self.bound_instance.set_corner_permutation(perm, expected_size)
+        self.bound_instance.set_corner_permutation(perm_arr, expected_size)
 
     def set_halfedge_permutation(
-        self, perm: NDArray, expected_size: int | None = None
+        self, perm: ArrayLike, expected_size: int | None = None
     ) -> None:
-        if len(perm.shape) != 1 or perm.shape[0] != self.n_halfedges():
+        perm_arr = np.asarray(perm)
+        if len(perm_arr.shape) != 1 or perm_arr.shape[0] != self.n_halfedges():
             raise ValueError("'perm' should be an array with one entry per halfedge")
         if expected_size is None:
             expected_size = 0
-        self.bound_instance.set_halfedge_permutation(perm, expected_size)
+        self.bound_instance.set_halfedge_permutation(perm_arr, expected_size)
 
     def set_all_permutations(
         self,
-        vertex_perm: NDArray | None = None,
+        vertex_perm: ArrayLike | None = None,
         vertex_perm_size: int | None = None,  # now ignored
-        face_perm: NDArray | None = None,
+        face_perm: ArrayLike | None = None,
         face_perm_size: int | None = None,  # now ignored
-        edge_perm: NDArray | None = None,
+        edge_perm: ArrayLike | None = None,
         edge_perm_size: int | None = None,
-        corner_perm: NDArray | None = None,
+        corner_perm: ArrayLike | None = None,
         corner_perm_size: int | None = None,
-        halfedge_perm: NDArray | None = None,
+        halfedge_perm: ArrayLike | None = None,
         halfedge_perm_size: int | None = None,
     ) -> None:
         if edge_perm is not None:
@@ -257,55 +277,56 @@ class SurfaceMesh(Structure):
     def add_scalar_quantity(
         self,
         name: str,
-        values: NDArray,
-        defined_on: str = "vertices",
-        datatype: str = "standard",
+        values: ArrayLike,
+        defined_on: Literal["vertices", "faces", "edges", "halfedges", "corners", "texture"] | str = "vertices",
+        datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
         param_name: str | None = None,
-        image_origin: str = "upper_left",
+        image_origin: Literal["lower_left", "upper_left"] | str = "upper_left",
         **scalar_args: Any,
     ) -> None:
-        if defined_on != "texture" and len(values.shape) != 1:
+        values_arr = np.asarray(values)
+        if defined_on != "texture" and len(values_arr.shape) != 1:
             raise ValueError("'values' should be a length-N array")
 
         if defined_on == "vertices":
-            if values.shape[0] != self.n_vertices():
+            if values_arr.shape[0] != self.n_vertices():
                 raise ValueError("'values' should be a length n_vertices array")
             q = self.bound_instance.add_vertex_scalar_quantity(
-                name, values, to_enum(psb.DataType,datatype)
+                name, values_arr, to_enum(psb.DataType, datatype)
             )
 
         elif defined_on == "faces":
-            if values.shape[0] != self.n_faces():
+            if values_arr.shape[0] != self.n_faces():
                 raise ValueError("'values' should be a length n_faces array")
             q = self.bound_instance.add_face_scalar_quantity(
-                name, values, to_enum(psb.DataType,datatype)
+                name, values_arr, to_enum(psb.DataType, datatype)
             )
 
         elif defined_on == "edges":
-            if values.shape[0] != self.n_edges():
+            if values_arr.shape[0] != self.n_edges():
                 raise ValueError("'values' should be a length n_edges array")
             q = self.bound_instance.add_edge_scalar_quantity(
-                name, values, to_enum(psb.DataType,datatype)
+                name, values_arr, to_enum(psb.DataType, datatype)
             )
 
         elif defined_on == "halfedges":
-            if values.shape[0] != self.n_halfedges():
+            if values_arr.shape[0] != self.n_halfedges():
                 raise ValueError("'values' should be a length n_halfedges array")
             q = self.bound_instance.add_halfedge_scalar_quantity(
-                name, values, to_enum(psb.DataType,datatype)
+                name, values_arr, to_enum(psb.DataType, datatype)
             )
 
         elif defined_on == "corners":
-            if values.shape[0] != self.n_corners():
+            if values_arr.shape[0] != self.n_corners():
                 raise ValueError("'values' should be a length n_corners array")
             q = self.bound_instance.add_corner_scalar_quantity(
-                name, values, to_enum(psb.DataType,datatype)
+                name, values_arr, to_enum(psb.DataType, datatype)
             )
 
         elif defined_on == "texture":
-            check_is_scalar_image(values)
-            dimY = values.shape[0]
-            dimX = values.shape[1]
+            check_is_scalar_image(values_arr)
+            dimY = values_arr.shape[0]
+            dimX = values_arr.shape[1]
             if not isinstance(param_name, str):
                 raise ValueError(
                     "when adding a quantity defined in a texture, you must pass 'param_name' as a string giving the name of a parameterization quantity on this structure, which provides the UV coords"
@@ -315,7 +336,7 @@ class SurfaceMesh(Structure):
                 param_name,
                 dimX,
                 dimY,
-                values.flatten(),
+                values_arr.flatten(),
                 to_enum(psb.ImageOrigin, image_origin),
                 to_enum(psb.DataType, datatype),
             )
@@ -338,27 +359,28 @@ class SurfaceMesh(Structure):
     def add_color_quantity(
         self,
         name: str,
-        values: NDArray,
-        defined_on: str = "vertices",
+        values: ArrayLike,
+        defined_on: Literal["vertices", "faces", "texture"] | str = "vertices",
         param_name: str | None = None,
-        image_origin: str = "upper_left",
+        image_origin: Literal["lower_left", "upper_left"] | str = "upper_left",
         **color_args: Any,
     ) -> None:
-        if defined_on != "texture" and (len(values.shape) != 2 or values.shape[1] != 3):
+        values_arr = np.asarray(values)
+        if defined_on != "texture" and (len(values_arr.shape) != 2 or values_arr.shape[1] != 3):
             raise ValueError("'values' should be an Nx3 array")
 
         if defined_on == "vertices":
-            if values.shape[0] != self.n_vertices():
+            if values_arr.shape[0] != self.n_vertices():
                 raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_instance.add_vertex_color_quantity(name, values)
+            q = self.bound_instance.add_vertex_color_quantity(name, values_arr)
         elif defined_on == "faces":
-            if values.shape[0] != self.n_faces():
+            if values_arr.shape[0] != self.n_faces():
                 raise ValueError("'values' should be a length n_faces array")
-            q = self.bound_instance.add_face_color_quantity(name, values)
+            q = self.bound_instance.add_face_color_quantity(name, values_arr)
         elif defined_on == "texture":
-            check_is_image3(values)
-            dimY = values.shape[0]
-            dimX = values.shape[1]
+            check_is_image3(values_arr)
+            dimY = values_arr.shape[0]
+            dimX = values_arr.shape[1]
             if not isinstance(param_name, str):
                 raise ValueError(
                     "when adding a quantity defined in a texture, you must pass 'param_name' as a string giving the name of a parameterization quantity on this structure, which provides the UV coords"
@@ -368,7 +390,7 @@ class SurfaceMesh(Structure):
                 param_name,
                 dimX,
                 dimY,
-                values.reshape(-1, 3),
+                values_arr.reshape(-1, 3),
                 to_enum(psb.ImageOrigin, image_origin),
             )
         else:
@@ -390,8 +412,8 @@ class SurfaceMesh(Structure):
     def add_distance_quantity(
         self,
         name: str,
-        values: NDArray,
-        defined_on: str = "vertices",
+        values: ArrayLike,
+        defined_on: Literal["vertices"] | str = "vertices",
         enabled: bool | None = None,
         signed: bool = False,
         vminmax: Any = None,
@@ -399,19 +421,20 @@ class SurfaceMesh(Structure):
         stripe_size_relative: bool = True,
         cmap: Any = None,
     ) -> None:
-        if len(values.shape) != 1:
+        values_arr = np.asarray(values)
+        if len(values_arr.shape) != 1:
             raise ValueError("'values' should be a length-N array")
 
         if defined_on == "vertices":
-            if values.shape[0] != self.n_vertices():
+            if values_arr.shape[0] != self.n_vertices():
                 raise ValueError("'values' should be a length n_vertices array")
 
             if signed:
                 q = self.bound_instance.add_vertex_signed_distance_quantity(
-                    name, values
+                    name, values_arr
                 )
             else:
-                q = self.bound_instance.add_vertex_distance_quantity(name, values)
+                q = self.bound_instance.add_vertex_distance_quantity(name, values_arr)
         else:
             raise ValueError(
                 "bad `defined_on` value {}, should be one of ['vertices']".format(
@@ -433,28 +456,29 @@ class SurfaceMesh(Structure):
     def add_parameterization_quantity(
         self,
         name: str,
-        values: NDArray,
-        defined_on: str = "vertices",
-        coords_type: str = "unit",
+        values: ArrayLike,
+        defined_on: Literal["vertices", "corners"] | str = "vertices",
+        coords_type: Literal["unit", "world"] | str = "unit",
         **parameterization_args: Any,
     ) -> None:
-        if len(values.shape) != 2 or values.shape[1] != 2:
+        values_arr = np.asarray(values)
+        if len(values_arr.shape) != 2 or values_arr.shape[1] != 2:
             raise ValueError("'values' should be an (Nx2) array")
 
         # parse the coords type in to an enum
         coords_type_enum = to_enum(psb.ParamCoordsType, coords_type)
 
         if defined_on == "vertices":
-            if values.shape[0] != self.n_vertices():
+            if values_arr.shape[0] != self.n_vertices():
                 raise ValueError("'values' should be a length n_vertices array")
             q = self.bound_instance.add_vertex_parameterization_quantity(
-                name, values, coords_type_enum
+                name, values_arr, coords_type_enum
             )
         elif defined_on == "corners":
-            if values.shape[0] != self.n_corners():
+            if values_arr.shape[0] != self.n_corners():
                 raise ValueError("'values' should be a length n_faces array")
             q = self.bound_instance.add_corner_parameterization_quantity(
-                name, values, coords_type_enum
+                name, values_arr, coords_type_enum
             )
         else:
             raise ValueError(
@@ -473,38 +497,39 @@ class SurfaceMesh(Structure):
     def add_vector_quantity(
         self,
         name: str,
-        values: NDArray,
-        defined_on: str = "vertices",
-        vectortype: str = "standard",
+        values: ArrayLike,
+        defined_on: Literal["vertices", "faces"] | str = "vertices",
+        vectortype: Literal["standard", "ambient"] | str = "standard",
         **vector_args: Any,
     ) -> None:
-        if len(values.shape) != 2 or values.shape[1] not in [2, 3]:
+        values_arr = np.asarray(values)
+        if len(values_arr.shape) != 2 or values_arr.shape[1] not in [2, 3]:
             raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
 
         if defined_on == "vertices":
-            if values.shape[0] != self.n_vertices():
+            if values_arr.shape[0] != self.n_vertices():
                 raise ValueError("'values' should be a length n_vertices array")
 
-            if values.shape[1] == 2:
+            if values_arr.shape[1] == 2:
                 q = self.bound_instance.add_vertex_vector_quantity2D(
-                    name, values, to_enum(psb.VectorType, vectortype)
+                    name, values_arr, to_enum(psb.VectorType, vectortype)
                 )
-            elif values.shape[1] == 3:
+            elif values_arr.shape[1] == 3:
                 q = self.bound_instance.add_vertex_vector_quantity(
-                    name, values, to_enum(psb.VectorType, vectortype)
+                    name, values_arr, to_enum(psb.VectorType, vectortype)
                 )
 
         elif defined_on == "faces":
-            if values.shape[0] != self.n_faces():
+            if values_arr.shape[0] != self.n_faces():
                 raise ValueError("'values' should be a length n_faces array")
 
-            if values.shape[1] == 2:
+            if values_arr.shape[1] == 2:
                 q = self.bound_instance.add_face_vector_quantity2D(
-                    name, values, to_enum(psb.VectorType, vectortype)
+                    name, values_arr, to_enum(psb.VectorType, vectortype)
                 )
-            elif values.shape[1] == 3:
+            elif values_arr.shape[1] == 3:
                 q = self.bound_instance.add_face_vector_quantity(
-                    name, values, to_enum(psb.VectorType, vectortype)
+                    name, values_arr, to_enum(psb.VectorType, vectortype)
                 )
 
         else:
@@ -523,43 +548,46 @@ class SurfaceMesh(Structure):
     def add_tangent_vector_quantity(
         self,
         name: str,
-        values: NDArray,
-        basisX: NDArray,
-        basisY: NDArray,
+        values: ArrayLike,
+        basisX: ArrayLike,
+        basisY: ArrayLike,
         n_sym: int = 1,
-        defined_on: str = "vertices",
-        vectortype: str = "standard",
+        defined_on: Literal["vertices", "faces"] | str = "vertices",
+        vectortype: Literal["standard", "ambient"] | str = "standard",
         **vector_args: Any,
     ) -> None:
-        if len(values.shape) != 2 or values.shape[1] != 2:
+        values_arr = np.asarray(values)
+        basisX_arr = np.asarray(basisX)
+        basisY_arr = np.asarray(basisY)
+        if len(values_arr.shape) != 2 or values_arr.shape[1] != 2:
             raise ValueError("'values' should be an Nx2 array")
-        if len(basisX.shape) != 2 or basisX.shape[1] != 3:
+        if len(basisX_arr.shape) != 2 or basisX_arr.shape[1] != 3:
             raise ValueError("'basisX' should be an Nx3 array")
-        if len(basisY.shape) != 2 or basisY.shape[1] != 3:
+        if len(basisY_arr.shape) != 2 or basisY_arr.shape[1] != 3:
             raise ValueError("'basisY' should be an Nx3 array")
 
         if defined_on == "vertices":
-            if values.shape[0] != self.n_vertices():
+            if values_arr.shape[0] != self.n_vertices():
                 raise ValueError("'values' should be a length n_vertices array")
-            if basisX.shape[0] != self.n_vertices():
+            if basisX_arr.shape[0] != self.n_vertices():
                 raise ValueError("'basisX' should be a length n_vertices array")
-            if basisY.shape[0] != self.n_vertices():
+            if basisY_arr.shape[0] != self.n_vertices():
                 raise ValueError("'basisY' should be a length n_vertices array")
 
             q = self.bound_instance.add_vertex_tangent_vector_quantity(
-                name, values, basisX, basisY, n_sym, to_enum(psb.VectorType, vectortype)
+                name, values_arr, basisX_arr, basisY_arr, n_sym, to_enum(psb.VectorType, vectortype)
             )
 
         elif defined_on == "faces":
-            if values.shape[0] != self.n_faces():
+            if values_arr.shape[0] != self.n_faces():
                 raise ValueError("'values' should be a length n_faces array")
-            if basisX.shape[0] != self.n_faces():
+            if basisX_arr.shape[0] != self.n_faces():
                 raise ValueError("'basisX' should be a length n_faces array")
-            if basisY.shape[0] != self.n_faces():
+            if basisY_arr.shape[0] != self.n_faces():
                 raise ValueError("'basisY' should be a length n_faces array")
 
             q = self.bound_instance.add_face_tangent_vector_quantity(
-                name, values, basisX, basisY, n_sym, to_enum(psb.VectorType, vectortype)
+                name, values_arr, basisX_arr, basisY_arr, n_sym, to_enum(psb.VectorType, vectortype)
             )
 
         else:
@@ -576,15 +604,17 @@ class SurfaceMesh(Structure):
         check_all_args_processed(self, q, vector_args)
 
     def add_one_form_vector_quantity(
-        self, name: str, values: NDArray, orientations: NDArray, **vector_args: Any
+        self, name: str, values: ArrayLike, orientations: ArrayLike, **vector_args: Any
     ) -> None:
-        if len(values.shape) != 1 or values.shape[0] != self.n_edges():
+        values_arr = np.asarray(values)
+        orientations_arr = np.asarray(orientations)
+        if len(values_arr.shape) != 1 or values_arr.shape[0] != self.n_edges():
             raise ValueError("'values' should be length n_edges array")
-        if len(orientations.shape) != 1 or orientations.shape[0] != self.n_edges():
+        if len(orientations_arr.shape) != 1 or orientations_arr.shape[0] != self.n_edges():
             raise ValueError("'orientations' should be length n_edges array")
 
         q = self.bound_instance.add_one_form_tangent_vector_quantity(
-            name, values, orientations
+            name, values_arr, orientations_arr
         )
 
         # process and act on additional arguments
@@ -596,16 +626,16 @@ class SurfaceMesh(Structure):
 
 def register_surface_mesh(
     name: str,
-    vertices: NDArray,
-    faces: Any,
+    vertices: ArrayLike,
+    faces: ArrayLike,
     enabled: bool | None = None,
-    color: Sequence | None = None,
-    edge_color: Sequence | None = None,
+    color: ArrayLike | None = None,
+    edge_color: ArrayLike | None = None,
     smooth_shade: bool | None = None,
     edge_width: float | None = None,
     material: str | None = None,
-    back_face_policy: str | None = None,
-    back_face_color: Sequence | None = None,
+    back_face_policy: Literal["identical", "different", "custom", "cull"] | str | None = None,
+    back_face_color: ArrayLike | None = None,
     transparency: float | None = None,
 ) -> SurfaceMesh:
     """Register a new surface mesh"""

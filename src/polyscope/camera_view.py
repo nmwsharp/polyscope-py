@@ -4,7 +4,7 @@ from polyscope.core import glm3, CameraParameters
 from polyscope.structure import Structure
 
 import numpy as np
-from collections.abc import Sequence
+from numpy.typing import ArrayLike
 
 class CameraView(Structure):
     bound_instance: psb.CameraView
@@ -46,7 +46,7 @@ class CameraView(Structure):
     ## Options
     
     # Widget color
-    def set_widget_color(self, val: Sequence[float]) -> None:
+    def set_widget_color(self, val: ArrayLike) -> None:
         self.bound_instance.set_widget_color(glm3(val))
     def get_widget_color(self) -> tuple[float, float, float]:
         return self.bound_instance.get_widget_color().as_tuple()
@@ -71,7 +71,7 @@ def register_camera_view(name,
                          camera_parameters: CameraParameters,
                          enabled: bool | None = None, 
                          transparency: float | None = None,
-                         widget_color: Sequence[float] | None = None, 
+                         widget_color: ArrayLike | None = None, 
                          widget_thickness: float | None = None, 
                          widget_focal_length: float | None = None,
                          ):

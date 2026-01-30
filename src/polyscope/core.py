@@ -8,9 +8,8 @@ import os
 
 import numpy as np
 
-from collections.abc import Sequence
-from typing import Any, Literal, Tuple, TypeAlias
-from numpy.typing import NDArray
+from typing import Literal, Tuple
+from numpy.typing import NDArray, ArrayLike
 
 ### Basic setup and teardown
 
@@ -537,7 +536,7 @@ PickResult(
 )
 """
 
-def pick(*, screen_coords: Sequence[float] | None = None, buffer_inds: Sequence[int] | None = None) -> PickResult:
+def pick(*, screen_coords: ArrayLike | None = None, buffer_inds: ArrayLike | None = None) -> PickResult:
     if screen_coords is not None and buffer_inds is not None:
         raise ValueError("pass args one of screen_coords OR buffer_inds, but not both")
     if screen_coords is None and buffer_inds is None:
@@ -546,6 +545,9 @@ def pick(*, screen_coords: Sequence[float] | None = None, buffer_inds: Sequence[
     if screen_coords is not None:
         raw_result = psb.pick_at_screen_coords(glm2(screen_coords))
     if buffer_inds is not None:
+        arr = np.asarray(buffer_inds)
+        if not np.issubdtype(arr.dtype, np.integer) or arr.shape != (2,):
+            raise ValueError("buffer_inds should be a an array/tuple/etc of two integers")
         raw_result = psb.pick_at_buffer_inds(glm2i(buffer_inds))
 
     return PickResult(raw_result)
@@ -709,7 +711,7 @@ class SlicePlane:
     def get_active(self) -> bool:
         return self.bound_slice_plane.get_active()
 
-    def set_pose(self, plane_position: Sequence[float], plane_normal: Sequence[float]) -> None:
+    def set_pose(self, plane_position: ArrayLike, plane_normal: ArrayLike) -> None:
         self.bound_slice_plane.set_pose(glm3(plane_position), glm3(plane_normal))
 
     def get_center(self):
@@ -819,7 +821,7 @@ class TransformationGizmo:
     def get_transform(self) -> NDArray:
         return self.bound_gizmo.get_transform()
 
-    def set_position(self, p : Sequence[float]) -> None:
+    def set_position(self, p : ArrayLike) -> None:
         self.bound_gizmo.set_position(glm3(p))
 
     def get_position(self) -> NDArray:
@@ -927,9 +929,9 @@ class CameraExtrinsics:
     instance: psb.CameraExtrinsics
 
     def __init__(self, 
-                 root: Sequence[float] | None = None, 
-                 look_dir: Sequence[float] | None = None, 
-                 up_dir: Sequence[float] | None = None, 
+                 root: ArrayLike | None = None, 
+                 look_dir: ArrayLike | None = None, 
+                 up_dir: ArrayLike | None = None, 
                  mat: NDArray | None = None, 
                  instance: psb.CameraExtrinsics | None = None
                  ) -> None:
@@ -1024,24 +1026,38 @@ class CameraParameters:
 
 
 ## Small utilities
-def glm2(vals: Sequence[float]) -> psb.glm_vec2:
-    return psb.glm_vec2(vals[0], vals[1])
+def glm2(vals: ArrayLike) -> psb.glm_vec2:
+    vals_arr = np.asarray(vals, dtype=np.float32)
+    if vals_arr.shape != (2,):
+        raise ValueError("vals should be length-2 float array/tuple/etc")
+    return psb.glm_vec2(vals_arr[0], vals_arr[1])
 
 
-def glm2i(vals: Sequence[int]) -> psb.glm_ivec2:
-    return psb.glm_ivec2(vals[0], vals[1])
+def glm2i(vals: ArrayLike) -> psb.glm_ivec2:
+    vals_arr = np.asarray(vals, dtype=np.int32)
+    if vals_arr.shape != (2,):
+        raise ValueError("vals should be length-2 int array/tuple/etc")
+    return psb.glm_ivec2(vals_arr[0], vals_arr[1])
 
 
-def glm3u(vals: Sequence[int]) -> psb.glm_uvec3:
-    return psb.glm_uvec3(vals[0], vals[1], vals[2])
+def glm3u(vals: ArrayLike) -> psb.glm_uvec3:
+    vals_arr = np.asarray(vals, dtype=np.uint32)
+    if vals_arr.shape != (3,):
+        raise ValueError("vals should be length-3 int array/tuple/etc")
+    return psb.glm_uvec3(vals_arr[0], vals_arr[1], vals_arr[2])
+
+def glm3(vals: ArrayLike) -> psb.glm_vec3:
+    vals_arr = np.asarray(vals, dtype=np.float32)
+    if vals_arr.shape != (3,):
+        raise ValueError("vals should be length-3 float array/tuple/etc")
+    return psb.glm_vec3(vals_arr[0], vals_arr[1], vals_arr[2])
 
 
-def glm3(vals: Sequence[float]) -> psb.glm_vec3:
-    return psb.glm_vec3(vals[0], vals[1], vals[2])
-
-
-def glm4(vals: Sequence[float]) -> psb.glm_vec4:
-    return psb.glm_vec4(vals[0], vals[1], vals[2], vals[3])
+def glm4(vals: ArrayLike) -> psb.glm_vec4:
+    vals_arr = np.asarray(vals, dtype=np.float32)
+    if vals_arr.shape != (4,):
+        raise ValueError("vals should be length-4 float array/tuple/etc")
+    return psb.glm_vec4(vals_arr[0], vals_arr[1], vals_arr[2], vals_arr[3])
 
 
 def degrees(val: float) -> float:

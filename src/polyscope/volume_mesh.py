@@ -1,26 +1,36 @@
+from typing import Any, Literal, overload
+
 import polyscope_bindings as psb
-import numpy as np
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum
 from polyscope.structure import Structure
 from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed
 
+import numpy as np
+from numpy.typing import NDArray, ArrayLike
+
 class VolumeMesh(Structure):
 
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
     bound_instance: psb.VolumeMesh
 
+    @overload
+    def __init__(self, name: str, vertices: ArrayLike, tets: ArrayLike | None = None, hexes: ArrayLike | None = None, mixed_cells: ArrayLike | None = None) -> None: ...
+
+    @overload
+    def __init__(self, *, instance: psb.VolumeMesh) -> None: ...
+
     # End users should not call this constrctor, use register_volume_mesh instead
-    def __init__(self, 
-                 name: str | None = None, 
-                 vertices: np.ndarray | None = None, 
-                 tets: np.ndarray | None = None, 
-                 hexes: np.ndarray | None = None, 
-                 mixed_cells: np.ndarray | None = None, 
+    def __init__(self,
+                 name: str | None = None,
+                 vertices: ArrayLike | None = None,
+                 tets: ArrayLike | None = None,
+                 hexes: ArrayLike | None = None,
+                 mixed_cells: ArrayLike | None = None,
                  instance: psb.VolumeMesh | None = None
-                ):
-        
+                ) -> None:
+
         super().__init__()
 
         if instance is not None:
@@ -32,38 +42,44 @@ class VolumeMesh(Structure):
 
             assert name is not None
             assert vertices is not None
-            self.check_shape(vertices)
-            self.check_index_array(tets, 4, "tets")
-            self.check_index_array(hexes, 8, "tets")
-            self.check_index_array(mixed_cells, 8, "tets")
 
-            if mixed_cells is not None and (tets is not None or hexes is not None):
+            vertices_arr = np.asarray(vertices)
+            tets_arr = np.asarray(tets) if tets is not None else None
+            hexes_arr = np.asarray(hexes) if hexes is not None else None
+            mixed_cells_arr = np.asarray(mixed_cells) if mixed_cells is not None else None
+
+            self.check_shape(vertices_arr)
+            self.check_index_array(tets_arr, 4, "tets")
+            self.check_index_array(hexes_arr, 8, "hexes")
+            self.check_index_array(mixed_cells_arr, 8, "mixed_cells")
+
+            if mixed_cells_arr is not None and (tets_arr is not None or hexes_arr is not None):
                 raise ValueError("specify EITHER mixed_cells OR tets/hexes but not both")
 
-            if mixed_cells is not None:
-                self.bound_instance = psb.register_volume_mesh(name, vertices, mixed_cells)
+            if mixed_cells_arr is not None:
+                self.bound_instance = psb.register_volume_mesh(name, vertices_arr, mixed_cells_arr)
 
             else:
-                if tets is None:
-                    assert hexes is not None
-                    self.bound_instance = psb.register_hex_mesh(name, vertices, hexes)
-                elif hexes is None:
-                    assert tets is not None
-                    self.bound_instance = psb.register_tet_mesh(name, vertices, tets)
+                if tets_arr is None:
+                    assert hexes_arr is not None
+                    self.bound_instance = psb.register_hex_mesh(name, vertices_arr, hexes_arr)
+                elif hexes_arr is None:
+                    assert tets_arr is not None
+                    self.bound_instance = psb.register_tet_mesh(name, vertices_arr, tets_arr)
                 else:
-                    self.bound_instance = psb.register_tet_hex_mesh(name, vertices, tets, hexes)
+                    self.bound_instance = psb.register_tet_hex_mesh(name, vertices_arr, tets_arr, hexes_arr)
 
 
-    def check_shape(self, points):
+    def check_shape(self, points: NDArray) -> None:
         # Helper to validate arrays
-        
+
         if points is None:
             raise ValueError("must specify volume mesh vertex positions")
-        
-        if len(points.shape) !=2 or points.shape[1] != 3:
+
+        if len(points.shape) != 2 or points.shape[1] != 3:
             raise ValueError("volume mesh vertex positions should have shape (N,3); shape is " + str(points.shape))
 
-    def check_index_array(self, arr, dim, name):
+    def check_index_array(self, arr: NDArray | None, dim: int, name: str) -> None:
         # Helper to validate arrays
 
         # check the type
@@ -89,66 +105,68 @@ class VolumeMesh(Structure):
     ## Structure management
 
     # Update
-    def update_vertex_positions(self, vertices) -> None:
-        self.check_shape(vertices)
-        self.bound_instance.update_vertex_positions(vertices)
+    def update_vertex_positions(self, vertices: ArrayLike) -> None:
+        vertices_arr = np.asarray(vertices)
+        self.check_shape(vertices_arr)
+        self.bound_instance.update_vertex_positions(vertices_arr)
 
 
     ## Options
-    
+
     # Color
-    def set_color(self, val):
+    def set_color(self, val: ArrayLike) -> None:
         self.bound_instance.set_color(glm3(val))
-    def get_color(self):
+    def get_color(self) -> tuple[float, float, float]:
         return self.bound_instance.get_color().as_tuple()
-    
+
     # Interior Color
-    def set_interior_color(self, val):
+    def set_interior_color(self, val: ArrayLike) -> None:
         self.bound_instance.set_interior_color(glm3(val))
-    def get_interior_color(self):
+    def get_interior_color(self) -> tuple[float, float, float]:
         return self.bound_instance.get_interior_color().as_tuple()
-    
+
     # Edge Color
-    def set_edge_color(self, val):
+    def set_edge_color(self, val: ArrayLike) -> None:
         self.bound_instance.set_edge_color(glm3(val))
-    def get_edge_color(self):
+    def get_edge_color(self) -> tuple[float, float, float]:
         return self.bound_instance.get_edge_color().as_tuple()
-    
+
     # Edge width
-    def set_edge_width(self, val):
+    def set_edge_width(self, val: float) -> None:
         self.bound_instance.set_edge_width(val)
-    def get_edge_width(self):
+    def get_edge_width(self) -> float:
         return self.bound_instance.get_edge_width()
-    
+
     # Material
-    def set_material(self, mat):
+    def set_material(self, mat: str) -> None:
         self.bound_instance.set_material(mat)
-    def get_material(self):
+    def get_material(self) -> str:
         return self.bound_instance.get_material()
 
     # Picking
-    def append_pick_data(self, pick_result):
+    def append_pick_data(self, pick_result: Any) -> None:
         struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
-        pick_result.structure_data["element_type"] = struct_result.element_type
+        pick_result.structure_data["element_type"] = from_enum(struct_result.element_type)
         pick_result.structure_data["index"] = struct_result.index
 
 
     ## Quantities
 
     # Scalar
-    def add_scalar_quantity(self, name, values, defined_on='vertices', datatype="standard", **scalar_args):
+    def add_scalar_quantity(self, name: str, values: ArrayLike, defined_on: Literal["vertices", "cells"] | str = 'vertices', datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard", **scalar_args: Any) -> None:
 
-        if len(values.shape) != 1: raise ValueError("'values' should be a length-N array")
+        values_arr = np.asarray(values)
+        if len(values_arr.shape) != 1: raise ValueError("'values' should be a length-N array")
 
         if defined_on == 'vertices':
-            if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_instance.add_vertex_scalar_quantity(name, values, to_enum(psb.DataType, datatype))
+            if values_arr.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
+            q = self.bound_instance.add_vertex_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
         elif defined_on == 'cells':
-            if values.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
-            q = self.bound_instance.add_cell_scalar_quantity(name, values, to_enum(psb.DataType, datatype))
+            if values_arr.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
+            q = self.bound_instance.add_cell_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
-  
+
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
@@ -156,18 +174,19 @@ class VolumeMesh(Structure):
         process_scalar_args(self, q, scalar_args)
         check_all_args_processed(self, q, scalar_args)
 
-    
-    
+
+
     # Color
-    def add_color_quantity(self, name, values, defined_on='vertices', **color_args):
-        if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
-        
+    def add_color_quantity(self, name: str, values: ArrayLike, defined_on: Literal["vertices", "cells"] | str = 'vertices', **color_args: Any) -> None:
+        values_arr = np.asarray(values)
+        if len(values_arr.shape) != 2 or values_arr.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
+
         if defined_on == 'vertices':
-            if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_instance.add_vertex_color_quantity(name, values)
+            if values_arr.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
+            q = self.bound_instance.add_vertex_color_quantity(name, values_arr)
         elif defined_on == 'cells':
-            if values.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
-            q = self.bound_instance.add_cell_color_quantity(name, values)
+            if values_arr.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
+            q = self.bound_instance.add_cell_color_quantity(name, values_arr)
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
 
@@ -177,19 +196,20 @@ class VolumeMesh(Structure):
         process_quantity_args(self, q, color_args)
         process_color_args(self, q, color_args)
         check_all_args_processed(self, q, color_args)
-    
-    
+
+
     # Vector
-    def add_vector_quantity(self, name, values, defined_on='vertices', vectortype="standard", **vector_args):
-        if len(values.shape) != 2 or values.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
-        
-        
+    def add_vector_quantity(self, name: str, values: ArrayLike, defined_on: Literal["vertices", "cells"] | str = 'vertices', vectortype: Literal["standard", "ambient"] | str = "standard", **vector_args: Any) -> None:
+        values_arr = np.asarray(values)
+        if len(values_arr.shape) != 2 or values_arr.shape[1] != 3: raise ValueError("'values' should be an Nx3 array")
+
+
         if defined_on == 'vertices':
-            if values.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_instance.add_vertex_vector_quantity(name, values, to_enum(psb.VectorType, vectortype))
+            if values_arr.shape[0] != self.n_vertices(): raise ValueError("'values' should be a length n_vertices array")
+            q = self.bound_instance.add_vertex_vector_quantity(name, values_arr, to_enum(psb.VectorType, vectortype))
         elif defined_on == 'cells':
-            if values.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
-            q = self.bound_instance.add_cell_vector_quantity(name, values, to_enum(psb.VectorType, vectortype))
+            if values_arr.shape[0] != self.n_cells(): raise ValueError("'values' should be a length n_cells array")
+            q = self.bound_instance.add_cell_vector_quantity(name, values_arr, to_enum(psb.VectorType, vectortype))
         else:
             raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'cells']".format(defined_on))
 
@@ -202,13 +222,25 @@ class VolumeMesh(Structure):
     
     
 
-def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None, enabled=None, color=None, interior_color=None, edge_color=None, edge_width=None, material=None, transparency=None):
-
+def register_volume_mesh(
+    name: str,
+    vertices: ArrayLike,
+    tets: ArrayLike | None = None,
+    hexes: ArrayLike | None = None,
+    mixed_cells: ArrayLike | None = None,
+    enabled: bool | None = None,
+    color: ArrayLike | None = None,
+    interior_color: ArrayLike | None = None,
+    edge_color: ArrayLike | None = None,
+    edge_width: float | None = None,
+    material: str | None = None,
+    transparency: float | None = None
+) -> VolumeMesh:
     """Register a new volume mesh"""
 
     if not psb.is_initialized():
         raise RuntimeError("Polyscope has not been initialized")
-    
+
     p = VolumeMesh(name, vertices=vertices, tets=tets, hexes=hexes, mixed_cells=mixed_cells)
 
     # == Apply options
@@ -229,11 +261,11 @@ def register_volume_mesh(name, vertices, tets=None, hexes=None, mixed_cells=None
 
     return p
 
-def remove_volume_mesh(name, error_if_absent=True):
+def remove_volume_mesh(name: str, error_if_absent: bool = True) -> None:
     """Remove a volume mesh by name"""
     psb.remove_volume_mesh(name, error_if_absent)
 
-def get_volume_mesh(name):
+def get_volume_mesh(name: str) -> VolumeMesh:
     """Get volume mesh by name"""
     if not has_volume_mesh(name):
         raise ValueError("no volume mesh with name " + str(name))
@@ -243,7 +275,7 @@ def get_volume_mesh(name):
     # Wrap the instance
     return VolumeMesh(instance=raw)
 
-def has_volume_mesh(name):
+def has_volume_mesh(name: str) -> bool:
     """Check if a volume mesh exists by name"""
     return psb.has_volume_mesh(name)
     

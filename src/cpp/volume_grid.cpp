@@ -37,9 +37,9 @@ void bind_volume_grid(nb::module_& m) {
       // basics
       .def("n_nodes", &ps::VolumeGrid::nNodes)
       .def("n_cells", &ps::VolumeGrid::nCells)
-      .def("grid_spacing", &ps::VolumeGrid::gridSpacing)
-      .def("get_grid_node_dim", &ps::VolumeGrid::getGridNodeDim)
-      .def("get_grid_cell_dim", &ps::VolumeGrid::getGridCellDim)
+      .def("grid_spacing", [](ps::VolumeGrid& x) { return glm2eigen(x.gridSpacing()); })
+      .def("get_grid_node_dim", [](ps::VolumeGrid& x) { return glm2eigen(x.getGridNodeDim()); })
+      .def("get_grid_cell_dim", [](ps::VolumeGrid& x) { return glm2eigen(x.getGridCellDim()); })
       .def("get_bound_min", [](ps::VolumeGrid& x) { return glm2eigen(x.getBoundMin()); })
       .def("get_bound_max", [](ps::VolumeGrid& x) { return glm2eigen(x.getBoundMax()); })
       
