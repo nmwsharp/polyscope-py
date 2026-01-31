@@ -47,10 +47,10 @@ jobs:
       run: cd build && cmake --build . --parallel 4 # limit the number of jobs, it is running all and blowing up on CI machine
 
     - name: run test backend mock
-      run: python3 test/polyscope_test.py -v
+      run: python3 test/polyscope_test.py -v --backend=openGL_mock
 
     - name: run test backend EGL
-      run: python3 test/polyscope_test.py -v backend=openGL3_egl
+      run: python3 test/polyscope_test.py -v --backend=openGL3_egl
 
     - name: run type checker (ty)
       run: ty check .

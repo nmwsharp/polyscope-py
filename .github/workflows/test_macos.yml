@@ -40,4 +40,4 @@ jobs:
       run: cd build && cmake --build . --parallel
 
     - name: run test
-      run: python test/polyscope_test.py -v
+      run: python test/polyscope_test.py -v --backend=openGL_mock
