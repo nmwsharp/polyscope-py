@@ -48,8 +48,8 @@ def print_discovered_tests_summary(suite, full_listing=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--backend", default="openGL_mock", help="Backend to use for testing (default: openGL_mock)")
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
-    parser.add_argument("--failfast", action="store_true", help="Fail fast")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument("-f", "--failfast", action="store_true", help="Fail fast")
     args = parser.parse_args()
 
     ps_backend = args.backend
