@@ -49,3 +49,10 @@ inline std::vector<const char*> convert_string_items(const std::vector<std::stri
   }
   return _items;
 }
+
+inline const char *to_char_ptr(const std::optional<std::string> &s) {
+  if (s.has_value()) {
+    return s->c_str();
+  }
+  return nullptr;
+}

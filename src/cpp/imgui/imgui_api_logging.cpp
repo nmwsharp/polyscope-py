@@ -7,6 +7,8 @@
 #include "imgui_utils.h"
 
 #include <nanobind/stl/array.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/string.h>
 
 // clang-format off
 void bind_imgui_api_logging(nb::module_& m) {
@@ -21,7 +23,9 @@ void bind_imgui_api_logging(nb::module_& m) {
     // IMGUI_API void          LogToFile(int auto_open_depth = -1, const char* filename = NULL);
     m.def(
         "LogToFile",
-        [](int auto_open_depth, const char* filename) { ImGui::LogToFile(auto_open_depth, filename); },
+        [](int auto_open_depth, std::optional<std::string> filename) { 
+            ImGui::LogToFile(auto_open_depth, to_char_ptr(filename)); 
+        },
         nb::arg("auto_open_depth") = -1,
         nb::arg("filename") = nb::none());
 
