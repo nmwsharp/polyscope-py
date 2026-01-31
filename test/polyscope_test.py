@@ -48,7 +48,9 @@ def print_discovered_tests_summary(suite, full_listing=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--backend", default="openGL_mock", help="Backend to use for testing (default: openGL_mock)")
-    args, remaining = parser.parse_known_args()
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument("--failfast", action="store_true", help="Fail fast")
+    args = parser.parse_args()
 
     ps_backend = args.backend
     print(f"Testing polyscope version: {ps.__version__}  test_backend: {ps_backend}")
@@ -70,5 +72,5 @@ if __name__ == "__main__":
     print_discovered_tests_summary(suite, full_listing=False)
 
     # unittest.main()# Run the discovered tests
-    runner = unittest.TextTestRunner(verbosity=2)
+    runner = unittest.TextTestRunner(verbosity=2 if args.verbose else 1, failfast=args.failfast)
     runner.run(suite)

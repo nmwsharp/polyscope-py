@@ -175,8 +175,12 @@ class TestCore(unittest.TestCase):
         ps.set_window_size(default_w, default_h)
         self.assertEqual(ps.get_window_size(), (default_w, default_h))
 
+        ps.show(3)  # buffer might not resize until we show
+
         tup = ps.get_buffer_size()
         w, h = int(tup[0]), int(tup[1])
+        print(f"default window size: {default_w} x {default_h}")
+        print(f"buffer size: {w} x {h}")
         self.assertAlmostEqual(default_w / default_h, w / h)
 
         ps.set_window_resizable(True)
@@ -758,7 +762,7 @@ class TestPointCloud(unittest.TestCase):
         pts = self.generate_points()
         N = pts.shape[0]
         ps.register_point_cloud("test_cloud", pts)
-        p : ps.PointCloud = ps.get_point_cloud("test_cloud")
+        p: ps.PointCloud = ps.get_point_cloud("test_cloud")
         vals = np.random.rand(N)
 
         p.add_scalar_quantity("test_vals", vals)
