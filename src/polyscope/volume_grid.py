@@ -1,43 +1,30 @@
-from typing import Any, Callable, Literal, overload
+from typing import Any, Callable, Literal, cast, overload
 
+import sys
 import polyscope_bindings as psb
 
 from polyscope.core import glm3, glm3u
 from polyscope.enums import to_enum, from_enum
 from polyscope.structure import Structure
-from polyscope.common import process_quantity_args, process_scalar_args, check_all_args_processed, check_and_pop_arg
+
+from polyscope.common import (
+    QuantityArgsBase,
+    process_quantity_args,
+    VolumeGridArgsBase,
+    VolumeGridScalarQuantityArgs,
+    process_volume_grid_scalar_args,
+    ScalarArgsBase,
+    process_scalar_args,
+    check_all_args_processed,
+)
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
-
-
-def process_volume_grid_scalar_args(
-    structure: "VolumeGrid", quantity: Any, scalar_args: dict[str, Any], defined_on: str
-) -> None:
-    val = check_and_pop_arg(scalar_args, "enable_gridcube_viz")
-    if val is not None:
-        quantity.set_gridcube_viz_enabled(val)
-
-    if defined_on == "nodes":
-        val = check_and_pop_arg(scalar_args, "enable_isosurface_viz")
-        if val is not None:
-            quantity.set_isosurface_viz_enabled(val)
-
-        val = check_and_pop_arg(scalar_args, "isosurface_level")
-        if val is not None:
-            quantity.set_isosurface_level(val)
-
-        val = check_and_pop_arg(scalar_args, "isosurface_color")
-        if val is not None:
-            quantity.set_isosurface_color(glm3(val))
-
-        val = check_and_pop_arg(scalar_args, "slice_planes_affect_isosurface")
-        if val is not None:
-            quantity.set_slice_planes_affect_isosurface(val)
-
-        val = check_and_pop_arg(scalar_args, "register_isosurface_as_mesh_with_name")
-        if val is not None:
-            quantity.register_isosurface_as_mesh_with_name(val)
 
 
 class VolumeGrid(Structure):
@@ -159,7 +146,7 @@ class VolumeGrid(Structure):
         values: ArrayLike,
         defined_on: Literal["nodes", "cells"] | str = "nodes",
         datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
-        **scalar_args: Any,
+        **scalar_args: Unpack[VolumeGridScalarQuantityArgs],
     ) -> None:
         # NOTE: notice the .flatten('F') below to flatten in Fortran order. This assumes the input data is indexed like array[xInd,yInd,zInd],
         # and converts to the internal x-changes-fastest data layout that the volume grid uses.
@@ -187,9 +174,9 @@ class VolumeGrid(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_volume_grid_scalar_args(self, q, scalar_args, defined_on)
-        process_quantity_args(self, q, scalar_args)
-        process_scalar_args(self, q, scalar_args)
+        process_volume_grid_scalar_args(self, q, cast(VolumeGridArgsBase, scalar_args), defined_on)
+        process_quantity_args(self, q, cast(QuantityArgsBase, scalar_args))
+        process_scalar_args(self, q, cast(ScalarArgsBase, scalar_args))
         check_all_args_processed(self, q, scalar_args)
 
     def add_scalar_quantity_from_callable(
@@ -198,7 +185,7 @@ class VolumeGrid(Structure):
         func: Callable,
         defined_on: Literal["nodes", "cells"] | str = "nodes",
         datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
-        **scalar_args: Any,
+        **scalar_args: Unpack[VolumeGridScalarQuantityArgs],
     ) -> None:
         if defined_on == "nodes":
             q = self.bound_instance.add_node_scalar_quantity_from_callable(name, func, to_enum(psb.DataType, datatype))
@@ -211,9 +198,9 @@ class VolumeGrid(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_volume_grid_scalar_args(self, q, scalar_args, defined_on)
-        process_quantity_args(self, q, scalar_args)
-        process_scalar_args(self, q, scalar_args)
+        process_volume_grid_scalar_args(self, q, cast(VolumeGridArgsBase, scalar_args), defined_on)
+        process_quantity_args(self, q, cast(QuantityArgsBase, scalar_args))
+        process_scalar_args(self, q, cast(ScalarArgsBase, scalar_args))
         check_all_args_processed(self, q, scalar_args)
 
 

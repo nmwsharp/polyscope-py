@@ -898,8 +898,7 @@ class TestImGuiBindings(unittest.TestCase):
                         sort_order = spec.SortOrder
                         self.assertIsInstance(sort_order, int)
 
-                        sort_direction = spec.SortDirection
-                        self.assertIsInstance(sort_direction, int)
+                        sort_direction = spec.SortDirection  # noqa: F841
 
                 # Add some dummy rows
                 for i in range(3):

@@ -1,21 +1,36 @@
-from typing import Any, Literal, overload
+from typing import Any, Literal, overload, cast
 
+import sys
 import polyscope_bindings as psb
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum, from_enum
 from polyscope.structure import Structure
 from polyscope.common import (
+    QuantityArgsBase,
     process_quantity_args,
+    ScalarQuantityArgs,
+    ScalarArgsBase,
     process_scalar_args,
+    ColorQuantityArgs,
+    ColorArgsBase,
     process_color_args,
+    VectorQuantityArgs,
+    VectorArgsBase,
     process_vector_args,
+    ParameterizationQuantityArgs,
+    ParameterizationArgsBase,
     process_parameterization_args,
     check_all_args_processed,
 )
 
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 
 class PointCloud(Structure):
@@ -133,7 +148,7 @@ class PointCloud(Structure):
         name: str,
         values: ArrayLike,
         datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
-        **scalar_args: Any,
+        **scalar_args: Unpack[ScalarQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 1 or values_arr.shape[0] != self.n_points():
@@ -143,12 +158,12 @@ class PointCloud(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, scalar_args)
-        process_scalar_args(self, q, scalar_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, scalar_args))
+        process_scalar_args(self, q, cast(ScalarArgsBase, scalar_args))
         check_all_args_processed(self, q, scalar_args)
 
     # Color
-    def add_color_quantity(self, name: str, values: ArrayLike, **color_args: Any) -> None:
+    def add_color_quantity(self, name: str, values: ArrayLike, **color_args: Unpack[ColorQuantityArgs]) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 2 or values_arr.shape[0] != self.n_points() or values_arr.shape[1] != 3:
             raise ValueError("'values' should be an Nx3 array")
@@ -157,8 +172,8 @@ class PointCloud(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, color_args)
-        process_color_args(self, q, color_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, color_args))
+        process_color_args(self, q, cast(ColorArgsBase, color_args))
         check_all_args_processed(self, q, color_args)
 
     # Vector
@@ -167,7 +182,7 @@ class PointCloud(Structure):
         name: str,
         values: ArrayLike,
         vectortype: Literal["standard", "ambient"] | str = "standard",
-        **vector_args: Any,
+        **vector_args: Unpack[VectorQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 2 or values_arr.shape[0] != self.n_points() or values_arr.shape[1] not in [2, 3]:
@@ -180,8 +195,8 @@ class PointCloud(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, vector_args)
-        process_vector_args(self, q, vector_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, vector_args))
+        process_vector_args(self, q, cast(VectorArgsBase, vector_args))
         check_all_args_processed(self, q, vector_args)
 
     # Parameterization
@@ -190,7 +205,7 @@ class PointCloud(Structure):
         name: str,
         values: ArrayLike,
         coords_type: Literal["unit", "world"] | str = "unit",
-        **parameterization_args: Any,
+        **parameterization_args: Unpack[ParameterizationQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 2 or values_arr.shape[0] != self.n_points() or values_arr.shape[1] != 2:
@@ -203,8 +218,8 @@ class PointCloud(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, parameterization_args)
-        process_parameterization_args(self, q, parameterization_args, is_surface=False)
+        process_quantity_args(self, q, cast(QuantityArgsBase, parameterization_args))
+        process_parameterization_args(self, q, cast(ParameterizationArgsBase, parameterization_args), is_surface=False)
         check_all_args_processed(self, q, parameterization_args)
 
 

@@ -1,24 +1,40 @@
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
+import sys
 import polyscope_bindings as psb
 
+from polyscope.core import glm3
+from polyscope.enums import to_enum
 from polyscope.common import (
     check_is_scalar_image,
     check_is_image3,
     check_is_image4,
     check_image_dims_compatible,
+    QuantityArgsBase,
+    process_quantity_args,
+    ScalarArgsBase,
     process_scalar_args,
+    ColorArgsBase,
     process_color_args,
+    ImageArgsBase,
+    ScalarImageArgs,
+    ColorImageArgs,
+    RenderImageArgsBase,
+    ScalarRenderImageArgs,
+    ColorRenderImageArgs,
+    DepthRenderImageArgs,
     process_image_args,
     process_render_image_args,
-    process_quantity_args,
     check_all_args_processed,
 )
-from polyscope.core import glm3
-from polyscope.enums import to_enum
 
 import numpy as np
 from numpy.typing import ArrayLike
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 
 def _resolve_floating_struct_instance(struct_ref: Any) -> Any:
@@ -41,7 +57,7 @@ def add_scalar_image_quantity(
     image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
     datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
     struct_ref: Any = None,
-    **option_args: Any,
+    **option_args: Unpack[ScalarImageArgs],
 ) -> None:
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
@@ -58,9 +74,9 @@ def add_scalar_image_quantity(
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
-    process_quantity_args(struct_ref, q, option_args)
-    process_image_args(struct_ref, q, option_args)
-    process_scalar_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_image_args(struct_ref, q, cast(ImageArgsBase, option_args))
+    process_scalar_args(struct_ref, q, cast(ScalarArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
 
@@ -69,7 +85,7 @@ def add_color_image_quantity(
     values: ArrayLike,
     image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
     struct_ref: Any = None,
-    **option_args: Any,
+    **option_args: Unpack[ColorImageArgs],
 ) -> None:
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
@@ -86,9 +102,9 @@ def add_color_image_quantity(
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
-    process_quantity_args(struct_ref, q, option_args)
-    process_image_args(struct_ref, q, option_args)
-    process_color_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_image_args(struct_ref, q, cast(ImageArgsBase, option_args))
+    process_color_args(struct_ref, q, cast(ColorArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
 
@@ -97,7 +113,7 @@ def add_color_alpha_image_quantity(
     values: ArrayLike,
     image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
     struct_ref: Any = None,
-    **option_args: Any,
+    **option_args: Unpack[ColorImageArgs],
 ) -> None:
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
@@ -114,9 +130,9 @@ def add_color_alpha_image_quantity(
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
-    process_quantity_args(struct_ref, q, option_args)
-    process_image_args(struct_ref, q, option_args)
-    process_color_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_image_args(struct_ref, q, cast(ImageArgsBase, option_args))
+    process_color_args(struct_ref, q, cast(ColorArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
 
@@ -127,7 +143,7 @@ def add_depth_render_image_quantity(
     image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
     color: ArrayLike | None = None,
     struct_ref: Any = None,
-    **option_args: Any,
+    **option_args: Unpack[DepthRenderImageArgs],
 ) -> None:
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
@@ -154,8 +170,8 @@ def add_depth_render_image_quantity(
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
-    process_quantity_args(struct_ref, q, option_args)
-    process_render_image_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_render_image_args(struct_ref, q, cast(RenderImageArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
 
@@ -166,7 +182,7 @@ def add_color_render_image_quantity(
     color_values: ArrayLike,
     image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
     struct_ref: Any = None,
-    **option_args: Any,
+    **option_args: Unpack[ColorRenderImageArgs],
 ) -> None:
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
@@ -200,9 +216,9 @@ def add_color_render_image_quantity(
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
-    process_quantity_args(struct_ref, q, option_args)
-    process_color_args(struct_ref, q, option_args)
-    process_render_image_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_color_args(struct_ref, q, cast(ColorArgsBase, option_args))
+    process_render_image_args(struct_ref, q, cast(RenderImageArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
 
@@ -213,7 +229,7 @@ def add_scalar_render_image_quantity(
     scalar_values: ArrayLike,
     image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
     struct_ref: Any = None,
-    **option_args: Any,
+    **option_args: Unpack[ScalarRenderImageArgs],
 ) -> None:
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
@@ -247,9 +263,9 @@ def add_scalar_render_image_quantity(
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
-    process_quantity_args(struct_ref, q, option_args)
-    process_scalar_args(struct_ref, q, option_args)
-    process_render_image_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_scalar_args(struct_ref, q, cast(ScalarArgsBase, option_args))
+    process_render_image_args(struct_ref, q, cast(RenderImageArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
 
@@ -259,7 +275,7 @@ def add_raw_color_render_image_quantity(
     color_values: ArrayLike,
     image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
     struct_ref: Any = None,
-    **option_args: Any,
+    **option_args: Unpack[ColorRenderImageArgs],
 ) -> None:
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
@@ -280,9 +296,9 @@ def add_raw_color_render_image_quantity(
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
-    process_quantity_args(struct_ref, q, option_args)
-    process_color_args(struct_ref, q, option_args)
-    process_render_image_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_color_args(struct_ref, q, cast(ColorArgsBase, option_args))
+    process_render_image_args(struct_ref, q, cast(RenderImageArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
 
@@ -292,7 +308,7 @@ def add_raw_color_alpha_render_image_quantity(
     color_values: ArrayLike,
     image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
     struct_ref: Any = None,
-    **option_args: Any,
+    **option_args: Unpack[ColorRenderImageArgs],
 ) -> None:
     struct_instance_ref = _resolve_floating_struct_instance(struct_ref)
 
@@ -313,7 +329,7 @@ def add_raw_color_alpha_render_image_quantity(
 
     # process and act on additional arguments
     # note: each step modifies the option_args dict and removes processed args
-    process_quantity_args(struct_ref, q, option_args)
-    process_color_args(struct_ref, q, option_args)
-    process_render_image_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_color_args(struct_ref, q, cast(ColorArgsBase, option_args))
+    process_render_image_args(struct_ref, q, cast(RenderImageArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)

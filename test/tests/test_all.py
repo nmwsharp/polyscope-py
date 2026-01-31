@@ -758,10 +758,12 @@ class TestPointCloud(unittest.TestCase):
         pts = self.generate_points()
         N = pts.shape[0]
         ps.register_point_cloud("test_cloud", pts)
-        p = ps.get_point_cloud("test_cloud")
+        p : ps.PointCloud = ps.get_point_cloud("test_cloud")
         vals = np.random.rand(N)
 
         p.add_scalar_quantity("test_vals", vals)
+        p.add_scalar_quantity("test_vals", vals)
+        p.add_scalar_quantity("test_vals_disabled", vals, enabled=False)
         p.add_scalar_quantity("test_vals", vals, enabled=True)
         p.add_scalar_quantity("test_vals_with_range", vals, vminmax=(-5.0, 5.0), enabled=True)
         p.add_scalar_quantity("test_vals_with_datatype", vals, enabled=True, datatype="symmetric")

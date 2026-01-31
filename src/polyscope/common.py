@@ -3,6 +3,11 @@ import polyscope_bindings as psb
 from polyscope.core import glm2, glm3
 from polyscope.enums import to_enum
 
+from typing import TypedDict, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from polyscope.core import CameraParameters
+
 
 def check_is_scalar_image(values):
     if len(values.shape) != 2:
@@ -43,6 +48,15 @@ def check_and_pop_arg(d, argname):
     return None
 
 
+# ==========================================================================
+# ==== Basic Arguments
+# ==========================================================================
+
+
+class QuantityArgsBase(TypedDict, total=False):
+    enabled: bool
+
+
 # Process args, removing them from the dict if they are present
 def process_quantity_args(structure, quantity, quantity_args):
     val = check_and_pop_arg(quantity_args, "enabled")
@@ -50,15 +64,54 @@ def process_quantity_args(structure, quantity, quantity_args):
         quantity.set_enabled(val)
 
 
+# ==========================================================================
+# ==== Color Arguments
+# ==========================================================================
+
+
+class ColorArgsBase(TypedDict, total=False):
+    is_premultiplied: bool
+
+
+class ColorQuantityArgs(QuantityArgsBase, ColorArgsBase, total=False):
+    pass
+
+
 # Process args, removing them from the dict if they are present
-def process_color_args(structure, quantity, color_args):
+def process_color_args(structure, quantity, color_args: ColorArgsBase):
+
     val = check_and_pop_arg(color_args, "is_premultiplied")
     if val is not None:
         quantity.set_is_premultiplied(val)
 
 
+# ==========================================================================
+# ==== Scalar Arguments
+# ==========================================================================
+
+
+class ScalarArgsBase(TypedDict, total=False):
+    vminmax: tuple[float, float]
+    cmap: str
+    onscreen_colorbar_enabled: bool
+    onscreen_colorbar_location: tuple[float, float]
+    isolines_enabled: bool
+    isoline_style: str
+    isoline_period: float
+    isoline_period_relative: bool
+    isoline_width: float  # deprecated name
+    isoline_width_relative: bool  # deprecated name
+    isoline_darkness: float
+    isoline_contour_thickness: float
+
+
+class ScalarQuantityArgs(QuantityArgsBase, ScalarArgsBase, total=False):
+    pass
+
+
 # Process args, removing them from the dict if they are present
-def process_scalar_args(structure, quantity, scalar_args):
+# def process_scalar_args(structure, quantity, scalar_args: ScalarArgs | MutableMapping[str, Any]):
+def process_scalar_args(structure, quantity, scalar_args: ScalarArgsBase):
     val = check_and_pop_arg(scalar_args, "vminmax")
     if val is not None:
         quantity.set_map_range(val)
@@ -107,8 +160,24 @@ def process_scalar_args(structure, quantity, scalar_args):
         quantity.set_isoline_contour_thickness(val)
 
 
+# ==========================================================================
+# ==== Vector Arguments
+# ==========================================================================
+
+
+class VectorArgsBase(TypedDict, total=False):
+    length: float
+    radius: float
+    color: tuple[float, float, float]
+    material: str
+
+
+class VectorQuantityArgs(QuantityArgsBase, VectorArgsBase, total=False):
+    pass
+
+
 # Process args, removing them from the dict if they are present
-def process_vector_args(structure, quantity, vector_args):
+def process_vector_args(structure, quantity, vector_args: VectorArgsBase):
     val = check_and_pop_arg(vector_args, "length")
     if val is not None:
         quantity.set_length(val, True)
@@ -126,8 +195,29 @@ def process_vector_args(structure, quantity, vector_args):
         quantity.set_material(val)
 
 
+# ==========================================================================
+# ==== Parameterization Arguments
+# ==========================================================================
+
+
+class ParameterizationArgsBase(TypedDict, total=False):
+    grid_colors: tuple[tuple[float, float, float], tuple[float, float, float]]
+    checker_colors: tuple[tuple[float, float, float], tuple[float, float, float]]
+    checker_size: float
+    cmap: str
+    island_labels: Any  # NDArray
+    create_curve_network_from_seams: str
+    viz_style: str
+
+
+class ParameterizationQuantityArgs(QuantityArgsBase, ParameterizationArgsBase, total=False):
+    pass
+
+
 # Process args, removing them from the dict if they are present
-def process_parameterization_args(structure, quantity, parameterization_args, is_surface=True):
+def process_parameterization_args(
+    structure, quantity, parameterization_args: ParameterizationArgsBase, is_surface=True
+):
     val = check_and_pop_arg(parameterization_args, "grid_colors")
     if val is not None:
         quantity.set_grid_colors((glm3(val[0]), glm3(val[1])))
@@ -169,8 +259,70 @@ def process_texture_map_args(structure, quantity, texture_map_args):
         quantity.set_filter_mode(to_enum(psb.FilterMode, val))
 
 
+# ==========================================================================
+# ==== Volume Grid Arguments
+# ==========================================================================
+
+
+class VolumeGridArgsBase(TypedDict, total=False):
+    enable_gridcube_viz: bool
+    enable_isosurface_viz: bool
+    isosurface_level: float
+    isosurface_color: tuple[float, float, float]
+    slice_planes_affect_isosurface: bool
+    register_isosurface_as_mesh_with_name: str
+
+class VolumeGridScalarQuantityArgs(ScalarQuantityArgs, VolumeGridArgsBase, total=False):
+    pass
+
+def process_volume_grid_scalar_args(
+    structure: Any, quantity: Any, volume_grid_args: VolumeGridArgsBase, defined_on: str
+) -> None:
+
+    val = check_and_pop_arg(volume_grid_args, "enable_gridcube_viz")
+    if val is not None:
+        quantity.set_gridcube_viz_enabled(val)
+
+    if defined_on == "nodes":
+        val = check_and_pop_arg(volume_grid_args, "enable_isosurface_viz")
+        if val is not None:
+            quantity.set_isosurface_viz_enabled(val)
+
+        val = check_and_pop_arg(volume_grid_args, "isosurface_level")
+        if val is not None:
+            quantity.set_isosurface_level(val)
+
+        val = check_and_pop_arg(volume_grid_args, "isosurface_color")
+        if val is not None:
+            quantity.set_isosurface_color(glm3(val))
+
+        val = check_and_pop_arg(volume_grid_args, "slice_planes_affect_isosurface")
+        if val is not None:
+            quantity.set_slice_planes_affect_isosurface(val)
+
+        val = check_and_pop_arg(volume_grid_args, "register_isosurface_as_mesh_with_name")
+        if val is not None:
+            quantity.register_isosurface_as_mesh_with_name(val)
+
+
+# ==========================================================================
+# ==== Image Arguments
+# ==========================================================================
+
+class ImageArgsBase(TypedDict, total=False):
+    show_fullscreen: bool
+    show_in_imgui_window: bool
+    show_in_camera_billboard: bool
+    transparency: float
+
+class ScalarImageArgs(ScalarQuantityArgs, ImageArgsBase, total=False):
+    pass
+
+class ColorImageArgs(ColorQuantityArgs, ImageArgsBase, total=False):
+    pass
+
 # Process args, removing them from the dict if they are present
-def process_image_args(structure, quantity, image_args):
+def process_image_args(structure, quantity, image_args: ImageArgsBase):
     val = check_and_pop_arg(image_args, "show_fullscreen")
     if val is not None:
         quantity.set_show_fullscreen(val)
@@ -187,9 +339,22 @@ def process_image_args(structure, quantity, image_args):
     if val is not None:
         quantity.set_transparency(val)
 
+class RenderImageArgsBase(TypedDict, total=False):
+    transparency: float
+    material: str
+    allow_fullscreen_compositing: bool
+
+class DepthRenderImageArgs(ColorQuantityArgs, RenderImageArgsBase, total=False):
+    pass
+
+class ScalarRenderImageArgs(ScalarQuantityArgs, RenderImageArgsBase, total=False):
+    pass
+
+class ColorRenderImageArgs(ColorQuantityArgs, RenderImageArgsBase, total=False):
+    pass
 
 # Process args, removing them from the dict if they are present
-def process_render_image_args(structure, quantity, image_args):
+def process_render_image_args(structure, quantity, image_args: RenderImageArgsBase):
     val = check_and_pop_arg(image_args, "transparency")
     if val is not None:
         quantity.set_transparency(val)
@@ -202,6 +367,33 @@ def process_render_image_args(structure, quantity, image_args):
     if val is not None:
         quantity.set_allow_fullscreen_compositing(val)
 
+
+# ==========================================================================
+# ==== Implicit Render Arguments
+# ==========================================================================
+
+class ImplicitRenderArgs(TypedDict, total=False):
+    camera_parameters: "CameraParameters"
+    dim: tuple[int, int]
+    subsample_factor: int
+    miss_dist: float
+    miss_dist_relative: bool
+    hit_dist: float
+    hit_dist_relative: bool
+    step_factor: float
+    normal_sample_eps: float
+    step_size: float
+    step_size_relative: bool
+    n_max_steps: int
+
+class ImplicitDepthRenderArgs(DepthRenderImageArgs, ImplicitRenderArgs, total=False):
+    pass
+
+class ImplicitColorRenderArgs(ColorRenderImageArgs, ImplicitRenderArgs, total=False):
+    pass
+
+class ImplicitScalarRenderArgs(ScalarRenderImageArgs, ImplicitRenderArgs, total=False):
+    pass
 
 # Process args, removing them from the dict if they are present
 def process_implicit_render_args(opts, implicit_args):

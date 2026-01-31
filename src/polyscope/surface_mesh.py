@@ -1,15 +1,25 @@
 from typing import Any, Literal, overload, cast
 
+import sys
 import polyscope_bindings as psb
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum, from_enum
 from polyscope.structure import Structure
 from polyscope.common import (
+    QuantityArgsBase,
     process_quantity_args,
+    ScalarQuantityArgs,
+    ScalarArgsBase,
     process_scalar_args,
+    ColorQuantityArgs,
+    ColorArgsBase,
     process_color_args,
+    VectorQuantityArgs,
+    VectorArgsBase,
     process_vector_args,
+    ParameterizationQuantityArgs,
+    ParameterizationArgsBase,
     process_texture_map_args,
     process_parameterization_args,
     check_all_args_processed,
@@ -20,6 +30,11 @@ from polyscope.common import (
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
 from collections.abc import Sequence
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 RaggedList = Sequence[Sequence[int]]
 
@@ -264,7 +279,7 @@ class SurfaceMesh(Structure):
         datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
         param_name: str | None = None,
         image_origin: Literal["lower_left", "upper_left"] | str = "upper_left",
-        **scalar_args: Any,
+        **scalar_args: Unpack[ScalarQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if defined_on != "texture" and len(values_arr.shape) != 1:
@@ -322,8 +337,8 @@ class SurfaceMesh(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, scalar_args)
-        process_scalar_args(self, q, scalar_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, scalar_args))
+        process_scalar_args(self, q, cast(ScalarArgsBase, scalar_args))
         process_texture_map_args(self, q, scalar_args)
         check_all_args_processed(self, q, scalar_args)
 
@@ -335,7 +350,7 @@ class SurfaceMesh(Structure):
         defined_on: Literal["vertices", "faces", "texture"] | str = "vertices",
         param_name: str | None = None,
         image_origin: Literal["lower_left", "upper_left"] | str = "upper_left",
-        **color_args: Any,
+        **color_args: Unpack[ColorQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if defined_on != "texture" and (len(values_arr.shape) != 2 or values_arr.shape[1] != 3):
@@ -372,8 +387,8 @@ class SurfaceMesh(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, color_args)
-        process_color_args(self, q, color_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, color_args))
+        process_color_args(self, q, cast(ColorArgsBase, color_args))
         process_texture_map_args(self, q, color_args)
         check_all_args_processed(self, q, color_args)
 
@@ -423,7 +438,7 @@ class SurfaceMesh(Structure):
         values: ArrayLike,
         defined_on: Literal["vertices", "corners"] | str = "vertices",
         coords_type: Literal["unit", "world"] | str = "unit",
-        **parameterization_args: Any,
+        **parameterization_args: Unpack[ParameterizationQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 2 or values_arr.shape[1] != 2:
@@ -445,8 +460,8 @@ class SurfaceMesh(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, parameterization_args)
-        process_parameterization_args(self, q, parameterization_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, parameterization_args))
+        process_parameterization_args(self, q, cast(ParameterizationArgsBase, parameterization_args))
         check_all_args_processed(self, q, parameterization_args)
 
     # Vector
@@ -456,7 +471,7 @@ class SurfaceMesh(Structure):
         values: ArrayLike,
         defined_on: Literal["vertices", "faces"] | str = "vertices",
         vectortype: Literal["standard", "ambient"] | str = "standard",
-        **vector_args: Any,
+        **vector_args: Unpack[VectorQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 2 or values_arr.shape[1] not in [2, 3]:
@@ -491,8 +506,8 @@ class SurfaceMesh(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, vector_args)
-        process_vector_args(self, q, vector_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, vector_args))
+        process_vector_args(self, q, cast(VectorArgsBase, vector_args))
         check_all_args_processed(self, q, vector_args)
 
     def add_tangent_vector_quantity(
@@ -504,7 +519,7 @@ class SurfaceMesh(Structure):
         n_sym: int = 1,
         defined_on: Literal["vertices", "faces"] | str = "vertices",
         vectortype: Literal["standard", "ambient"] | str = "standard",
-        **vector_args: Any,
+        **vector_args: Unpack[VectorQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         basisX_arr = np.asarray(basisX)
@@ -545,8 +560,8 @@ class SurfaceMesh(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, vector_args)
-        process_vector_args(self, q, vector_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, vector_args))
+        process_vector_args(self, q, cast(VectorArgsBase, vector_args))
         check_all_args_processed(self, q, vector_args)
 
     def add_one_form_vector_quantity(
@@ -563,8 +578,8 @@ class SurfaceMesh(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, vector_args)
-        process_vector_args(self, q, vector_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, vector_args))
+        process_vector_args(self, q, cast(VectorArgsBase, vector_args))
         check_all_args_processed(self, q, vector_args)
 
 

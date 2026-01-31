@@ -1,19 +1,33 @@
-from typing import Literal, overload
+from typing import Literal, overload, cast, Any
+
+import sys
 import polyscope_bindings as psb
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum, from_enum
 from polyscope.structure import Structure
 from polyscope.common import (
+    QuantityArgsBase,
     process_quantity_args,
+    ScalarQuantityArgs,
+    ScalarArgsBase,
     process_scalar_args,
+    ColorQuantityArgs,
+    ColorArgsBase,
     process_color_args,
+    VectorQuantityArgs,
+    VectorArgsBase,
     process_vector_args,
     check_all_args_processed,
 )
 
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 
 class CurveNetwork(Structure):
@@ -166,7 +180,7 @@ class CurveNetwork(Structure):
         values: NDArray,
         defined_on: Literal["nodes", "edges"] | str = "nodes",
         datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
-        **scalar_args,
+        **scalar_args: Unpack[ScalarQuantityArgs],
     ) -> None:
         if len(values.shape) != 1:
             raise ValueError("'values' should be a length-N array")
@@ -184,13 +198,13 @@ class CurveNetwork(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, scalar_args)
-        process_scalar_args(self, q, scalar_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, scalar_args))
+        process_scalar_args(self, q, cast(ScalarArgsBase, scalar_args))
         check_all_args_processed(self, q, scalar_args)
 
     # Color
     def add_color_quantity(
-        self, name: str, values: NDArray, defined_on: Literal["nodes", "edges"] | str = "nodes", **color_args
+        self, name: str, values: NDArray, defined_on: Literal["nodes", "edges"] | str = "nodes", **color_args: Unpack[ColorQuantityArgs]
     ) -> None:
         if len(values.shape) != 2 or values.shape[1] != 3:
             raise ValueError("'values' should be an Nx3 array")
@@ -208,8 +222,8 @@ class CurveNetwork(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, color_args)
-        process_color_args(self, q, color_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, color_args))
+        process_color_args(self, q, cast(ColorArgsBase, color_args))
         check_all_args_processed(self, q, color_args)
 
     # Vector
@@ -218,8 +232,7 @@ class CurveNetwork(Structure):
         name: str,
         values: NDArray,
         defined_on: Literal["nodes", "edges"] | str = "nodes",
-        vectortype: Literal["standard", "ambient"] | str = "standard",
-        **vector_args,
+        vectortype: Literal["standard", "ambient"] | str = "standard", **vector_args: Unpack[VectorQuantityArgs],
     ):
         if len(values.shape) != 2 or values.shape[1] not in [2, 3]:
             raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
@@ -247,8 +260,8 @@ class CurveNetwork(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, vector_args)
-        process_vector_args(self, q, vector_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, vector_args))
+        process_vector_args(self, q, cast(VectorArgsBase, vector_args))
         check_all_args_processed(self, q, vector_args)
 
 

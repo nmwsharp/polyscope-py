@@ -1,20 +1,33 @@
-from typing import Any, Literal, overload
+from typing import Any, Literal, overload, cast
 
+import sys
 import polyscope_bindings as psb
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum, from_enum
 from polyscope.structure import Structure
 from polyscope.common import (
+    QuantityArgsBase,
     process_quantity_args,
+    ScalarQuantityArgs,
+    ScalarArgsBase,
     process_scalar_args,
+    ColorQuantityArgs,
+    ColorArgsBase,
     process_color_args,
+    VectorQuantityArgs,
+    VectorArgsBase,
     process_vector_args,
     check_all_args_processed,
 )
 
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 
 class VolumeMesh(Structure):
@@ -177,7 +190,7 @@ class VolumeMesh(Structure):
         values: ArrayLike,
         defined_on: Literal["vertices", "cells"] | str = "vertices",
         datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
-        **scalar_args: Any,
+        **scalar_args: Unpack[ScalarQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 1:
@@ -196,8 +209,8 @@ class VolumeMesh(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, scalar_args)
-        process_scalar_args(self, q, scalar_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, scalar_args))
+        process_scalar_args(self, q, cast(ScalarArgsBase, scalar_args))
         check_all_args_processed(self, q, scalar_args)
 
     # Color
@@ -206,7 +219,7 @@ class VolumeMesh(Structure):
         name: str,
         values: ArrayLike,
         defined_on: Literal["vertices", "cells"] | str = "vertices",
-        **color_args: Any,
+        **color_args: Unpack[ColorQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 2 or values_arr.shape[1] != 3:
@@ -225,8 +238,8 @@ class VolumeMesh(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, color_args)
-        process_color_args(self, q, color_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, color_args))
+        process_color_args(self, q, cast(ColorArgsBase, color_args))
         check_all_args_processed(self, q, color_args)
 
     # Vector
@@ -236,7 +249,7 @@ class VolumeMesh(Structure):
         values: ArrayLike,
         defined_on: Literal["vertices", "cells"] | str = "vertices",
         vectortype: Literal["standard", "ambient"] | str = "standard",
-        **vector_args: Any,
+        **vector_args: Unpack[VectorQuantityArgs],
     ) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 2 or values_arr.shape[1] != 3:
@@ -255,8 +268,8 @@ class VolumeMesh(Structure):
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
-        process_quantity_args(self, q, vector_args)
-        process_vector_args(self, q, vector_args)
+        process_quantity_args(self, q, cast(QuantityArgsBase, vector_args))
+        process_vector_args(self, q, cast(VectorArgsBase, vector_args))
         check_all_args_processed(self, q, vector_args)
 
 
