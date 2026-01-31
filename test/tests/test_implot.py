@@ -1,6 +1,3 @@
-from os import listdir
-import os.path as path
-from os.path import isfile, join
 import unittest
 
 import numpy as np
@@ -9,12 +6,12 @@ import polyscope as ps
 import polyscope.imgui as psim
 import polyscope.implot as psimplot
 
-class TestImPlotBindings(unittest.TestCase):
 
+class TestImPlotBindings(unittest.TestCase):
     def test_plot_line(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("line plot"):
                 psimplot.PlotLine("line1", np.random.rand(10))
                 psimplot.PlotLine("line2", np.random.rand(10), np.random.rand(10))
@@ -27,8 +24,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_scatter(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("scatter plot"):
                 psimplot.PlotScatter("scatter1", np.random.rand(10))
                 psimplot.PlotScatter("scatter2", np.random.rand(10), np.random.rand(10))
@@ -41,8 +38,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_stairs(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("stairs plot"):
                 psimplot.PlotStairs("stairs1", np.random.rand(10))
                 psimplot.PlotStairs("stairs2", np.random.rand(10), np.random.rand(10))
@@ -55,8 +52,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_shaded(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("shaded plot"):
                 psimplot.PlotShaded("shaded1", np.random.rand(10))
                 psimplot.PlotShaded("shaded2", np.random.rand(10), yref=1.0)
@@ -70,8 +67,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_bars(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("bars plot"):
                 psimplot.PlotBars("bars1", np.random.rand(10))
                 psimplot.PlotBars("bars2", np.random.rand(10), np.random.rand(10), 0.67)
@@ -83,8 +80,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_bar_groups(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("bar groups plot"):
                 data = np.random.rand(3, 5)
                 psimplot.PlotBarGroups(["A", "B", "C"], data)
@@ -96,8 +93,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_error_bars(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("error bars plot"):
                 xs = np.random.rand(10)
                 ys = np.random.rand(10)
@@ -112,8 +109,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_stems(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("stems plot"):
                 psimplot.PlotStems("stems1", np.random.rand(10))
                 psimplot.PlotStems("stems2", np.random.rand(10), np.random.rand(10))
@@ -125,8 +122,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_inf_lines(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("inf lines plot"):
                 psimplot.PlotInfLines("vlines", np.random.rand(3))
                 psimplot.PlotInfLines("hlines", np.random.rand(3), psimplot.ImPlotInfLinesFlags_Horizontal)
@@ -138,11 +135,11 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_pie_chart(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("pie chart plot"):
                 psimplot.PlotPieChart(["cat1", "cat2", "cat3"], np.random.rand(3), 0.5, 0.5, 0.5)
-                psimplot.PlotPieChart(["A", "B"], np.random.rand(2), x=2., y=3., radius=4.)
+                psimplot.PlotPieChart(["A", "B"], np.random.rand(2), x=2.0, y=3.0, radius=4.0)
                 psimplot.EndPlot()
 
         ps.set_user_callback(imgui_callback)
@@ -151,8 +148,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_heatmap(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("heatmap plot"):
                 data = np.random.rand(5, 10)
                 psimplot.PlotHeatmap("heatmap", data)
@@ -164,8 +161,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_histogram(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("histogram plot"):
                 psimplot.PlotHistogram("hist1", np.random.rand(100))
                 psimplot.PlotHistogram("hist2", np.random.rand(100), bins=20)
@@ -177,8 +174,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_histogram_2d(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("histogram 2d plot"):
                 psimplot.PlotHistogram2D("hist2d", np.random.rand(100), np.random.rand(100))
                 psimplot.EndPlot()
@@ -189,8 +186,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_digital(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("digital plot"):
                 xs = np.linspace(0, 10, 100)
                 ys = (np.sin(xs) > 0).astype(float)
@@ -203,8 +200,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_text(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("text plot"):
                 psimplot.PlotText("Hello", 0.5, 0.5)
                 psimplot.EndPlot()
@@ -215,8 +212,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_dummy(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("dummy plot"):
                 psimplot.PlotDummy("dummy")
                 psimplot.EndPlot()
@@ -227,8 +224,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_tools(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("tools plot"):
                 result, x, y = psimplot.DragPoint(0, 0.5, 0.5, (1, 0, 0, 1))
                 result, x = psimplot.DragLineX(1, 0.3, (0, 1, 0, 1))
@@ -249,8 +246,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_plot_utils(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("utils plot"):
                 psimplot.SetAxis(psimplot.ImAxis_X1)
                 psimplot.SetAxes(psimplot.ImAxis_X1, psimplot.ImAxis_Y1)
@@ -261,13 +258,13 @@ class TestImPlotBindings(unittest.TestCase):
                 px, py = psimplot.PlotToPixels((0.5, 0.5))
                 px, py = psimplot.PlotToPixels(0.5, 0.5)
 
-                pos = psimplot.GetPlotPos()
-                size = psimplot.GetPlotSize()
-                mouse_pos = psimplot.GetPlotMousePos()
+                pos = psimplot.GetPlotPos()  # noqa: F841
+                size = psimplot.GetPlotSize()  # noqa: F841
+                mouse_pos = psimplot.GetPlotMousePos()  # noqa: F841
                 xmin, xmax, ymin, ymax = psimplot.GetPlotLimits()
 
-                is_hovered = psimplot.IsPlotHovered()
-                is_axis_hovered = psimplot.IsAxisHovered(psimplot.ImAxis_X1)
+                is_hovered = psimplot.IsPlotHovered()  # noqa: F841
+                is_axis_hovered = psimplot.IsAxisHovered(psimplot.ImAxis_X1)  # noqa: F841
 
                 psimplot.EndPlot()
 
@@ -277,8 +274,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_legend_utils(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("legend plot"):
                 psimplot.PlotLine("line", np.random.rand(10))
 
@@ -286,7 +283,7 @@ class TestImPlotBindings(unittest.TestCase):
                     psim.Text("Legend popup")
                     psimplot.EndLegendPopup()
 
-                is_hovered = psimplot.IsLegendEntryHovered("line")
+                is_hovered = psimplot.IsLegendEntryHovered("line")  # noqa: F841
 
                 psimplot.EndPlot()
 
@@ -306,8 +303,8 @@ class TestImPlotBindings(unittest.TestCase):
 
             # Push/pop style colors
             psimplot.PushStyleColor(psimplot.ImPlotCol_Line, (1, 0, 0, 1))
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("styled plot"):
                 psimplot.PlotLine("red line", np.random.rand(10))
                 psimplot.EndPlot()
@@ -315,8 +312,8 @@ class TestImPlotBindings(unittest.TestCase):
 
             # Push/pop style vars
             psimplot.PushStyleVar(psimplot.ImPlotStyleVar_LineWeight, 3.0)
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("thick plot"):
                 psimplot.PlotLine("thick line", np.random.rand(10))
                 psimplot.EndPlot()
@@ -327,37 +324,35 @@ class TestImPlotBindings(unittest.TestCase):
             psimplot.SetNextFillStyle((0, 0, 1, 0.5))
             psimplot.SetNextMarkerStyle(psimplot.ImPlotMarker_Circle, 8.0)
 
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("next style plot"):
                 psimplot.PlotLine("styled line", np.random.rand(10))
                 psimplot.EndPlot()
 
             # Color names
-            name = psimplot.GetStyleColorName(psimplot.ImPlotCol_Line)
-            marker_name = psimplot.GetMarkerName(psimplot.ImPlotMarker_Circle)
+            name = psimplot.GetStyleColorName(psimplot.ImPlotCol_Line)  # noqa: F841
+            marker_name = psimplot.GetMarkerName(psimplot.ImPlotMarker_Circle)  # noqa: F841
 
         ps.set_user_callback(imgui_callback)
         ps.show(3)
         ps.clear_user_callback()
 
     def test_colormaps(self):
-
         # Add custom colormap
         colors = [(1, 0, 0, 1), (0, 1, 0, 1), (0, 0, 1, 1)]
-        cmap = psimplot.AddColormap("custom", colors)
+        cmap = psimplot.AddColormap("custom", colors)  # noqa: F841
 
         def imgui_callback():
-
             # Colormap info
-            count = psimplot.GetColormapCount()
-            name = psimplot.GetColormapName(psimplot.ImPlotColormap_Deep)
-            idx = psimplot.GetColormapIndex("Deep")
+            count = psimplot.GetColormapCount()  # noqa: F841
+            name = psimplot.GetColormapName(psimplot.ImPlotColormap_Deep)  # noqa: F841
+            idx = psimplot.GetColormapIndex("Deep")  # noqa: F841
 
             # Push/pop colormap
             psimplot.PushColormap(psimplot.ImPlotColormap_Viridis)
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("colormap plot"):
                 for i in range(5):
                     color = psimplot.NextColormapColor()
@@ -366,19 +361,19 @@ class TestImPlotBindings(unittest.TestCase):
             psimplot.PopColormap()
 
             # Colormap utils
-            size = psimplot.GetColormapSize()
+            size = psimplot.GetColormapSize()  # noqa: F841
             color = psimplot.GetColormapColor(0)
-            sampled = psimplot.SampleColormap(0.5)
+            sampled = psimplot.SampleColormap(0.5)  # noqa: F841
 
             # Colormap widgets
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("colormap widgets"):
                 psimplot.ColormapScale("scale", 0.0, 1.0, (60, 200))
                 psimplot.EndPlot()
 
             result, t, color = psimplot.ColormapSlider("slider", 0.5)
-            button_pressed = psimplot.ColormapButton("button")
+            button_pressed = psimplot.ColormapButton("button")  # noqa: F841
 
         ps.set_user_callback(imgui_callback)
         ps.show(3)
@@ -418,8 +413,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_subplots(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginSubplots("subplots", 2, 3, (800, 400)):
                 for i in range(6):
                     if psimplot.BeginPlot(f"subplot_{i}"):
@@ -433,8 +428,8 @@ class TestImPlotBindings(unittest.TestCase):
 
     def test_setup_axes(self):
         def imgui_callback():
-            psim.SetCursorPos((0,0))
-            psim.Dummy((5,5))
+            psim.SetCursorPos((0, 0))
+            psim.Dummy((5, 5))
             if psimplot.BeginPlot("setup plot"):
                 psimplot.SetupAxes("X Axis", "Y Axis")
                 psimplot.SetupAxis(psimplot.ImAxis_X1, "Time")

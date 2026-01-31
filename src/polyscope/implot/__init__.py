@@ -1,1 +1,1 @@
-from polyscope_bindings.implot import *
+from polyscope_bindings.implot import *  # noqa F403

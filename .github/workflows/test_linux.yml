@@ -35,7 +35,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
 
     - name: install python packages
-      run: python3 -m pip install numpy
+      run: python3 -m pip install numpy ruff ty
 
     - name: configure
       run: |
@@ -51,3 +51,15 @@ jobs:
 
     - name: run test backend EGL
       run: python3 test/polyscope_test.py -v backend=openGL3_egl
+
+    - name: run type checker (ty)
+      run: ty check .
+      continue-on-error: true # don't fail the whole job if this fails
+    
+    - name: run linter (ruff)
+      run: ruff check .
+      continue-on-error: true # don't fail the whole job if this fails
+    
+    - name: run format checker (ruff)
+      run: ruff format --check .
+      continue-on-error: true # don't fail the whole job if this fails
