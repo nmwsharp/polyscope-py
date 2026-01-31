@@ -6,23 +6,17 @@ from polyscope.enums import to_enum
 
 def check_is_scalar_image(values):
     if len(values.shape) != 2:
-        raise ValueError(
-            f"'values' should be a (height,width) array. Shape is {values.shape}."
-        )
+        raise ValueError(f"'values' should be a (height,width) array. Shape is {values.shape}.")
 
 
 def check_is_image3(values):
     if len(values.shape) != 3 or values.shape[2] != 3:
-        raise ValueError(
-            f"'values' should be a (height,width,3) array. Shape is {values.shape}."
-        )
+        raise ValueError(f"'values' should be a (height,width,3) array. Shape is {values.shape}.")
 
 
 def check_is_image4(values):
     if len(values.shape) != 3 or values.shape[2] != 4:
-        raise ValueError(
-            f"'values' should be a (height,width,4) array. Shape is {values.shape}."
-        )
+        raise ValueError(f"'values' should be a (height,width,4) array. Shape is {values.shape}.")
 
 
 def check_image_dims_compatible(images):
@@ -133,9 +127,7 @@ def process_vector_args(structure, quantity, vector_args):
 
 
 # Process args, removing them from the dict if they are present
-def process_parameterization_args(
-    structure, quantity, parameterization_args, is_surface=True
-):
+def process_parameterization_args(structure, quantity, parameterization_args, is_surface=True):
     val = check_and_pop_arg(parameterization_args, "grid_colors")
     if val is not None:
         quantity.set_grid_colors((glm3(val[0]), glm3(val[1])))
@@ -159,9 +151,7 @@ def process_parameterization_args(
                 raise ValueError("'island_labels' should be an (N_faces,) numpy array")
             quantity.set_island_labels(val)
 
-        val = check_and_pop_arg(
-            parameterization_args, "create_curve_network_from_seams"
-        )
+        val = check_and_pop_arg(parameterization_args, "create_curve_network_from_seams")
         if val is not None:
             quantity.create_curve_network_from_seams(val)
 
@@ -266,6 +256,4 @@ def process_implicit_render_args(opts, implicit_args):
 
 def check_all_args_processed(structure, quantity, args):
     for arg, val in args.items():
-        raise ValueError(
-            f"Polyscope: Unrecognized quantity keyword argument {arg}: {val}"
-        )
+        raise ValueError(f"Polyscope: Unrecognized quantity keyword argument {arg}: {val}")

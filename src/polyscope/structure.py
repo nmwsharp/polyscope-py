@@ -42,7 +42,7 @@ class Structure:
 
     def remove_quantity(self, name: str, error_if_absent: bool = False) -> None:
         """Remove a single quantity on the structure"""
-        self.bound_instance.remove_quantity(name, error_if_absent) # type: ignore
+        self.bound_instance.remove_quantity(name, error_if_absent)  # type: ignore
 
     ## Enable/disable
 
@@ -108,60 +108,27 @@ class Structure:
             raise ValueError("structure has no buffer named " + buffer_name)
 
         return {
-            psb.ManagedBufferType.Float: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_Float(n), t
-            ),
-            psb.ManagedBufferType.Double: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_Double(n), t
-            ),
-            psb.ManagedBufferType.Vec2: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_Vec2(n), t
-            ),
-            psb.ManagedBufferType.Vec3: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_Vec3(n), t
-            ),
-            psb.ManagedBufferType.Vec4: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_Vec4(n), t
-            ),
-            psb.ManagedBufferType.Arr2Vec3: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_Arr2Vec4(n), t
-            ),
-            psb.ManagedBufferType.Arr3Vec3: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_Arr3Vec4(n), t
-            ),
-            psb.ManagedBufferType.Arr4Vec3: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_Arr4Vec4(n), t
-            ),
-            psb.ManagedBufferType.UInt32: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_UInt32(n), t
-            ),
-            psb.ManagedBufferType.Int32: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_Int32(n), t
-            ),
-            psb.ManagedBufferType.UVec2: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_UVec2(n), t
-            ),
-            psb.ManagedBufferType.UVec3: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_UVec3(n), t
-            ),
-            psb.ManagedBufferType.UVec4: lambda n, t: ManagedBuffer(
-                self.bound_instance.get_buffer_UVec4(n), t
-            ),
+            psb.ManagedBufferType.Float: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_Float(n), t),
+            psb.ManagedBufferType.Double: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_Double(n), t),
+            psb.ManagedBufferType.Vec2: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_Vec2(n), t),
+            psb.ManagedBufferType.Vec3: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_Vec3(n), t),
+            psb.ManagedBufferType.Vec4: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_Vec4(n), t),
+            psb.ManagedBufferType.Arr2Vec3: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_Arr2Vec4(n), t),
+            psb.ManagedBufferType.Arr3Vec3: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_Arr3Vec4(n), t),
+            psb.ManagedBufferType.Arr4Vec3: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_Arr4Vec4(n), t),
+            psb.ManagedBufferType.UInt32: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_UInt32(n), t),
+            psb.ManagedBufferType.Int32: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_Int32(n), t),
+            psb.ManagedBufferType.UVec2: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_UVec2(n), t),
+            psb.ManagedBufferType.UVec3: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_UVec3(n), t),
+            psb.ManagedBufferType.UVec4: lambda n, t: ManagedBuffer(self.bound_instance.get_buffer_UVec4(n), t),
         }[buffer_type](buffer_name, buffer_type)
 
     @no_type_check
-    def get_quantity_buffer(
-        self, quantity_name: str, buffer_name: str
-    ) -> ManagedBuffer:
-        present, buffer_type = self.bound_instance.has_quantity_buffer_type(
-            quantity_name, buffer_name
-        )
+    def get_quantity_buffer(self, quantity_name: str, buffer_name: str) -> ManagedBuffer:
+        present, buffer_type = self.bound_instance.has_quantity_buffer_type(quantity_name, buffer_name)
 
         if not present:
-            if (
-                self.get_name()
-                == psb.get_global_floating_quantity_structure().get_name()
-            ):
+            if self.get_name() == psb.get_global_floating_quantity_structure().get_name():
                 # give a more informative error if this was called on the global floating quantity, becuase it is particularly easy for users to get confused and call this function at the global scope rather than on a quantity
                 raise ValueError(
                     f"There is no quantity {quantity_name} with buffer named {buffer_name}. NOTE: calling polyscope.get_quantity_buffer() is for global floating quantities only, call structure.get_quantity_buffer() to get buffers for a quantity added to some structure."
@@ -279,9 +246,7 @@ class Structure:
         """
 
         # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
-        return add_color_image_quantity(
-            name, values, image_origin=image_origin, struct_ref=self, **option_args
-        )
+        return add_color_image_quantity(name, values, image_origin=image_origin, struct_ref=self, **option_args)
 
     def add_color_alpha_image_quantity(
         self,
@@ -295,9 +260,7 @@ class Structure:
         """
 
         # Call the general version (this abstraction allows us to handle the free-floating case via the same code)
-        return add_color_alpha_image_quantity(
-            name, values, image_origin=image_origin, struct_ref=self, **option_args
-        )
+        return add_color_alpha_image_quantity(name, values, image_origin=image_origin, struct_ref=self, **option_args)
 
     ## Render Image
 

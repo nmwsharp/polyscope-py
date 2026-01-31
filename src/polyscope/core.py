@@ -99,9 +99,7 @@ def set_screenshot_extension(ext: str) -> None:
     psb.set_screenshot_extension(ext)
 
 
-def screenshot_to_buffer(
-    transparent_bg=True, vertical_flip=True, include_UI=False
-) -> NDArray[np.uint8]:
+def screenshot_to_buffer(transparent_bg=True, vertical_flip=True, include_UI=False) -> NDArray[np.uint8]:
     opts = psb.ScreenshotOptions()
     opts.include_UI = include_UI
     opts.transparent_background = transparent_bg
@@ -161,7 +159,9 @@ def set_always_redraw(v: bool) -> None:
     psb.set_always_redraw(v)
 
 
-def set_frame_tick_limit_fps_mode(v: Literal["ignore_limits", "block_to_hit_target", "skip_frames_to_hit_target"] | str) -> None:
+def set_frame_tick_limit_fps_mode(
+    v: Literal["ignore_limits", "block_to_hit_target", "skip_frames_to_hit_target"] | str,
+) -> None:
     psb.set_frame_tick_limit_fps_mode(to_enum(psb.LimitFPSMode, v))
 
 
@@ -254,7 +254,8 @@ def clear_files_dropped_callback() -> None:
 
 
 def set_navigation_style(val: Literal["turntable", "free", "planar", "arcball", "none", "first_person"] | str):
-    psb.set_navigation_style(to_enum(polyscope.NavigateStyle,val))
+    psb.set_navigation_style(to_enum(polyscope.NavigateStyle, val))
+
 
 def get_navigation_style() -> str:
     return from_enum(psb.get_navigation_style())
@@ -268,7 +269,9 @@ def get_up_dir() -> str:
     return from_enum(psb.get_up_dir())
 
 
-def set_front_dir(d: Literal["x_front", "y_front", "z_front", "neg_x_front", "neg_y_front", "neg_z_front"] | str) -> None:
+def set_front_dir(
+    d: Literal["x_front", "y_front", "z_front", "neg_x_front", "neg_y_front", "neg_z_front"] | str,
+) -> None:
     psb.set_front_dir(to_enum(psb.FrontDir, d))
 
 
@@ -497,29 +500,19 @@ class PickResult:
         from polyscope import point_cloud, curve_network, surface_mesh, volume_mesh, volume_grid
 
         if self.structure_type_name == "Point Cloud":
-            point_cloud.get_point_cloud(self.structure_name).append_pick_data(
-                self
-            )
+            point_cloud.get_point_cloud(self.structure_name).append_pick_data(self)
 
         if self.structure_type_name == "Curve Network":
-            curve_network.get_curve_network(
-                self.structure_name
-            ).append_pick_data(self)
+            curve_network.get_curve_network(self.structure_name).append_pick_data(self)
 
         if self.structure_type_name == "Surface Mesh":
-            surface_mesh.get_surface_mesh(
-                self.structure_name
-            ).append_pick_data(self)
+            surface_mesh.get_surface_mesh(self.structure_name).append_pick_data(self)
 
         if self.structure_type_name == "Volume Mesh":
-            volume_mesh.get_volume_mesh(self.structure_name).append_pick_data(
-                self
-            )
+            volume_mesh.get_volume_mesh(self.structure_name).append_pick_data(self)
 
         if self.structure_type_name == "Volume Grid":
-            volume_grid.get_volume_grid(self.structure_name).append_pick_data(
-                self
-            )
+            volume_grid.get_volume_grid(self.structure_name).append_pick_data(self)
 
     def __str__(self):
         return f"""
@@ -536,6 +529,7 @@ PickResult(
     structure_data={self.structure_data}
 )
 """
+
 
 def pick(*, screen_coords: ArrayLike | None = None, buffer_inds: ArrayLike | None = None) -> PickResult:
     if screen_coords is not None and buffer_inds is not None:
@@ -564,7 +558,6 @@ def get_selection() -> PickResult:
 
 def reset_selection() -> None:
     psb.reset_selection()
-
 
 
 ## Ground plane and shadows
@@ -597,6 +590,7 @@ def set_shadow_darkness(val: float) -> None:
 ## Transparency
 def set_transparency_mode(mode: Literal["none", "simple", "pretty"] | str) -> None:
     psb.set_transparency_mode(to_enum(psb.TransparencyMode, mode))
+
 
 def set_transparency_render_passes(n: int) -> None:
     psb.set_transparency_render_passes(n)
@@ -798,7 +792,7 @@ class TransformationGizmo:
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
 
     # End users should not call this constrctor, use add_transformation_gizmo() instead
-    def __init__(self, instance : psb.TransformationGizmo):
+    def __init__(self, instance: psb.TransformationGizmo):
         # Wrap an existing instance
         self.bound_gizmo = instance
 
@@ -814,7 +808,7 @@ class TransformationGizmo:
     def get_enabled(self) -> bool:
         return self.bound_gizmo.get_enabled()
 
-    def set_transform(self, T : NDArray) -> None:
+    def set_transform(self, T: NDArray) -> None:
         if not isinstance(T, np.ndarray) or T.shape != (4, 4):
             raise ValueError("T should be a 4x4 numpy matrix")
         self.bound_gizmo.set_transform(T)
@@ -822,7 +816,7 @@ class TransformationGizmo:
     def get_transform(self) -> NDArray:
         return self.bound_gizmo.get_transform()
 
-    def set_position(self, p : ArrayLike) -> None:
+    def set_position(self, p: ArrayLike) -> None:
         self.bound_gizmo.set_position(glm3(p))
 
     def get_position(self) -> NDArray:
@@ -870,7 +864,7 @@ class TransformationGizmo:
         self.bound_gizmo.build_inline_transform_ui()
 
 
-def add_transformation_gizmo(name : str | None = None) -> TransformationGizmo:
+def add_transformation_gizmo(name: str | None = None) -> TransformationGizmo:
     if name is None:
         # name gets automatically set internally; pass empty string
         instance = psb.add_transformation_gizmo("")
@@ -929,13 +923,14 @@ class CameraIntrinsics:
 class CameraExtrinsics:
     instance: psb.CameraExtrinsics
 
-    def __init__(self, 
-                 root: ArrayLike | None = None, 
-                 look_dir: ArrayLike | None = None, 
-                 up_dir: ArrayLike | None = None, 
-                 mat: NDArray | None = None, 
-                 instance: psb.CameraExtrinsics | None = None
-                 ) -> None:
+    def __init__(
+        self,
+        root: ArrayLike | None = None,
+        look_dir: ArrayLike | None = None,
+        up_dir: ArrayLike | None = None,
+        mat: NDArray | None = None,
+        instance: psb.CameraExtrinsics | None = None,
+    ) -> None:
         if instance is not None:
             self.instance = instance
 
@@ -947,34 +942,28 @@ class CameraExtrinsics:
 
         elif (root is not None) and (look_dir is not None) and (up_dir is not None):
             self.instance = psb.CameraExtrinsics.from_vectors(
-                np.asarray(root),
-                np.asarray(look_dir), 
-                np.asarray(up_dir)
+                np.asarray(root), np.asarray(look_dir), np.asarray(up_dir)
             )
 
         else:
-            raise ValueError(
-                "bad arguments, must pass non-None (root,look_dir,up_dir) or non-None mat"
-            )
+            raise ValueError("bad arguments, must pass non-None (root,look_dir,up_dir) or non-None mat")
 
 
 class CameraParameters:
     instance: psb.CameraParameters
 
-    def __init__(self, 
-                 intrinsics : CameraIntrinsics | None = None, 
-                 extrinsics: CameraExtrinsics | None = None, 
-                 instance: psb.CameraParameters | None = None
-                ):
-
+    def __init__(
+        self,
+        intrinsics: CameraIntrinsics | None = None,
+        extrinsics: CameraExtrinsics | None = None,
+        instance: psb.CameraParameters | None = None,
+    ):
         if instance is not None:
             self.instance = instance
         else:
             assert intrinsics is not None
             assert extrinsics is not None
-            self.instance = psb.CameraParameters(
-                intrinsics.instance, extrinsics.instance
-            )
+            self.instance = psb.CameraParameters(intrinsics.instance, extrinsics.instance)
 
     # getters
     def get_intrinsics(self) -> CameraIntrinsics:
@@ -1047,6 +1036,7 @@ def glm3u(vals: ArrayLike) -> psb.glm_uvec3:
         raise ValueError("vals should be length-3 int array/tuple/etc")
     return psb.glm_uvec3(vals_arr[0], vals_arr[1], vals_arr[2])
 
+
 def glm3(vals: ArrayLike) -> psb.glm_vec3:
     vals_arr = np.asarray(vals, dtype=np.float32)
     if vals_arr.shape != (3,):
@@ -1077,18 +1067,16 @@ def load_static_material(mat_name: str, filename: str) -> None:
 
 
 def load_blendable_material(
-    mat_name: str, 
-    filenames: Sequence[str] | None = None, 
-    filename_base: str | None = None, 
-    filename_ext: str | None = None
+    mat_name: str,
+    filenames: Sequence[str] | None = None,
+    filename_base: str | None = None,
+    filename_ext: str | None = None,
 ):
     # list of names
     if filenames is not None:
         if filename_base is not None or filename_ext is not None:
-            raise ValueError(
-                "`filenames` was specified, `filename_base`/`filename_ext` should NOT be specified"
-            )
-        
+            raise ValueError("`filenames` was specified, `filename_base`/`filename_ext` should NOT be specified")
+
         if len(filenames) != 4:
             raise ValueError("`filenames` should be a list of four filenames")
         filenames_tuple = (filenames[0], filenames[1], filenames[2], filenames[3])
@@ -1098,14 +1086,13 @@ def load_blendable_material(
     # base/ext pair
     if filename_base is not None and filename_ext is not None:
         if filenames is not None:
-            raise ValueError(
-                "`filename_base`/`filename_ext` were specified, `filenames` should NOT be specified"
-            )
+            raise ValueError("`filename_base`/`filename_ext` were specified, `filenames` should NOT be specified")
 
         psb.load_blendable_material_baseext(mat_name, filename_base, filename_ext)
 
 
 ### Colormaps
+
 
 def load_color_map(cmap_name: str, filename: str) -> None:
     psb.load_color_map(cmap_name, filename)

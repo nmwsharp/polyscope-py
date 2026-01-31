@@ -47,3 +47,11 @@ cmake.args = ["-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13"]
 [tool.ty.src]
 include = ["src", "test"]
 exclude = ["test/scripts/*.py"] # ignore helper scripts for type checking
+
+[tool.ty.analysis]
+allowed-unresolved-imports = ["cupy", "cuda", "cuda.bindings.runtime"] # optional dependencies
+
+[tool.ruff]
+include = ["pyproject.toml", "src/**/*.py", "test/**/*.py"]
+exclude = ["test/scripts/*.py"] # ignore helper scripts for linting
+line-length = 120

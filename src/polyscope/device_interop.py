@@ -39,6 +39,7 @@ from polyscope.core import get_render_engine_backend_name
 
 device_interop_funcs: dict[str, Callable] | None = None
 
+
 def ensure_device_interop_funcs_resolve() -> None:
     check_device_module_availibility()
     if device_interop_funcs is not None:
@@ -55,8 +56,8 @@ def resolve_default_device_interop_funcs() -> None:
     # Try both of these imports, but fail silently if they don't work (we will try
     # again and print an informative error below only if a relevant function is called)
     try:
-        import cuda  # type: ignore[import-untyped]
-        import cuda.bindings.runtime  # type: ignore[import-untyped]
+        import cuda
+        import cuda.bindings.runtime
     except ImportError:
         raise ImportError(
             "This Polyscope functionality requires cuda bindings to be installed. Please install the `cuda-python` package. See https://nvidia.github.io/cuda-python/cuda-bindings/latest/install.html"
@@ -78,11 +79,7 @@ def resolve_default_device_interop_funcs() -> None:
         }
 
         # check that it is contiguous (disallow arrays with a nonzero stride specified)
-        if (
-            "strides" in interface
-            and interface["strides"] is not None
-            and any(i != 0 for i in interface["strides"])
-        ):
+        if "strides" in interface and interface["strides"] is not None and any(i != 0 for i in interface["strides"]):
             raise ValueError("GPU array must be contiguous")
 
         # compute n_bytes
@@ -102,14 +99,12 @@ def resolve_default_device_interop_funcs() -> None:
             return False
 
         # futhermore check that its a CUDA dlpack array
-        is_dlpack_cuda = (
-            arr.__dlpack_device__()[0] == 2
-        )  # this is an enum, and 2 is "cuda"
+        is_dlpack_cuda = arr.__dlpack_device__()[0] == 2  # this is an enum, and 2 is "cuda"
 
         return is_dlpack and is_dlpack_cuda
 
     def resolve_dlpack(arr):
-        import cupy  # type: ignore[import-untyped]
+        import cupy
 
         cupy_arr = cupy.ascontiguousarray(cupy.from_dlpack(arr))
         return resolve_cuda_array_interface(cupy_arr)
@@ -152,7 +147,7 @@ def resolve_default_device_interop_funcs() -> None:
         # try__dlpack__
         if arr_info_dict is None and is_dlpack_cuda(arr):
             try:
-                import cupy  # type: ignore[import-untyped]
+                import cupy  # noqa: F401
             except ImportError:
                 raise ImportError(
                     "Passing __dlpack__ arrays requires the `cupy` package to be installed. NOTE: the __cuda_array_interface__ is generally simpler, widely supported, and does not require an additional dependency."
@@ -178,16 +173,14 @@ def resolve_default_device_interop_funcs() -> None:
         return check_cudart_err(cuda.bindings.runtime.cudaGraphicsSubResourceGetMappedArray(handle, 0, 0))
 
     def map_resource_and_get_pointer(handle):
-        check_cudart_err( cuda.bindings.runtime.cudaGraphicsMapResources(1, handle, None))
-        raw_ptr, size = check_cudart_err(cuda.bindings.runtime.cudaGraphicsResourceGetMappedPointer(handle)) # type: ignore[return-value]
+        check_cudart_err(cuda.bindings.runtime.cudaGraphicsMapResources(1, handle, None))
+        raw_ptr, size = check_cudart_err(cuda.bindings.runtime.cudaGraphicsResourceGetMappedPointer(handle))
         return raw_ptr, size
 
     func_dict = {
         # returns tuple `(desc, extent, flags)`, as in cudaArrayGetInfo()
         # this function is optional, and only used for sanity checks it can be left undefined
-        "get_array_info": lambda array: check_cudart_err(
-            cuda.bindings.runtime.cudaArrayGetInfo(array)
-        ),
+        "get_array_info": lambda array: check_cudart_err(cuda.bindings.runtime.cudaArrayGetInfo(array)),
         # as cudaGraphicsUnmapResources(1, handle, None)
         "unmap_resource": lambda handle: check_cudart_err(
             cuda.bindings.runtime.cudaGraphicsUnmapResources(1, handle, None)
@@ -279,9 +272,7 @@ class CUDAOpenGLMappedAttributeBuffer:
 
     # Roughly based on this, see for more goodies: https://gist.github.com/keckj/e37d312128eac8c5fca790ce1e7fc437
 
-    def __init__(
-        self, gl_attribute_native_id: int, buffer_type: Any
-    ) -> None:
+    def __init__(self, gl_attribute_native_id: int, buffer_type: Any) -> None:
         self.gl_attribute_native_id = gl_attribute_native_id
         self.buffer_type = buffer_type
         self.resource_handle = None
@@ -321,9 +312,9 @@ class CUDAOpenGLMappedAttributeBuffer:
         if self.cuda_buffer_ptr is not None:
             return
 
-        self.cuda_buffer_ptr, self.cuda_buffer_size = device_interop_funcs[
-            "map_resource_and_get_pointer"
-        ](self.resource_handle)
+        self.cuda_buffer_ptr, self.cuda_buffer_size = device_interop_funcs["map_resource_and_get_pointer"](
+            self.resource_handle
+        )
 
     def unmap(self) -> None:
         if not hasattr(self, "cuda_buffer_ptr") or self.cuda_buffer_ptr is None:
@@ -342,9 +333,7 @@ class CUDAOpenGLMappedAttributeBuffer:
         self.map()
 
         # access the input array
-        arr_ptr, arr_shape, arr_dtype, arr_nbytes = device_interop_funcs[
-            "get_array_ptr"
-        ](arr)
+        arr_ptr, arr_shape, arr_dtype, arr_nbytes = device_interop_funcs["get_array_ptr"](arr)
 
         if arr_nbytes is not None and arr_nbytes != self.cuda_buffer_size:
             # if cupy_arr has the right size/dtype, it should have exactly the same
@@ -356,9 +345,7 @@ class CUDAOpenGLMappedAttributeBuffer:
             )
 
         # perform the actual copy
-        device_interop_funcs["memcpy"](
-            self.cuda_buffer_ptr, arr_ptr, self.cuda_buffer_size
-        )
+        device_interop_funcs["memcpy"](self.cuda_buffer_ptr, arr_ptr, self.cuda_buffer_size)
 
         self.unmap()
 
@@ -391,9 +378,7 @@ class CUDAOpenGLMappedTextureBuffer:
             # see cudaGraphicsGLRegisterImage in these docs https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__OPENGL.html
 
         elif self.buffer_type == psb.DeviceBufferType.texture2d:
-            self.resource_handle = device_interop_funcs["register_gl_image_2d"](
-                self.gl_attribute_native_id
-            )
+            self.resource_handle = device_interop_funcs["register_gl_image_2d"](self.gl_attribute_native_id)
 
         elif self.buffer_type == psb.DeviceBufferType.texture3d:
             # TODO
@@ -418,9 +403,7 @@ class CUDAOpenGLMappedTextureBuffer:
             return
         assert device_interop_funcs is not None
 
-        self.cuda_buffer_array = device_interop_funcs["map_resource_and_get_array"](
-            self.resource_handle
-        )
+        self.cuda_buffer_array = device_interop_funcs["map_resource_and_get_array"](self.resource_handle)
 
     def unmap(self) -> None:
         if not hasattr(self, "cuda_buffer_array") or self.cuda_buffer_array is None:
@@ -443,9 +426,7 @@ class CUDAOpenGLMappedTextureBuffer:
             extent_tup = device_interop_funcs["get_array_info"](self.cuda_buffer_array)
 
         # access the input array
-        arr_ptr, arr_shape, arr_dtype, arr_nbytes = device_interop_funcs[
-            "get_array_ptr"
-        ](arr)
+        arr_ptr, arr_shape, arr_dtype, arr_nbytes = device_interop_funcs["get_array_ptr"](arr)
 
         if self.buffer_type == psb.DeviceBufferType.texture2d:
             dst_buff_width = None
@@ -456,10 +437,10 @@ class CUDAOpenGLMappedTextureBuffer:
                 desc, extent, flags = extent_tup
                 dst_buff_width = extent.width
                 dst_buff_height = extent.height
-                dst_buff_width_pad = 0
+                dst_buff_width_pad = 0  # noqa: F841
 
                 dst_buff_bytes_per = (desc.x + desc.y + desc.z + desc.w) // 8
-                dst_buff_width_in_bytes = dst_buff_width * dst_buff_bytes_per
+                dst_buff_width_in_bytes = dst_buff_width * dst_buff_bytes_per  # noqa: F841
 
                 dst_n_cmp = (
                     (1 if desc.x > 0 else 0)
@@ -468,20 +449,14 @@ class CUDAOpenGLMappedTextureBuffer:
                     + (1 if desc.w > 0 else 0)
                 )
 
-                dst_n_elems = dst_buff_width * dst_buff_height * dst_n_cmp
+                dst_n_elems = dst_buff_width * dst_buff_height * dst_n_cmp  # noqa: F841
 
                 if extent.width != texture_dims[0]:
-                    raise ValueError(
-                        f"Mapped buffer width mismatch,  {extent.width} vs. {texture_dims[0]}."
-                    )
+                    raise ValueError(f"Mapped buffer width mismatch,  {extent.width} vs. {texture_dims[0]}.")
                 if extent.height != texture_dims[1]:
-                    raise ValueError(
-                        f"Mapped buffer height mismatch,  {extent.height} vs. {texture_dims[1]}."
-                    )
+                    raise ValueError(f"Mapped buffer height mismatch,  {extent.height} vs. {texture_dims[1]}.")
                 if extent.depth != texture_dims[2]:
-                    raise ValueError(
-                        f"Mapped buffer depth mismatch,  {extent.depth} vs. {texture_dims[2]}."
-                    )
+                    raise ValueError(f"Mapped buffer depth mismatch,  {extent.depth} vs. {texture_dims[2]}.")
                 if dst_buff_bytes_per != entry_size_in_bytes:
                     raise ValueError(
                         f"Mapped buffer entry byte size mismatch,  {dst_buff_bytes_per} vs. {entry_size_in_bytes}."
@@ -505,7 +480,12 @@ class CUDAOpenGLMappedTextureBuffer:
             #                 raise ValueError(f"Mapped buffer write has wrong size, destination buffer has {dst_size} elements, but source buffer has {arr_size}.")
 
             # if we got bytesize info from the source AND destination array, use it to do more sanity checks
-            if arr_nbytes is not None and extent_tup is not None and dst_buff_width is not None and dst_buff_height is not None:
+            if (
+                arr_nbytes is not None
+                and extent_tup is not None
+                and dst_buff_width is not None
+                and dst_buff_height is not None
+            ):
                 expected_bytes = dst_buff_width * dst_buff_height * dst_buff_bytes_per
                 if arr_nbytes != expected_bytes:
                     # if cupy_arr has the right size/dtype, it should have exactly the same

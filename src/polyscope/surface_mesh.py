@@ -23,6 +23,7 @@ from collections.abc import Sequence
 
 RaggedList = Sequence[Sequence[int]]
 
+
 class SurfaceMesh(Structure):
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
     bound_instance: psb.SurfaceMesh
@@ -57,7 +58,7 @@ class SurfaceMesh(Structure):
             self.check_shape(vertices_arr)
 
             # Check if the faces list is a rectangular array or
-            # a ragged array    
+            # a ragged array
             try:
                 faces_arr = np.asarray(faces, dtype=np.int32)
                 is_rectangular_arr = True
@@ -67,21 +68,15 @@ class SurfaceMesh(Structure):
                 is_rectangular_arr = False
 
             if is_rectangular_arr:
-
                 if len(faces_arr.shape) != 2:
                     raise ValueError(
-                        "surface mesh face array should have shape (F,D) for some D; shape is "
-                        + str(faces_arr.shape)
+                        "surface mesh face array should have shape (F,D) for some D; shape is " + str(faces_arr.shape)
                     )
 
                 if vertices_arr.shape[1] == 3:
-                    self.bound_instance = psb.register_surface_mesh(
-                        name, vertices_arr, faces_arr
-                    )
+                    self.bound_instance = psb.register_surface_mesh(name, vertices_arr, faces_arr)
                 elif vertices_arr.shape[1] == 2:
-                    self.bound_instance = psb.register_surface_mesh2D(
-                        name, vertices_arr, faces_arr
-                    )
+                    self.bound_instance = psb.register_surface_mesh2D(name, vertices_arr, faces_arr)
 
             else:
                 # Faces is something else, try to iterate through it to build a list of lists
@@ -91,20 +86,15 @@ class SurfaceMesh(Structure):
                     faces_copy.append(f_copy)
 
                 if vertices_arr.shape[1] == 3:
-                    self.bound_instance = psb.register_surface_mesh_list(
-                        name, vertices_arr, faces_ragged
-                    )
+                    self.bound_instance = psb.register_surface_mesh_list(name, vertices_arr, faces_ragged)
                 elif vertices_arr.shape[1] == 2:
-                    self.bound_instance = psb.register_surface_mesh_list2D(
-                        name, vertices_arr, faces_ragged
-                    )
+                    self.bound_instance = psb.register_surface_mesh_list2D(name, vertices_arr, faces_ragged)
 
     def check_shape(self, points: NDArray) -> None:
         # Helper to validate arrays
         if (len(points.shape) != 2) or (points.shape[1] not in (2, 3)):
             raise ValueError(
-                "surface mesh vertex positions should have shape (N,3) or (N,2); shape is "
-                + str(points.shape)
+                "surface mesh vertex positions should have shape (N,3) or (N,2); shape is " + str(points.shape)
             )
 
     def n_vertices(self) -> int:
@@ -143,9 +133,7 @@ class SurfaceMesh(Structure):
 
     # Picking
     def append_pick_data(self, pick_result: Any) -> None:
-        struct_result = self.bound_instance.interpret_pick_result(
-            pick_result.raw_result
-        )
+        struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
         pick_result.structure_data["element_type"] = from_enum(struct_result.element_type)
         pick_result.structure_data["index"] = struct_result.index
         bary_coords = np.array(struct_result.bary_coords.as_tuple())
@@ -221,9 +209,7 @@ class SurfaceMesh(Structure):
 
     ## Permutations and bases
 
-    def set_edge_permutation(
-        self, perm: ArrayLike, expected_size: int | None = None
-    ) -> None:
+    def set_edge_permutation(self, perm: ArrayLike, expected_size: int | None = None) -> None:
         perm_arr = np.asarray(perm)
         if len(perm_arr.shape) != 1 or perm_arr.shape[0] != self.n_edges():
             raise ValueError("'perm' should be an array with one entry per edge")
@@ -231,9 +217,7 @@ class SurfaceMesh(Structure):
             expected_size = 0
         self.bound_instance.set_edge_permutation(perm_arr, expected_size)
 
-    def set_corner_permutation(
-        self, perm: ArrayLike, expected_size: int | None = None
-    ) -> None:
+    def set_corner_permutation(self, perm: ArrayLike, expected_size: int | None = None) -> None:
         perm_arr = np.asarray(perm)
         if len(perm_arr.shape) != 1 or perm_arr.shape[0] != self.n_corners():
             raise ValueError("'perm' should be an array with one entry per corner")
@@ -241,9 +225,7 @@ class SurfaceMesh(Structure):
             expected_size = 0
         self.bound_instance.set_corner_permutation(perm_arr, expected_size)
 
-    def set_halfedge_permutation(
-        self, perm: ArrayLike, expected_size: int | None = None
-    ) -> None:
+    def set_halfedge_permutation(self, perm: ArrayLike, expected_size: int | None = None) -> None:
         perm_arr = np.asarray(perm)
         if len(perm_arr.shape) != 1 or perm_arr.shape[0] != self.n_halfedges():
             raise ValueError("'perm' should be an array with one entry per halfedge")
@@ -291,37 +273,27 @@ class SurfaceMesh(Structure):
         if defined_on == "vertices":
             if values_arr.shape[0] != self.n_vertices():
                 raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_instance.add_vertex_scalar_quantity(
-                name, values_arr, to_enum(psb.DataType, datatype)
-            )
+            q = self.bound_instance.add_vertex_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
 
         elif defined_on == "faces":
             if values_arr.shape[0] != self.n_faces():
                 raise ValueError("'values' should be a length n_faces array")
-            q = self.bound_instance.add_face_scalar_quantity(
-                name, values_arr, to_enum(psb.DataType, datatype)
-            )
+            q = self.bound_instance.add_face_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
 
         elif defined_on == "edges":
             if values_arr.shape[0] != self.n_edges():
                 raise ValueError("'values' should be a length n_edges array")
-            q = self.bound_instance.add_edge_scalar_quantity(
-                name, values_arr, to_enum(psb.DataType, datatype)
-            )
+            q = self.bound_instance.add_edge_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
 
         elif defined_on == "halfedges":
             if values_arr.shape[0] != self.n_halfedges():
                 raise ValueError("'values' should be a length n_halfedges array")
-            q = self.bound_instance.add_halfedge_scalar_quantity(
-                name, values_arr, to_enum(psb.DataType, datatype)
-            )
+            q = self.bound_instance.add_halfedge_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
 
         elif defined_on == "corners":
             if values_arr.shape[0] != self.n_corners():
                 raise ValueError("'values' should be a length n_corners array")
-            q = self.bound_instance.add_corner_scalar_quantity(
-                name, values_arr, to_enum(psb.DataType, datatype)
-            )
+            q = self.bound_instance.add_corner_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
 
         elif defined_on == "texture":
             check_is_scalar_image(values_arr)
@@ -395,9 +367,7 @@ class SurfaceMesh(Structure):
             )
         else:
             raise ValueError(
-                "bad `defined_on` value {}, should be one of ['vertices', 'faces', 'texture']".format(
-                    defined_on
-                )
+                "bad `defined_on` value {}, should be one of ['vertices', 'faces', 'texture']".format(defined_on)
             )
 
         # process and act on additional arguments
@@ -430,17 +400,11 @@ class SurfaceMesh(Structure):
                 raise ValueError("'values' should be a length n_vertices array")
 
             if signed:
-                q = self.bound_instance.add_vertex_signed_distance_quantity(
-                    name, values_arr
-                )
+                q = self.bound_instance.add_vertex_signed_distance_quantity(name, values_arr)
             else:
                 q = self.bound_instance.add_vertex_distance_quantity(name, values_arr)
         else:
-            raise ValueError(
-                "bad `defined_on` value {}, should be one of ['vertices']".format(
-                    defined_on
-                )
-            )
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices']".format(defined_on))
 
         # Support optional params
         if enabled is not None:
@@ -471,21 +435,13 @@ class SurfaceMesh(Structure):
         if defined_on == "vertices":
             if values_arr.shape[0] != self.n_vertices():
                 raise ValueError("'values' should be a length n_vertices array")
-            q = self.bound_instance.add_vertex_parameterization_quantity(
-                name, values_arr, coords_type_enum
-            )
+            q = self.bound_instance.add_vertex_parameterization_quantity(name, values_arr, coords_type_enum)
         elif defined_on == "corners":
             if values_arr.shape[0] != self.n_corners():
                 raise ValueError("'values' should be a length n_faces array")
-            q = self.bound_instance.add_corner_parameterization_quantity(
-                name, values_arr, coords_type_enum
-            )
+            q = self.bound_instance.add_corner_parameterization_quantity(name, values_arr, coords_type_enum)
         else:
-            raise ValueError(
-                "bad `defined_on` value {}, should be one of ['vertices', 'corners']".format(
-                    defined_on
-                )
-            )
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'corners']".format(defined_on))
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
@@ -528,16 +484,10 @@ class SurfaceMesh(Structure):
                     name, values_arr, to_enum(psb.VectorType, vectortype)
                 )
             elif values_arr.shape[1] == 3:
-                q = self.bound_instance.add_face_vector_quantity(
-                    name, values_arr, to_enum(psb.VectorType, vectortype)
-                )
+                q = self.bound_instance.add_face_vector_quantity(name, values_arr, to_enum(psb.VectorType, vectortype))
 
         else:
-            raise ValueError(
-                "bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(
-                    defined_on
-                )
-            )
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
@@ -591,11 +541,7 @@ class SurfaceMesh(Structure):
             )
 
         else:
-            raise ValueError(
-                "bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(
-                    defined_on
-                )
-            )
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
@@ -613,9 +559,7 @@ class SurfaceMesh(Structure):
         if len(orientations_arr.shape) != 1 or orientations_arr.shape[0] != self.n_edges():
             raise ValueError("'orientations' should be length n_edges array")
 
-        q = self.bound_instance.add_one_form_tangent_vector_quantity(
-            name, values_arr, orientations_arr
-        )
+        q = self.bound_instance.add_one_form_tangent_vector_quantity(name, values_arr, orientations_arr)
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args

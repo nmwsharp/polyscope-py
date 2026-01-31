@@ -1,10 +1,10 @@
-import polyscope_bindings as psb
 import polyscope.imgui as psim
 
 from typing import TypeVar
 from enum import Enum
 
 E = TypeVar("E", bound=Enum)
+
 
 def to_enum(enum: type[E], value: str | E) -> E:
     if isinstance(value, enum):
@@ -14,14 +14,15 @@ def to_enum(enum: type[E], value: str | E) -> E:
         if value in enum.__members__:
             return enum.__members__[value]
 
-    raise ValueError(
-        f"Bad specifier '{value}', should be one of the strings {{{','.join(enum.__members__.keys())}}}"
-    )
+    raise ValueError(f"Bad specifier '{value}', should be one of the strings {{{','.join(enum.__members__.keys())}}}")
+
 
 def from_enum(value: Enum) -> str:
     return value.name
 
+
 # Most enums are defined in the C++ bindings in core.cpp
+
 
 # Some additional python-only enums
 class Backend(Enum):
@@ -29,6 +30,7 @@ class Backend(Enum):
     openGL3_glfw = 1
     openGL3_egl = 2
     openGL_mock = 3
+
 
 # Mapping for some common characters, to support our legacy get_key_code() function.
 # The more proper solution is to use the ImGui enum names directly like psim.ImGuiKey_W; only a subset of them are mapped get_key_code() and the dict below.

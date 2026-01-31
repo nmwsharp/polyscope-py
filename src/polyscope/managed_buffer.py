@@ -8,10 +8,10 @@ from numpy.typing import ArrayLike
 from polyscope.device_interop import CUDAOpenGLMappedAttributeBuffer, CUDAOpenGLMappedTextureBuffer
 
 # A cache of mapped buffers
-_mapped_buffer_cache_CUDAOpenGL = {} # maps uniqueID --> buffer object
+_mapped_buffer_cache_CUDAOpenGL = {}  # maps uniqueID --> buffer object
+
 
 class ManagedBuffer:
-
     # This class wraps a _reference_ to the underlying object, whose lifetime is managed by Polyscope
 
     bound_buffer: Any
@@ -22,8 +22,7 @@ class ManagedBuffer:
 
     # End users should not call this constructor, use structure.get_buffer("name") or another like it
     def __init__(self, instance: Any, buffer_type: Any) -> None:
-
-        self.uniqueID = None # gets overwritten below, setting early so it is defined if __del__ gets called
+        self.uniqueID = None  # gets overwritten below, setting early so it is defined if __del__ gets called
 
         self.bound_buffer = instance
         self.buffer_type = buffer_type
@@ -31,7 +30,7 @@ class ManagedBuffer:
 
         self.buffer_weak_ref = self.bound_buffer.get_generic_weak_handle()
         self.uniqueID = self.buffer_weak_ref.get_unique_ID()
-    
+
     def __del__(self) -> None:
         # NOTE: this means that if the user writes the common ps.get_buffer("name").update_data_from_device(arr), then
         # we are re-registering the buffer every time, which could be slow, and is unintuitive.
@@ -100,11 +99,14 @@ class ManagedBuffer:
 
             self.bound_buffer.mark_render_attribute_buffer_updated()
 
-        else: # texture
+        else:  # texture
             assert isinstance(mapped_buffer, CUDAOpenGLMappedTextureBuffer)
 
-            mapped_buffer.set_data_from_array(new_vals_device, self.bound_buffer.get_texture_size(),
-                                              self.bound_buffer.get_device_buffer_element_size_in_bytes())
+            mapped_buffer.set_data_from_array(
+                new_vals_device,
+                self.bound_buffer.get_texture_size(),
+                self.bound_buffer.get_device_buffer_element_size_in_bytes(),
+            )
 
             self.bound_buffer.mark_render_texture_buffer_updated()
 
@@ -116,21 +118,16 @@ class ManagedBuffer:
             if self.device_buffer_type == psb.DeviceBufferType.attribute:
                 nativeID = self.bound_buffer.get_native_render_attribute_buffer_ID()
 
-                _mapped_buffer_cache_CUDAOpenGL[self.uniqueID] = \
-                    CUDAOpenGLMappedAttributeBuffer(
-                            nativeID,
-                            self.device_buffer_type
-                    )
+                _mapped_buffer_cache_CUDAOpenGL[self.uniqueID] = CUDAOpenGLMappedAttributeBuffer(
+                    nativeID, self.device_buffer_type
+                )
 
-            else: # texture
+            else:  # texture
                 nativeID = self.bound_buffer.get_native_render_texture_buffer_ID()
 
-                _mapped_buffer_cache_CUDAOpenGL[self.uniqueID] = \
-                    CUDAOpenGLMappedTextureBuffer(
-                            nativeID,
-                            self.device_buffer_type
-                    )
-
+                _mapped_buffer_cache_CUDAOpenGL[self.uniqueID] = CUDAOpenGLMappedTextureBuffer(
+                    nativeID, self.device_buffer_type
+                )
 
         return _mapped_buffer_cache_CUDAOpenGL[self.uniqueID]
 
@@ -151,10 +148,8 @@ class ManagedBuffer:
 
         return self.bound_buffer.get_native_render_attribute_buffer_ID()
 
-
     def mark_device_buffer_updated(self) -> None:
-
         if self.device_buffer_type == psb.DeviceBufferType.attribute:
             self.bound_buffer.mark_render_attribute_buffer_updated()
-        else: # texture
+        else:  # texture
             self.bound_buffer.mark_render_texture_buffer_updated()

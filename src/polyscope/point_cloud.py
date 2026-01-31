@@ -60,10 +60,7 @@ class PointCloud(Structure):
         # Helper to validate arrays
 
         if (len(points.shape) != 2) or (points.shape[1] not in (2, 3)):
-            raise ValueError(
-                "Point cloud positions should have shape (N,3); shape is "
-                + str(points.shape)
-            )
+            raise ValueError("Point cloud positions should have shape (N,3); shape is " + str(points.shape))
 
     def n_points(self) -> int:
         return self.bound_instance.n_points()
@@ -88,9 +85,7 @@ class PointCloud(Structure):
             raise ValueError("bad point cloud shape")
 
     # Custom radius quantity
-    def set_point_radius_quantity(
-        self, quantity_name: str, autoscale: bool = True
-    ) -> None:
+    def set_point_radius_quantity(self, quantity_name: str, autoscale: bool = True) -> None:
         self.bound_instance.set_point_radius_quantity(quantity_name, autoscale)
 
     def clear_point_radius_quantity(self) -> None:
@@ -127,24 +122,24 @@ class PointCloud(Structure):
         return self.bound_instance.get_material()
 
     def append_pick_data(self, pick_result: Any) -> None:
-        struct_result = self.bound_instance.interpret_pick_result(
-            pick_result.raw_result
-        )
+        struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
         pick_result.structure_data["index"] = struct_result.index
 
     ## Quantities
 
     # Scalar
     def add_scalar_quantity(
-        self, name: str, values: ArrayLike, datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard", **scalar_args: Any
+        self,
+        name: str,
+        values: ArrayLike,
+        datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
+        **scalar_args: Any,
     ) -> None:
         values_arr = np.asarray(values)
         if len(values_arr.shape) != 1 or values_arr.shape[0] != self.n_points():
             raise ValueError("'values' should be a length-N array")
 
-        q = self.bound_instance.add_scalar_quantity(
-            name, values_arr, to_enum(psb.DataType, datatype)
-        )
+        q = self.bound_instance.add_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
@@ -155,11 +150,7 @@ class PointCloud(Structure):
     # Color
     def add_color_quantity(self, name: str, values: ArrayLike, **color_args: Any) -> None:
         values_arr = np.asarray(values)
-        if (
-            len(values_arr.shape) != 2
-            or values_arr.shape[0] != self.n_points()
-            or values_arr.shape[1] != 3
-        ):
+        if len(values_arr.shape) != 2 or values_arr.shape[0] != self.n_points() or values_arr.shape[1] != 3:
             raise ValueError("'values' should be an Nx3 array")
 
         q = self.bound_instance.add_color_quantity(name, values_arr)
@@ -179,21 +170,13 @@ class PointCloud(Structure):
         **vector_args: Any,
     ) -> None:
         values_arr = np.asarray(values)
-        if (
-            len(values_arr.shape) != 2
-            or values_arr.shape[0] != self.n_points()
-            or values_arr.shape[1] not in [2, 3]
-        ):
+        if len(values_arr.shape) != 2 or values_arr.shape[0] != self.n_points() or values_arr.shape[1] not in [2, 3]:
             raise ValueError("'values' should be an Nx3 array (or Nx2 for 2D)")
 
         if values_arr.shape[1] == 2:
-            q = self.bound_instance.add_vector_quantity2D(
-                name, values_arr, to_enum(psb.VectorType, vectortype)
-            )
+            q = self.bound_instance.add_vector_quantity2D(name, values_arr, to_enum(psb.VectorType, vectortype))
         elif values_arr.shape[1] == 3:
-            q = self.bound_instance.add_vector_quantity(
-                name, values_arr, to_enum(psb.VectorType, vectortype)
-            )
+            q = self.bound_instance.add_vector_quantity(name, values_arr, to_enum(psb.VectorType, vectortype))
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
@@ -210,19 +193,13 @@ class PointCloud(Structure):
         **parameterization_args: Any,
     ) -> None:
         values_arr = np.asarray(values)
-        if (
-            len(values_arr.shape) != 2
-            or values_arr.shape[0] != self.n_points()
-            or values_arr.shape[1] != 2
-        ):
+        if len(values_arr.shape) != 2 or values_arr.shape[0] != self.n_points() or values_arr.shape[1] != 2:
             raise ValueError("'values' should be an Nx2 array")
 
         # parse the coords type in to an enum
         coords_type_enum = to_enum(psb.ParamCoordsType, coords_type)
 
-        q = self.bound_instance.add_parameterization_quantity(
-            name, values_arr, coords_type_enum
-        )
+        q = self.bound_instance.add_parameterization_quantity(name, values_arr, coords_type_enum)
 
         # process and act on additional arguments
         # note: each step modifies the args dict and removes processed args
