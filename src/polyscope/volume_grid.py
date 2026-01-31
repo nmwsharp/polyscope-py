@@ -156,13 +156,13 @@ class VolumeGrid(Structure):
 
         if defined_on == 'nodes':
 
-            if values_arr.shape != self.get_grid_node_dim(): raise ValueError(f"'values' should be a {self.get_grid_node_dim()} array")
+            if values_arr.shape != tuple(self.get_grid_node_dim()): raise ValueError(f"'values' should be a {self.get_grid_node_dim()} array")
 
             q = self.bound_instance.add_node_scalar_quantity(name, values_arr.flatten('F'), to_enum(psb.DataType, datatype))
 
         elif defined_on == 'cells':
 
-            if values_arr.shape != self.get_grid_cell_dim(): raise ValueError(f"'values' should be a {self.get_grid_cell_dim()} array")
+            if values_arr.shape != tuple(self.get_grid_cell_dim()): raise ValueError(f"'values' should be a {self.get_grid_cell_dim()} array")
 
             q = self.bound_instance.add_cell_scalar_quantity(name, values_arr.flatten('F'), to_enum(psb.DataType, datatype))
 

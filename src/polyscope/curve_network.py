@@ -233,8 +233,8 @@ class CurveNetwork(Structure):
 
 
 def register_curve_network(name: str, 
-                           nodes: NDArray, 
-                           edges: NDArray, 
+                           nodes: ArrayLike, 
+                           edges: ArrayLike | Literal["line", "loop", "segments"] | str,
                            enabled: bool | None = None, 
                            radius: float | None = None, 
                            color: ArrayLike | None = None, 

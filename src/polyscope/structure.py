@@ -1,3 +1,5 @@
+from typing import Any, Literal, no_type_check
+
 import polyscope_bindings as psb
 
 from polyscope.floating_quantities import (
@@ -14,10 +16,7 @@ from polyscope.managed_buffer import ManagedBuffer
 from polyscope.core import TransformationGizmo
 
 import numpy as np
-
-from collections.abc import Sequence
-from typing import Any, overload, no_type_check
-from numpy.typing import NDArray
+from numpy.typing import NDArray, ArrayLike
 
 
 # Base class for common properties and methods on structures
@@ -72,14 +71,17 @@ class Structure:
     def reset_transform(self) -> None:
         self.bound_instance.reset_transform()
 
-    def set_transform(self, new_mat4x4: NDArray) -> None:
-        self.bound_instance.set_transform(new_mat4x4)
+    def set_transform(self, new_mat4x4: ArrayLike) -> None:
+        new_mat4x4_arr = np.asarray(new_mat4x4)
+        self.bound_instance.set_transform(new_mat4x4_arr)
 
-    def set_position(self, new_vec3: Sequence[float]) -> None:
-        self.bound_instance.set_position(np.array(new_vec3))
+    def set_position(self, new_vec3: ArrayLike) -> None:
+        new_vec3_arr = np.asarray(new_vec3)
+        self.bound_instance.set_position(new_vec3_arr)
 
-    def translate(self, trans_vec3: Sequence[float]) -> None:
-        self.bound_instance.translate(np.array(trans_vec3))
+    def translate(self, trans_vec3: ArrayLike) -> None:
+        trans_vec3_arr = np.asarray(trans_vec3)
+        self.bound_instance.translate(trans_vec3_arr)
 
     def get_transform(self) -> NDArray:
         return self.bound_instance.get_transform()
@@ -246,9 +248,9 @@ class Structure:
     def add_scalar_image_quantity(
         self,
         name: str,
-        values: NDArray,
-        image_origin: str = "upper_left",
-        datatype: str = "standard",
+        values: ArrayLike,
+        image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
+        datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
         **option_args: Any,
     ) -> Any:
         """
@@ -268,8 +270,8 @@ class Structure:
     def add_color_image_quantity(
         self,
         name: str,
-        values: NDArray,
-        image_origin: str = "upper_left",
+        values: ArrayLike,
+        image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
         **option_args: Any,
     ) -> Any:
         """
@@ -284,8 +286,8 @@ class Structure:
     def add_color_alpha_image_quantity(
         self,
         name: str,
-        values: NDArray,
-        image_origin: str = "upper_left",
+        values: ArrayLike,
+        image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
         **option_args: Any,
     ) -> Any:
         """
@@ -302,10 +304,10 @@ class Structure:
     def add_depth_render_image_quantity(
         self,
         name: str,
-        depth_values: NDArray,
-        normal_values: NDArray,
-        image_origin: str = "upper_left",
-        color: Sequence | None = None,
+        depth_values: ArrayLike,
+        normal_values: ArrayLike,
+        image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
+        color: ArrayLike | None = None,
         **option_args: Any,
     ) -> Any:
         """
@@ -326,10 +328,10 @@ class Structure:
     def add_color_render_image_quantity(
         self,
         name: str,
-        depth_values: NDArray,
-        normal_values: NDArray,
-        color_values: NDArray,
-        image_origin: str = "upper_left",
+        depth_values: ArrayLike,
+        normal_values: ArrayLike,
+        color_values: ArrayLike,
+        image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
         **option_args: Any,
     ) -> Any:
         """
@@ -350,10 +352,10 @@ class Structure:
     def add_scalar_render_image_quantity(
         self,
         name: str,
-        depth_values: NDArray,
-        normal_values: NDArray,
-        scalar_values: NDArray,
-        image_origin: str = "upper_left",
+        depth_values: ArrayLike,
+        normal_values: ArrayLike,
+        scalar_values: ArrayLike,
+        image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
         **option_args: Any,
     ) -> Any:
         """
@@ -374,9 +376,9 @@ class Structure:
     def add_raw_color_render_image_quantity(
         self,
         name: str,
-        depth_values: NDArray,
-        color_values: NDArray,
-        image_origin: str = "upper_left",
+        depth_values: ArrayLike,
+        color_values: ArrayLike,
+        image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
         **option_args: Any,
     ) -> Any:
         """
@@ -396,9 +398,9 @@ class Structure:
     def add_raw_color_alpha_render_image_quantity(
         self,
         name: str,
-        depth_values: NDArray,
-        color_values: NDArray,
-        image_origin: str = "upper_left",
+        depth_values: ArrayLike,
+        color_values: ArrayLike,
+        image_origin: Literal["upper_left", "lower_left"] | str = "upper_left",
         **option_args: Any,
     ) -> Any:
         """

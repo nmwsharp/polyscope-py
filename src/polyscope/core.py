@@ -10,6 +10,7 @@ import numpy as np
 
 from typing import Literal, Tuple
 from numpy.typing import NDArray, ArrayLike
+from collections.abc import Sequence
 
 ### Basic setup and teardown
 
@@ -1077,7 +1078,7 @@ def load_static_material(mat_name: str, filename: str) -> None:
 
 def load_blendable_material(
     mat_name: str, 
-    filenames: list[str] | None = None, 
+    filenames: Sequence[str] | None = None, 
     filename_base: str | None = None, 
     filename_ext: str | None = None
 ):

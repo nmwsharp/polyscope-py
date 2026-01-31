@@ -3,7 +3,7 @@ from typing import Any, Literal, overload
 import polyscope_bindings as psb
 
 from polyscope.core import glm3
-from polyscope.enums import to_enum
+from polyscope.enums import to_enum, from_enum
 from polyscope.structure import Structure
 from polyscope.common import process_quantity_args, process_scalar_args, process_color_args, process_vector_args, check_all_args_processed
 

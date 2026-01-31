@@ -1,14 +1,10 @@
-import polyscope_bindings as psb
+from typing import Any, Callable
 
-import os, sys
-from functools import partial
-from typing import Any
+import polyscope_bindings as psb
 
 import numpy as np
 
 from polyscope.core import get_render_engine_backend_name
-
-device_interop_funcs = None
 
 #############################################################################
 ### Default CUDA implementation of interop functions
@@ -41,19 +37,21 @@ device_interop_funcs = None
 #   the meaning of these callbacks.
 
 
-def ensure_device_interop_funcs_resolve():
+device_interop_funcs: dict[str, Callable] | None = None
+
+def ensure_device_interop_funcs_resolve() -> None:
     check_device_module_availibility()
     if device_interop_funcs is not None:
         return
     resolve_default_device_interop_funcs()
 
 
-def set_device_interop_funcs(func_dict):
+def set_device_interop_funcs(func_dict: dict[str, Callable]) -> None:
     global device_interop_funcs
     device_interop_funcs = func_dict
 
 
-def resolve_default_device_interop_funcs():
+def resolve_default_device_interop_funcs() -> None:
     # Try both of these imports, but fail silently if they don't work (we will try
     # again and print an informative error below only if a relevant function is called)
     try:
@@ -176,24 +174,12 @@ def resolve_default_device_interop_funcs():
         return ptr, shape, dtype, n_bytes
 
     def map_resource_and_get_array(handle):
-        (
-            check_cudart_err(
-                cuda.bindings.runtime.cudaGraphicsMapResources(1, handle, None)
-            ),
-        )
-        return check_cudart_err(
-            cuda.bindings.runtime.cudaGraphicsSubResourceGetMappedArray(handle, 0, 0)
-        )
+        check_cudart_err(cuda.bindings.runtime.cudaGraphicsMapResources(1, handle, None))
+        return check_cudart_err(cuda.bindings.runtime.cudaGraphicsSubResourceGetMappedArray(handle, 0, 0))
 
     def map_resource_and_get_pointer(handle):
-        (
-            check_cudart_err(
-                cuda.bindings.runtime.cudaGraphicsMapResources(1, handle, None)
-            ),
-        )
-        raw_ptr, size = check_cudart_err(
-            cuda.bindings.runtime.cudaGraphicsResourceGetMappedPointer(handle)
-        )
+        check_cudart_err( cuda.bindings.runtime.cudaGraphicsMapResources(1, handle, None))
+        raw_ptr, size = check_cudart_err(cuda.bindings.runtime.cudaGraphicsResourceGetMappedPointer(handle)) # type: ignore[return-value]
         return raw_ptr, size
 
     func_dict = {
@@ -275,7 +261,7 @@ _CONSTANT_GL_TEXTURE_3D = int("806F", 16)
 #############################################################################
 
 
-def check_device_module_availibility():
+def check_device_module_availibility() -> None:
     supported_backends = ["openGL3_glfw"]
     if get_render_engine_backend_name() not in supported_backends:
         raise ValueError(
@@ -285,17 +271,16 @@ def check_device_module_availibility():
 
 class CUDAOpenGLMappedAttributeBuffer:
     gl_attribute_native_id: int
-    buffer_type: psb.DeviceBufferType
+    buffer_type: Any
     resource_handle: Any
     cuda_buffer_ptr: Any
     cuda_buffer_size: int
-    finished_init: bool
     finished_init: bool
 
     # Roughly based on this, see for more goodies: https://gist.github.com/keckj/e37d312128eac8c5fca790ce1e7fc437
 
     def __init__(
-        self, gl_attribute_native_id: int, buffer_type: psb.DeviceBufferType
+        self, gl_attribute_native_id: int, buffer_type: Any
     ) -> None:
         self.gl_attribute_native_id = gl_attribute_native_id
         self.buffer_type = buffer_type
@@ -305,32 +290,33 @@ class CUDAOpenGLMappedAttributeBuffer:
         self.finished_init = False
 
         ensure_device_interop_funcs_resolve()
+        assert device_interop_funcs is not None
 
         # Sanity checks
         if self.buffer_type != psb.DeviceBufferType.attribute:
             raise ValueError("device buffer type should be attribute")
 
         # Register the buffer
-        self.resource_handle = device_interop_funcs["register_gl_buffer"](
-            self.gl_attribute_native_id
-        )
+        self.resource_handle = device_interop_funcs["register_gl_buffer"](self.gl_attribute_native_id)
         self.finished_init = True
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         if self.finished_init and psb.is_initialized():
             # Don't bother trying to unregister if Polyscope is not initialized.
             # This usually happens during shutdown, if Polyscope gets shutdown first the openGL context
             # is invalidated, and this would throw an error. Better to silently skip it.
             self.unregister()
 
-    def unregister(self):
+    def unregister(self) -> None:
+        assert device_interop_funcs is not None
         self.unmap()
         device_interop_funcs["unregister_resource"](self.resource_handle)
 
-    def map(self):
+    def map(self) -> None:
         """
-        Returns a memory pointer to the buffer
+        Fetch a memory pointer to the buffer, store it in the member variables
         """
+        assert device_interop_funcs is not None
 
         if self.cuda_buffer_ptr is not None:
             return
@@ -339,9 +325,10 @@ class CUDAOpenGLMappedAttributeBuffer:
             "map_resource_and_get_pointer"
         ](self.resource_handle)
 
-    def unmap(self):
+    def unmap(self) -> None:
         if not hasattr(self, "cuda_buffer_ptr") or self.cuda_buffer_ptr is None:
             return
+        assert device_interop_funcs is not None
 
         device_interop_funcs["unmap_resource"](self.resource_handle)
 
@@ -349,8 +336,9 @@ class CUDAOpenGLMappedAttributeBuffer:
         self.cuda_buffer_size = -1
 
     def set_data_from_array(
-        self, arr, buffer_size_in_bytes=None, expected_shape=None, expected_dtype=None
-    ):
+        self, arr: Any, buffer_size_in_bytes: int | None = None, expected_shape: Any = None, expected_dtype: Any = None
+    ) -> None:
+        assert device_interop_funcs is not None
         self.map()
 
         # access the input array
@@ -376,7 +364,13 @@ class CUDAOpenGLMappedAttributeBuffer:
 
 
 class CUDAOpenGLMappedTextureBuffer:
-    def __init__(self, gl_attribute_native_id, buffer_type):
+    gl_attribute_native_id: int
+    buffer_type: Any
+    resource_handle: Any
+    cuda_buffer_array: Any
+    finished_init: bool
+
+    def __init__(self, gl_attribute_native_id: int, buffer_type: Any) -> None:
         self.gl_attribute_native_id = gl_attribute_native_id
         self.buffer_type = buffer_type
         self.resource_handle = None
@@ -384,6 +378,7 @@ class CUDAOpenGLMappedTextureBuffer:
         self.finished_init = False
 
         ensure_device_interop_funcs_resolve()
+        assert device_interop_funcs is not None
 
         # Register the buffer
 
@@ -406,34 +401,38 @@ class CUDAOpenGLMappedTextureBuffer:
 
         self.finished_init = True
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         if self.finished_init and psb.is_initialized():
             # Don't bother trying to unregister if Polyscope is not initialized.
             # This usually happens during shotdown, if Polyscope gets shutdown first the openGL context
             # is invalidated, and this would throw an error. Better to silently skip it.
             self.unregister()
 
-    def unregister(self):
+    def unregister(self) -> None:
+        assert device_interop_funcs is not None
         self.unmap()
         device_interop_funcs["unregister_resource"](self.resource_handle)
 
-    def map(self):
+    def map(self) -> None:
         if self.cuda_buffer_array is not None:
             return
+        assert device_interop_funcs is not None
 
         self.cuda_buffer_array = device_interop_funcs["map_resource_and_get_array"](
             self.resource_handle
         )
 
-    def unmap(self):
+    def unmap(self) -> None:
         if not hasattr(self, "cuda_buffer_array") or self.cuda_buffer_array is None:
             return
+        assert device_interop_funcs is not None
 
         device_interop_funcs["unmap_resource"](self.resource_handle)
 
         self.cuda_buffer_array = None
 
-    def set_data_from_array(self, arr, texture_dims, entry_size_in_bytes):
+    def set_data_from_array(self, arr: Any, texture_dims: tuple[int, ...], entry_size_in_bytes: int) -> None:
+        assert device_interop_funcs is not None
         self.map()
 
         # get some info about the buffer we just mapped
@@ -449,6 +448,9 @@ class CUDAOpenGLMappedTextureBuffer:
         ](arr)
 
         if self.buffer_type == psb.DeviceBufferType.texture2d:
+            dst_buff_width = None
+            dst_buff_height = None
+
             # if we got extent info from the destination array, use it to do additional sanity checks
             if extent_tup is not None:
                 desc, extent, flags = extent_tup
@@ -503,7 +505,7 @@ class CUDAOpenGLMappedTextureBuffer:
             #                 raise ValueError(f"Mapped buffer write has wrong size, destination buffer has {dst_size} elements, but source buffer has {arr_size}.")
 
             # if we got bytesize info from the source AND destination array, use it to do more sanity checks
-            if arr_nbytes is not None and extent_tup is not None:
+            if arr_nbytes is not None and extent_tup is not None and dst_buff_width is not None and dst_buff_height is not None:
                 expected_bytes = dst_buff_width * dst_buff_height * dst_buff_bytes_per
                 if arr_nbytes != expected_bytes:
                     # if cupy_arr has the right size/dtype, it should have exactly the same

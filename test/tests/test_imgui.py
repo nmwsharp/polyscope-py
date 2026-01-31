@@ -276,7 +276,6 @@ class TestImGuiBindings(unittest.TestCase):
 
     def test_fonts(self):
         # Test font bindings
-
         def imgui_callback():
             io = psim.GetIO()
 
@@ -285,23 +284,28 @@ class TestImGuiBindings(unittest.TestCase):
             self.assertIsNotNone(font_atlas)
 
             # Get default font
-            font = io.FontDefault
+            font = psim.GetFont()
             if font is not None:
                 # Test font properties
                 is_loaded = font.IsLoaded()
                 self.assertIsInstance(is_loaded, bool)
 
-                font_size = font.FontSize
-                self.assertIsInstance(font_size, float)
-                self.assertGreater(font_size, 0.0)
+                # Get baked font data for a specific size
+                font_size = 16.0
+                font_baked = font.GetFontBaked(font_size)
+                self.assertIsNotNone(font_baked)
+
+                baked_size = font_baked.Size
+                self.assertIsInstance(baked_size, float)
+                self.assertGreater(baked_size, 0.0)
 
                 # Test text size calculation
                 text_size = font.CalcTextSizeA(font_size, 1000.0, 0.0, "Test")
                 self.assertIsInstance(text_size, tuple)
                 self.assertEqual(len(text_size), 2)
 
-                # Test char advance
-                advance = font.GetCharAdvance(ord('A'))
+                # Test char advance (on ImFontBaked, not ImFont)
+                advance = font_baked.GetCharAdvance(ord('A'))
                 self.assertIsInstance(advance, float)
                 self.assertGreater(advance, 0.0)
 

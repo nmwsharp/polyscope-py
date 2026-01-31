@@ -1,24 +1,10 @@
 import polyscope_bindings as psb
 import polyscope.imgui as psim
 
-import polyscope
-
-import os
-
-from collections.abc import Sequence
-from typing import Any, Literal, TypeAlias, NoReturn, TypeVar
+from typing import TypeVar
 from enum import Enum
-from numpy.typing import NDArray
-
-## General purpose [string or enum] --> enum
-
-
-def normalize_string(value: str) -> str:
-    return value.lower().replace("_", "")
-
 
 E = TypeVar("E", bound=Enum)
-
 
 def to_enum(enum: type[E], value: str | E) -> E:
     if isinstance(value, enum):

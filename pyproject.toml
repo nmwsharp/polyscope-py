@@ -40,3 +40,10 @@ logging.level = "INFO"
 # compatibility.
 # There is a matching setting in cibuildwheel_config.toml 
 cmake.args = ["-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13"]
+
+
+## Misc tools and extensions
+
+[tool.ty.src]
+include = ["src", "test"]
+exclude = ["test/scripts/*.py"] # ignore helper scripts for type checking

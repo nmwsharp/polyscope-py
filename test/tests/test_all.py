@@ -1959,8 +1959,8 @@ class TestVolumeGrid(unittest.TestCase):
         p.n_nodes()
         p.n_cells()
         p.grid_spacing()
-        self.assertTrue((p.get_grid_node_dim() == (10,12,14)))
-        self.assertTrue((p.get_grid_cell_dim() == ((10-1),(12-1),(14-1))))
+        self.assertTrue((p.get_grid_node_dim() == (10,12,14)).all())
+        self.assertTrue((p.get_grid_cell_dim() == ((10-1),(12-1),(14-1))).all())
         self.assertTrue((p.get_bound_min() == np.array((0., 0., 0.))).all())
         self.assertTrue((p.get_bound_max() == np.array((1., 1., 1.))).all())
 
