@@ -248,23 +248,92 @@ class TestImGuiBindings(unittest.TestCase):
             window_padding = style.WindowPadding
             self.assertIsInstance(window_padding, tuple)
             self.assertEqual(len(window_padding), 2)
+            
+            # Test Colors array (basic usage)
+            text_color = style.Colors[psim.ImGuiCol_Text] # get a color
+            self.assertIsInstance(text_color, tuple)
+            self.assertEqual(len(text_color), 4)  # RGBA
+            style.Colors[psim.ImGuiCol_Text] = (1.0, 0.6, 0.0, 1.0)  # set a color
+            new_text_color = style.Colors[psim.ImGuiCol_Text]   # get it back   
+            for i in range(4):
+                self.assertAlmostEqual(new_text_color[i], (1.0, 0.6, 0.0, 1.0)[i], places=5)
 
-            # Test color access
-            color_count = style.GetColorCount()
+            # Test Colors array access (comprehensive test)
+            colors = style.Colors
+            self.assertIsNotNone(colors)
+
+            # Test __len__
+            color_count = len(colors)
             self.assertIsInstance(color_count, int)
             self.assertGreater(color_count, 0)
+            self.assertEqual(color_count, psim.ImGuiCol_COUNT)
 
-            # Get a color
-            text_color = style.GetColor(psim.ImGuiCol_Text)
-            self.assertIsInstance(text_color, tuple)
-            self.assertEqual(len(text_color), 4)
+            # Test reading colors by index (like C++: style.Colors[idx])
+            text_color_original = colors[psim.ImGuiCol_Text]
+            self.assertIsInstance(text_color_original, tuple)
+            self.assertEqual(len(text_color_original), 4)  # RGBA
 
-            # Set a color and get it back
-            test_color = (0.1, 0.2, 0.3, 0.4)
-            style.SetColor(psim.ImGuiCol_Text, test_color)
-            retrieved_color = style.GetColor(psim.ImGuiCol_Text)
+            button_color_original = colors[psim.ImGuiCol_Button]
+            self.assertIsInstance(button_color_original, tuple)
+            self.assertEqual(len(button_color_original), 4)
+
+            # Test writing colors by index (like C++: style.Colors[idx] = color)
+            new_text_color = (1.0, 0.0, 0.0, 1.0)  # Red
+            colors[psim.ImGuiCol_Text] = new_text_color
+
+            new_button_color = (0.0, 1.0, 0.0, 0.8)  # Green with alpha
+            colors[psim.ImGuiCol_Button] = new_button_color
+
+            # Verify colors were actually set by reading them back
+            text_color_readback = colors[psim.ImGuiCol_Text]
             for i in range(4):
-                self.assertAlmostEqual(retrieved_color[i], test_color[i], places=5)
+                self.assertAlmostEqual(text_color_readback[i], new_text_color[i], places=5)
+
+            button_color_readback = colors[psim.ImGuiCol_Button]
+            for i in range(4):
+                self.assertAlmostEqual(button_color_readback[i], new_button_color[i], places=5)
+
+            # Test multiple color modifications
+            test_colors = {
+                psim.ImGuiCol_WindowBg: (0.1, 0.1, 0.1, 0.9),
+                psim.ImGuiCol_FrameBg: (0.2, 0.3, 0.4, 0.5),
+                psim.ImGuiCol_Border: (0.7, 0.7, 0.7, 1.0),
+            }
+
+            for idx, color_value in test_colors.items():
+                colors[idx] = color_value
+                readback = colors[idx]
+                for i in range(4):
+                    self.assertAlmostEqual(readback[i], color_value[i], places=5)
+
+            # Test boundary conditions - valid indices
+            first_color = colors[0]
+            self.assertEqual(len(first_color), 4)
+
+            last_color = colors[color_count - 1]
+            self.assertEqual(len(last_color), 4)
+
+            # Test that we can modify first and last colors
+            colors[0] = (0.5, 0.5, 0.5, 0.5)
+            first_readback = colors[0]
+            self.assertAlmostEqual(first_readback[0], 0.5, places=5)
+
+            colors[color_count - 1] = (0.9, 0.8, 0.7, 0.6)
+            last_readback = colors[color_count - 1]
+            self.assertAlmostEqual(last_readback[0], 0.9, places=5)
+
+            # Test that out-of-range access raises exception
+            with self.assertRaises(IndexError):
+                _ = colors[color_count]  # One past the end
+
+            with self.assertRaises(IndexError):
+                _ = colors[-1]  # Negative index
+
+            with self.assertRaises(IndexError):
+                colors[color_count] = (1.0, 1.0, 1.0, 1.0)
+
+            with self.assertRaises(IndexError):
+                colors[-1] = (1.0, 1.0, 1.0, 1.0)
 
         ps.set_user_callback(imgui_callback)
         ps.show(3)

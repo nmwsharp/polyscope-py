@@ -4,6 +4,33 @@
 
 // clang-format off
 
+// Helper class to provide array-like access to ImGuiStyle::Colors
+class ImGuiStyleColorsWrapper {
+public:
+    ImGuiStyleColorsWrapper(ImGuiStyle& style) : style_(style) {}
+
+    Vec4T get_item(int idx) {
+        if (idx < 0 || idx >= ImGuiCol_COUNT) {
+            throw std::out_of_range("Color index out of range: " + std::to_string(idx));
+        }
+        return from_vec4(style_.Colors[idx]);
+    }
+
+    void set_item(int idx, const Vec4T& color) {
+        if (idx < 0 || idx >= ImGuiCol_COUNT) {
+            throw std::out_of_range("Color index out of range: " + std::to_string(idx));
+        }
+        style_.Colors[idx] = to_vec4(color);
+    }
+
+    uint32_t size() const {
+        return ImGuiCol_COUNT;
+    }
+
+private:
+    ImGuiStyle& style_;
+};
+
 void bind_imgui_style(nb::module_& m) {
 
     #define VEC2_PROPERTY(name)                            \
@@ -12,6 +39,13 @@ void bind_imgui_style(nb::module_& m) {
         }, [](ImGuiStyle& style, const Vec2T& value) {     \
             style.name = to_vec2(value);                   \
         })
+
+    // Bind the wrapper class first
+    nb::class_<ImGuiStyleColorsWrapper>(m, "ImGuiStyleColorsWrapper")
+        .def("__getitem__", &ImGuiStyleColorsWrapper::get_item)
+        .def("__setitem__", &ImGuiStyleColorsWrapper::set_item)
+        .def("__len__", &ImGuiStyleColorsWrapper::size)
+    ;
 
     nb::class_<ImGuiStyle>(m, "ImGuiStyle")
 
@@ -114,25 +148,9 @@ void bind_imgui_style(nb::module_& m) {
         .def_rw("CircleTessellationMaxError", &ImGuiStyle::CircleTessellationMaxError)
 
         // Colors
-        // TODO think about making this more similar to the C++ style
-        // Provide indexed access to color array
-        .def("GetColor", [](const ImGuiStyle& style, int idx) {
-            if (idx < 0 || idx >= ImGuiCol_COUNT) {
-                throw std::out_of_range("Color index out of range: " + std::to_string(idx));
-            }
-            return from_vec4(style.Colors[idx]);
-        }, nb::arg("idx"), "Get color by index")
-
-        .def("SetColor", [](ImGuiStyle& style, int idx, const Vec4T& color) {
-            if (idx < 0 || idx >= ImGuiCol_COUNT) {
-                throw std::out_of_range("Color index out of range: " + std::to_string(idx));
-            }
-            style.Colors[idx] = to_vec4(color);
-        }, nb::arg("idx"), nb::arg("color"), "Set color by index")
-
-        .def("GetColorCount", [](ImGuiStyle& style) {
-            return static_cast<uint32_t>(ImGuiCol_COUNT);
-        }, "Get total number of colors")
+        .def_prop_ro("Colors", [](ImGuiStyle& style) {
+            return ImGuiStyleColorsWrapper(style);
+        })
 
         // Behaviors
         .def_rw("HoverStationaryDelay", &ImGuiStyle::HoverStationaryDelay)
