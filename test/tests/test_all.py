@@ -167,8 +167,9 @@ class TestCore(unittest.TestCase):
 
         ps.set_camera_view_matrix(ps.get_camera_view_matrix())
 
-        ps.set_view_center((0.1, 0.1, 0.2))
-        ps.set_view_center(ps.get_view_center(), fly_to=True)
+        ps.set_view_center_raw((0.1, 0.1, 0.2))
+        ps.set_view_center_and_look_at(ps.get_view_center(), fly_to=True)
+        ps.set_view_center_and_project(ps.get_view_center())
 
         default_w = 800
         default_h = 600
@@ -179,8 +180,6 @@ class TestCore(unittest.TestCase):
 
         tup = ps.get_buffer_size()
         w, h = int(tup[0]), int(tup[1])
-        print(f"default window size: {default_w} x {default_h}")
-        print(f"buffer size: {w} x {h}")
         self.assertAlmostEqual(default_w / default_h, w / h)
 
         ps.set_window_resizable(True)
@@ -2961,7 +2960,7 @@ class TestManagedBuffers(unittest.TestCase):
         img_buf.update_data(np.zeros(dimX * dimY))
 
         # test key presses
-        if psim.IsKeyPressed(psim.ImGuiKey_A):
-            pass
+        # if psim.IsKeyPressed(psim.ImGuiKey_A):
+        #     pass
 
         ps.show(3)
