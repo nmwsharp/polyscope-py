@@ -409,9 +409,16 @@ def get_camera_view_matrix():
     return psb.get_camera_view_matrix()
 
 
-def set_view_center(pos, fly_to=False):
-    pos = glm3(pos)
-    psb.set_view_center(pos, fly_to)
+def set_view_center_and_look_at(pos: ArrayLike, fly_to: bool = False):
+    psb.set_view_center_and_look_at(glm3(pos), fly_to)
+
+
+def set_view_center_and_project(pos: ArrayLike):
+    psb.set_view_center_and_project(glm3(pos))
+
+
+def set_view_center_raw(pos: ArrayLike):
+    psb.set_view_center_raw(glm3(pos))
 
 
 def get_view_center():
