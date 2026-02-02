@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Generate imgui_enums.cpp from imgui.h
+Generate imgui_enums.cpp and implot_enums.cpp from imgui.h and implot.h
 
-This script parses imgui.h to extract all public-facing enums and generates
-nanobind bindings for them.
+This script parses imgui.h and implot.h to extract all public-facing enums
+and generates nanobind bindings for them.
 
 WARNING: this file is LLM generated, don't trust it.
 """
@@ -14,9 +14,12 @@ from datetime import datetime
 from pathlib import Path
 
 
-def extract_version(content: str) -> str:
-    """Extract imgui version from the header."""
-    match = re.search(r'#define\s+IMGUI_VERSION\s+"([^"]+)"', content)
+def extract_version(content: str, lib: str = "imgui") -> str:
+    """Extract version from the header."""
+    if lib == "imgui":
+        match = re.search(r'#define\s+IMGUI_VERSION\s+"([^"]+)"', content)
+    else:  # implot
+        match = re.search(r'#define\s+IMPLOT_VERSION\s+"([^"]+)"', content)
     return match.group(1) if match else "unknown"
 
 
@@ -95,8 +98,9 @@ def parse_enums(content: str) -> list[dict]:
 
     # Pattern for enum definition: enum EnumName_ or enum EnumName : type
     # We want the full definition, not forward declarations
-    # Matches Im* prefix (ImGui, ImDraw, ImFont, ImTexture, etc.)
-    pattern = r'^enum\s+(Im\w+?)(_?)\s*(?::\s*\w+)?\s*\n\{'
+    # Matches Im* prefix (ImGui, ImDraw, ImFont, ImTexture, ImPlot, ImAxis, etc.)
+    # The { can be on the same line or the next line
+    pattern = r'^enum\s+(Im\w+?)(_?)\s*(?::\s*\w+)?\s*[{\n]'
 
     for match in re.finditer(pattern, content, re.MULTILINE):
         enum_name = match.group(1) + match.group(2)
@@ -117,7 +121,7 @@ def parse_enums(content: str) -> list[dict]:
     return enums
 
 
-def generate_cpp(enums: list[dict], typed_enums: set[str], version: str) -> str:
+def generate_cpp(enums: list[dict], version: str, lib: str = "imgui") -> str:
     """Generate the C++ bindings file.
 
     All enums are bound as nb::enum_ with is_arithmetic() and is_flag() to allow
@@ -125,20 +129,36 @@ def generate_cpp(enums: list[dict], typed_enums: set[str], version: str) -> str:
     """
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    lines = [
-        "// AUTO-GENERATED FILE - DO NOT EDIT",
-        f"// Generated: {now}",
-        f"// imgui version: {version}",
-        "// Generator: python3 scripts/generate_imgui_enums.py",
-        "",
-        '#include "imgui.h"',
-        "",
-        '#include "../utils.h"',
-        '#include "imgui_utils.h"',
-        "",
-        "void bind_imgui_enums(nb::module_& m) {",
-        "",
-    ]
+    if lib == "imgui":
+        lines = [
+            "// AUTO-GENERATED FILE - DO NOT EDIT",
+            f"// Generated: {now}",
+            f"// imgui version: {version}",
+            "// Generator: python3 scripts/generate_imgui_enums.py",
+            "",
+            '#include "imgui.h"',
+            "",
+            '#include "../utils.h"',
+            '#include "imgui_utils.h"',
+            "",
+            "void bind_imgui_enums(nb::module_& m) {",
+            "",
+        ]
+    else:  # implot
+        lines = [
+            "// AUTO-GENERATED FILE - DO NOT EDIT",
+            f"// Generated: {now}",
+            f"// implot version: {version}",
+            "// Generator: python3 scripts/generate_imgui_enums.py",
+            "",
+            '#include "implot.h"',
+            "",
+            '#include "../utils.h"',
+            '#include "imgui_utils.h"',
+            "",
+            "void bind_implot_enums(nb::module_& m) {",
+            "",
+        ]
 
     for enum in enums:
         enum_name = enum['name']
@@ -166,39 +186,53 @@ def generate_cpp(enums: list[dict], typed_enums: set[str], version: str) -> str:
     return '\n'.join(lines)
 
 
-def main():
-    # Find imgui.h
-    script_dir = Path(__file__).parent
-    repo_root = script_dir.parent
-
-    imgui_path = repo_root / "deps/polyscope/deps/imgui/imgui/imgui.h"
-    if not imgui_path.exists():
-        print(f"Error: Could not find imgui.h at {imgui_path}")
+def process_header(header_path: Path, output_path: Path, lib: str) -> None:
+    """Process a single header file and generate bindings."""
+    if not header_path.exists():
+        print(f"Error: Could not find {header_path}")
         sys.exit(1)
 
-    output_path = repo_root / "src/cpp/imgui/imgui_enums.cpp"
-
-    # Read imgui.h
-    content = imgui_path.read_text()
+    # Read header
+    content = header_path.read_text()
 
     # Extract version
-    version = extract_version(content)
-    print(f"imgui version: {version}")
+    version = extract_version(content, lib)
+    print(f"{lib} version: {version}")
 
-    # Find typed enums (forward declared with : type)
+    # Find typed enums (forward declared with : type) - only relevant for imgui
     typed_enums = find_typed_enums(content)
-    print(f"Found {len(typed_enums)} typed enums: {sorted(typed_enums)}")
+    if typed_enums:
+        print(f"Found {len(typed_enums)} typed enums: {sorted(typed_enums)}")
 
     # Parse all enums
     enums = parse_enums(content)
     print(f"Found {len(enums)} enum definitions")
 
     # Generate the C++ file
-    cpp_content = generate_cpp(enums, typed_enums, version)
+    cpp_content = generate_cpp(enums, version, lib)
 
     # Write output
     output_path.write_text(cpp_content)
     print(f"Generated {output_path}")
+
+
+def main():
+    script_dir = Path(__file__).parent
+    repo_root = script_dir.parent
+
+    # Process imgui.h
+    print("=== Processing imgui.h ===")
+    imgui_path = repo_root / "deps/polyscope/deps/imgui/imgui/imgui.h"
+    imgui_output = repo_root / "src/cpp/imgui/imgui_enums.cpp"
+    process_header(imgui_path, imgui_output, "imgui")
+
+    print()
+
+    # Process implot.h
+    print("=== Processing implot.h ===")
+    implot_path = repo_root / "deps/polyscope/deps/imgui/implot/implot.h"
+    implot_output = repo_root / "src/cpp/imgui/implot_enums.cpp"
+    process_header(implot_path, implot_output, "implot")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 // AUTO-GENERATED FILE - DO NOT EDIT
-// Generated: 2026-02-01 11:01:19
+// Generated: 2026-02-01 17:13:16
 // imgui version: 1.92.6 WIP
 // Generator: python3 scripts/generate_imgui_enums.py
 

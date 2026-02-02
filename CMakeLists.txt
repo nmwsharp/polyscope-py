@@ -107,6 +107,7 @@ nanobind_add_module(polyscope_bindings
   src/cpp/imgui/imgui_api_allocators.cpp
 
   src/cpp/imgui/implot.cpp
+  src/cpp/imgui/implot_enums.cpp
 
   src/cpp/imgui/imgui_utils.h
 
