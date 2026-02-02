@@ -131,6 +131,8 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("set_build_gui", [](bool x) { ps::options::buildGui = x; });
   m.def("set_user_gui_is_on_right_side", [](bool x) { ps::options::userGuiIsOnRightSide = x; });
   m.def("set_build_default_gui_panels", [](bool x) { ps::options::buildDefaultGuiPanels = x; });
+  m.def("set_right_gui_pane_width", [](int x) { ps::options::rightGuiPaneWidth = x; });
+  m.def("get_right_gui_pane_width", []() { return ps::options::rightGuiPaneWidth; });
   m.def("set_render_scene", [](bool x) { ps::options::renderScene = x; });
   m.def("set_open_imgui_window_for_user_callback", [](bool x) { ps::options::openImGuiWindowForUserCallback= x; });
   m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });

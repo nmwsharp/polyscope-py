@@ -201,6 +201,14 @@ def set_build_default_gui_panels(b: bool) -> None:
     psb.set_build_default_gui_panels(b)
 
 
+def set_right_gui_pane_width(w: int) -> None:
+    psb.set_right_gui_pane_width(w)
+
+
+def get_right_gui_pane_width() -> int:
+    return psb.get_right_gui_pane_width()
+
+
 def set_render_scene(b: bool) -> None:
     psb.set_render_scene(b)
 

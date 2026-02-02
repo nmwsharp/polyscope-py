@@ -80,6 +80,9 @@ class TestCore(unittest.TestCase):
         ps.set_ui_scale(0.8)
         self.assertAlmostEqual(ps.get_ui_scale(), 0.8)
 
+        ps.set_right_gui_pane_width(600)
+        self.assertEqual(ps.get_right_gui_pane_width(), 600)
+
         ps.set_build_gui(True)
         ps.set_render_scene(True)
         ps.set_open_imgui_window_for_user_callback(True)
