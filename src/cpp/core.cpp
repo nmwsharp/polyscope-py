@@ -92,9 +92,6 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("is_headless", &ps::isHeadless);
   m.def("set_allow_headless_backends", [](bool x) { ps::options::allowHeadlessBackends = x; });
 
-  // === Structure management
-  m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
-  
   // === Screenshots
   nb::class_<ps::ScreenshotOptions>(m, "ScreenshotOptions")
    .def(nb::init<>())
@@ -134,6 +131,8 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("set_build_gui", [](bool x) { ps::options::buildGui = x; });
   m.def("set_user_gui_is_on_right_side", [](bool x) { ps::options::userGuiIsOnRightSide = x; });
   m.def("set_build_default_gui_panels", [](bool x) { ps::options::buildDefaultGuiPanels = x; });
+  m.def("set_right_gui_pane_width", [](int x) { ps::options::rightGuiPaneWidth = x; });
+  m.def("get_right_gui_pane_width", []() { return ps::options::rightGuiPaneWidth; });
   m.def("set_render_scene", [](bool x) { ps::options::renderScene = x; });
   m.def("set_open_imgui_window_for_user_callback", [](bool x) { ps::options::openImGuiWindowForUserCallback= x; });
   m.def("set_invoke_user_callback_for_nested_show", [](bool x) { ps::options::invokeUserCallbackForNestedShow = x; });
@@ -145,6 +144,8 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("clear_configure_imgui_style_callback", []() {ps::options::configureImGuiStyleCallback = polyscope::configureImGuiStyle;});
   m.def("set_files_dropped_callback", [](std::function<void(const std::vector<std::string>&)> x) { ps::state::filesDroppedCallback = x; });
   m.def("clear_files_dropped_callback", []() {ps::state::filesDroppedCallback = nullptr;});
+  m.def("set_prepare_imgui_fonts_callback", [](std::function<std::tuple<ImFont*, ImFont*>(ImFontAtlas*)> x) { ps::options::prepareImGuiFontsCallback = x; });
+  m.def("clear_prepare_imgui_fonts_callback", []() {ps::options::prepareImGuiFontsCallback = polyscope::loadBaseFonts;});
 
 
   // === Scene extents
@@ -176,7 +177,9 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("set_view_camera_parameters", &ps::view::setViewToCamera);
   m.def("set_camera_view_matrix", [](Eigen::Matrix4f mat) { ps::view::setCameraViewMatrix(eigen2glm(mat)); });
   m.def("get_camera_view_matrix", []() { return glm2eigen(ps::view::getCameraViewMatrix()); });
-  m.def("set_view_center", [](glm::vec3 pos, bool flyTo) { ps::view::setViewCenter(pos, flyTo); });
+  m.def("set_view_center_and_look_at", [](glm::vec3 pos, bool flyTo) { ps::view::setViewCenterAndLookAt(pos, flyTo); });
+  m.def("set_view_center_and_project", [](glm::vec3 pos) { ps::view::setViewCenterAndProject(pos); });
+  m.def("set_view_center_raw", [](glm::vec3 pos) { ps::view::setViewCenterRaw(pos); });
   m.def("get_view_center", &ps::view::getViewCenter);
   m.def("set_window_size", &ps::view::setWindowSize);
   m.def("get_window_size", &ps::view::getWindowSize);
@@ -278,10 +281,49 @@ NB_MODULE(polyscope_bindings, m) {
 
   // === Structure
 
-  // (this is the generic structure class, subtypes get bound in their respective files)
-  nb::class_<ps::Structure>(m, "Structure")
-   .def_ro("name", &ps::Structure::name) 
-  ;
+  // Structure management
+  m.def("remove_all_structures", &ps::removeAllStructures, "Remove all structures from polyscope");
+ 
+  // Main structure class
+  { // (this is the generic structure class, subtypes get bound in their respective files)
+    nb::class_<ps::Structure> s = nb::class_<ps::Structure>(m, "Structure");
+    s.def_ro("name", &ps::Structure::name);
+
+    // Basics
+    s.def("remove", &ps::Structure::remove, "Remove the structure");
+    s.def("get_name", [](ps::Structure& s) { return s.name; }, "Ge the name");
+    s.def("get_unique_prefix", &ps::Structure::uniquePrefix, "Get unique prefix");
+    s.def("set_enabled", &ps::Structure::setEnabled, "Enable the structure");
+    s.def("enable_isolate", &ps::Structure::enableIsolate, "Enable the structure, disable all of same type");
+    s.def("is_enabled", &ps::Structure::isEnabled, "Check if the structure is enabled");
+    s.def("set_transparency", &ps::Structure::setTransparency, "Set transparency alpha");
+    s.def("get_transparency", &ps::Structure::getTransparency, "Get transparency alpha");
+
+    // group things
+    s.def("add_to_group", nb::overload_cast<std::string>(&ps::Structure::addToGroup), "Add to group");
+
+    // slice plane things
+    s.def("set_ignore_slice_plane", &ps::Structure::setIgnoreSlicePlane, "Set ignore slice plane");
+    s.def("get_ignore_slice_plane", &ps::Structure::getIgnoreSlicePlane, "Get ignore slice plane");
+    s.def("set_cull_whole_elements", &ps::Structure::setCullWholeElements, "Set cull whole elements");
+    s.def("get_cull_whole_elements", &ps::Structure::getCullWholeElements, "Get cull whole elememts");
+
+    // transform management
+    // clang-format off
+    s.def("center_bounding_box", &ps::Structure::centerBoundingBox, "center bounding box");
+    s.def("rescale_to_unit", &ps::Structure::rescaleToUnit, "set the transform so the object has length scale 1");
+    s.def("reset_transform", &ps::Structure::resetTransform, "reset the transform to the identity");
+    s.def("set_transform", [](ps::Structure& s, Eigen::Matrix4f T) { s.setTransform(eigen2glm(T)); }, "set the transform to the given 4x4 homogenous transform matrix");
+    s.def("set_position", [](ps::Structure& s, Eigen::Vector3f T) { s.setPosition(eigen2glm(T)); }, "set the translation component of the transform to the given position");
+    s.def("translate", [](ps::Structure& s, Eigen::Vector3f T) { s.translate(eigen2glm(T)); }, "apply the given translation to the shape, updating its position");
+    s.def("get_transform", [](ps::Structure& s) { return glm2eigen(s.getTransform()); }, "get the current 4x4 transform matrix");
+    s.def("get_position", [](ps::Structure& s) { return glm2eigen(s.getPosition()); }, "get the position of the shape origin after transform");
+    s.def("set_transform_gizmo_enabled", &ps::Structure::setTransformGizmoEnabled);
+    s.def("get_transform_gizmo_enabled", &ps::Structure::getTransformGizmoEnabled);
+    s.def("get_transformation_gizmo", &ps::Structure::getTransformGizmo, nb::rv_policy::reference, "Get the TransformationGizmo associated with this structure");
+    ;
+      
+  }
   
   // === Groups
  

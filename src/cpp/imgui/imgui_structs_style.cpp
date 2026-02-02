@@ -1,0 +1,167 @@
+// ImGuiStyle struct bindings
+
+#include "imgui_utils.h"
+
+// clang-format off
+
+// Helper class to provide array-like access to ImGuiStyle::Colors
+class ImGuiStyleColorsWrapper {
+public:
+    ImGuiStyleColorsWrapper(ImGuiStyle& style) : style_(style) {}
+
+    Vec4T get_item(int idx) {
+        if (idx < 0 || idx >= ImGuiCol_COUNT) {
+            throw std::out_of_range("Color index out of range: " + std::to_string(idx));
+        }
+        return from_vec4(style_.Colors[idx]);
+    }
+
+    void set_item(int idx, const Vec4T& color) {
+        if (idx < 0 || idx >= ImGuiCol_COUNT) {
+            throw std::out_of_range("Color index out of range: " + std::to_string(idx));
+        }
+        style_.Colors[idx] = to_vec4(color);
+    }
+
+    uint32_t size() const {
+        return ImGuiCol_COUNT;
+    }
+
+private:
+    ImGuiStyle& style_;
+};
+
+void bind_imgui_style(nb::module_& m) {
+
+    #define VEC2_PROPERTY(name)                            \
+        def_prop_rw(#name, [](const ImGuiStyle& style) {  \
+            return from_vec2(style.name);                  \
+        }, [](ImGuiStyle& style, const Vec2T& value) {     \
+            style.name = to_vec2(value);                   \
+        })
+
+    // Bind the wrapper class first
+    nb::class_<ImGuiStyleColorsWrapper>(m, "ImGuiStyleColorsWrapper")
+        .def("__getitem__", &ImGuiStyleColorsWrapper::get_item)
+        .def("__setitem__", &ImGuiStyleColorsWrapper::set_item)
+        .def("__len__", &ImGuiStyleColorsWrapper::size)
+    ;
+
+    nb::class_<ImGuiStyle>(m, "ImGuiStyle")
+
+        // Font scaling
+        .def_rw("FontSizeBase", &ImGuiStyle::FontSizeBase)
+        .def_rw("FontScaleMain", &ImGuiStyle::FontScaleMain)
+        .def_rw("FontScaleDpi", &ImGuiStyle::FontScaleDpi)
+
+        // Main
+        .def_rw("Alpha", &ImGuiStyle::Alpha)
+        .def_rw("DisabledAlpha", &ImGuiStyle::DisabledAlpha)
+
+        // Window
+        .VEC2_PROPERTY(WindowPadding)
+        .def_rw("WindowRounding", &ImGuiStyle::WindowRounding)
+        .def_rw("WindowBorderSize", &ImGuiStyle::WindowBorderSize)
+        .def_rw("WindowBorderHoverPadding", &ImGuiStyle::WindowBorderHoverPadding)
+        .VEC2_PROPERTY(WindowMinSize)
+        .VEC2_PROPERTY(WindowTitleAlign)
+        .def_rw("WindowMenuButtonPosition", &ImGuiStyle::WindowMenuButtonPosition)
+
+        // Child windows
+        .def_rw("ChildRounding", &ImGuiStyle::ChildRounding)
+        .def_rw("ChildBorderSize", &ImGuiStyle::ChildBorderSize)
+
+        // Popups
+        .def_rw("PopupRounding", &ImGuiStyle::PopupRounding)
+        .def_rw("PopupBorderSize", &ImGuiStyle::PopupBorderSize)
+
+        // Frames
+        .VEC2_PROPERTY(FramePadding)
+        .def_rw("FrameRounding", &ImGuiStyle::FrameRounding)
+        .def_rw("FrameBorderSize", &ImGuiStyle::FrameBorderSize)
+
+        // Spacing
+        .VEC2_PROPERTY(ItemSpacing)
+        .VEC2_PROPERTY(ItemInnerSpacing)
+        .VEC2_PROPERTY(CellPadding)
+        .VEC2_PROPERTY(TouchExtraPadding)
+        .def_rw("IndentSpacing", &ImGuiStyle::IndentSpacing)
+        .def_rw("ColumnsMinSpacing", &ImGuiStyle::ColumnsMinSpacing)
+
+        // Scrollbars
+        .def_rw("ScrollbarSize", &ImGuiStyle::ScrollbarSize)
+        .def_rw("ScrollbarRounding", &ImGuiStyle::ScrollbarRounding)
+        .def_rw("ScrollbarPadding", &ImGuiStyle::ScrollbarPadding)
+
+        // Grab handles
+        .def_rw("GrabMinSize", &ImGuiStyle::GrabMinSize)
+        .def_rw("GrabRounding", &ImGuiStyle::GrabRounding)
+        .def_rw("LogSliderDeadzone", &ImGuiStyle::LogSliderDeadzone)
+
+        // Images
+        .def_rw("ImageBorderSize", &ImGuiStyle::ImageBorderSize)
+
+        // Tabs
+        .def_rw("TabRounding", &ImGuiStyle::TabRounding)
+        .def_rw("TabBorderSize", &ImGuiStyle::TabBorderSize)
+        .def_rw("TabCloseButtonMinWidthSelected", &ImGuiStyle::TabCloseButtonMinWidthSelected)
+        .def_rw("TabCloseButtonMinWidthUnselected", &ImGuiStyle::TabCloseButtonMinWidthUnselected)
+        .def_rw("TabBarBorderSize", &ImGuiStyle::TabBarBorderSize)
+        .def_rw("TabBarOverlineSize", &ImGuiStyle::TabBarOverlineSize)
+
+        // Tables
+        .def_rw("TableAngledHeadersAngle", &ImGuiStyle::TableAngledHeadersAngle)
+        .VEC2_PROPERTY(TableAngledHeadersTextAlign)
+
+        // Tree Lines
+        .def_rw("TreeLinesFlags", &ImGuiStyle::TreeLinesFlags)
+        .def_rw("TreeLinesSize", &ImGuiStyle::TreeLinesSize)
+        .def_rw("TreeLinesRounding", &ImGuiStyle::TreeLinesRounding)
+
+        // Drag and Drop
+        .def_rw("DragDropTargetRounding", &ImGuiStyle::DragDropTargetRounding)
+        .def_rw("DragDropTargetBorderSize", &ImGuiStyle::DragDropTargetBorderSize)
+        .def_rw("DragDropTargetPadding", &ImGuiStyle::DragDropTargetPadding)
+
+        // Widgets
+        .def_rw("ColorButtonPosition", &ImGuiStyle::ColorButtonPosition)
+        .VEC2_PROPERTY(ButtonTextAlign)
+        .VEC2_PROPERTY(SelectableTextAlign)
+
+        // Separators
+        .def_rw("SeparatorTextBorderSize", &ImGuiStyle::SeparatorTextBorderSize)
+        .VEC2_PROPERTY(SeparatorTextAlign)
+        .VEC2_PROPERTY(SeparatorTextPadding)
+
+        // Display
+        .VEC2_PROPERTY(DisplayWindowPadding)
+        .VEC2_PROPERTY(DisplaySafeAreaPadding)
+        .def_rw("MouseCursorScale", &ImGuiStyle::MouseCursorScale)
+
+        // Anti-aliasing
+        .def_rw("AntiAliasedLines", &ImGuiStyle::AntiAliasedLines)
+        .def_rw("AntiAliasedLinesUseTex", &ImGuiStyle::AntiAliasedLinesUseTex)
+        .def_rw("AntiAliasedFill", &ImGuiStyle::AntiAliasedFill)
+
+        // Tessellation
+        .def_rw("CurveTessellationTol", &ImGuiStyle::CurveTessellationTol)
+        .def_rw("CircleTessellationMaxError", &ImGuiStyle::CircleTessellationMaxError)
+
+        // Colors
+        .def_prop_ro("Colors", [](ImGuiStyle& style) {
+            return ImGuiStyleColorsWrapper(style);
+        })
+
+        // Behaviors
+        .def_rw("HoverStationaryDelay", &ImGuiStyle::HoverStationaryDelay)
+        .def_rw("HoverDelayShort", &ImGuiStyle::HoverDelayShort)
+        .def_rw("HoverDelayNormal", &ImGuiStyle::HoverDelayNormal)
+        .def_rw("HoverFlagsForTooltipMouse", &ImGuiStyle::HoverFlagsForTooltipMouse)
+        .def_rw("HoverFlagsForTooltipNav", &ImGuiStyle::HoverFlagsForTooltipNav)
+
+        // Methods
+        .def("ScaleAllSizes", &ImGuiStyle::ScaleAllSizes, nb::arg("scale_factor"))
+    ;
+
+    #undef VEC2_PROPERTY
+}

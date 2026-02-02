@@ -37,7 +37,9 @@ jobs:
       run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DPOLYSCOPE_BACKEND_OPENGL3_GLFW=ON -DPOLYSCOPE_BACKEND_OPENGL_MOCK=ON ..
 
     - name: build
-      run: cd build && make
+      # explicitly limit to 4 parallel jobs here, otherwise the macOS intel 
+      # runners seem to use too many and crash
+      run: cd build && cmake --build . --parallel 4
 
     - name: run test
-      run: python test/polyscope_test.py -v
+      run: python test/polyscope_test.py -v --backend=openGL_mock

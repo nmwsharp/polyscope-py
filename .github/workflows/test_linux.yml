@@ -35,7 +35,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
 
     - name: install python packages
-      run: python3 -m pip install numpy
+      run: python3 -m pip install numpy ruff ty
 
     - name: configure
       run: |
@@ -44,10 +44,22 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Debug -DPYTHON_EXECUTABLE=$(python3 -c "import sys; print(sys.executable)") -DPOLYSCOPE_BACKEND_OPENGL3_EGL=ON ..
 
     - name: build
-      run: cd build && make
+      run: cd build && cmake --build . --parallel 4 # limit the number of jobs, it is running all and blowing up on CI machine
 
     - name: run test backend mock
-      run: python3 test/polyscope_test.py -v
+      run: python3 test/polyscope_test.py -v --backend=openGL_mock
 
     - name: run test backend EGL
-      run: python3 test/polyscope_test.py -v backend=openGL3_egl
+      run: python3 test/polyscope_test.py -v --backend=openGL3_egl
+
+    - name: run type checker (ty)
+      run: ty check .
+      continue-on-error: true # don't fail the whole job if this fails
+    
+    - name: run linter (ruff)
+      run: ruff check .
+      continue-on-error: true # don't fail the whole job if this fails
+    
+    - name: run format checker (ruff)
+      run: ruff format --check .
+      continue-on-error: true # don't fail the whole job if this fails

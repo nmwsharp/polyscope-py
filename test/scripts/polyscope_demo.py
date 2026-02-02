@@ -3,13 +3,13 @@ import sys
 import os.path as path
 
 # Path to where the bindings live
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src")))
 if os.name == 'nt': # if Windows
     # handle default location where VS puts binary
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build", "Debug")))
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "build", "Debug")))
 else:
     # normal / unix case
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "build")))
 
 import polyscope
 import polyscope.imgui as psim

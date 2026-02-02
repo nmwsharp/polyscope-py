@@ -1,8 +1,33 @@
 #pragma once
 
-namespace ps = polyscope;
+#include <nanobind/eigen/dense.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
+#include <nanobind/stl/array.h>
+#include <nanobind/stl/function.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/pair.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/stl/vector.h>
+
+#include "imgui.h"
+#include "implot.h"
+// #include "imgui_internal.h"
+
+// Opaque types
+// NB_MAKE_OPAQUE(ImGuiContext);
+NB_MAKE_OPAQUE(ImPlotContext);
+NB_MAKE_OPAQUE(ImDrawListSharedData);
+
+
+#include "Eigen/Dense"
+
+// #include "../utils.h"
+
 namespace nb = nanobind;
 using namespace nb::literals;
+
 
 // Type translations between Python and ImGui.  Prefer native Python types (tuples, arrays), translating into ImGui
 // equivalents.
@@ -23,4 +48,11 @@ inline std::vector<const char*> convert_string_items(const std::vector<std::stri
     _items.push_back(item.data());
   }
   return _items;
+}
+
+inline const char *to_char_ptr(const std::optional<std::string> &s) {
+  if (s.has_value()) {
+    return s->c_str();
+  }
+  return nullptr;
 }

@@ -1,15 +1,56 @@
+from typing import Any, Callable, Literal, cast
+
+import sys
 import polyscope_bindings as psb
 
-from polyscope.common import check_is_scalar_image, check_is_image3, check_is_image4, check_image_dims_compatible, process_scalar_args, process_color_args, process_image_args, process_render_image_args, process_quantity_args, process_implicit_render_args, check_all_args_processed
+from polyscope.common import (
+    check_is_scalar_image,
+    check_is_image3,
+    check_is_image4,
+    check_image_dims_compatible,
+    QuantityArgsBase,
+    process_quantity_args,
+    ScalarArgsBase,
+    process_scalar_args,
+    ColorArgsBase,
+    process_color_args,
+    ImageArgsBase,
+    ScalarImageArgs,
+    ColorImageArgs,
+    RenderImageArgsBase,
+    ScalarRenderImageArgs,
+    ColorRenderImageArgs,
+    DepthRenderImageArgs,
+    process_image_args,
+    process_render_image_args,
+    ImplicitDepthRenderArgs,
+    ImplicitColorRenderArgs,
+    ImplicitScalarRenderArgs,
+    process_implicit_render_args,
+    check_all_args_processed,
+)
 
-from polyscope.core import str_to_image_origin, str_to_datatype, str_to_implicit_render_mode, glm3
+from polyscope.core import glm3
+from polyscope.enums import to_enum
+
+from numpy.typing import ArrayLike
+
+if sys.version_info >= (3, 11):
+    from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 
-  
-def render_implicit_surface(name, func, mode, camera_view=None, color=None, **option_args):
-
+def render_implicit_surface(
+    name: str,
+    func: Callable,
+    mode: Literal["fixed_step", "sphere_march"] | str,
+    camera_view: Any = None,
+    color: ArrayLike | None = None,
+    **option_args: Unpack[ImplicitDepthRenderArgs],
+) -> None:
     # prep args
-    mode_str = str_to_implicit_render_mode(mode)
+    mode_str = to_enum(psb.ImplicitRenderMode, mode)
     opts = psb.ImplicitRenderOpts()
     opts = process_implicit_render_args(opts, option_args)
 
@@ -25,14 +66,21 @@ def render_implicit_surface(name, func, mode, camera_view=None, color=None, **op
     if color is not None:
         q.set_color(glm3(color))
 
-    process_quantity_args(struct_ref, q, option_args)
-    process_render_image_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_render_image_args(struct_ref, q, cast(RenderImageArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
-def render_implicit_surface_color(name, func, func_color, mode, camera_view=None, **option_args):
 
+def render_implicit_surface_color(
+    name: str,
+    func: Callable,
+    func_color: Callable,
+    mode: Literal["fixed_step", "sphere_march"] | str,
+    camera_view: Any = None,
+    **option_args: Unpack[ImplicitColorRenderArgs],
+) -> None:
     # prep args
-    mode_str = str_to_implicit_render_mode(mode)
+    mode_str = to_enum(psb.ImplicitRenderMode, mode)
     opts = psb.ImplicitRenderOpts()
     opts = process_implicit_render_args(opts, option_args)
 
@@ -45,15 +93,22 @@ def render_implicit_surface_color(name, func, func_color, mode, camera_view=None
 
     q = psb.render_implicit_surface_color_batch(name, func, func_color, mode_str, opts, cam)
 
-    process_quantity_args(struct_ref, q, option_args)
-    process_render_image_args(struct_ref, q, option_args)
-    process_color_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_render_image_args(struct_ref, q, cast(RenderImageArgsBase, option_args))
+    process_color_args(struct_ref, q, cast(ColorArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
-def render_implicit_surface_scalar(name, func, func_scalar, mode, camera_view=None, **option_args):
 
+def render_implicit_surface_scalar(
+    name: str,
+    func: Callable,
+    func_scalar: Callable,
+    mode: Literal["fixed_step", "sphere_march"] | str,
+    camera_view: Any = None,
+    **option_args: Unpack[ImplicitScalarRenderArgs],
+) -> None:
     # prep args
-    mode_str = str_to_implicit_render_mode(mode)
+    mode_str = to_enum(psb.ImplicitRenderMode, mode)
     opts = psb.ImplicitRenderOpts()
     opts = process_implicit_render_args(opts, option_args)
 
@@ -66,15 +121,22 @@ def render_implicit_surface_scalar(name, func, func_scalar, mode, camera_view=No
 
     q = psb.render_implicit_surface_scalar_batch(name, func, func_scalar, mode_str, opts, cam)
 
-    process_quantity_args(struct_ref, q, option_args)
-    process_render_image_args(struct_ref, q, option_args)
-    process_scalar_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_render_image_args(struct_ref, q, cast(RenderImageArgsBase, option_args))
+    process_scalar_args(struct_ref, q, cast(ScalarArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
 
-def render_implicit_surface_raw_color(name, func, func_color, mode, camera_view=None, **option_args):
 
+def render_implicit_surface_raw_color(
+    name: str,
+    func: Callable,
+    func_color: Callable,
+    mode: Literal["fixed_step", "sphere_march"] | str,
+    camera_view: Any = None,
+    **option_args: Unpack[ImplicitColorRenderArgs],
+) -> None:
     # prep args
-    mode_str = str_to_implicit_render_mode(mode)
+    mode_str = to_enum(psb.ImplicitRenderMode, mode)
     opts = psb.ImplicitRenderOpts()
     opts = process_implicit_render_args(opts, option_args)
 
@@ -87,8 +149,7 @@ def render_implicit_surface_raw_color(name, func, func_color, mode, camera_view=
 
     q = psb.render_implicit_surface_raw_color_batch(name, func, func_color, mode_str, opts, cam)
 
-    process_quantity_args(struct_ref, q, option_args)
-    process_render_image_args(struct_ref, q, option_args)
-    process_color_args(struct_ref, q, option_args)
+    process_quantity_args(struct_ref, q, cast(QuantityArgsBase, option_args))
+    process_render_image_args(struct_ref, q, cast(RenderImageArgsBase, option_args))
+    process_color_args(struct_ref, q, cast(ColorArgsBase, option_args))
     check_all_args_processed(struct_ref, q, option_args)
-
