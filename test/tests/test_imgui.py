@@ -248,13 +248,13 @@ class TestImGuiBindings(unittest.TestCase):
             window_padding = style.WindowPadding
             self.assertIsInstance(window_padding, tuple)
             self.assertEqual(len(window_padding), 2)
-            
+
             # Test Colors array (basic usage)
-            text_color = style.Colors[psim.ImGuiCol_Text] # get a color
+            text_color = style.Colors[psim.ImGuiCol_Text]  # get a color
             self.assertIsInstance(text_color, tuple)
             self.assertEqual(len(text_color), 4)  # RGBA
             style.Colors[psim.ImGuiCol_Text] = (1.0, 0.6, 0.0, 1.0)  # set a color
-            new_text_color = style.Colors[psim.ImGuiCol_Text]   # get it back   
+            new_text_color = style.Colors[psim.ImGuiCol_Text]  # get it back
             for i in range(4):
                 self.assertAlmostEqual(new_text_color[i], (1.0, 0.6, 0.0, 1.0)[i], places=5)
 
