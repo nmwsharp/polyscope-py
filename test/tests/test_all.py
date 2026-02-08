@@ -43,7 +43,19 @@ class TestCore(unittest.TestCase):
         ps.set_user_callback(callback)
         ps.show(10)
 
+        # Make sure that unshow worked, and we stopped short of 10 loop iterations
         self.assertLess(counts[0], 4)
+
+
+        # Make sure unshow doesn't mess up subsequent calls
+        counts[0] = 0
+        def callback():
+            counts[0] = counts[0] + 1
+        ps.set_user_callback(callback)
+        ps.show(3)
+        self.assertEqual(counts[0], 3)
+
+        ps.clear_user_callback()
 
     def test_options(self):
         # Remember, polyscope has global state, so we're actually setting these for the remainder of the tests (lol)
@@ -87,7 +99,7 @@ class TestCore(unittest.TestCase):
         ps.set_render_scene(True)
         ps.set_open_imgui_window_for_user_callback(True)
         ps.set_invoke_user_callback_for_nested_show(False)
-        ps.set_give_focus_on_show(True)
+        ps.set_give_focus_on_show(False)
 
         ps.set_background_color((0.7, 0.8, 0.9))
         ps.set_background_color((0.7, 0.8, 0.9, 0.9))
