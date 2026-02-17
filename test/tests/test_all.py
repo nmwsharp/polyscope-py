@@ -2353,6 +2353,243 @@ class TestVolumeGrid(unittest.TestCase):
         ps.remove_all_structures()
 
 
+class TestSparseVolumeGrid(unittest.TestCase):
+
+    def generate_test_grid(self, name="test_sparse_grid"):
+        # Create a small set of occupied cells
+        occupied_cells = np.array([
+            [0, 0, 0],
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+            [1, 1, 0],
+            [1, 0, 1],
+            [0, 1, 1],
+            [1, 1, 1],
+        ], dtype=np.int32)
+        origin = (0.0, 0.0, 0.0)
+        grid_cell_width = (0.1, 0.1, 0.1)
+        return ps.register_sparse_volume_grid(name, origin, grid_cell_width, occupied_cells), occupied_cells
+
+    def test_add_remove(self):
+        # add
+        n, _ = self.generate_test_grid("test_sparse_grid")
+        self.assertTrue(ps.has_sparse_volume_grid("test_sparse_grid"))
+        self.assertFalse(ps.has_sparse_volume_grid("nope"))
+        self.assertEqual(n.n_cells(), 8)
+
+        # remove by name
+        self.generate_test_grid("test_sparse_grid2")
+        ps.remove_sparse_volume_grid("test_sparse_grid2")
+        self.assertTrue(ps.has_sparse_volume_grid("test_sparse_grid"))
+        self.assertFalse(ps.has_sparse_volume_grid("test_sparse_grid2"))
+
+        # remove by ref
+        c, _ = self.generate_test_grid("test_sparse_grid2")
+        c.remove()
+        self.assertTrue(ps.has_sparse_volume_grid("test_sparse_grid"))
+        self.assertFalse(ps.has_sparse_volume_grid("test_sparse_grid2"))
+
+        # get by name
+        self.generate_test_grid("test_sparse_grid3")
+        p = ps.get_sparse_volume_grid("test_sparse_grid3")
+        self.assertTrue(isinstance(p, ps.SparseVolumeGrid))
+
+        ps.remove_all_structures()
+
+    def test_render(self):
+        self.generate_test_grid("test_sparse_grid")
+        ps.show(3)
+        ps.remove_all_structures()
+
+    def test_options(self):
+        p, _ = self.generate_test_grid("test_sparse_grid")
+
+        # misc getters
+        p.n_nodes()
+        p.n_cells()
+        p.get_origin()
+        p.get_grid_cell_width()
+
+        # Set enabled
+        p.set_enabled()
+        p.set_enabled(False)
+        p.set_enabled(True)
+        self.assertTrue(p.is_enabled())
+
+        # Color
+        color = (0.3, 0.3, 0.5)
+        p.set_color(color)
+        ret_color = p.get_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+
+        # Edge color
+        color = (0.1, 0.5, 0.5)
+        p.set_edge_color(color)
+        ret_color = p.get_edge_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+
+        ps.show(3)
+
+        # Edge width
+        p.set_edge_width(1.5)
+        ps.show(3)
+        self.assertAlmostEqual(p.get_edge_width(), 1.5)
+
+        # Cube size factor
+        p.set_cube_size_factor(0.5)
+        ps.show(3)
+        self.assertAlmostEqual(p.get_cube_size_factor(), 0.5)
+
+        # Material
+        p.set_material("candy")
+        self.assertEqual("candy", p.get_material())
+        p.set_material("clay")
+
+        # Transparency
+        p.set_transparency(0.8)
+        self.assertAlmostEqual(0.8, p.get_transparency())
+
+        # Set with optional arguments
+        occupied_cells = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0]], dtype=np.int32)
+        ps.register_sparse_volume_grid(
+            "test_sparse_grid",
+            (0.0, 0.0, 0.0),
+            (0.1, 0.1, 0.1),
+            occupied_cells,
+            enabled=True,
+            material="wax",
+            color=(1.0, 0.0, 0.0),
+            edge_color=(0.5, 0.5, 0.5),
+            edge_width=0.5,
+            cube_size_factor=0.5,
+            transparency=0.9,
+        )
+
+        ps.show(3)
+
+        ps.remove_all_structures()
+        ps.set_transparency_mode("none")
+
+    def test_transform(self):
+        p, _ = self.generate_test_grid("test_sparse_grid")
+        test_transforms(self, p)
+        ps.remove_all_structures()
+
+    def test_slice_plane(self):
+        p, _ = self.generate_test_grid("test_sparse_grid")
+
+        plane = ps.add_scene_slice_plane()
+        p.set_cull_whole_elements(True)
+        ps.show(3)
+        p.set_cull_whole_elements(False)
+        ps.show(3)
+
+        p.set_ignore_slice_plane(plane, True)
+        self.assertEqual(True, p.get_ignore_slice_plane(plane))
+        p.set_ignore_slice_plane(plane.get_name(), False)
+        self.assertEqual(False, p.get_ignore_slice_plane(plane.get_name()))
+
+        ps.show(3)
+
+        ps.remove_all_structures()
+        ps.remove_last_scene_slice_plane()
+
+    def test_cell_scalar(self):
+        p, occupied_cells = self.generate_test_grid("test_sparse_grid")
+        n_cells = len(occupied_cells)
+
+        vals = np.random.rand(n_cells).astype(np.float32)
+
+        p.add_scalar_quantity("test_vals", vals, defined_on="cells")
+        p.add_scalar_quantity("test_vals2", vals, defined_on="cells", enabled=True)
+        p.add_scalar_quantity("test_vals_with_range", vals, defined_on="cells", vminmax=(-5.0, 5.0), enabled=True)
+        p.add_scalar_quantity("test_vals_with_datatype", vals, defined_on="cells", enabled=True, datatype="symmetric")
+        p.add_scalar_quantity("test_vals_with_cmap", vals, defined_on="cells", enabled=True, cmap="blues")
+
+        ps.show(3)
+
+        # test some additions/removal while we're at it
+        p.remove_quantity("test_vals")
+        p.remove_quantity("not_here")  # should not error
+        p.remove_all_quantities()
+        p.remove_all_quantities()
+
+        ps.remove_all_structures()
+
+    def test_node_scalar(self):
+        p, occupied_cells = self.generate_test_grid("test_sparse_grid")
+
+        # Build node indices: for each cell (i,j,k) the 8 corner nodes are (i+dx, j+dy, k+dz)
+        node_set = set()
+        for cell in occupied_cells:
+            for dx in range(2):
+                for dy in range(2):
+                    for dz in range(2):
+                        node_set.add((cell[0] + dx, cell[1] + dy, cell[2] + dz))
+        node_indices = np.array(list(node_set), dtype=np.int32)
+        node_values = np.random.rand(len(node_indices)).astype(np.float32)
+
+        p.add_scalar_quantity("test_vals", node_values, defined_on="nodes", node_indices=node_indices)
+        p.add_scalar_quantity("test_vals2", node_values, defined_on="nodes", node_indices=node_indices, enabled=True)
+        p.add_scalar_quantity(
+            "test_vals_with_range", node_values, defined_on="nodes", node_indices=node_indices,
+            vminmax=(-5.0, 5.0), enabled=True
+        )
+        p.add_scalar_quantity(
+            "test_vals_with_datatype", node_values, defined_on="nodes", node_indices=node_indices,
+            enabled=True, datatype="symmetric"
+        )
+
+        ps.show(3)
+
+        p.remove_all_quantities()
+        ps.remove_all_structures()
+
+    def test_cell_color(self):
+        p, occupied_cells = self.generate_test_grid("test_sparse_grid")
+        n_cells = len(occupied_cells)
+
+        colors = np.random.rand(n_cells, 3).astype(np.float32)
+
+        p.add_color_quantity("test_colors", colors, defined_on="cells")
+        p.add_color_quantity("test_colors2", colors, defined_on="cells", enabled=True)
+
+        ps.show(3)
+
+        p.remove_all_quantities()
+        ps.remove_all_structures()
+
+    def test_node_color(self):
+        p, occupied_cells = self.generate_test_grid("test_sparse_grid")
+
+        # Build node indices
+        node_set = set()
+        for cell in occupied_cells:
+            for dx in range(2):
+                for dy in range(2):
+                    for dz in range(2):
+                        node_set.add((cell[0] + dx, cell[1] + dy, cell[2] + dz))
+        node_indices = np.array(list(node_set), dtype=np.int32)
+        node_colors = np.random.rand(len(node_indices), 3).astype(np.float32)
+
+        p.add_color_quantity("test_colors", node_colors, defined_on="nodes", node_indices=node_indices)
+        p.add_color_quantity("test_colors2", node_colors, defined_on="nodes", node_indices=node_indices, enabled=True)
+
+        ps.show(3)
+
+        p.remove_all_quantities()
+        ps.remove_all_structures()
+
+    def test_mark_nodes_as_used(self):
+        p, _ = self.generate_test_grid("test_sparse_grid")
+        p.mark_nodes_as_used()
+        ps.show(3)
+        ps.remove_all_structures()
+
+
 class TestCameraView(unittest.TestCase):
     def generate_parameters(self):
         intrinsics = ps.CameraIntrinsics(fov_vertical_deg=60, aspect=2)

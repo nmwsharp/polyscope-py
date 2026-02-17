@@ -30,6 +30,7 @@ void bind_point_cloud(nb::module_& m);
 void bind_curve_network(nb::module_& m);
 void bind_volume_mesh(nb::module_& m);
 void bind_volume_grid(nb::module_& m);
+void bind_sparse_volume_grid(nb::module_& m);
 void bind_camera_view(nb::module_& m);
 void bind_floating_quantities(nb::module_& m);
 void bind_implicit_helpers(nb::module_& m);
@@ -615,8 +616,13 @@ NB_MODULE(polyscope_bindings, m) {
   nb::enum_<ps::VolumeGridElement>(m, "VolumeGridElement")
     .value("node", ps::VolumeGridElement::NODE)
     .value("cell", ps::VolumeGridElement::CELL)
-    ; 
-  
+    ;
+
+  nb::enum_<ps::SparseVolumeGridElement>(m, "SparseVolumeGridElement")
+    .value("cell", ps::SparseVolumeGridElement::CELL)
+    .value("node", ps::SparseVolumeGridElement::NODE)
+    ;
+
   nb::enum_<ps::PointRenderMode>(m, "PointRenderMode")
     .value("sphere", ps::PointRenderMode::Sphere)
     .value("quad", ps::PointRenderMode::Quad)
@@ -717,6 +723,7 @@ NB_MODULE(polyscope_bindings, m) {
   bind_surface_mesh(m);
   bind_volume_mesh(m);
   bind_volume_grid(m);
+  bind_sparse_volume_grid(m);
   bind_camera_view(m);
   bind_managed_buffer(m);
   bind_imgui(m);
