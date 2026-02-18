@@ -512,7 +512,7 @@ class PickResult:
         # resolve data from various types
 
         # Use local imports to avoid circular dependencies
-        from polyscope import point_cloud, curve_network, surface_mesh, volume_mesh, volume_grid
+        from polyscope import point_cloud, curve_network, surface_mesh, volume_mesh, volume_grid, sparse_volume_grid
 
         if self.structure_type_name == "Point Cloud":
             point_cloud.get_point_cloud(self.structure_name).append_pick_data(self)
@@ -528,6 +528,9 @@ class PickResult:
 
         if self.structure_type_name == "Volume Grid":
             volume_grid.get_volume_grid(self.structure_name).append_pick_data(self)
+        
+        if self.structure_type_name == "Sparse Volume Grid":
+            sparse_volume_grid.get_sparse_volume_grid(self.structure_name).append_pick_data(self)
 
     def __str__(self):
         return f"""
