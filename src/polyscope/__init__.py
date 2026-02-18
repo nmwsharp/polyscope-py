@@ -28,6 +28,7 @@ from polyscope_bindings import (
     VolumeMeshElement,  # noqa F401
     VolumeGridElement,  # noqa F401
     SparseVolumeGridElement,  # noqa F401
+    SparseVolumeGridRenderMode,  # noqa F401
     PointRenderMode,  # noqa F401
     FilterMode,  # noqa F401
     ImageOrigin,  # noqa F401

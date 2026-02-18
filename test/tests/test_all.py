@@ -2589,6 +2589,54 @@ class TestSparseVolumeGrid(unittest.TestCase):
         ps.show(3)
         ps.remove_all_structures()
 
+    def test_render_mode(self):
+        p, _ = self.generate_test_grid("test_sparse_grid")
+
+        # Default should be gridcube
+        self.assertEqual(p.get_render_mode(), "gridcube")
+        ps.show(3)
+
+        # Switch to wireframe
+        p.set_render_mode("wireframe")
+        self.assertEqual(p.get_render_mode(), "wireframe")
+        ps.show(3)
+
+        # Wireframe radius
+        p.set_wireframe_radius(2.0)
+        self.assertAlmostEqual(p.get_wireframe_radius(), 2.0)
+        ps.show(3)
+
+        p.set_wireframe_radius(0.5)
+        self.assertAlmostEqual(p.get_wireframe_radius(), 0.5)
+        ps.show(3)
+
+        # Wireframe color
+        wf_color = (1.0, 0.0, 0.0)
+        p.set_wireframe_color(wf_color)
+        ret_color = p.get_wireframe_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], wf_color[i])
+        ps.show(3)
+
+        # Switch back
+        p.set_render_mode("gridcube")
+        self.assertEqual(p.get_render_mode(), "gridcube")
+        ps.show(3)
+
+        # Register with wireframe mode
+        occupied_cells = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0]], dtype=np.int32)
+        p2 = ps.register_sparse_volume_grid(
+            "test_sparse_grid_wf",
+            (0.0, 0.0, 0.0),
+            (0.1, 0.1, 0.1),
+            occupied_cells,
+            render_mode="wireframe",
+        )
+        self.assertEqual(p2.get_render_mode(), "wireframe")
+        ps.show(3)
+
+        ps.remove_all_structures()
+
 
 class TestCameraView(unittest.TestCase):
     def generate_parameters(self):

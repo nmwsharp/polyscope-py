@@ -623,6 +623,11 @@ NB_MODULE(polyscope_bindings, m) {
     .value("node", ps::SparseVolumeGridElement::NODE)
     ;
 
+  nb::enum_<ps::SparseVolumeGridRenderMode>(m, "SparseVolumeGridRenderMode")
+    .value("gridcube", ps::SparseVolumeGridRenderMode::Gridcube)
+    .value("wireframe", ps::SparseVolumeGridRenderMode::Wireframe)
+    ;
+
   nb::enum_<ps::PointRenderMode>(m, "PointRenderMode")
     .value("sphere", ps::PointRenderMode::Sphere)
     .value("quad", ps::PointRenderMode::Quad)

@@ -125,6 +125,27 @@ class SparseVolumeGrid(Structure):
     def mark_nodes_as_used(self) -> None:
         return self.bound_instance.mark_nodes_as_used()
 
+    # Render mode
+    def set_render_mode(self, mode: Literal["gridcube", "wireframe"]) -> None:
+        self.bound_instance.set_render_mode(to_enum(psb.SparseVolumeGridRenderMode, mode))
+
+    def get_render_mode(self) -> str:
+        return from_enum(self.bound_instance.get_render_mode())
+
+    # Wireframe radius
+    def set_wireframe_radius(self, val: float) -> None:
+        self.bound_instance.set_wireframe_radius(val)
+
+    def get_wireframe_radius(self) -> float:
+        return self.bound_instance.get_wireframe_radius()
+
+    # Wireframe color
+    def set_wireframe_color(self, val: ArrayLike) -> None:
+        self.bound_instance.set_wireframe_color(glm3(val))
+
+    def get_wireframe_color(self) -> tuple[float, float, float]:
+        return self.bound_instance.get_wireframe_color().as_tuple()
+
     # Picking
     def append_pick_data(self, pick_result: Any) -> None:
         struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
@@ -233,6 +254,9 @@ def register_sparse_volume_grid(
     cube_size_factor: float | None = None,
     material: str | None = None,
     transparency: float | None = None,
+    render_mode: Literal["gridcube", "wireframe"] | None = None,
+    wireframe_radius: float | None = None,
+    wireframe_color: ArrayLike | None = None,
 ) -> SparseVolumeGrid:
     """Register a new sparse volume grid"""
 
@@ -256,6 +280,12 @@ def register_sparse_volume_grid(
         p.set_material(material)
     if transparency is not None:
         p.set_transparency(transparency)
+    if render_mode is not None:
+        p.set_render_mode(render_mode)
+    if wireframe_radius is not None:
+        p.set_wireframe_radius(wireframe_radius)
+    if wireframe_color is not None:
+        p.set_wireframe_color(wireframe_color)
 
     return p
 

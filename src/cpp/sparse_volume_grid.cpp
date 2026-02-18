@@ -53,6 +53,12 @@ void bind_sparse_volume_grid(nb::module_& m) {
       .def("get_edge_width", &ps::SparseVolumeGrid::getEdgeWidth, "Get edge width")
       .def("set_cube_size_factor", &ps::SparseVolumeGrid::setCubeSizeFactor, "Set cube size factor")
       .def("get_cube_size_factor", &ps::SparseVolumeGrid::getCubeSizeFactor, "Get cube size factor")
+      .def("set_render_mode", &ps::SparseVolumeGrid::setRenderMode, "Set voxel render mode")
+      .def("get_render_mode", &ps::SparseVolumeGrid::getRenderMode, "Get voxel render mode")
+      .def("set_wireframe_radius", &ps::SparseVolumeGrid::setWireframeRadius, "Set wireframe radius")
+      .def("get_wireframe_radius", &ps::SparseVolumeGrid::getWireframeRadius, "Get wireframe radius")
+      .def("set_wireframe_color", &ps::SparseVolumeGrid::setWireframeColor, "Set wireframe color")
+      .def("get_wireframe_color", &ps::SparseVolumeGrid::getWireframeColor, "Get wireframe color")
 
       // picking
       .def("interpret_pick_result", &ps::SparseVolumeGrid::interpretPickResult)
