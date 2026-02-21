@@ -32,6 +32,7 @@ void bind_volume_mesh(nb::module_& m);
 void bind_volume_grid(nb::module_& m);
 void bind_sparse_volume_grid(nb::module_& m);
 void bind_camera_view(nb::module_& m);
+void bind_gaussian_particles(nb::module_& m);
 void bind_floating_quantities(nb::module_& m);
 void bind_implicit_helpers(nb::module_& m);
 void bind_managed_buffer(nb::module_& m);
@@ -59,6 +60,8 @@ NB_MODULE(polyscope_bindings, m) {
         ps::state::userCallback = nullptr;
         if (ps::render::engine != nullptr) {
           ps::shutdown(true);
+        } else {
+          ps::removeEverything();
         }
   }));
   
@@ -87,6 +90,7 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("window_requests_close", &ps::windowRequestsClose);
   m.def("frame_tick", &ps::frameTick);
   m.def("shutdown", &ps::shutdown);
+  m.def("remove_everything", &ps::removeEverything);
 
   // === Render engine related things
   m.def("get_render_engine_backend_name", &ps::render::getRenderEngineBackendName);
@@ -155,6 +159,7 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("get_length_scale", []() { return ps::state::lengthScale; });
   m.def("set_bounding_box", [](glm::vec3 low, glm::vec3 high) { ps::state::boundingBox = std::tuple<glm::vec3, glm::vec3>(low, high); });
   m.def("get_bounding_box", []() { return ps::state::boundingBox; });
+  m.def("update_scene_extents", &ps::updateStructureExtents);
 
   // === Camera controls & View
   m.def("set_navigation_style", [](ps::view::NavigateStyle x) { ps::view::style = x; });
@@ -174,6 +179,7 @@ NB_MODULE(polyscope_bindings, m) {
       ps::view::lookAt(location, target, upDir, flyTo); 
   });
   m.def("set_view_projection_mode", [](ps::ProjectionMode x) { ps::view::projectionMode = x; });
+  m.def("get_view_projection_mode", []() { return ps::view::projectionMode; });
   m.def("get_view_camera_parameters", &ps::view::getCameraParametersForCurrentView);
   m.def("set_view_camera_parameters", &ps::view::setViewToCamera);
   m.def("set_camera_view_matrix", [](Eigen::Matrix4f mat) { ps::view::setCameraViewMatrix(eigen2glm(mat)); });
@@ -730,6 +736,7 @@ NB_MODULE(polyscope_bindings, m) {
   bind_volume_grid(m);
   bind_sparse_volume_grid(m);
   bind_camera_view(m);
+  bind_gaussian_particles(m);
   bind_managed_buffer(m);
   bind_imgui(m);
   bind_implot(m);
