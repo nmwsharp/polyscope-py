@@ -54,4 +54,5 @@ from polyscope.curve_network import *  # noqa F403
 from polyscope.volume_mesh import *  # noqa F403
 from polyscope.volume_grid import *  # noqa F403
 from polyscope.camera_view import *  # noqa F403
+from polyscope.gaussian_particles import *  # noqa F403
 from polyscope.global_floating_quantity_structure import *  # noqa F403

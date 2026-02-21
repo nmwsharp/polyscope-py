@@ -60,6 +60,10 @@ def shutdown(allow_mid_frame_shutdown: bool = False) -> None:
     psb.shutdown(allow_mid_frame_shutdown)
 
 
+def remove_everything() -> None:
+    psb.remove_everything()
+
+
 ### Render engine
 
 
@@ -323,6 +327,11 @@ def get_bounding_box():
     return np.array(low.as_tuple()), np.array(high.as_tuple())
 
 
+def update_scene_extents():
+    """This is usually an internal function, and should not need to be called by end users unless you are manually updating structure bounds after creation."""
+    psb.update_scene_extents()
+
+
 ### Camera controls
 
 
@@ -336,6 +345,10 @@ def look_at(camera_location, target, fly_to: bool = False) -> None:
 
 def look_at_dir(camera_location, target, up_dir, fly_to: bool = False) -> None:
     psb.look_at_dir(glm3(camera_location), glm3(target), glm3(up_dir), fly_to)
+
+
+def get_view_projection_mode() -> Literal["orthographic", "perspective"]:
+    return from_enum(psb.get_view_projection_mode())
 
 
 def set_view_projection_mode(s: Literal["orthographic", "perspective"] | str) -> None:
@@ -1034,35 +1047,35 @@ class CameraParameters:
 def glm2(vals: ArrayLike) -> psb.glm_vec2:
     vals_arr = np.asarray(vals, dtype=np.float32)
     if vals_arr.shape != (2,):
-        raise ValueError("vals should be length-2 float array/tuple/etc")
+        raise ValueError("vals should be length-2 float array/tuple/etc. Got shape " + str(vals_arr.shape))
     return psb.glm_vec2(vals_arr[0], vals_arr[1])
 
 
 def glm2i(vals: ArrayLike) -> psb.glm_ivec2:
     vals_arr = np.asarray(vals, dtype=np.int32)
     if vals_arr.shape != (2,):
-        raise ValueError("vals should be length-2 int array/tuple/etc")
+        raise ValueError("vals should be length-2 int array/tuple/etc. Got shape " + str(vals_arr.shape))
     return psb.glm_ivec2(vals_arr[0], vals_arr[1])
 
 
 def glm3u(vals: ArrayLike) -> psb.glm_uvec3:
     vals_arr = np.asarray(vals, dtype=np.uint32)
     if vals_arr.shape != (3,):
-        raise ValueError("vals should be length-3 int array/tuple/etc")
+        raise ValueError("vals should be length-3 int array/tuple/etc. Got shape " + str(vals_arr.shape))
     return psb.glm_uvec3(vals_arr[0], vals_arr[1], vals_arr[2])
 
 
 def glm3(vals: ArrayLike) -> psb.glm_vec3:
     vals_arr = np.asarray(vals, dtype=np.float32)
     if vals_arr.shape != (3,):
-        raise ValueError("vals should be length-3 float array/tuple/etc")
+        raise ValueError("vals should be length-3 float array/tuple/etc. Got shape " + str(vals_arr.shape))
     return psb.glm_vec3(vals_arr[0], vals_arr[1], vals_arr[2])
 
 
 def glm4(vals: ArrayLike) -> psb.glm_vec4:
     vals_arr = np.asarray(vals, dtype=np.float32)
     if vals_arr.shape != (4,):
-        raise ValueError("vals should be length-4 float array/tuple/etc")
+        raise ValueError("vals should be length-4 float array/tuple/etc. Got shape " + str(vals_arr.shape))
     return psb.glm_vec4(vals_arr[0], vals_arr[1], vals_arr[2], vals_arr[3])
 
 
