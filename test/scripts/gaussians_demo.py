@@ -21,16 +21,7 @@ import sys
 import argparse
 import numpy as np
 from plyfile import PlyData
-from arrgh import arrgh
 
-'''
-Download the mipnerf360 dataset:
-
-mkdir -p data/mipnerf360
-cd data/mipnerf360
-wget http://storage.googleapis.com/gresearch/refraw360/360_v2.zip
-unzip 360_v2.zip
-'''
 
 def load_gaussians_from_ply(path_ply, device='cuda'):
 
@@ -91,32 +82,27 @@ def main():
     args = parser.parse_args()
 
 
-    ps.init() 
-    ps.set_ground_plane_mode("shadow_only")
+    ps.init()
+    ps.set_ground_plane_mode("none")
 
-    def callback():
-        pass
-    ps.set_user_callback(callback)
-   
-    
     # Load the file
     centers, features_dc, opacity, scaling, rotation = load_gaussians_from_ply(args.gaussian_ply)
     print(f"Loaded {centers.shape[0]} gaussian particles")
 
-
-    arrgh(centers, features_dc, opacity, scaling, rotation)
-
-    ps.register_gaussian_particles("gaussians", 
-                                   means=centers.unsqueeze(0), 
-                                   colors=features_dc.unsqueeze(0), 
-                                   opacities=opacity.unsqueeze(0), 
-                                   scales=scaling.unsqueeze(0), 
-                                   quats=rotation.unsqueeze(0)
+    # Register Gaussians
+    ps.register_gaussian_particles("gaussians",
+                                   # the arguments below are passed directly
+                                   # to gsplat.rasterization(...). See the docs there for the meaning
+                                   # and other parameters you can pass.
+                                   means=centers.unsqueeze(0),
+                                   colors=features_dc.unsqueeze(0),
+                                   opacities=opacity.unsqueeze(0),
+                                   scales=scaling.unsqueeze(0),
+                                   quats=rotation.unsqueeze(0),
+                                   sh_degree=0,
                                 )
 
     ps.show()
-
-    # ps.remove_gaussian_particles("gaussians")
 
 
 if __name__ == '__main__':

@@ -21,10 +21,10 @@ const std::string GaussianParticles::structureTypeName = "Gaussian Particles";
 GaussianParticles::GaussianParticles(std::string name_, std::function<void()>& drawCallback_,
                                      std::function<void()>& extentsCallback_, std::function<void()>& deletionCallback_)
     : Structure(name_, structureTypeName), drawCallback(drawCallback_), extentsCallback(extentsCallback_),
-      deletionCallback(deletionCallback_) {
+      deletionCallback(deletionCallback_), subsampleFactor(uniquePrefix() + "subsampleFactor", 1) {
 
-  // note: unlike other structures this does not call updateObjectSpaceBounds() here, to avoid a circular problem with
-  // the external class. we call it manually right after creation there.
+  // Note: unlike other structures this does not call updateObjectSpaceBounds() here, to avoid a circular problem with
+  // the external class. We call it manually right after creation there.
 }
 
 GaussianParticles::~GaussianParticles() { deletionCallback(); }
@@ -32,7 +32,13 @@ GaussianParticles::~GaussianParticles() { deletionCallback(); }
 void GaussianParticles::buildCustomUI() {
   ensureImagebuffersAllocated(); // doing this here ensures we re-render after resizing
 
-  ImGui::Text("# particles: -1");
+  ImGui::Text("%d Gaussians", numParticles);
+
+  ImGui::PushItemWidth(100);
+  if (ImGui::InputInt("render subsample", &(subsampleFactor.get()), 1, 10)) {
+    setSubsampleFactor(subsampleFactor.get());
+  }
+  ImGui::PopItemWidth();
 }
 void GaussianParticles::buildCustomOptionsUI() {}
 void GaussianParticles::buildPickUI(const PickResult& result) {}
@@ -45,7 +51,10 @@ void GaussianParticles::drawDelayed() {
 
   ensureImagebuffersAllocated();
 
-  drawCallback();
+  if (!internal::renderPassIsRedraw) {
+    // if doing multiple passes from the same view, no need to do this multiple times
+    drawCallback();
+  }
 
   if (!imageToScreenProgram) {
     prepareImageToScreenProgram();
@@ -58,12 +67,22 @@ void GaussianParticles::drawPick() {}
 void GaussianParticles::drawPickDelayed() {}
 void GaussianParticles::updateObjectSpaceBounds() { extentsCallback(); }
 
+void GaussianParticles::setSubsampleFactor(int32_t newVal) {
+  newVal = std::max(1, newVal);
+  subsampleFactor = newVal;
+  ensureImagebuffersAllocated();
+}
+
+int32_t GaussianParticles::getSubsampleFactor() { return subsampleFactor.get(); }
+
 void GaussianParticles::setExtents(glm::vec3 bbox_min, glm::vec3 bbox_max) {
   std::get<0>(objectSpaceBoundingBox) = bbox_min;
   std::get<1>(objectSpaceBoundingBox) = bbox_max;
   objectSpaceLengthScale = glm::length(bbox_max - bbox_min);
   requestRedraw();
 }
+
+void GaussianParticles::setNumParticles(int32_t numParticles_) { numParticles = numParticles_; }
 
 std::string GaussianParticles::typeName() { return structureTypeName; }
 void GaussianParticles::refresh() {}
@@ -74,8 +93,8 @@ std::tuple<int32_t, int32_t> GaussianParticles::getRenderDims() {
 }
 
 void GaussianParticles::ensureImagebuffersAllocated() {
-  int32_t newImageWidth = view::bufferWidth / subsampleFactor;
-  int32_t newImageHeight = view::bufferHeight / subsampleFactor;
+  int32_t newImageWidth = view::bufferWidth / subsampleFactor.get();
+  int32_t newImageHeight = view::bufferHeight / subsampleFactor.get();
 
   if (newImageHeight == currImageHeight && newImageWidth == currImageWidth) {
     return;
@@ -99,6 +118,12 @@ void GaussianParticles::ensureImagebuffersAllocated() {
   colors->ensureHostBufferAllocated();
   colors->data = std::vector<glm::vec4>(currImageWidth * currImageHeight, glm::vec4(0.0f));
   colors->markHostBufferUpdated();
+
+  if (imageToScreenProgram) {
+    imageToScreenProgram->setTextureFromBuffer("t_depth", depths->getRenderTextureBuffer().get());
+    imageToScreenProgram->setTextureFromBuffer("t_color", colors->getRenderTextureBuffer().get());
+  }
+
 
   requestRedraw();
 }

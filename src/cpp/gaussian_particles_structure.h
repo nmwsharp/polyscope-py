@@ -61,6 +61,7 @@ public:
   // Manually set the extents of the structure (note: does _not_ automatically update the scene, call refresh() after if
   // you need that.)
   void setExtents(glm::vec3 bbox_min, glm::vec3 bbox_max);
+  void setNumParticles(int32_t numParticles);  
 
 
 private:
@@ -70,7 +71,10 @@ private:
 
   int32_t currImageWidth = -1;
   int32_t currImageHeight = -1;
-  int32_t subsampleFactor = 1;
+  int32_t currSubsampleFactor = -1;
+  int32_t numParticles = -1;
+
+  PersistentValue<int32_t> subsampleFactor;
 
   // === Render data
   std::vector<float> depthsData;

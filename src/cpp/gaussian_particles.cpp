@@ -33,6 +33,7 @@ void bind_gaussian_particles(nb::module_& m) {
     // internal
     .def("get_render_dims", &ps::GaussianParticles::getRenderDims)
     .def("set_extents", &ps::GaussianParticles::setExtents)
+    .def("set_num_particles", &ps::GaussianParticles::setNumParticles)
     .def("update_object_space_bounds", &ps::GaussianParticles::updateObjectSpaceBounds)
 
     ;

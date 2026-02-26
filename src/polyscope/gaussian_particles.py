@@ -93,6 +93,7 @@ class GaussianParticles(Structure):
         max_bound = np.percentile(centers, 75, axis=0)
 
         self.bound_instance.set_extents(glm3(min_bound), glm3(max_bound))
+        self.bound_instance.set_num_particles(centers.shape[0])
 
     def structure_deletion_callback(self):
         """
@@ -106,9 +107,8 @@ class GaussianParticles(Structure):
         return self.bound_instance.n_particles()
 
     def draw(self):
-        import gsplat, torch
-
-        # print("drawing gaussian particles!")
+        import torch
+        import gsplat
 
         color_buffer = self.get_buffer("colors")
         depth_buffer = self.get_buffer("depths")
@@ -118,6 +118,7 @@ class GaussianParticles(Structure):
 
         with torch.no_grad():
 
+            # prep camera matrices for the current Polyscope view
             render_w, render_h = self.bound_instance.get_render_dims()
             view_params = get_view_camera_parameters()
             T_camera_convent = np.array([
@@ -126,7 +127,6 @@ class GaussianParticles(Structure):
                 [0., 0., -1., 0.],
                 [0., 0., 0., 1.],
             ], dtype=np.float32)
-
             view_mat = torch.tensor(T_camera_convent @ view_params.get_view_mat(), device=self.device)
             fov_height = np.deg2rad(view_params.get_fov_vertical_deg())
             fov_width = 2.0 * np.arctan(np.tan(fov_height / 2.0) * view_params.get_aspect())
@@ -145,7 +145,6 @@ class GaussianParticles(Structure):
                 width=render_w,
                 height=render_h,
                 render_mode="RGB+ED",
-                sh_degree=0
             )
 
             # unbatchify
