@@ -40,9 +40,13 @@ nanobind_add_module(polyscope_bindings
   src/cpp/volume_grid.cpp
   src/cpp/sparse_volume_grid.cpp
   src/cpp/camera_view.cpp
+  src/cpp/gaussian_particles.cpp
   src/cpp/floating_quantities.cpp
   src/cpp/implicit_helpers.cpp
   src/cpp/managed_buffer.cpp
+  
+  src/cpp/gaussian_particles_structure.cpp
+  src/cpp/gaussian_particles_structure.h
   
   src/cpp/utils.h
 
