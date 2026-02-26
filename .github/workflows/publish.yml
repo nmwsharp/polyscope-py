@@ -38,7 +38,7 @@ jobs:
           python -m build --sdist
 
       - name: Run cibuildwheel
-        uses: pypa/cibuildwheel@v3.3.0
+        uses: pypa/cibuildwheel@v3.3.1
         with:
           config-file: ".github/workflows/cibuildwheel_config.toml"
 
