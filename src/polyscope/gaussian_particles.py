@@ -160,6 +160,8 @@ class GaussianParticles(Structure):
             color_buffer.update_data_from_device(render_coloralpha.contiguous())
             depth_buffer.update_data_from_device(render_depth.contiguous())
 
+    def set_subsample_factor(self, factor: int) -> None:
+        self.bound_instance.set_subsample_factor(factor)
 
 # A cache of instances, keyed on their name.
 # For all other structures, we just create new wrapper objects on-demand.
@@ -173,6 +175,7 @@ def register_gaussian_particles(
     name: str,
     enabled: bool | None = None,
     transparency: float | None = None,
+    subsample_factor: int | None = None,
     **gaussian_particles_kwargs: Any
 ) -> GaussianParticles:
     """Register a new point cloud"""
@@ -189,6 +192,8 @@ def register_gaussian_particles(
         p.set_enabled(enabled)
     if transparency is not None:
         p.set_transparency(transparency)
+    if subsample_factor is not None:
+        p.set_subsample_factor(subsample_factor)
 
     return p
 

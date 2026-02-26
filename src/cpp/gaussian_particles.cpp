@@ -35,6 +35,7 @@ void bind_gaussian_particles(nb::module_& m) {
     .def("set_extents", &ps::GaussianParticles::setExtents)
     .def("set_num_particles", &ps::GaussianParticles::setNumParticles)
     .def("update_object_space_bounds", &ps::GaussianParticles::updateObjectSpaceBounds)
+    .def("set_subsample_factor", &ps::GaussianParticles::setSubsampleFactor)
 
     ;
 

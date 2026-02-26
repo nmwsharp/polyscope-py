@@ -65,7 +65,7 @@ def load_gaussians_from_ply(path_ply, device='cuda'):
 
 
     # apply activations
-    # (assumes file holds pre-activated values)
+    # (assumes the file holds pre-activated values)
     opacity = torch.sigmoid(opacity)
     scaling = torch.exp(scaling)
 
@@ -91,6 +91,7 @@ def main():
 
     # Register Gaussians
     ps.register_gaussian_particles("gaussians",
+                                   subsample_factor=2, # set to >1 for fast rendering at lower resolution
                                    # the arguments below are passed directly
                                    # to gsplat.rasterization(...). See the docs there for the meaning
                                    # and other parameters you can pass.
