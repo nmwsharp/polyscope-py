@@ -24,3 +24,8 @@ MACOSX_DEPLOYMENT_TARGET = "10.14"
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
 before-all = "apk add libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev freeglut-dev mesa-dev mesa-gl mesa-egl"
+
+# skip 32-bit builds on windows, 64bit only. As of Feb 2026 32bit are failing in CI for unclear reasons.
+# maybe platform bugs? it looks like it's trying to link with the 64bit linker chain for some reason
+[tool.cibuildwheel.windows]
+archs = ["auto64"]
