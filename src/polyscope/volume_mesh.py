@@ -292,12 +292,12 @@ def register_volume_mesh(
 
     Pass index arrays of tets (N,4), hexes (N,8) or mixed_cells (N,8) to specify the cell connectivity.
 
-    The mixed_cells argument supports a mixture of tets, hexes, prisms, and pyramid elements; for each 
-    row of indices, right-pad with -1 indices when not needed for that element type, for example a 
+    The mixed_cells argument supports a mixture of tets, hexes, prisms, and pyramid elements; for each
+    row of indices, right-pad with -1 indices when not needed for that element type, for example a
     pyramid cell row might be [72, 33, 86, 91, 15, -1, -1, -1].
 
-    It is not supported to specify both tets/hexes and the general mixed_cells; in this case, just pass 
-    all cells as mixed_cells. You may pass both the tets and hexes arrays simultaneously, if so the cells 
+    It is not supported to specify both tets/hexes and the general mixed_cells; in this case, just pass
+    all cells as mixed_cells. You may pass both the tets and hexes arrays simultaneously, if so the cells
     are presumed to be ordered with all tetrahedral cells coming first, then hexahedral cells.
     """
 
