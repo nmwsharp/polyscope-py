@@ -1816,6 +1816,20 @@ class TestVolumeMesh(unittest.TestCase):
         # cells[-5:,4:] = -1 # clear out some rows at end
         # ps.register_volume_mesh("test_mesh3", self.generate_verts(), hexes=self.generate_tets())
 
+    def test_add_prisms_pyramids_mixed(self):
+        np.random.seed(777)
+        n_pts = 10
+        # prisms: (N,6) padded to (N,8) with -1 in last 2 cols
+        prism_cells = np.random.randint(0, n_pts, size=(n_pts, 8))
+        prism_cells[:, 6:] = -1
+        # pyramids: (N,5) padded to (N,8) with -1 in last 3 cols
+        pyramid_cells = np.random.randint(0, n_pts, size=(n_pts, 8))
+        pyramid_cells[:, 5:] = -1
+        cells = np.concatenate([prism_cells, pyramid_cells], axis=0)
+        ps.register_volume_mesh("test_mesh3", self.generate_verts(), mixed_cells=cells)
+        ps.show(3)
+        ps.remove_all_structures()
+
     def test_options(self):
         p = ps.register_volume_mesh("test_mesh", self.generate_verts(), self.generate_tets())
 

@@ -287,7 +287,15 @@ def register_volume_mesh(
     material: str | None = None,
     transparency: float | None = None,
 ) -> VolumeMesh:
-    """Register a new volume mesh"""
+    """
+    Register a new volume mesh.
+
+    Pass exactly one of tets (N,4), hexes (N,8) or mixed_cells (N,8) to specify the cell connectivity.  
+
+    The mixed_cells argument supports a mixture of tets, hexes, prisms, and pyramid elements; for each 
+    row of indices, right-pad with -1 indices when not needed for that element type, for example a 
+    pyramid cell row might be [72, 33, 86, 91, 15, -1, -1, -1].
+    """
 
     if not psb.is_initialized():
         raise RuntimeError("Polyscope has not been initialized")
