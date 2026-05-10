@@ -34,6 +34,7 @@ add_subdirectory(deps/polyscope)
 nanobind_add_module(polyscope_bindings 
   src/cpp/core.cpp
   src/cpp/surface_mesh.cpp
+  src/cpp/simple_triangle_mesh.cpp
   src/cpp/point_cloud.cpp
   src/cpp/curve_network.cpp
   src/cpp/volume_mesh.cpp

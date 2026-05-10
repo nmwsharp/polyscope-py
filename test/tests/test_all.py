@@ -3264,3 +3264,211 @@ class TestManagedBuffers(unittest.TestCase):
         #     pass
 
         ps.show(3)
+
+
+def make_stm(n_verts=20, n_faces=30, seed=42):
+    """Helper: random simple triangle mesh with given counts."""
+    np.random.seed(seed)
+    verts = np.random.rand(n_verts, 3).astype(np.float32)
+    faces = np.random.randint(0, n_verts, size=(n_faces, 3)).astype(np.int32)
+    return verts, faces
+
+
+class TestSimpleTriangleMesh(unittest.TestCase):
+    def generate_verts(self, n_pts=10):
+        np.random.seed(777)
+        return np.random.rand(n_pts, 3)
+
+    def generate_faces(self, n_pts=10):
+        np.random.seed(777)
+        return np.random.randint(0, n_pts, size=(2 * n_pts, 3))
+
+    def test_add_remove(self):
+        # add
+        m = ps.register_simple_triangle_mesh("test_stm", self.generate_verts(), self.generate_faces())
+        self.assertTrue(ps.has_simple_triangle_mesh("test_stm"))
+        self.assertFalse(ps.has_simple_triangle_mesh("nope"))
+        self.assertEqual(m.n_vertices(), 10)
+        self.assertEqual(m.n_faces(), 20)
+
+        # remove by name
+        ps.register_simple_triangle_mesh("test_stm2", self.generate_verts(), self.generate_faces())
+        ps.remove_simple_triangle_mesh("test_stm2")
+        self.assertTrue(ps.has_simple_triangle_mesh("test_stm"))
+        self.assertFalse(ps.has_simple_triangle_mesh("test_stm2"))
+
+        # remove by ref
+        c = ps.register_simple_triangle_mesh("test_stm2", self.generate_verts(), self.generate_faces())
+        c.remove()
+        self.assertTrue(ps.has_simple_triangle_mesh("test_stm"))
+        self.assertFalse(ps.has_simple_triangle_mesh("test_stm2"))
+
+        # get by name
+        ps.register_simple_triangle_mesh("test_stm3", self.generate_verts(), self.generate_faces())
+        p = ps.get_simple_triangle_mesh("test_stm3")
+        self.assertTrue(isinstance(p, ps.SimpleTriangleMesh))
+
+        ps.remove_all_structures()
+
+    def test_render(self):
+        ps.register_simple_triangle_mesh("test_stm", self.generate_verts(), self.generate_faces())
+        ps.show(3)
+        ps.remove_all_structures()
+
+    def test_options(self):
+        p = ps.register_simple_triangle_mesh("test_stm", self.generate_verts(), self.generate_faces())
+
+        # Enabled
+        p.set_enabled()
+        p.set_enabled(False)
+        p.set_enabled(True)
+        self.assertTrue(p.is_enabled())
+
+        # Color
+        color = (0.3, 0.3, 0.5)
+        p.set_color(color)
+        ret_color = p.get_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_color[i], color[i])
+
+        # Back face policy
+        p.set_back_face_policy("different")
+        self.assertEqual("different", p.get_back_face_policy())
+        p.set_back_face_policy("custom")
+        self.assertEqual("custom", p.get_back_face_policy())
+        p.set_back_face_color((0.25, 0.25, 0.25))
+        self.assertEqual((0.25, 0.25, 0.25), p.get_back_face_color())
+        p.set_back_face_policy("cull")
+
+        # Material
+        p.set_material("candy")
+        self.assertEqual("candy", p.get_material())
+        p.set_material("clay")
+
+        # Selection mode
+        p.set_selection_mode("vertices_only")
+        self.assertEqual("vertices_only", p.get_selection_mode())
+        p.set_selection_mode("faces_only")
+        self.assertEqual("faces_only", p.get_selection_mode())
+
+        ps.show(3)
+        ps.remove_all_structures()
+
+    def test_update(self):
+        p = ps.register_simple_triangle_mesh("test_stm", self.generate_verts(), self.generate_faces())
+
+        # update vertex positions (same count)
+        new_verts = np.random.rand(10, 3).astype(np.float32)
+        p.update_vertex_positions(new_verts)
+        ps.show(3)
+
+        # update both vertices and faces (counts may change)
+        new_verts2 = np.random.rand(8, 3).astype(np.float32)
+        new_faces2 = np.random.randint(0, 8, size=(12, 3)).astype(np.int32)
+        p.update(new_verts2, new_faces2)
+        self.assertEqual(p.n_vertices(), 8)
+        self.assertEqual(p.n_faces(), 12)
+        ps.show(3)
+
+        ps.remove_all_structures()
+
+    def test_reserve(self):
+        p = ps.register_simple_triangle_mesh("test_stm", self.generate_verts(), self.generate_faces())
+        p.reserve(100, 200)  # should not raise
+        ps.remove_all_structures()
+
+    def test_scalar(self):
+        p = ps.register_simple_triangle_mesh("test_stm", self.generate_verts(), self.generate_faces())
+        n_verts = p.n_vertices()
+        n_faces = p.n_faces()
+
+        # vertex scalar
+        vals = np.random.rand(n_verts).astype(np.float32)
+        p.add_vertex_scalar_quantity("vert_scalar", vals, enabled=True)
+        ps.show(3)
+
+        # vertex scalar with options
+        p.add_vertex_scalar_quantity("vert_scalar_sym", vals, datatype="symmetric")
+        p.add_vertex_scalar_quantity("vert_scalar_mag", vals, datatype="magnitude")
+        ps.show(3)
+
+        # face scalar
+        f_vals = np.random.rand(n_faces).astype(np.float32)
+        p.add_face_scalar_quantity("face_scalar", f_vals, enabled=True)
+        ps.show(3)
+
+        ps.remove_all_structures()
+
+    def test_color(self):
+        p = ps.register_simple_triangle_mesh("test_stm", self.generate_verts(), self.generate_faces())
+        n_verts = p.n_vertices()
+        n_faces = p.n_faces()
+
+        # vertex color
+        cols = np.random.rand(n_verts, 3).astype(np.float32)
+        p.add_vertex_color_quantity("vert_color", cols, enabled=True)
+        ps.show(3)
+
+        # face color
+        f_cols = np.random.rand(n_faces, 3).astype(np.float32)
+        p.add_face_color_quantity("face_color", f_cols, enabled=True)
+        ps.show(3)
+
+        ps.remove_all_structures()
+
+    def test_update_sizes_and_quantities(self):
+        sizes = [
+            (5,   8),    # small
+            (50,  80),   # grow big
+            (10,  15),   # shrink back down
+            (200, 350),  # grow very large
+            (3,   4),    # shrink to minimum
+            (100, 180),  # mid-size to finish
+        ]
+
+        verts0, faces0 = make_stm(*sizes[0])
+        p = ps.register_simple_triangle_mesh("stm_sz", verts0, faces0)
+
+        # Add all four quantity types before any update — they'll be replaced
+        # on each iteration as the size changes.
+        v_scalar = p.add_vertex_scalar_quantity(
+            "v_scalar", np.zeros(sizes[0][0], dtype=np.float32), enabled=True)
+        f_scalar = p.add_face_scalar_quantity(
+            "f_scalar", np.zeros(sizes[0][1], dtype=np.float32), enabled=True)
+        v_color = p.add_vertex_color_quantity(
+            "v_color", np.zeros((sizes[0][0], 3), dtype=np.float32), enabled=True)
+        f_color = p.add_face_color_quantity(
+            "f_color", np.zeros((sizes[0][1], 3), dtype=np.float32), enabled=True)
+
+        ps.show(3)
+
+        for n_verts, n_faces in sizes[1:]:
+            verts, faces = make_stm(n_verts, n_faces, seed=n_verts)
+
+            # Update the mesh geometry (counts change)
+            p.update(verts, faces)
+            self.assertEqual(p.n_vertices(), n_verts)
+            self.assertEqual(p.n_faces(), n_faces)
+
+            # Re-add quantities with the new size (replaces old ones)
+            v_scalar_data = np.random.rand(n_verts).astype(np.float32)
+            f_scalar_data = np.random.rand(n_faces).astype(np.float32)
+            v_color_data  = np.random.rand(n_verts, 3).astype(np.float32)
+            f_color_data  = np.random.rand(n_faces, 3).astype(np.float32)
+
+            v_scalar = p.add_vertex_scalar_quantity("v_scalar", v_scalar_data, enabled=True)
+            f_scalar = p.add_face_scalar_quantity("f_scalar", f_scalar_data, enabled=True)
+            v_color  = p.add_vertex_color_quantity("v_color",  v_color_data,  enabled=True)
+            f_color  = p.add_face_color_quantity("f_color",   f_color_data,  enabled=True)
+
+            ps.show(3)
+
+            # Now test update_data (same size, in-place update)
+            v_scalar.update_data(np.random.rand(n_verts).astype(np.float32))
+            f_scalar.update_data(np.random.rand(n_faces).astype(np.float32))
+            v_color.update_data(np.random.rand(n_verts, 3).astype(np.float32))
+            f_color.update_data(np.random.rand(n_faces, 3).astype(np.float32))
+
+            ps.show(3)
+
+        ps.remove_all_structures()

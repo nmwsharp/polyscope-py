@@ -26,6 +26,7 @@ namespace ps = polyscope;
 
 // Forward-declare bindings from other files
 void bind_surface_mesh(nb::module_& m);
+void bind_simple_triangle_mesh(nb::module_& m);
 void bind_point_cloud(nb::module_& m);
 void bind_curve_network(nb::module_& m);
 void bind_volume_mesh(nb::module_& m);
@@ -732,6 +733,7 @@ NB_MODULE(polyscope_bindings, m) {
   bind_point_cloud(m);
   bind_curve_network(m);
   bind_surface_mesh(m);
+  bind_simple_triangle_mesh(m);
   bind_volume_mesh(m);
   bind_volume_grid(m);
   bind_sparse_volume_grid(m);
