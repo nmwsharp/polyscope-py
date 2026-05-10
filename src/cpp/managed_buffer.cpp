@@ -15,7 +15,7 @@ nb::class_<ps::render::ManagedBuffer<T>> bind_managed_buffer_T(nb::module_& m, p
   return nb::class_<ps::render::ManagedBuffer<T>>(m, ("ManagedBuffer_" + ps::typeName(t)).c_str())
       .def("size", &ps::render::ManagedBuffer<T>::size)
       .def("get_texture_size", &ps::render::ManagedBuffer<T>::getTextureSize)
-      .def("has_data", &ps::render::ManagedBuffer<T>::hasData)
+      .def("has_data", [](const ps::render::ManagedBuffer<T>& b) { return b.size() > 0; })
       .def("summary_string", &ps::render::ManagedBuffer<T>::summaryString)
       .def("get_device_buffer_type", &ps::render::ManagedBuffer<T>::getDeviceBufferType)
       .def("get_generic_weak_handle",
@@ -65,8 +65,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<float>(m, ps::ManagedBufferType::Float)
     .def("update_data", [](ps::render::ManagedBuffer<float>& s, Eigen::VectorXf& d) {
       if(d.rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()));
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = d(i);
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, d(i));
       s.markHostBufferUpdated();
     })
   ;
@@ -74,8 +74,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<double>(m, ps::ManagedBufferType::Double)
     .def("update_data", [](ps::render::ManagedBuffer<double>& s, Eigen::VectorXd& d) {
       if(d.rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()));
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = d(i);
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, d(i));
       s.markHostBufferUpdated();
     })
   ;
@@ -83,8 +83,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<glm::vec2>(m, ps::ManagedBufferType::Vec2)
     .def("update_data", [](ps::render::ManagedBuffer<glm::vec2>& s, Eigen::Matrix<float, Eigen::Dynamic, 2>& d) {
       if(d.rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()) + " x 2");
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = {d(i,0), d(i,1)};
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, {d(i,0), d(i,1)});
       s.markHostBufferUpdated();
     })
   ;
@@ -92,8 +92,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<glm::vec3>(m, ps::ManagedBufferType::Vec3)
     .def("update_data", [](ps::render::ManagedBuffer<glm::vec3>& s, Eigen::Matrix<float, Eigen::Dynamic, 3>& d) {
       if(d.rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()) + " x 3");
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = {d(i,0), d(i,1), d(i,2)};
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, {d(i,0), d(i,1), d(i,2)});
       s.markHostBufferUpdated();
     })
   ;
@@ -101,8 +101,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<glm::vec4>(m, ps::ManagedBufferType::Vec4)
     .def("update_data", [](ps::render::ManagedBuffer<glm::vec4>& s, Eigen::Matrix<float, Eigen::Dynamic, 4>& d) {
       if(d.rows() != s.size() || d.cols() != 4) ps::exception("bad update size, should be " + std::to_string(s.size()) + " x 4");
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = {d(i,0), d(i,1), d(i,2), d(i,3)};
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, {d(i,0), d(i,1), d(i,2), d(i,3)});
       s.markHostBufferUpdated();
     })
   ;
@@ -112,11 +112,11 @@ void bind_managed_buffer(nb::module_& m) {
       for(uint32_t k = 0; k < 2; k++) {
         if(d[k].rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()) + " x 3");
       }
-      s.ensureHostBufferAllocated();
+      s.ensureHostBufferPopulated();
       for(uint32_t i = 0; i < s.size(); i++) {
-        for(uint32_t k = 0; k < 2; k++) {
-          s.data[i][k] = {d[k](i,0), d[k](i,1), d[k](i,2)};
-        }
+        std::array<glm::vec3, 2> val;
+        for(uint32_t k = 0; k < 2; k++) val[k] = {d[k](i,0), d[k](i,1), d[k](i,2)};
+        s.setHostValue(i, val);
       }
       s.markHostBufferUpdated();
     })
@@ -128,11 +128,11 @@ void bind_managed_buffer(nb::module_& m) {
       for(uint32_t k = 0; k < 3; k++) {
         if(d[k].rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()) + " x 3");
       }
-      s.ensureHostBufferAllocated();
+      s.ensureHostBufferPopulated();
       for(uint32_t i = 0; i < s.size(); i++) {
-        for(uint32_t k = 0; k < 3; k++) {
-          s.data[i][k] = {d[k](i,0), d[k](i,1), d[k](i,2)};
-        }
+        std::array<glm::vec3, 3> val;
+        for(uint32_t k = 0; k < 3; k++) val[k] = {d[k](i,0), d[k](i,1), d[k](i,2)};
+        s.setHostValue(i, val);
       }
       s.markHostBufferUpdated();
     })
@@ -143,11 +143,11 @@ void bind_managed_buffer(nb::module_& m) {
       for(uint32_t k = 0; k < 4; k++) {
         if(d[k].rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()) + " x 3");
       }
-      s.ensureHostBufferAllocated();
+      s.ensureHostBufferPopulated();
       for(uint32_t i = 0; i < s.size(); i++) {
-        for(uint32_t k = 0; k < 4; k++) {
-          s.data[i][k] = {d[k](i,0), d[k](i,1), d[k](i,2)};
-        }
+        std::array<glm::vec3, 4> val;
+        for(uint32_t k = 0; k < 4; k++) val[k] = {d[k](i,0), d[k](i,1), d[k](i,2)};
+        s.setHostValue(i, val);
       }
       s.markHostBufferUpdated();
     })
@@ -156,8 +156,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<uint32_t>(m, ps::ManagedBufferType::UInt32)
     .def("update_data", [](ps::render::ManagedBuffer<uint32_t>& s, Eigen::Matrix<uint32_t, Eigen::Dynamic, 1>& d) {
       if(d.rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()));
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = d(i);
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, d(i));
       s.markHostBufferUpdated();
     })
   ;
@@ -165,8 +165,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<int32_t>(m, ps::ManagedBufferType::Int32)
     .def("update_data", [](ps::render::ManagedBuffer<uint32_t>& s, Eigen::Matrix<int32_t, Eigen::Dynamic, 1>& d) {
       if(d.rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()));
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = d(i);
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, d(i));
       s.markHostBufferUpdated();
     })
   ;
@@ -174,8 +174,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<glm::uvec2>(m, ps::ManagedBufferType::UVec2)
     .def("update_data", [](ps::render::ManagedBuffer<glm::uvec2>& s, Eigen::Matrix<uint32_t, Eigen::Dynamic, 2>& d) {
       if(d.rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()) + " x 2");
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = {d(i,0), d(i,1)};
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, {d(i,0), d(i,1)});
       s.markHostBufferUpdated();
     })
   ;
@@ -184,8 +184,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<glm::uvec3>(m, ps::ManagedBufferType::UVec3)
     .def("update_data", [](ps::render::ManagedBuffer<glm::uvec3>& s, Eigen::Matrix<uint32_t, Eigen::Dynamic, 3>& d) {
       if(d.rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()) + " x 3");
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = {d(i,0), d(i,1), d(i,2)};
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, {d(i,0), d(i,1), d(i,2)});
       s.markHostBufferUpdated();
     })
   ;
@@ -193,8 +193,8 @@ void bind_managed_buffer(nb::module_& m) {
   bind_managed_buffer_T<glm::uvec4>(m, ps::ManagedBufferType::UVec4)
     .def("update_data", [](ps::render::ManagedBuffer<glm::uvec4>& s, Eigen::Matrix<uint32_t, Eigen::Dynamic, 4>& d) {
       if(d.rows() != s.size()) ps::exception("bad update size, should be " + std::to_string(s.size()) + " x 4");
-      s.ensureHostBufferAllocated();
-      for(uint32_t i = 0; i < s.size(); i++) s.data[i] = {d(i,0), d(i,1), d(i,2), d(i,3)};
+      s.ensureHostBufferPopulated();
+      for(uint32_t i = 0; i < s.size(); i++) s.setHostValue(i, {d(i,0), d(i,1), d(i,2), d(i,3)});
       s.markHostBufferUpdated();
     })
   ;
