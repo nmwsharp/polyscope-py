@@ -46,11 +46,12 @@ class TestCore(unittest.TestCase):
         # Make sure that unshow worked, and we stopped short of 10 loop iterations
         self.assertLess(counts[0], 4)
 
-
         # Make sure unshow doesn't mess up subsequent calls
         counts[0] = 0
+
         def callback():
             counts[0] = counts[0] + 1
+
         ps.set_user_callback(callback)
         ps.show(3)
         self.assertEqual(counts[0], 3)
@@ -2354,19 +2355,21 @@ class TestVolumeGrid(unittest.TestCase):
 
 
 class TestSparseVolumeGrid(unittest.TestCase):
-
     def generate_test_grid(self, name="test_sparse_grid"):
         # Create a small set of occupied cells
-        occupied_cells = np.array([
-            [0, 0, 0],
-            [1, 0, 0],
-            [0, 1, 0],
-            [0, 0, 1],
-            [1, 1, 0],
-            [1, 0, 1],
-            [0, 1, 1],
-            [1, 1, 1],
-        ], dtype=np.int32)
+        occupied_cells = np.array(
+            [
+                [0, 0, 0],
+                [1, 0, 0],
+                [0, 1, 0],
+                [0, 0, 1],
+                [1, 1, 0],
+                [1, 0, 1],
+                [0, 1, 1],
+                [1, 1, 1],
+            ],
+            dtype=np.int32,
+        )
         origin = (0.0, 0.0, 0.0)
         grid_cell_width = (0.1, 0.1, 0.1)
         return ps.register_sparse_volume_grid(name, origin, grid_cell_width, occupied_cells), occupied_cells
@@ -2535,12 +2538,20 @@ class TestSparseVolumeGrid(unittest.TestCase):
         p.add_scalar_quantity("test_vals", node_values, defined_on="nodes", node_indices=node_indices)
         p.add_scalar_quantity("test_vals2", node_values, defined_on="nodes", node_indices=node_indices, enabled=True)
         p.add_scalar_quantity(
-            "test_vals_with_range", node_values, defined_on="nodes", node_indices=node_indices,
-            vminmax=(-5.0, 5.0), enabled=True
+            "test_vals_with_range",
+            node_values,
+            defined_on="nodes",
+            node_indices=node_indices,
+            vminmax=(-5.0, 5.0),
+            enabled=True,
         )
         p.add_scalar_quantity(
-            "test_vals_with_datatype", node_values, defined_on="nodes", node_indices=node_indices,
-            enabled=True, datatype="symmetric"
+            "test_vals_with_datatype",
+            node_values,
+            defined_on="nodes",
+            node_indices=node_indices,
+            enabled=True,
+            datatype="symmetric",
         )
 
         ps.show(3)
@@ -3266,7 +3277,7 @@ class TestManagedBuffers(unittest.TestCase):
         ps.show(3)
 
 
-def make_stm(n_verts=20, n_faces=30, seed=42):
+def make_simple_triangle_mesn(n_verts=20, n_faces=30, seed=42):
     """Helper: random simple triangle mesh with given counts."""
     np.random.seed(seed)
     verts = np.random.rand(n_verts, 3).astype(np.float32)
@@ -3365,7 +3376,7 @@ class TestSimpleTriangleMesh(unittest.TestCase):
         # update both vertices and faces (counts may change)
         new_verts2 = np.random.rand(8, 3).astype(np.float32)
         new_faces2 = np.random.randint(0, 8, size=(12, 3)).astype(np.int32)
-        p.update(new_verts2, new_faces2)
+        p.update_mesh(new_verts2, new_faces2)
         self.assertEqual(p.n_vertices(), 8)
         self.assertEqual(p.n_faces(), 12)
         ps.show(3)
@@ -3374,7 +3385,7 @@ class TestSimpleTriangleMesh(unittest.TestCase):
 
     def test_reserve(self):
         p = ps.register_simple_triangle_mesh("test_stm", self.generate_verts(), self.generate_faces())
-        p.reserve(100, 200)  # should not raise
+        p.reserve_mesh_capacity(100, 200)  # should not raise
         ps.remove_all_structures()
 
     def test_scalar(self):
@@ -3418,48 +3429,44 @@ class TestSimpleTriangleMesh(unittest.TestCase):
 
     def test_update_sizes_and_quantities(self):
         sizes = [
-            (5,   8),    # small
-            (50,  80),   # grow big
-            (10,  15),   # shrink back down
+            (5, 8),  # small
+            (50, 80),  # grow big
+            (10, 15),  # shrink back down
             (200, 350),  # grow very large
-            (3,   4),    # shrink to minimum
+            (3, 4),  # shrink to minimum
             (100, 180),  # mid-size to finish
         ]
 
-        verts0, faces0 = make_stm(*sizes[0])
+        verts0, faces0 = make_simple_triangle_mesn(*sizes[0])
         p = ps.register_simple_triangle_mesh("stm_sz", verts0, faces0)
 
         # Add all four quantity types before any update — they'll be replaced
         # on each iteration as the size changes.
-        v_scalar = p.add_vertex_scalar_quantity(
-            "v_scalar", np.zeros(sizes[0][0], dtype=np.float32), enabled=True)
-        f_scalar = p.add_face_scalar_quantity(
-            "f_scalar", np.zeros(sizes[0][1], dtype=np.float32), enabled=True)
-        v_color = p.add_vertex_color_quantity(
-            "v_color", np.zeros((sizes[0][0], 3), dtype=np.float32), enabled=True)
-        f_color = p.add_face_color_quantity(
-            "f_color", np.zeros((sizes[0][1], 3), dtype=np.float32), enabled=True)
+        v_scalar = p.add_vertex_scalar_quantity("v_scalar", np.zeros(sizes[0][0], dtype=np.float32), enabled=True)
+        f_scalar = p.add_face_scalar_quantity("f_scalar", np.zeros(sizes[0][1], dtype=np.float32), enabled=True)
+        v_color = p.add_vertex_color_quantity("v_color", np.zeros((sizes[0][0], 3), dtype=np.float32), enabled=True)
+        f_color = p.add_face_color_quantity("f_color", np.zeros((sizes[0][1], 3), dtype=np.float32), enabled=True)
 
         ps.show(3)
 
         for n_verts, n_faces in sizes[1:]:
-            verts, faces = make_stm(n_verts, n_faces, seed=n_verts)
+            verts, faces = make_simple_triangle_mesn(n_verts, n_faces, seed=n_verts)
 
             # Update the mesh geometry (counts change)
-            p.update(verts, faces)
+            p.update_mesh(verts, faces)
             self.assertEqual(p.n_vertices(), n_verts)
             self.assertEqual(p.n_faces(), n_faces)
 
             # Re-add quantities with the new size (replaces old ones)
             v_scalar_data = np.random.rand(n_verts).astype(np.float32)
             f_scalar_data = np.random.rand(n_faces).astype(np.float32)
-            v_color_data  = np.random.rand(n_verts, 3).astype(np.float32)
-            f_color_data  = np.random.rand(n_faces, 3).astype(np.float32)
+            v_color_data = np.random.rand(n_verts, 3).astype(np.float32)
+            f_color_data = np.random.rand(n_faces, 3).astype(np.float32)
 
             v_scalar = p.add_vertex_scalar_quantity("v_scalar", v_scalar_data, enabled=True)
             f_scalar = p.add_face_scalar_quantity("f_scalar", f_scalar_data, enabled=True)
-            v_color  = p.add_vertex_color_quantity("v_color",  v_color_data,  enabled=True)
-            f_color  = p.add_face_color_quantity("f_color",   f_color_data,  enabled=True)
+            v_color = p.add_vertex_color_quantity("v_color", v_color_data, enabled=True)
+            f_color = p.add_face_color_quantity("f_color", f_color_data, enabled=True)
 
             ps.show(3)
 
