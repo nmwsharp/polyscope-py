@@ -1,3 +1,6 @@
 test_shot.png
 screenshot_*.tga
 screenshot_*.png
+*.png
+*.mp4
+*.ply

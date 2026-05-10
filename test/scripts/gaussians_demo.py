@@ -21,6 +21,7 @@ import sys
 import argparse
 import numpy as np
 from plyfile import PlyData
+import potpourri3d as pp3d
 
 
 def load_gaussians_from_ply(path_ply, device='cuda'):
@@ -77,6 +78,7 @@ def main():
 
     # Build arguments
     parser.add_argument('--gaussian_ply', type=str, help='path to a .ply file')
+    parser.add_argument('--mesh', type=str, help='path to a mesh')
 
     # Parse arguments
     args = parser.parse_args()
@@ -102,6 +104,15 @@ def main():
                                    quats=rotation.unsqueeze(0),
                                    sh_degree=0,
                                 )
+    
+    
+    ## Load a mesh as well if given
+    if args.mesh:
+        # Load a mesh argument
+        verts, faces = pp3d.read_mesh(args.mesh)
+        ps_mesh = ps.register_surface_mesh("test mesh", verts, faces, enabled=True)
+
+
 
     ps.show()
 
