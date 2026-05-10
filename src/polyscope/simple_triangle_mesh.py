@@ -72,15 +72,15 @@ class SimpleTriangleMesh(Structure):
         vertices_arr = np.array(vertices, dtype=np.float32)
         self.bound_instance.update_vertex_positions(vertices_arr)
 
-    def update(self, vertices: ArrayLike, faces: ArrayLike) -> None:
+    def update_mesh(self, vertices: ArrayLike, faces: ArrayLike) -> None:
         """Update vertices and faces; counts may change."""
         vertices_arr = np.array(vertices, dtype=np.float32)
         faces_arr = np.array(faces, dtype=np.int32)
-        self.bound_instance.update(vertices_arr, faces_arr)
+        self.bound_instance.update_mesh(vertices_arr, faces_arr)
 
-    def reserve(self, n_verts: int, n_faces: int) -> None:
+    def reserve_mesh_capacity(self, n_verts: int, n_faces: int) -> None:
         """Pre-allocate capacity to avoid reallocations on future updates."""
-        self.bound_instance.reserve(n_verts, n_faces)
+        self.bound_instance.reserve_mesh_capacity(n_verts, n_faces)
 
     # Picking
     def append_pick_data(self, pick_result: Any) -> None:
