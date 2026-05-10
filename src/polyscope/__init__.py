@@ -51,6 +51,7 @@ from polyscope.implicit_helpers import *  # noqa F403
 from polyscope.device_interop import *  # noqa F403
 
 from polyscope.surface_mesh import *  # noqa F403
+from polyscope.simple_triangle_mesh import *  # noqa F403
 from polyscope.point_cloud import *  # noqa F403
 from polyscope.curve_network import *  # noqa F403
 from polyscope.volume_mesh import *  # noqa F403
