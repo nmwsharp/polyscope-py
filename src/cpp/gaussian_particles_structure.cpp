@@ -110,14 +110,20 @@ void GaussianParticles::ensureImagebuffersAllocated() {
 
   // re-allocate buffers
   depths->setTextureSize(currImageWidth, currImageHeight);
-  depths->ensureHostBufferAllocated();
-  depths->data = std::vector<float>(currImageWidth * currImageHeight, 0.0f);
-  depths->markHostBufferUpdated();
+  {
+    std::vector<float> depthZeros(currImageWidth * currImageHeight, 0.0f);
+    depths->resize(depthZeros.size());
+    depths->setDataHost(depthZeros);
+    depths->markHostBufferUpdated();
+  }
 
   colors->setTextureSize(currImageWidth, currImageHeight);
-  colors->ensureHostBufferAllocated();
-  colors->data = std::vector<glm::vec4>(currImageWidth * currImageHeight, glm::vec4(0.0f));
-  colors->markHostBufferUpdated();
+  {
+    std::vector<glm::vec4> colorZeros(currImageWidth * currImageHeight, glm::vec4(0.0f));
+    colors->resize(colorZeros.size());
+    colors->setDataHost(colorZeros);
+    colors->markHostBufferUpdated();
+  }
 
   if (imageToScreenProgram) {
     imageToScreenProgram->setTextureFromBuffer("t_depth", depths->getRenderTextureBuffer().get());
