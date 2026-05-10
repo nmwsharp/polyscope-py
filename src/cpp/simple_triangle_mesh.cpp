@@ -43,13 +43,10 @@ void bind_simple_triangle_mesh(nb::module_& m) {
       // update
       .def("update_vertex_positions", &ps::SimpleTriangleMesh::updateVertexPositions<Eigen::MatrixXf>,
            "Update vertex positions (vertex count must stay the same)")
-      .def("update", &ps::SimpleTriangleMesh::update<Eigen::MatrixXf, Eigen::MatrixXi>,
-           nb::arg("vertices"), nb::arg("faces"),
-           "Update vertices and faces (counts may change)")
       .def("update_mesh", &ps::SimpleTriangleMesh::updateMesh<Eigen::MatrixXf, Eigen::MatrixXi>,
            nb::arg("vertices"), nb::arg("faces"),
-           "Update vertices and faces (counts may change), also updates object-space bounds")
-      .def("reserve", &ps::SimpleTriangleMesh::reserve,
+           "Update vertices and faces (counts may change)")
+      .def("reserve_mesh_capacity", &ps::SimpleTriangleMesh::reserveMeshCapacity,
            nb::arg("n_verts"), nb::arg("n_faces"),
            "Pre-allocate capacity to avoid reallocations on future updates")
 
