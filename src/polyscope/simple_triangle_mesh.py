@@ -127,59 +127,56 @@ class SimpleTriangleMesh(Structure):
 
     ## Quantities
 
-    def add_vertex_scalar_quantity(
+    def add_scalar_quantity(
         self,
         name: str,
         values: ArrayLike,
+        defined_on: Literal["vertices", "faces"] | str = "vertices",
         datatype: Literal["standard", "symmetric", "magnitude"] | str = "standard",
         **scalar_args: Unpack[ScalarQuantityArgs],
-    ) -> psb.SimpleTriangleMeshVertexScalarQuantity:
+    ):
         values_arr = np.asarray(values, dtype=np.float32)
-        q = self.bound_instance.add_vertex_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
+        if len(values_arr.shape) != 1:
+            raise ValueError("'values' should be a length-N array")
+
+        if defined_on == "vertices":
+            if values_arr.shape[0] != self.n_vertices():
+                raise ValueError("'values' should be a length n_vertices array")
+            q = self.bound_instance.add_vertex_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
+        elif defined_on == "faces":
+            if values_arr.shape[0] != self.n_faces():
+                raise ValueError("'values' should be a length n_faces array")
+            q = self.bound_instance.add_face_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
+        else:
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
+
         process_quantity_args(self, q, cast(QuantityArgsBase, scalar_args))
         process_scalar_args(self, q, cast(ScalarArgsBase, scalar_args))
         check_all_args_processed(self, q, scalar_args)
         return q
 
-    def add_face_scalar_quantity(
+    def add_color_quantity(
         self,
         name: str,
         values: ArrayLike,
-        datatype: Literal["standard", "symmetric", "magnitude"] | str = "standard",
-        **scalar_args: Unpack[ScalarQuantityArgs],
-    ) -> psb.SimpleTriangleMeshFaceScalarQuantity:
-        values_arr = np.asarray(values, dtype=np.float32)
-        q = self.bound_instance.add_face_scalar_quantity(name, values_arr, to_enum(psb.DataType, datatype))
-        process_quantity_args(self, q, cast(QuantityArgsBase, scalar_args))
-        process_scalar_args(self, q, cast(ScalarArgsBase, scalar_args))
-        check_all_args_processed(self, q, scalar_args)
-        return q
-
-    def add_vertex_color_quantity(
-        self,
-        name: str,
-        values: ArrayLike,
+        defined_on: Literal["vertices", "faces"] | str = "vertices",
         **color_args: Unpack[ColorQuantityArgs],
-    ) -> psb.SimpleTriangleMeshVertexColorQuantity:
+    ):
         values_arr = np.asarray(values, dtype=np.float32)
         if values_arr.ndim != 2 or values_arr.shape[1] != 3:
             raise ValueError("'values' should be an Nx3 array")
-        q = self.bound_instance.add_vertex_color_quantity(name, values_arr)
-        process_quantity_args(self, q, cast(QuantityArgsBase, color_args))
-        process_color_args(self, q, cast(ColorArgsBase, color_args))
-        check_all_args_processed(self, q, color_args)
-        return q
 
-    def add_face_color_quantity(
-        self,
-        name: str,
-        values: ArrayLike,
-        **color_args: Unpack[ColorQuantityArgs],
-    ) -> psb.SimpleTriangleMeshFaceColorQuantity:
-        values_arr = np.asarray(values, dtype=np.float32)
-        if values_arr.ndim != 2 or values_arr.shape[1] != 3:
-            raise ValueError("'values' should be an Nx3 array")
-        q = self.bound_instance.add_face_color_quantity(name, values_arr)
+        if defined_on == "vertices":
+            if values_arr.shape[0] != self.n_vertices():
+                raise ValueError("'values' should be a length n_vertices array")
+            q = self.bound_instance.add_vertex_color_quantity(name, values_arr)
+        elif defined_on == "faces":
+            if values_arr.shape[0] != self.n_faces():
+                raise ValueError("'values' should be a length n_faces array")
+            q = self.bound_instance.add_face_color_quantity(name, values_arr)
+        else:
+            raise ValueError("bad `defined_on` value {}, should be one of ['vertices', 'faces']".format(defined_on))
+
         process_quantity_args(self, q, cast(QuantityArgsBase, color_args))
         process_color_args(self, q, cast(ColorArgsBase, color_args))
         check_all_args_processed(self, q, color_args)
