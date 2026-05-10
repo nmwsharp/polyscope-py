@@ -3395,17 +3395,17 @@ class TestSimpleTriangleMesh(unittest.TestCase):
 
         # vertex scalar
         vals = np.random.rand(n_verts).astype(np.float32)
-        p.add_vertex_scalar_quantity("vert_scalar", vals, enabled=True)
+        p.add_scalar_quantity("vert_scalar", vals, enabled=True)
         ps.show(3)
 
         # vertex scalar with options
-        p.add_vertex_scalar_quantity("vert_scalar_sym", vals, datatype="symmetric")
-        p.add_vertex_scalar_quantity("vert_scalar_mag", vals, datatype="magnitude")
+        p.add_scalar_quantity("vert_scalar_sym", vals, datatype="symmetric")
+        p.add_scalar_quantity("vert_scalar_mag", vals, datatype="magnitude")
         ps.show(3)
 
         # face scalar
         f_vals = np.random.rand(n_faces).astype(np.float32)
-        p.add_face_scalar_quantity("face_scalar", f_vals, enabled=True)
+        p.add_scalar_quantity("face_scalar", f_vals, defined_on='faces', enabled=True)
         ps.show(3)
 
         ps.remove_all_structures()
@@ -3417,12 +3417,12 @@ class TestSimpleTriangleMesh(unittest.TestCase):
 
         # vertex color
         cols = np.random.rand(n_verts, 3).astype(np.float32)
-        p.add_vertex_color_quantity("vert_color", cols, enabled=True)
+        p.add_color_quantity("vert_color", cols, enabled=True)
         ps.show(3)
 
         # face color
         f_cols = np.random.rand(n_faces, 3).astype(np.float32)
-        p.add_face_color_quantity("face_color", f_cols, enabled=True)
+        p.add_color_quantity("face_color", f_cols, defined_on='faces', enabled=True)
         ps.show(3)
 
         ps.remove_all_structures()
@@ -3437,20 +3437,20 @@ class TestSimpleTriangleMesh(unittest.TestCase):
             (100, 180),  # mid-size to finish
         ]
 
-        verts0, faces0 = make_simple_triangle_mesn(*sizes[0])
+        verts0, faces0 = make_simple_triangle_mesh(*sizes[0])
         p = ps.register_simple_triangle_mesh("stm_sz", verts0, faces0)
 
         # Add all four quantity types before any update — they'll be replaced
         # on each iteration as the size changes.
-        v_scalar = p.add_vertex_scalar_quantity("v_scalar", np.zeros(sizes[0][0], dtype=np.float32), enabled=True)
-        f_scalar = p.add_face_scalar_quantity("f_scalar", np.zeros(sizes[0][1], dtype=np.float32), enabled=True)
-        v_color = p.add_vertex_color_quantity("v_color", np.zeros((sizes[0][0], 3), dtype=np.float32), enabled=True)
-        f_color = p.add_face_color_quantity("f_color", np.zeros((sizes[0][1], 3), dtype=np.float32), enabled=True)
+        v_scalar = p.add_scalar_quantity("v_scalar", np.zeros(sizes[0][0], dtype=np.float32), enabled=True)
+        f_scalar = p.add_scalar_quantity("f_scalar", np.zeros(sizes[0][1], dtype=np.float32), defined_on='faces', enabled=True)
+        v_color = p.add_color_quantity("v_color", np.zeros((sizes[0][0], 3), dtype=np.float32), enabled=True)
+        f_color = p.add_color_quantity("f_color", np.zeros((sizes[0][1], 3), dtype=np.float32), defined_on='faces', enabled=True)
 
         ps.show(3)
 
         for n_verts, n_faces in sizes[1:]:
-            verts, faces = make_simple_triangle_mesn(n_verts, n_faces, seed=n_verts)
+            verts, faces = make_simple_triangle_mesh(n_verts, n_faces, seed=n_verts)
 
             # Update the mesh geometry (counts change)
             p.update_mesh(verts, faces)
@@ -3463,10 +3463,10 @@ class TestSimpleTriangleMesh(unittest.TestCase):
             v_color_data = np.random.rand(n_verts, 3).astype(np.float32)
             f_color_data = np.random.rand(n_faces, 3).astype(np.float32)
 
-            v_scalar = p.add_vertex_scalar_quantity("v_scalar", v_scalar_data, enabled=True)
-            f_scalar = p.add_face_scalar_quantity("f_scalar", f_scalar_data, enabled=True)
-            v_color = p.add_vertex_color_quantity("v_color", v_color_data, enabled=True)
-            f_color = p.add_face_color_quantity("f_color", f_color_data, enabled=True)
+            v_scalar = p.add_scalar_quantity("v_scalar", v_scalar_data, enabled=True)
+            f_scalar = p.add_scalar_quantity("f_scalar", f_scalar_data, defined_on='faces', enabled=True)
+            v_color = p.add_color_quantity("v_color", v_color_data, enabled=True)
+            f_color = p.add_color_quantity("f_color", f_color_data, defined_on='faces', enabled=True)
 
             ps.show(3)
 
