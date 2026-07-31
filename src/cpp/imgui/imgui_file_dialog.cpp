@@ -10,6 +10,16 @@ using namespace nb::literals;
 
 using Vec2T = std::tuple<float, float>;
 
+/// Resolve the sentinel default to half the viewport, since ImGuiFileDialog's default minimum size
+/// allows the window to collapse 
+ImVec2 resolve_min_size(const Vec2T& min_size) {
+  if (std::get<0>(min_size) < 0.0f && std::get<1>(min_size) < 0.0f) {
+    const ImVec2 viewport_size = ImGui::GetMainViewport()->Size;
+    return ImVec2(viewport_size.x * 0.5f, viewport_size.y * 0.5f);
+  }
+  return ImVec2(std::get<0>(min_size), std::get<1>(min_size));
+}
+
 void bind_imgui_file_dialog(nb::module_& m) {
   // Configuration value passed to OpenDialog(). Pointer and callback fields are intentionally omitted.
   nb::class_<IGFD::FileDialogConfig>(m, "FileDialogConfig")
@@ -50,12 +60,11 @@ void bind_imgui_file_dialog(nb::module_& m) {
   m.def(
       "Display",
       [](const std::string& key, ImGuiWindowFlags flags, const Vec2T& min_size, const Vec2T& max_size) {
-        return IGFD::FileDialog::Instance()->Display(
-            key, flags, ImVec2(std::get<0>(min_size), std::get<1>(min_size)),
-            ImVec2(std::get<0>(max_size), std::get<1>(max_size)));
+        return IGFD::FileDialog::Instance()->Display(key, flags, resolve_min_size(min_size),
+                                                     ImVec2(std::get<0>(max_size), std::get<1>(max_size)));
       },
       nb::arg("key"), nb::arg("flags") = static_cast<ImGuiWindowFlags>(ImGuiWindowFlags_NoCollapse),
-      nb::arg("min_size") = Vec2T{0.0f, 0.0f}, nb::arg("max_size") = Vec2T{FLT_MAX, FLT_MAX});
+      nb::arg("min_size") = Vec2T{-1.0f, -1.0f}, nb::arg("max_size") = Vec2T{FLT_MAX, FLT_MAX});
   m.def("Close", []() { IGFD::FileDialog::Instance()->Close(); });
   m.def(
       "IsOpened",
@@ -102,11 +111,11 @@ void bind_imgui_file_dialog(nb::module_& m) {
           "Display",
           [](IGFD::FileDialog& dialog, const std::string& key, ImGuiWindowFlags flags,
              const Vec2T& min_size, const Vec2T& max_size) {
-            return dialog.Display(key, flags, ImVec2(std::get<0>(min_size), std::get<1>(min_size)),
+            return dialog.Display(key, flags, resolve_min_size(min_size),
                                   ImVec2(std::get<0>(max_size), std::get<1>(max_size)));
           },
           nb::arg("key"), nb::arg("flags") = static_cast<ImGuiWindowFlags>(ImGuiWindowFlags_NoCollapse),
-          nb::arg("min_size") = Vec2T{0.0f, 0.0f}, nb::arg("max_size") = Vec2T{FLT_MAX, FLT_MAX})
+          nb::arg("min_size") = Vec2T{-1.0f, -1.0f}, nb::arg("max_size") = Vec2T{FLT_MAX, FLT_MAX})
       .def("Close", &IGFD::FileDialog::Close)
       .def("IsOpened", nb::overload_cast<>(&IGFD::FileDialog::IsOpened, nb::const_))
       .def("IsOpened", nb::overload_cast<const std::string&>(&IGFD::FileDialog::IsOpened, nb::const_),
