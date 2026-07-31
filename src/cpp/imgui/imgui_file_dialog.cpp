@@ -139,28 +139,41 @@ void bind_imgui_file_dialog(nb::module_& m) {
       .def("GetCurrentPath", &IGFD::FileDialog::GetCurrentPath)
       .def("GetCurrentFilter", &IGFD::FileDialog::GetCurrentFilter);
 
-  // Export flags and result modes
-#define BIND_IGFD_CONSTANT(name) m.attr(#name) = nb::int_(static_cast<int>(name))
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_None);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_ConfirmOverwrite);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_DontShowHiddenFiles);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_DisableCreateDirectoryButton);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_HideColumnType);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_HideColumnSize);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_HideColumnDate);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_NoDialog);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_ReadOnlyFileNameField);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_CaseInsensitiveExtentionFiltering);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_Modal);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_DisableThumbnailMode);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_DisablePlaceMode);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_DisableQuickPathSelection);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_ShowDevicesButton);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_NaturalSorting);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_OptionalFileName);
-  BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_Default);
-  BIND_IGFD_CONSTANT(IGFD_ResultMode_AddIfNoFileExt);
-  BIND_IGFD_CONSTANT(IGFD_ResultMode_OverwriteFileExt);
-  BIND_IGFD_CONSTANT(IGFD_ResultMode_KeepInputFile);
-#undef BIND_IGFD_CONSTANT
+  {
+    auto e = nb::enum_<ImGuiFileDialogFlags_>(m, "ImGuiFileDialogFlags_", nb::is_arithmetic(),
+                                               nb::is_flag());
+#define BIND_IGFD_ENUM_VALUE(name) \
+  e.value(#name, name);             \
+  m.attr(#name) = ImGuiFileDialogFlags_::name
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_None);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_ConfirmOverwrite);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_DontShowHiddenFiles);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_DisableCreateDirectoryButton);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_HideColumnType);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_HideColumnSize);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_HideColumnDate);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_NoDialog);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_ReadOnlyFileNameField);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_CaseInsensitiveExtentionFiltering);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_Modal);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_DisableThumbnailMode);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_DisablePlaceMode);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_DisableQuickPathSelection);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_ShowDevicesButton);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_NaturalSorting);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_OptionalFileName);
+    BIND_IGFD_ENUM_VALUE(ImGuiFileDialogFlags_Default);
+#undef BIND_IGFD_ENUM_VALUE
+  }
+
+  {
+    auto e = nb::enum_<IGFD_ResultMode_>(m, "IGFD_ResultMode_", nb::is_arithmetic(), nb::is_flag());
+#define BIND_IGFD_ENUM_VALUE(name) \
+  e.value(#name, name);             \
+  m.attr(#name) = IGFD_ResultMode_::name
+    BIND_IGFD_ENUM_VALUE(IGFD_ResultMode_AddIfNoFileExt);
+    BIND_IGFD_ENUM_VALUE(IGFD_ResultMode_OverwriteFileExt);
+    BIND_IGFD_ENUM_VALUE(IGFD_ResultMode_KeepInputFile);
+#undef BIND_IGFD_ENUM_VALUE
+  }
 }
