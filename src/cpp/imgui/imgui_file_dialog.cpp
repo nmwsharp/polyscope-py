@@ -20,7 +20,9 @@ ImVec2 resolve_min_size(const Vec2T& min_size) {
   return ImVec2(std::get<0>(min_size), std::get<1>(min_size));
 }
 
-void bind_imgui_file_dialog(nb::module_& m) {
+void bind_imgui_file_dialog(nb::module_& imgui_module) {
+  auto m = imgui_module.def_submodule("file_dialog", "ImGuiFileDialog bindings");
+
   // Configuration value passed to OpenDialog(). Pointer and callback fields are intentionally omitted.
   nb::class_<IGFD::FileDialogConfig>(m, "FileDialogConfig")
       .def(
