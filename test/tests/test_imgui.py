@@ -8,8 +8,9 @@ import polyscope.imgui as psim
 
 class TestImGuiBindings(unittest.TestCase):
     def test_file_dialog_state(self):
-        flags = psim.ImGuiFileDialogFlags_Modal | psim.ImGuiFileDialogFlags_ConfirmOverwrite
-        config = psim.FileDialogConfig(
+        file_dialog = psim.file_dialog
+        flags = file_dialog.ImGuiFileDialogFlags_Modal | file_dialog.ImGuiFileDialogFlags_ConfirmOverwrite
+        config = file_dialog.FileDialogConfig(
             path=".",
             fileName="mesh.obj",
             filePathName="./mesh.obj",
@@ -25,25 +26,25 @@ class TestImGuiBindings(unittest.TestCase):
         self.assertEqual(config.flags, flags)
         self.assertEqual(config.sidePaneWidth, 300.0)
 
-        dialog = psim.FileDialog()
+        dialog = file_dialog.FileDialog()
         self.assertFalse(dialog.IsOpened())
         self.assertFalse(dialog.IsOpened("unused"))
         self.assertEqual(dialog.GetOpenedKey(), "")
         self.assertFalse(dialog.IsOk())
 
-        psim.Close()
-        self.assertFalse(psim.IsOpened())
-        self.addCleanup(psim.Close)
-        psim.OpenDialog("directory", "Choose directory", None)
-        self.assertTrue(psim.IsOpened())
-        self.assertTrue(psim.IsOpened("directory"))
-        self.assertEqual(psim.GetOpenedKey(), "directory")
-        self.assertFalse(psim.IsOk())
-        singleton = psim.FileDialog.Instance()
-        self.assertIs(singleton, psim.FileDialog.Instance())
+        file_dialog.Close()
+        self.assertFalse(file_dialog.IsOpened())
+        self.addCleanup(file_dialog.Close)
+        file_dialog.OpenDialog("directory", "Choose directory", None)
+        self.assertTrue(file_dialog.IsOpened())
+        self.assertTrue(file_dialog.IsOpened("directory"))
+        self.assertEqual(file_dialog.GetOpenedKey(), "directory")
+        self.assertFalse(file_dialog.IsOk())
+        singleton = file_dialog.FileDialog.Instance()
+        self.assertIs(singleton, file_dialog.FileDialog.Instance())
         self.assertTrue(singleton.IsOpened("directory"))
-        psim.Close()
-        self.assertFalse(psim.IsOpened())
+        file_dialog.Close()
+        self.assertFalse(file_dialog.IsOpened())
 
     def test_context_creation(self):
         # Test context creation functions using capsules
