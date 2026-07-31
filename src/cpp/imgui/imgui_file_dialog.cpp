@@ -1,14 +1,11 @@
 #include "ImGuiFileDialog.h"
 
-#include <nanobind/nanobind.h>
-#include <nanobind/stl/optional.h>
-#include <nanobind/stl/string.h>
-#include <nanobind/stl/tuple.h>
+#include "imgui_utils.h"
+
 
 namespace nb = nanobind;
 using namespace nb::literals;
 
-using Vec2T = std::tuple<float, float>;
 
 /// Resolve the sentinel default to half the viewport, since ImGuiFileDialog's default minimum size
 /// allows the window to collapse 
