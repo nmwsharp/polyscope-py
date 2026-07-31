@@ -52,6 +52,7 @@ nanobind_add_module(polyscope_bindings
 
   # ImGui related things
   src/cpp/imgui/imgui.cpp
+  src/cpp/imgui/imgui_file_dialog.cpp
 
   src/cpp/imgui/imgui_enums.cpp
   src/cpp/imgui/imgui_structs.cpp
@@ -137,15 +138,19 @@ nanobind_add_stub(
   OUTPUT_PATH .
   OUTPUT
       __init__.pyi
-      imgui.pyi
+      imgui/__init__.pyi
+      imgui/file_dialog.pyi
       implot.pyi
 )
 
 # Copy stub files into the appropriate place in the source directory after build
-set(STUB_FILES __init__.pyi imgui.pyi implot.pyi)
+set(STUB_FILES __init__.pyi imgui/__init__.pyi imgui/file_dialog.pyi implot.pyi)
 foreach(STUB_FILE ${STUB_FILES})
+  get_filename_component(STUB_DIR ${STUB_FILE} DIRECTORY)
   add_custom_command(
     TARGET polyscope_stub POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/polyscope_bindings/${STUB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_CURRENT_BINARY_DIR}/polyscope_bindings/${STUB_FILE}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/polyscope_bindings/${STUB_FILE}

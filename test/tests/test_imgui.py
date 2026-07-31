@@ -7,6 +7,45 @@ import polyscope.imgui as psim
 
 
 class TestImGuiBindings(unittest.TestCase):
+    def test_file_dialog_state(self):
+        file_dialog = psim.file_dialog
+        flags = file_dialog.ImGuiFileDialogFlags_Modal | file_dialog.ImGuiFileDialogFlags_ConfirmOverwrite
+        config = file_dialog.FileDialogConfig(
+            path=".",
+            fileName="mesh.obj",
+            filePathName="./mesh.obj",
+            countSelectionMax=3,
+            flags=flags,
+            sidePaneWidth=300.0,
+        )
+
+        self.assertEqual(config.path, ".")
+        self.assertEqual(config.fileName, "mesh.obj")
+        self.assertEqual(config.filePathName, "./mesh.obj")
+        self.assertEqual(config.countSelectionMax, 3)
+        self.assertEqual(config.flags, flags)
+        self.assertEqual(config.sidePaneWidth, 300.0)
+
+        dialog = file_dialog.FileDialog()
+        self.assertFalse(dialog.IsOpened())
+        self.assertFalse(dialog.IsOpened("unused"))
+        self.assertEqual(dialog.GetOpenedKey(), "")
+        self.assertFalse(dialog.IsOk())
+
+        file_dialog.Close()
+        self.assertFalse(file_dialog.IsOpened())
+        self.addCleanup(file_dialog.Close)
+        file_dialog.OpenDialog("directory", "Choose directory", None)
+        self.assertTrue(file_dialog.IsOpened())
+        self.assertTrue(file_dialog.IsOpened("directory"))
+        self.assertEqual(file_dialog.GetOpenedKey(), "directory")
+        self.assertFalse(file_dialog.IsOk())
+        singleton = file_dialog.FileDialog.Instance()
+        self.assertIs(singleton, file_dialog.FileDialog.Instance())
+        self.assertTrue(singleton.IsOpened("directory"))
+        file_dialog.Close()
+        self.assertFalse(file_dialog.IsOpened())
+
     def test_context_creation(self):
         # Test context creation functions using capsules
         # Note: We don't actually switch contexts in this test, just verify the bindings work
