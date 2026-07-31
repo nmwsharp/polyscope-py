@@ -11,6 +11,7 @@ using namespace nb::literals;
 using Vec2T = std::tuple<float, float>;
 
 void bind_imgui_file_dialog(nb::module_& m) {
+  // Configuration value passed to OpenDialog(). Pointer and callback fields are intentionally omitted.
   nb::class_<IGFD::FileDialogConfig>(m, "FileDialogConfig")
       .def(
           nb::new_([](const std::string& path, const std::string& file_name,
@@ -36,6 +37,7 @@ void bind_imgui_file_dialog(nb::module_& m) {
       .def_rw("flags", &IGFD::FileDialogConfig::flags)
       .def_rw("sidePaneWidth", &IGFD::FileDialogConfig::sidePaneWidth);
 
+  // Advanced API for independently owned dialogs, plus access to the upstream library-owned singleton.
   auto file_dialog_class = nb::class_<IGFD::FileDialog>(m, "FileDialog");
   file_dialog_class
       .def(nb::init<>())
@@ -81,6 +83,7 @@ void bind_imgui_file_dialog(nb::module_& m) {
       .def("GetCurrentPath", &IGFD::FileDialog::GetCurrentPath)
       .def("GetCurrentFilter", &IGFD::FileDialog::GetCurrentFilter);
 
+  // Ordinary API backed by FileDialog::Instance(), so callers do not need to retain a dialog object.
   m.def(
       "OpenDialog",
       [](const std::string& key, const std::string& title,
@@ -127,6 +130,7 @@ void bind_imgui_file_dialog(nb::module_& m) {
   m.def("GetCurrentPath", []() { return IGFD::FileDialog::Instance()->GetCurrentPath(); });
   m.def("GetCurrentFilter", []() { return IGFD::FileDialog::Instance()->GetCurrentFilter(); });
 
+  // Export flags and result modes
 #define BIND_IGFD_CONSTANT(name) m.attr(#name) = nb::int_(static_cast<int>(name))
   BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_None);
   BIND_IGFD_CONSTANT(ImGuiFileDialogFlags_ConfirmOverwrite);
