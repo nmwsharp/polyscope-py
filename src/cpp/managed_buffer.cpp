@@ -27,10 +27,13 @@ nb::class_<ps::render::ManagedBuffer<T>> bind_managed_buffer_T(nb::module_& m, p
       .def("get_value", nb::overload_cast<size_t, size_t, size_t>(&ps::render::ManagedBuffer<T>::getValue))
       .def("mark_host_buffer_updated", &ps::render::ManagedBuffer<T>::markHostBufferUpdated)
       .def("get_device_buffer_size_in_bytes",
-           [](ps::render::ManagedBuffer<T>& s) {
+           [](ps::render::ManagedBuffer<T>& s) -> size_t {
              // NOTE: this could cause the underlying device buffer to be allocatred if it wasn't already
              if (s.getDeviceBufferType() == polyscope::DeviceBufferType::Attribute) {
-               return s.getRenderAttributeBuffer()->getDataSizeInBytes();
+              // TODO: update this for new API, distinguish capacity vs size
+               std::shared_ptr<polyscope::render::AttributeBuffer> buff = s.getRenderAttributeBuffer();
+               return static_cast<size_t>(buff->getBufferSize()) * polyscope::sizeInBytes(buff->getType()) *
+                      buff->getArrayCount();
              } else {
                return s.getRenderTextureBuffer()->getSizeInBytes();
              }
