@@ -385,8 +385,101 @@ def get_view_as_json() -> str:
     return psb.get_view_as_json()
 
 
-def screen_coords_to_world_ray(screen_coords):
-    return np.array(psb.screen_coords_to_world_ray(glm2(screen_coords)).as_tuple())
+def screen_coords_to_world_ray(screen_coords: ArrayLike, subview_ind: int = -1) -> NDArray:
+    return np.array(psb.screen_coords_to_world_ray(glm2(screen_coords), subview_ind).as_tuple())
+
+
+### Subview / multi-viewport
+
+
+def set_num_subviews(count: int) -> None:
+    psb.set_num_subviews(count)
+
+
+def get_num_subviews() -> int:
+    return psb.get_num_subviews()
+
+
+def create_subview_grid(grid_width: int, grid_height: int) -> None:
+    psb.create_subview_grid(grid_width, grid_height)
+
+
+def activate_subview(subview_ind: int) -> None:
+    psb.activate_subview(subview_ind)
+
+
+def get_active_subview_index() -> int:
+    return psb.get_active_subview_index()
+
+
+def set_active_subview_relative_location(pos_x: float, pos_y: float) -> None:
+    psb.set_active_subview_relative_location(pos_x, pos_y)
+
+
+def set_active_subview_relative_size(width: float, height: float) -> None:
+    psb.set_active_subview_relative_size(width, height)
+
+
+def get_active_subview_buffer_width() -> int:
+    return psb.get_active_subview_buffer_width()
+
+
+def get_active_subview_buffer_height() -> int:
+    return psb.get_active_subview_buffer_height()
+
+
+def get_subviews_share_navigation() -> bool:
+    return psb.get_subviews_share_navigation()
+
+
+def set_subviews_share_navigation(share_navigation: bool) -> None:
+    psb.set_subviews_share_navigation(share_navigation)
+
+
+def buffer_inds_to_screen_coords_subview(x_pos: int, y_pos: int, subview_ind: int = -1) -> NDArray:
+    return np.array(psb.buffer_inds_to_screen_coords_subview(x_pos, y_pos, subview_ind).as_tuple())
+
+
+def screen_coords_to_buffer_inds_subview(screen_coords: ArrayLike, subview_ind: int = -1) -> Tuple[int, int]:
+    return psb.screen_coords_to_buffer_inds_subview(glm2(screen_coords), subview_ind)
+
+
+def screen_coords_to_subview_ind(screen_coords: ArrayLike) -> int:
+    return psb.screen_coords_to_subview_ind(glm2(screen_coords))
+
+
+def buffer_inds_to_subview_ind(buffer_inds: ArrayLike) -> int:
+    return psb.buffer_inds_to_subview_ind(glm2i(buffer_inds))
+
+
+def screen_coords_global_to_subview(screen_coords: ArrayLike) -> Tuple[NDArray, int]:
+    local_coords, i_subview = psb.screen_coords_global_to_subview(glm2(screen_coords))
+    return np.array(local_coords.as_tuple()), i_subview
+
+
+def buffer_inds_global_to_subview(buffer_inds: ArrayLike) -> Tuple[NDArray, int]:
+    local_inds, i_subview = psb.buffer_inds_global_to_subview(glm2i(buffer_inds))
+    return np.array(local_inds.as_tuple()), i_subview
+
+
+def screen_coords_subview_to_global(screen_coords: ArrayLike, subview_ind: int) -> NDArray:
+    return np.array(psb.screen_coords_subview_to_global(glm2(screen_coords), subview_ind).as_tuple())
+
+
+def buffer_inds_subview_to_global(buffer_inds: ArrayLike, subview_ind: int) -> NDArray:
+    return np.array(psb.buffer_inds_subview_to_global(glm2i(buffer_inds), subview_ind).as_tuple())
+
+
+def get_subview_imgui_rect(subview_ind: int = -1) -> NDArray:
+    return np.array(psb.get_subview_imgui_rect(subview_ind).as_tuple())
+
+
+def buffer_inds_to_world_ray(buffer_inds: ArrayLike, subview_ind: int = -1) -> NDArray:
+    return np.array(psb.buffer_inds_to_world_ray(glm2i(buffer_inds), subview_ind).as_tuple())
+
+
+def screen_coords_and_depth_to_world_position(screen_coords: ArrayLike, clip_depth: float, subview_ind: int = -1) -> NDArray:
+    return np.array(psb.screen_coords_and_depth_to_world_position(glm2(screen_coords), clip_depth, subview_ind).as_tuple())
 
 
 # deprecated! use query_pick_at_screen_coords
