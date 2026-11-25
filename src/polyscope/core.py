@@ -440,6 +440,14 @@ def set_viewports_share_navigation(share_navigation: bool) -> None:
     psb.set_viewports_share_navigation(share_navigation)
 
 
+def buffer_inds_to_screen_coords(x_pos: int, y_pos: int) -> NDArray:
+    return np.array(psb.buffer_inds_to_screen_coords(x_pos, y_pos).as_tuple())
+
+
+def screen_coords_to_buffer_inds(screen_coords: ArrayLike) -> Tuple[int, int]:
+    return psb.screen_coords_to_buffer_inds(glm2(screen_coords))
+
+
 def buffer_inds_to_screen_coords_viewport(x_pos: int, y_pos: int, viewport_ind: int = -1) -> NDArray:
     return np.array(psb.buffer_inds_to_screen_coords_viewport(x_pos, y_pos, viewport_ind).as_tuple())
 
@@ -466,11 +474,11 @@ def buffer_inds_global_to_viewport(buffer_inds: ArrayLike) -> Tuple[NDArray, int
     return np.array(local_inds.as_tuple()), viewport_ind
 
 
-def screen_coords_viewport_to_global(screen_coords: ArrayLike, viewport_ind: int) -> NDArray:
+def screen_coords_viewport_to_global(screen_coords: ArrayLike, viewport_ind: int = -1) -> NDArray:
     return np.array(psb.screen_coords_viewport_to_global(glm2(screen_coords), viewport_ind).as_tuple())
 
 
-def buffer_inds_viewport_to_global(buffer_inds: ArrayLike, viewport_ind: int) -> NDArray:
+def buffer_inds_viewport_to_global(buffer_inds: ArrayLike, viewport_ind: int = -1) -> NDArray:
     return np.array(psb.buffer_inds_viewport_to_global(glm2i(buffer_inds), viewport_ind).as_tuple())
 
 
@@ -616,6 +624,9 @@ class PickResult:
         self.quantity_name = bound_pick_result.quantity_name
         self.screen_coords = bound_pick_result.screen_coords.as_tuple()
         self.buffer_inds = bound_pick_result.buffer_inds.as_tuple()
+        self.viewport_ind = bound_pick_result.viewport_ind
+        self.viewport_screen_coords = bound_pick_result.viewport_screen_coords.as_tuple()
+        self.viewport_buffer_inds = bound_pick_result.viewport_buffer_inds.as_tuple()
         self.position = np.array(bound_pick_result.position.as_tuple())
         self.depth = bound_pick_result.depth
         self.local_index = bound_pick_result.local_index
@@ -659,6 +670,9 @@ PickResult(
     quantity_name={self.quantity_name},
     screen_coords={self.screen_coords},
     buffer_inds={self.buffer_inds},
+    viewport_ind={self.viewport_ind},
+    viewport_screen_coords={self.viewport_screen_coords},
+    viewport_buffer_inds={self.viewport_buffer_inds},
     position={self.position},
     depth={self.depth},
     local_index={self.local_index},
@@ -667,19 +681,30 @@ PickResult(
 """
 
 
-def pick(*, screen_coords: ArrayLike | None = None, buffer_inds: ArrayLike | None = None) -> PickResult:
+def pick(
+    *,
+    screen_coords: ArrayLike | None = None,
+    buffer_inds: ArrayLike | None = None,
+    viewport_ind: int | None = None,
+) -> PickResult:
     if screen_coords is not None and buffer_inds is not None:
         raise ValueError("pass args one of screen_coords OR buffer_inds, but not both")
     if screen_coords is None and buffer_inds is None:
         raise ValueError("must pass args one of screen_coords or buffer_inds")
 
     if screen_coords is not None:
-        raw_result = psb.pick_at_screen_coords(glm2(screen_coords))
+        if viewport_ind is None:
+            raw_result = psb.pick_at_screen_coords(glm2(screen_coords))
+        else:
+            raw_result = psb.pick_viewport_at_screen_coords(glm2(screen_coords), viewport_ind)
     if buffer_inds is not None:
         arr = np.asarray(buffer_inds)
         if not np.issubdtype(arr.dtype, np.integer) or arr.shape != (2,):
             raise ValueError("buffer_inds should be a an array/tuple/etc of two integers")
-        raw_result = psb.pick_at_buffer_inds(glm2i(buffer_inds))
+        if viewport_ind is None:
+            raw_result = psb.pick_at_buffer_inds(glm2i(buffer_inds))
+        else:
+            raw_result = psb.pick_viewport_at_buffer_inds(glm2i(buffer_inds), viewport_ind)
 
     return PickResult(raw_result)
 

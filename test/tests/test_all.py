@@ -253,54 +253,78 @@ class TestCore(unittest.TestCase):
 
         ps.show(3)
 
-        # coordinate conversion
-        rect = ps.get_viewport_imgui_rect(0)
-        self.assertEqual(len(rect), 4)
+        # coordinate conversion (logical pixel screen_coords and integer buffer_inds, origin top-left)
+        win_w, win_h = ps.get_window_size()
+        rect0 = ps.get_viewport_imgui_rect(0)
+        rect1 = ps.get_viewport_imgui_rect(1)
+        self.assertEqual(len(rect0), 4)
+        self.assertAlmostEqual(rect0[0] + rect0[2], rect1[0], places=4)
 
-        ind = ps.screen_coords_to_viewport_ind((0.5, 0.5))
-        self.assertGreaterEqual(ind, 0)
+        left_sc = (0.25 * win_w, 0.5 * win_h)
+        right_sc = (0.75 * win_w, 0.5 * win_h)
+        self.assertEqual(ps.screen_coords_to_viewport_ind(left_sc), 0)
+        self.assertEqual(ps.screen_coords_to_viewport_ind(right_sc), 1)
 
-        ind2 = ps.buffer_inds_to_viewport_ind((10, 10))
-        self.assertGreaterEqual(ind2, 0)
+        right_bi = ps.screen_coords_to_buffer_inds(right_sc)
+        self.assertEqual(len(right_bi), 2)
+        self.assertEqual(ps.buffer_inds_to_viewport_ind(right_bi), 1)
+        recovered_sc = ps.buffer_inds_to_screen_coords(right_bi[0], right_bi[1])
+        self.assertAlmostEqual(recovered_sc[0], right_sc[0], delta=2.0)
+        self.assertAlmostEqual(recovered_sc[1], right_sc[1], delta=2.0)
 
-        local_coords, iviewport = ps.screen_coords_global_to_viewport((0.5, 0.5))
+        local_coords, iviewport = ps.screen_coords_global_to_viewport(right_sc)
+        self.assertEqual(iviewport, 1)
         self.assertEqual(len(local_coords), 2)
-        self.assertGreaterEqual(iviewport, 0)
+        global_sc = ps.screen_coords_viewport_to_global(local_coords, iviewport)
+        self.assertAlmostEqual(global_sc[0], right_sc[0], places=3)
+        self.assertAlmostEqual(global_sc[1], right_sc[1], places=3)
+        # default viewport_ind=-1 uses active viewport (currently 1)
+        global_sc_default = ps.screen_coords_viewport_to_global(local_coords)
+        self.assertAlmostEqual(global_sc_default[0], right_sc[0], places=3)
 
-        local_inds, iviewport2 = ps.buffer_inds_global_to_viewport((10, 10))
-        self.assertEqual(len(local_inds), 2)
-        self.assertGreaterEqual(iviewport2, 0)
-
-        global_sc = ps.screen_coords_viewport_to_global((0.25, 0.25), 0)
-        self.assertEqual(len(global_sc), 2)
-
-        global_bi = ps.buffer_inds_viewport_to_global((5, 5), 0)
-        self.assertEqual(len(global_bi), 2)
+        local_inds, iviewport2 = ps.buffer_inds_global_to_viewport(right_bi)
+        self.assertEqual(iviewport2, 1)
+        global_bi = ps.buffer_inds_viewport_to_global(local_inds, iviewport2)
+        self.assertEqual(tuple(global_bi), right_bi)
+        global_bi_default = ps.buffer_inds_viewport_to_global(local_inds)
+        self.assertEqual(tuple(global_bi_default), right_bi)
 
         sc = ps.buffer_inds_to_screen_coords_viewport(10, 10, 0)
         self.assertEqual(len(sc), 2)
 
-        bi = ps.screen_coords_to_buffer_inds_viewport((0.5, 0.5), 0)
+        bi = ps.screen_coords_to_buffer_inds_viewport((50.0, 50.0), 0)
         self.assertEqual(len(bi), 2)
 
         # viewport variants take coordinates local to a viewport (active viewport by default)
         ray = ps.viewport_buffer_inds_to_world_ray((10, 10), 0)
         self.assertEqual(len(ray), 3)
-        ray = ps.viewport_screen_coords_to_world_ray((0.5, 0.5))
+        ray = ps.viewport_screen_coords_to_world_ray((50.0, 50.0))
         self.assertEqual(len(ray), 3)
 
-        pos = ps.viewport_screen_coords_and_depth_to_world_position((0.5, 0.5), 0.5, 0)
+        pos = ps.viewport_screen_coords_and_depth_to_world_position((50.0, 50.0), 0.5, 0)
         self.assertEqual(len(pos), 3)
 
         # the plain variants take global coordinates
-        ray = ps.buffer_inds_to_world_ray((10, 10))
+        ray = ps.buffer_inds_to_world_ray(right_bi)
         self.assertEqual(len(ray), 3)
 
-        pos = ps.screen_coords_and_depth_to_world_position((0.5, 0.5), 0.5)
+        pos = ps.screen_coords_and_depth_to_world_position(right_sc, 0.5)
         self.assertEqual(len(pos), 3)
 
-        # reset to single viewport
-        ps.set_num_viewports(1)
+        # PickResult exposes viewport fields, and pick() accepts optional viewport_ind
+        pr_global = ps.pick(screen_coords=right_sc)
+        self.assertEqual(pr_global.viewport_ind, 1)
+        self.assertEqual(len(pr_global.viewport_screen_coords), 2)
+        self.assertEqual(len(pr_global.viewport_buffer_inds), 2)
+        pr_local = ps.pick(buffer_inds=pr_global.viewport_buffer_inds, viewport_ind=1)
+        self.assertEqual(pr_local.viewport_ind, 1)
+        self.assertEqual(pr_local.buffer_inds, pr_global.buffer_inds)
+        pr_active = ps.pick(screen_coords=local_coords, viewport_ind=-1)
+        self.assertEqual(pr_active.viewport_ind, 1)
+
+        # reset cleanly to a single full-window viewport
+        ps.set_viewports_share_navigation(True)
+        ps.create_viewport_grid(1, 1)
 
     def test_ground_options(self):
         ps.set_ground_plane_mode("none")

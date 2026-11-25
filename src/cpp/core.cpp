@@ -216,6 +216,12 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("get_active_viewport_buffer_height", &ps::view::getActiveViewportBufferHeight);
   m.def("get_viewports_share_navigation", &ps::view::getViewportsShareNavigation);
   m.def("set_viewports_share_navigation", &ps::view::setViewportsShareNavigation, "share_navigation"_a);
+  m.def("buffer_inds_to_screen_coords", [](int x, int y) {
+      return ps::view::bufferIndsToScreenCoords(x, y);
+  }, "x_pos"_a, "y_pos"_a);
+  m.def("screen_coords_to_buffer_inds", [](glm::vec2 screen_coords) {
+      return ps::view::screenCoordsToBufferInds(screen_coords);
+  }, "screen_coords"_a);
   m.def("buffer_inds_to_screen_coords_viewport", [](int x, int y, int32_t viewport_ind) {
       return ps::view::bufferIndsToScreenCoordsViewport(x, y, viewport_ind);
   }, "x_pos"_a, "y_pos"_a, "viewport_ind"_a = -1);
@@ -236,10 +242,10 @@ NB_MODULE(polyscope_bindings, m) {
   }, "buffer_inds"_a);
   m.def("screen_coords_viewport_to_global", [](glm::vec2 screen_coords, int32_t viewport_ind) {
       return ps::view::screenCoordsViewportToGlobal(screen_coords, viewport_ind);
-  }, "screen_coords"_a, "viewport_ind"_a);
+  }, "screen_coords"_a, "viewport_ind"_a = -1);
   m.def("buffer_inds_viewport_to_global", [](glm::ivec2 buffer_inds, int32_t viewport_ind) {
       return ps::view::bufferIndsViewportToGlobal(buffer_inds, viewport_ind);
-  }, "buffer_inds"_a, "viewport_ind"_a);
+  }, "buffer_inds"_a, "viewport_ind"_a = -1);
   m.def("get_viewport_imgui_rect", &ps::view::getViewportImGuiRect, "viewport_ind"_a = -1);
   m.def("buffer_inds_to_world_ray", [](glm::ivec2 buffer_inds) {
       return ps::view::bufferIndsToWorldRay(buffer_inds);
@@ -310,6 +316,8 @@ NB_MODULE(polyscope_bindings, m) {
   // query what is under a pixel
   m.def("pick_at_screen_coords", &ps::pickAtScreenCoords);
   m.def("pick_at_buffer_inds", &ps::pickAtBufferInds);
+  m.def("pick_viewport_at_screen_coords", &ps::pickViewportAtScreenCoords, "screen_coords"_a, "viewport_ind"_a = -1);
+  m.def("pick_viewport_at_buffer_inds", &ps::pickViewportAtBufferInds, "buffer_inds"_a, "viewport_ind"_a = -1);
 
   // === Ground plane and shadows
   m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });
