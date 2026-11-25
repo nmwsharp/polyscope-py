@@ -97,6 +97,20 @@ class SimpleTriangleMesh(Structure):
     def get_color(self) -> tuple[float, float, float]:
         return self.bound_instance.get_color().as_tuple()
 
+    def set_edge_color(self, val: ArrayLike) -> "SimpleTriangleMesh":
+        self.bound_instance.set_edge_color(glm3(val))
+        return self
+
+    def get_edge_color(self) -> tuple[float, float, float]:
+        return self.bound_instance.get_edge_color().as_tuple()
+
+    def set_edge_width(self, val: float) -> "SimpleTriangleMesh":
+        self.bound_instance.set_edge_width(val)
+        return self
+
+    def get_edge_width(self) -> float:
+        return self.bound_instance.get_edge_width()
+
     def set_back_face_policy(self, val: str) -> "SimpleTriangleMesh":
         self.bound_instance.set_back_face_policy(to_enum(psb.BackFacePolicy, val))
         return self
@@ -132,7 +146,7 @@ class SimpleTriangleMesh(Structure):
         name: str,
         values: ArrayLike,
         defined_on: Literal["vertices", "faces"] | str = "vertices",
-        datatype: Literal["standard", "symmetric", "magnitude"] | str = "standard",
+        datatype: Literal["standard", "symmetric", "magnitude", "categorical"] | str = "standard",
         **scalar_args: Unpack[ScalarQuantityArgs],
     ):
         values_arr = np.asarray(values, dtype=np.float32)
@@ -184,9 +198,44 @@ class SimpleTriangleMesh(Structure):
 
 
 def register_simple_triangle_mesh(
-    name: str, vertices: ArrayLike, faces: ArrayLike
+    name: str,
+    vertices: ArrayLike,
+    faces: ArrayLike,
+    enabled: bool | None = None,
+    color: ArrayLike | None = None,
+    edge_color: ArrayLike | None = None,
+    edge_width: float | None = None,
+    material: str | None = None,
+    back_face_policy: Literal["identical", "different", "custom", "cull"] | str | None = None,
+    back_face_color: ArrayLike | None = None,
+    transparency: float | None = None,
 ) -> SimpleTriangleMesh:
-    return SimpleTriangleMesh(name=name, vertices=vertices, faces=faces)
+    """Register a new simple triangle mesh"""
+
+    if not psb.is_initialized():
+        raise RuntimeError("Polyscope has not been initialized")
+
+    p = SimpleTriangleMesh(name=name, vertices=vertices, faces=faces)
+
+    # == Apply options
+    if enabled is not None:
+        p.set_enabled(enabled)
+    if color is not None:
+        p.set_color(color)
+    if edge_color is not None:
+        p.set_edge_color(edge_color)
+    if edge_width is not None:
+        p.set_edge_width(edge_width)
+    if material is not None:
+        p.set_material(material)
+    if back_face_policy is not None:
+        p.set_back_face_policy(back_face_policy)
+    if back_face_color is not None:
+        p.set_back_face_color(back_face_color)
+    if transparency is not None:
+        p.set_transparency(transparency)
+
+    return p
 
 
 def remove_simple_triangle_mesh(name: str = "", error_if_absent: bool = False) -> None:

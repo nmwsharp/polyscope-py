@@ -12,18 +12,18 @@ void bind_simple_triangle_mesh(nb::module_& m) {
   // Scalar quantities
   bindScalarQuantity<ps::SimpleTriangleMeshVertexScalarQuantity>(m, "SimpleTriangleMeshVertexScalarQuantity")
       .def("update_data", &ps::SimpleTriangleMeshVertexScalarQuantity::updateData<Eigen::VectorXf>,
-           nb::arg("values"), "Update scalar values (count must stay the same)");
+           nb::arg("values"), "Update scalar values (count must match current vertex count)");
   bindScalarQuantity<ps::SimpleTriangleMeshFaceScalarQuantity>(m, "SimpleTriangleMeshFaceScalarQuantity")
       .def("update_data", &ps::SimpleTriangleMeshFaceScalarQuantity::updateData<Eigen::VectorXf>,
-           nb::arg("values"), "Update scalar values (count must stay the same)");
+           nb::arg("values"), "Update scalar values (count must match current face count)");
 
   // Color quantities
   bindColorQuantity<ps::SimpleTriangleMeshVertexColorQuantity>(m, "SimpleTriangleMeshVertexColorQuantity")
       .def("update_data", &ps::SimpleTriangleMeshVertexColorQuantity::updateData<Eigen::MatrixXf>,
-           nb::arg("values"), "Update color values (count must stay the same)");
+           nb::arg("values"), "Update color values (count must match current vertex count)");
   bindColorQuantity<ps::SimpleTriangleMeshFaceColorQuantity>(m, "SimpleTriangleMeshFaceColorQuantity")
       .def("update_data", &ps::SimpleTriangleMeshFaceColorQuantity::updateData<Eigen::MatrixXf>,
-           nb::arg("values"), "Update color values (count must stay the same)");
+           nb::arg("values"), "Update color values (count must match current face count)");
 
 
   // == Helper classes
@@ -53,6 +53,10 @@ void bind_simple_triangle_mesh(nb::module_& m) {
       // options
       .def("set_color", &ps::SimpleTriangleMesh::setSurfaceColor, "Set surface color")
       .def("get_color", &ps::SimpleTriangleMesh::getSurfaceColor, "Get surface color")
+      .def("set_edge_color", &ps::SimpleTriangleMesh::setEdgeColor, "Set edge color")
+      .def("get_edge_color", &ps::SimpleTriangleMesh::getEdgeColor, "Get edge color")
+      .def("set_edge_width", &ps::SimpleTriangleMesh::setEdgeWidth, "Set edge width")
+      .def("get_edge_width", &ps::SimpleTriangleMesh::getEdgeWidth, "Get edge width")
       .def("set_back_face_policy", &ps::SimpleTriangleMesh::setBackFacePolicy, "Set back face policy")
       .def("get_back_face_policy", &ps::SimpleTriangleMesh::getBackFacePolicy, "Get back face policy")
       .def("set_back_face_color", &ps::SimpleTriangleMesh::setBackFaceColor, "Set back face color")
