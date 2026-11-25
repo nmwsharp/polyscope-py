@@ -156,6 +156,12 @@ class GaussianParticles(Structure):
             render_color = render_color[..., :3]
             render_coloralpha = torch.concatenate((render_color, render_alpha), dim=-1)
 
+            # gsplat outputs depth == 0 for empty background pixels (alpha == 0); set them above
+            # LARGE_FLOAT (1e25) so the render-image shader discards them instead of writing gl_FragDepth = 0.
+            render_depth = torch.where(
+                render_alpha[..., 0] > 1e-4, render_depth, torch.full_like(render_depth, 1e30)
+            )
+
             # copy to the image buffer
             color_buffer.update_data_from_device(render_coloralpha.contiguous())
             depth_buffer.update_data_from_device(render_depth.contiguous())

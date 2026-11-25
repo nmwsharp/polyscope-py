@@ -85,7 +85,11 @@ void GaussianParticles::setExtents(glm::vec3 bbox_min, glm::vec3 bbox_max) {
 void GaussianParticles::setNumParticles(int32_t numParticles_) { numParticles = numParticles_; }
 
 std::string GaussianParticles::typeName() { return structureTypeName; }
-void GaussianParticles::refresh() {}
+void GaussianParticles::refresh() {
+  imageToScreenProgram.reset();
+  requestRedraw();
+  Structure::refresh();
+}
 
 std::tuple<int32_t, int32_t> GaussianParticles::getRenderDims() {
   ensureImagebuffersAllocated();
