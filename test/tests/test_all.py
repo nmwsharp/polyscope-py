@@ -227,60 +227,60 @@ class TestCore(unittest.TestCase):
         world_pos = ps.screen_coords_to_world_position(screen_coords)
         self.assertEqual(len(world_pos), 3)
 
-    def test_subviews(self):
-        # basic subview creation and navigation
-        ps.create_subview_grid(2, 2)
-        self.assertEqual(ps.get_num_subviews(), 4)
-        self.assertGreater(ps.get_active_subview_buffer_width(), 0)
-        self.assertGreater(ps.get_active_subview_buffer_height(), 0)
+    def test_viewports(self):
+        # basic viewport creation and navigation
+        ps.create_viewport_grid(2, 2)
+        self.assertEqual(ps.get_num_viewports(), 4)
+        self.assertGreater(ps.get_active_viewport_buffer_width(), 0)
+        self.assertGreater(ps.get_active_viewport_buffer_height(), 0)
 
-        ps.activate_subview(1)
-        self.assertEqual(ps.get_active_subview_index(), 1)
-        ps.activate_subview(0)
+        ps.activate_viewport(1)
+        self.assertEqual(ps.get_active_viewport_index(), 1)
+        ps.activate_viewport(0)
 
-        ps.set_subviews_share_navigation(True)
-        self.assertEqual(ps.get_subviews_share_navigation(), True)
-        ps.set_subviews_share_navigation(False)
+        ps.set_viewports_share_navigation(True)
+        self.assertEqual(ps.get_viewports_share_navigation(), True)
+        ps.set_viewports_share_navigation(False)
 
-        # manual subview setup
-        ps.set_num_subviews(2)
-        ps.activate_subview(0)
-        ps.set_active_subview_relative_location(0.0, 0.0)
-        ps.set_active_subview_relative_size(0.5, 1.0)
-        ps.activate_subview(1)
-        ps.set_active_subview_relative_location(0.5, 0.0)
-        ps.set_active_subview_relative_size(0.5, 1.0)
+        # manual viewport setup
+        ps.set_num_viewports(2)
+        ps.activate_viewport(0)
+        ps.set_active_viewport_relative_location(0.0, 0.0)
+        ps.set_active_viewport_relative_size(0.5, 1.0)
+        ps.activate_viewport(1)
+        ps.set_active_viewport_relative_location(0.5, 0.0)
+        ps.set_active_viewport_relative_size(0.5, 1.0)
 
         ps.show(3)
 
         # coordinate conversion
-        rect = ps.get_subview_imgui_rect(0)
+        rect = ps.get_viewport_imgui_rect(0)
         self.assertEqual(len(rect), 4)
 
-        ind = ps.screen_coords_to_subview_ind((0.5, 0.5))
+        ind = ps.screen_coords_to_viewport_ind((0.5, 0.5))
         self.assertGreaterEqual(ind, 0)
 
-        ind2 = ps.buffer_inds_to_subview_ind((10, 10))
+        ind2 = ps.buffer_inds_to_viewport_ind((10, 10))
         self.assertGreaterEqual(ind2, 0)
 
-        local_coords, isubview = ps.screen_coords_global_to_subview((0.5, 0.5))
+        local_coords, iviewport = ps.screen_coords_global_to_viewport((0.5, 0.5))
         self.assertEqual(len(local_coords), 2)
-        self.assertGreaterEqual(isubview, 0)
+        self.assertGreaterEqual(iviewport, 0)
 
-        local_inds, isubview2 = ps.buffer_inds_global_to_subview((10, 10))
+        local_inds, iviewport2 = ps.buffer_inds_global_to_viewport((10, 10))
         self.assertEqual(len(local_inds), 2)
-        self.assertGreaterEqual(isubview2, 0)
+        self.assertGreaterEqual(iviewport2, 0)
 
-        global_sc = ps.screen_coords_subview_to_global((0.25, 0.25), 0)
+        global_sc = ps.screen_coords_viewport_to_global((0.25, 0.25), 0)
         self.assertEqual(len(global_sc), 2)
 
-        global_bi = ps.buffer_inds_subview_to_global((5, 5), 0)
+        global_bi = ps.buffer_inds_viewport_to_global((5, 5), 0)
         self.assertEqual(len(global_bi), 2)
 
-        sc = ps.buffer_inds_to_screen_coords_subview(10, 10, 0)
+        sc = ps.buffer_inds_to_screen_coords_viewport(10, 10, 0)
         self.assertEqual(len(sc), 2)
 
-        bi = ps.screen_coords_to_buffer_inds_subview((0.5, 0.5), 0)
+        bi = ps.screen_coords_to_buffer_inds_viewport((0.5, 0.5), 0)
         self.assertEqual(len(bi), 2)
 
         ray = ps.buffer_inds_to_world_ray((10, 10), 0)
@@ -289,8 +289,8 @@ class TestCore(unittest.TestCase):
         pos = ps.screen_coords_and_depth_to_world_position((0.5, 0.5), 0.5, 0)
         self.assertEqual(len(pos), 3)
 
-        # reset to single subview
-        ps.set_num_subviews(1)
+        # reset to single viewport
+        ps.set_num_viewports(1)
 
     def test_ground_options(self):
         ps.set_ground_plane_mode("none")
@@ -694,24 +694,24 @@ def test_transforms(t, s):
     s.set_transform_gizmo_enabled(False)
 
 
-def test_subview_visibility_helper(t, s):
-    ps.create_subview_grid(2, 1)
+def test_viewport_visibility_helper(t, s):
+    ps.create_viewport_grid(2, 1)
 
-    s.set_subview_visibility(0, False)
-    t.assertFalse(s.get_subview_visibility(0))
-    s.set_subview_visibility(0, True)
-    t.assertTrue(s.get_subview_visibility(0))
+    s.set_viewport_visibility(0, False)
+    t.assertFalse(s.get_viewport_visibility(0))
+    s.set_viewport_visibility(0, True)
+    t.assertTrue(s.get_viewport_visibility(0))
 
-    s.set_subview_visibility_all(False)
-    t.assertFalse(s.get_subview_visibility(0))
-    t.assertFalse(s.get_subview_visibility(1))
+    s.set_viewport_visibility_all(False)
+    t.assertFalse(s.get_viewport_visibility(0))
+    t.assertFalse(s.get_viewport_visibility(1))
 
-    s.set_subview_visibility_exclusive(1)
-    t.assertFalse(s.get_subview_visibility(0))
-    t.assertTrue(s.get_subview_visibility(1))
+    s.set_viewport_visibility_exclusive(1)
+    t.assertFalse(s.get_viewport_visibility(0))
+    t.assertTrue(s.get_viewport_visibility(1))
 
-    s.set_subview_visibility_all(True)
-    ps.set_num_subviews(1)
+    s.set_viewport_visibility_all(True)
+    ps.set_num_viewports(1)
 
 
 class TestPointCloud(unittest.TestCase):
@@ -805,9 +805,9 @@ class TestPointCloud(unittest.TestCase):
         test_transforms(self, ps_cloud)
         ps.remove_all_structures()
 
-    def test_subview_visibility(self):
+    def test_viewport_visibility(self):
         ps_cloud = ps.register_point_cloud("test_cloud", self.generate_points())
-        test_subview_visibility_helper(self, ps_cloud)
+        test_viewport_visibility_helper(self, ps_cloud)
         ps.remove_all_structures()
 
     def test_update(self):

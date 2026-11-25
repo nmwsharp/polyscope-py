@@ -210,19 +210,19 @@ class Structure:
         else:
             return self.bound_instance.get_ignore_slice_plane(plane.get_name())
 
-    ## Subview visibility
+    ## Viewport visibility
 
-    def set_subview_visibility(self, i_subview: int, val: bool) -> None:
-        self.bound_instance.set_subview_visibility(i_subview, val)
+    def set_viewport_visibility(self, i_viewport: int, val: bool) -> None:
+        self.bound_instance.set_viewport_visibility(i_viewport, val)
 
-    def set_subview_visibility_all(self, val: bool) -> None:
-        self.bound_instance.set_subview_visibility_all(val)
+    def set_viewport_visibility_all(self, val: bool) -> None:
+        self.bound_instance.set_viewport_visibility_all(val)
 
-    def set_subview_visibility_exclusive(self, i_subview: int) -> None:
-        self.bound_instance.set_subview_visibility_exclusive(i_subview)
+    def set_viewport_visibility_exclusive(self, i_viewport: int) -> None:
+        self.bound_instance.set_viewport_visibility_exclusive(i_viewport)
 
-    def get_subview_visibility(self, i_subview: int = -1) -> bool:
-        return self.bound_instance.get_subview_visibility(i_subview)
+    def get_viewport_visibility(self, i_viewport: int = -1) -> bool:
+        return self.bound_instance.get_viewport_visibility(i_viewport)
 
     ## Image Floating Quantities
 

@@ -196,56 +196,56 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("get_window_resizable", &ps::view::getWindowResizable);
   m.def("set_view_from_json", &ps::view::setViewFromJson);
   m.def("get_view_as_json", &ps::view::getViewAsJson);
-  m.def("screen_coords_to_world_ray", &ps::view::screenCoordsToWorldRay, "screen_coords"_a, "subview_ind"_a = -1);
+  m.def("screen_coords_to_world_ray", &ps::view::screenCoordsToWorldRay, "screen_coords"_a, "viewport_ind"_a = -1);
   m.def("set_background_color", [](glm::vec4 c) { for(int i = 0; i < 4; i++) ps::view::bgColor[i] = c[i]; });
   m.def("get_background_color", []() { return glm2eigen(glm::vec4{
         ps::view::bgColor[0], ps::view::bgColor[1], ps::view::bgColor[2], ps::view::bgColor[3] 
       }); 
   });
 
-  // === Subview / multi-viewport
-  m.def("set_num_subviews", &ps::view::setNumSubviews, "count"_a);
-  m.def("get_num_subviews", &ps::view::getNumSubviews);
-  m.def("create_subview_grid", &ps::view::createSubviewGrid, "grid_width"_a, "grid_height"_a);
-  m.def("activate_subview", &ps::view::activateSubview, "subview_ind"_a);
-  m.def("get_active_subview_index", &ps::view::getActiveSubviewIndex);
-  m.def("set_active_subview_relative_location", &ps::view::setActiveSubviewRelativeLocation, "pos_x"_a, "pos_y"_a);
-  m.def("set_active_subview_relative_size", &ps::view::setActiveSubviewRelativeSize, "width"_a, "height"_a);
-  m.def("get_active_subview_buffer_width", &ps::view::getActiveSubviewBufferWidth);
-  m.def("get_active_subview_buffer_height", &ps::view::getActiveSubviewBufferHeight);
-  m.def("get_subviews_share_navigation", &ps::view::getSubviewsShareNavigation);
-  m.def("set_subviews_share_navigation", &ps::view::setSubviewsShareNavigation, "share_navigation"_a);
-  m.def("buffer_inds_to_screen_coords_subview", [](int x, int y, int32_t subview_ind) {
-      return ps::view::bufferIndsToScreenCoordsSubview(x, y, subview_ind);
-  }, "x_pos"_a, "y_pos"_a, "subview_ind"_a = -1);
-  m.def("screen_coords_to_buffer_inds_subview", [](glm::vec2 screen_coords, int32_t subview_ind) {
-      return ps::view::screenCoordsToBufferIndsSubview(screen_coords, subview_ind);
-  }, "screen_coords"_a, "subview_ind"_a = -1);
-  m.def("screen_coords_to_subview_ind", [](glm::vec2 screen_coords) {
-      return ps::view::screenCoordsToSubviewInd(screen_coords);
+  // === Viewport / multi-viewport
+  m.def("set_num_viewports", &ps::view::setNumViewports, "count"_a);
+  m.def("get_num_viewports", &ps::view::getNumViewports);
+  m.def("create_viewport_grid", &ps::view::createViewportGrid, "grid_width"_a, "grid_height"_a);
+  m.def("activate_viewport", &ps::view::activateViewport, "viewport_ind"_a);
+  m.def("get_active_viewport_index", &ps::view::getActiveViewportIndex);
+  m.def("set_active_viewport_relative_location", &ps::view::setActiveViewportRelativeLocation, "pos_x"_a, "pos_y"_a);
+  m.def("set_active_viewport_relative_size", &ps::view::setActiveViewportRelativeSize, "width"_a, "height"_a);
+  m.def("get_active_viewport_buffer_width", &ps::view::getActiveViewportBufferWidth);
+  m.def("get_active_viewport_buffer_height", &ps::view::getActiveViewportBufferHeight);
+  m.def("get_viewports_share_navigation", &ps::view::getViewportsShareNavigation);
+  m.def("set_viewports_share_navigation", &ps::view::setViewportsShareNavigation, "share_navigation"_a);
+  m.def("buffer_inds_to_screen_coords_viewport", [](int x, int y, int32_t viewport_ind) {
+      return ps::view::bufferIndsToScreenCoordsViewport(x, y, viewport_ind);
+  }, "x_pos"_a, "y_pos"_a, "viewport_ind"_a = -1);
+  m.def("screen_coords_to_buffer_inds_viewport", [](glm::vec2 screen_coords, int32_t viewport_ind) {
+      return ps::view::screenCoordsToBufferIndsViewport(screen_coords, viewport_ind);
+  }, "screen_coords"_a, "viewport_ind"_a = -1);
+  m.def("screen_coords_to_viewport_ind", [](glm::vec2 screen_coords) {
+      return ps::view::screenCoordsToViewportInd(screen_coords);
   }, "screen_coords"_a);
-  m.def("buffer_inds_to_subview_ind", [](glm::ivec2 buffer_inds) {
-      return ps::view::bufferIndsToSubviewInd(buffer_inds);
+  m.def("buffer_inds_to_viewport_ind", [](glm::ivec2 buffer_inds) {
+      return ps::view::bufferIndsToViewportInd(buffer_inds);
   }, "buffer_inds"_a);
-  m.def("screen_coords_global_to_subview", [](glm::vec2 screen_coords) {
-      return ps::view::screenCoordsGlobalToSubview(screen_coords);
+  m.def("screen_coords_global_to_viewport", [](glm::vec2 screen_coords) {
+      return ps::view::screenCoordsGlobalToViewport(screen_coords);
   }, "screen_coords"_a);
-  m.def("buffer_inds_global_to_subview", [](glm::ivec2 buffer_inds) {
-      return ps::view::bufferIndsGlobalToSubview(buffer_inds);
+  m.def("buffer_inds_global_to_viewport", [](glm::ivec2 buffer_inds) {
+      return ps::view::bufferIndsGlobalToViewport(buffer_inds);
   }, "buffer_inds"_a);
-  m.def("screen_coords_subview_to_global", [](glm::vec2 screen_coords, int32_t i_subview) {
-      return ps::view::screenCoordsSubviewToGlobal(screen_coords, i_subview);
-  }, "screen_coords"_a, "subview_ind"_a);
-  m.def("buffer_inds_subview_to_global", [](glm::ivec2 buffer_inds, int32_t i_subview) {
-      return ps::view::bufferIndsSubviewToGlobal(buffer_inds, i_subview);
-  }, "buffer_inds"_a, "subview_ind"_a);
-  m.def("get_subview_imgui_rect", &ps::view::getSubviewImGuiRect, "subview_ind"_a = -1);
-  m.def("buffer_inds_to_world_ray", [](glm::ivec2 buffer_inds, int32_t subview_ind) {
-      return ps::view::bufferIndsToWorldRay(buffer_inds, subview_ind);
-  }, "buffer_inds"_a, "subview_ind"_a = -1);
-  m.def("screen_coords_and_depth_to_world_position", [](glm::vec2 screen_coords, float clip_depth, int32_t subview_ind) {
-      return ps::view::screenCoordsAndDepthToWorldPosition(screen_coords, clip_depth, subview_ind);
-  }, "screen_coords"_a, "clip_depth"_a, "subview_ind"_a = -1);
+  m.def("screen_coords_viewport_to_global", [](glm::vec2 screen_coords, int32_t i_viewport) {
+      return ps::view::screenCoordsViewportToGlobal(screen_coords, i_viewport);
+  }, "screen_coords"_a, "viewport_ind"_a);
+  m.def("buffer_inds_viewport_to_global", [](glm::ivec2 buffer_inds, int32_t i_viewport) {
+      return ps::view::bufferIndsViewportToGlobal(buffer_inds, i_viewport);
+  }, "buffer_inds"_a, "viewport_ind"_a);
+  m.def("get_viewport_imgui_rect", &ps::view::getViewportImGuiRect, "viewport_ind"_a = -1);
+  m.def("buffer_inds_to_world_ray", [](glm::ivec2 buffer_inds, int32_t viewport_ind) {
+      return ps::view::bufferIndsToWorldRay(buffer_inds, viewport_ind);
+  }, "buffer_inds"_a, "viewport_ind"_a = -1);
+  m.def("screen_coords_and_depth_to_world_position", [](glm::vec2 screen_coords, float clip_depth, int32_t viewport_ind) {
+      return ps::view::screenCoordsAndDepthToWorldPosition(screen_coords, clip_depth, viewport_ind);
+  }, "screen_coords"_a, "clip_depth"_a, "viewport_ind"_a = -1);
 
   // === "Advanced" UI management
   m.def("build_polyscope_gui", &ps::buildPolyscopeGui);
@@ -373,11 +373,11 @@ NB_MODULE(polyscope_bindings, m) {
     s.def("get_transform_gizmo_enabled", &ps::Structure::getTransformGizmoEnabled);
     s.def("get_transformation_gizmo", &ps::Structure::getTransformGizmo, nb::rv_policy::reference, "Get the TransformationGizmo associated with this structure");
 
-    // subview visibility
-    s.def("set_subview_visibility", &ps::Structure::setSubviewVisibility, "i_subview"_a, "val"_a);
-    s.def("set_subview_visibility_all", &ps::Structure::setSubviewVisibilityAll, "val"_a);
-    s.def("set_subview_visibility_exclusive", &ps::Structure::setSubviewVisibilityExclusive, "i_subview"_a);
-    s.def("get_subview_visibility", &ps::Structure::getSubviewVisibility, "i_subview"_a = -1);
+    // viewport visibility
+    s.def("set_viewport_visibility", &ps::Structure::setViewportVisibility, "i_viewport"_a, "val"_a);
+    s.def("set_viewport_visibility_all", &ps::Structure::setViewportVisibilityAll, "val"_a);
+    s.def("set_viewport_visibility_exclusive", &ps::Structure::setViewportVisibilityExclusive, "i_viewport"_a);
+    s.def("get_viewport_visibility", &ps::Structure::getViewportVisibility, "i_viewport"_a = -1);
     ;
 
   }
