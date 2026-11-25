@@ -233,11 +233,11 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("buffer_inds_global_to_viewport", [](glm::ivec2 buffer_inds) {
       return ps::view::bufferIndsGlobalToViewport(buffer_inds);
   }, "buffer_inds"_a);
-  m.def("screen_coords_viewport_to_global", [](glm::vec2 screen_coords, int32_t i_viewport) {
-      return ps::view::screenCoordsViewportToGlobal(screen_coords, i_viewport);
+  m.def("screen_coords_viewport_to_global", [](glm::vec2 screen_coords, int32_t viewport_ind) {
+      return ps::view::screenCoordsViewportToGlobal(screen_coords, viewport_ind);
   }, "screen_coords"_a, "viewport_ind"_a);
-  m.def("buffer_inds_viewport_to_global", [](glm::ivec2 buffer_inds, int32_t i_viewport) {
-      return ps::view::bufferIndsViewportToGlobal(buffer_inds, i_viewport);
+  m.def("buffer_inds_viewport_to_global", [](glm::ivec2 buffer_inds, int32_t viewport_ind) {
+      return ps::view::bufferIndsViewportToGlobal(buffer_inds, viewport_ind);
   }, "buffer_inds"_a, "viewport_ind"_a);
   m.def("get_viewport_imgui_rect", &ps::view::getViewportImGuiRect, "viewport_ind"_a = -1);
   m.def("buffer_inds_to_world_ray", [](glm::ivec2 buffer_inds, int32_t viewport_ind) {
@@ -374,10 +374,10 @@ NB_MODULE(polyscope_bindings, m) {
     s.def("get_transformation_gizmo", &ps::Structure::getTransformGizmo, nb::rv_policy::reference, "Get the TransformationGizmo associated with this structure");
 
     // viewport visibility
-    s.def("set_viewport_visibility", &ps::Structure::setViewportVisibility, "i_viewport"_a, "val"_a);
+    s.def("set_viewport_visibility", &ps::Structure::setViewportVisibility, "viewport_ind"_a, "val"_a);
     s.def("set_viewport_visibility_all", &ps::Structure::setViewportVisibilityAll, "val"_a);
-    s.def("set_viewport_visibility_exclusive", &ps::Structure::setViewportVisibilityExclusive, "i_viewport"_a);
-    s.def("get_viewport_visibility", &ps::Structure::getViewportVisibility, "i_viewport"_a = -1);
+    s.def("set_viewport_visibility_exclusive", &ps::Structure::setViewportVisibilityExclusive, "viewport_ind"_a);
+    s.def("get_viewport_visibility", &ps::Structure::getViewportVisibility, "viewport_ind"_a = -1);
     ;
 
   }

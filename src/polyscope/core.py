@@ -453,13 +453,13 @@ def buffer_inds_to_viewport_ind(buffer_inds: ArrayLike) -> int:
 
 
 def screen_coords_global_to_viewport(screen_coords: ArrayLike) -> Tuple[NDArray, int]:
-    local_coords, i_viewport = psb.screen_coords_global_to_viewport(glm2(screen_coords))
-    return np.array(local_coords.as_tuple()), i_viewport
+    local_coords, viewport_ind = psb.screen_coords_global_to_viewport(glm2(screen_coords))
+    return np.array(local_coords.as_tuple()), viewport_ind
 
 
 def buffer_inds_global_to_viewport(buffer_inds: ArrayLike) -> Tuple[NDArray, int]:
-    local_inds, i_viewport = psb.buffer_inds_global_to_viewport(glm2i(buffer_inds))
-    return np.array(local_inds.as_tuple()), i_viewport
+    local_inds, viewport_ind = psb.buffer_inds_global_to_viewport(glm2i(buffer_inds))
+    return np.array(local_inds.as_tuple()), viewport_ind
 
 
 def screen_coords_viewport_to_global(screen_coords: ArrayLike, viewport_ind: int) -> NDArray:
