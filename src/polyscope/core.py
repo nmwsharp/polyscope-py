@@ -385,8 +385,12 @@ def get_view_as_json() -> str:
     return psb.get_view_as_json()
 
 
-def screen_coords_to_world_ray(screen_coords: ArrayLike, viewport_ind: int = -1) -> NDArray:
-    return np.array(psb.screen_coords_to_world_ray(glm2(screen_coords), viewport_ind).as_tuple())
+def screen_coords_to_world_ray(screen_coords: ArrayLike) -> NDArray:
+    return np.array(psb.screen_coords_to_world_ray(glm2(screen_coords)).as_tuple())
+
+
+def viewport_screen_coords_to_world_ray(screen_coords: ArrayLike, viewport_ind: int = -1) -> NDArray:
+    return np.array(psb.viewport_screen_coords_to_world_ray(glm2(screen_coords), viewport_ind).as_tuple())
 
 
 ### Viewport / multi-viewport
@@ -474,12 +478,20 @@ def get_viewport_imgui_rect(viewport_ind: int = -1) -> NDArray:
     return np.array(psb.get_viewport_imgui_rect(viewport_ind).as_tuple())
 
 
-def buffer_inds_to_world_ray(buffer_inds: ArrayLike, viewport_ind: int = -1) -> NDArray:
-    return np.array(psb.buffer_inds_to_world_ray(glm2i(buffer_inds), viewport_ind).as_tuple())
+def buffer_inds_to_world_ray(buffer_inds: ArrayLike) -> NDArray:
+    return np.array(psb.buffer_inds_to_world_ray(glm2i(buffer_inds)).as_tuple())
 
 
-def screen_coords_and_depth_to_world_position(screen_coords: ArrayLike, clip_depth: float, viewport_ind: int = -1) -> NDArray:
-    return np.array(psb.screen_coords_and_depth_to_world_position(glm2(screen_coords), clip_depth, viewport_ind).as_tuple())
+def viewport_buffer_inds_to_world_ray(buffer_inds: ArrayLike, viewport_ind: int = -1) -> NDArray:
+    return np.array(psb.viewport_buffer_inds_to_world_ray(glm2i(buffer_inds), viewport_ind).as_tuple())
+
+
+def screen_coords_and_depth_to_world_position(screen_coords: ArrayLike, clip_depth: float) -> NDArray:
+    return np.array(psb.screen_coords_and_depth_to_world_position(glm2(screen_coords), clip_depth).as_tuple())
+
+
+def viewport_screen_coords_and_depth_to_world_position(screen_coords: ArrayLike, clip_depth: float, viewport_ind: int = -1) -> NDArray:
+    return np.array(psb.viewport_screen_coords_and_depth_to_world_position(glm2(screen_coords), clip_depth, viewport_ind).as_tuple())
 
 
 # deprecated! use query_pick_at_screen_coords

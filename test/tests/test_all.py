@@ -283,10 +283,20 @@ class TestCore(unittest.TestCase):
         bi = ps.screen_coords_to_buffer_inds_viewport((0.5, 0.5), 0)
         self.assertEqual(len(bi), 2)
 
-        ray = ps.buffer_inds_to_world_ray((10, 10), 0)
+        # viewport variants take coordinates local to a viewport (active viewport by default)
+        ray = ps.viewport_buffer_inds_to_world_ray((10, 10), 0)
+        self.assertEqual(len(ray), 3)
+        ray = ps.viewport_screen_coords_to_world_ray((0.5, 0.5))
         self.assertEqual(len(ray), 3)
 
-        pos = ps.screen_coords_and_depth_to_world_position((0.5, 0.5), 0.5, 0)
+        pos = ps.viewport_screen_coords_and_depth_to_world_position((0.5, 0.5), 0.5, 0)
+        self.assertEqual(len(pos), 3)
+
+        # the plain variants take global coordinates
+        ray = ps.buffer_inds_to_world_ray((10, 10))
+        self.assertEqual(len(ray), 3)
+
+        pos = ps.screen_coords_and_depth_to_world_position((0.5, 0.5), 0.5)
         self.assertEqual(len(pos), 3)
 
         # reset to single viewport
