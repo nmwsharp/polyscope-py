@@ -3291,7 +3291,7 @@ class TestManagedBuffers(unittest.TestCase):
         ps.show(3)
 
 
-def make_simple_triangle_mesn(n_verts=20, n_faces=30, seed=42):
+def make_simple_triangle_mesh(n_verts=20, n_faces=30, seed=42):
     """Helper: random simple triangle mesh with given counts."""
     np.random.seed(seed)
     verts = np.random.rand(n_verts, 3).astype(np.float32)
@@ -3356,6 +3356,18 @@ class TestSimpleTriangleMesh(unittest.TestCase):
         for i in range(3):
             self.assertAlmostEqual(ret_color[i], color[i])
 
+        # Edge color and width
+        edge_color = (0.1, 0.8, 0.2)
+        p.set_edge_color(edge_color)
+        ret_edge_color = p.get_edge_color()
+        for i in range(3):
+            self.assertAlmostEqual(ret_edge_color[i], edge_color[i])
+        p.set_edge_width(1.5)
+        self.assertAlmostEqual(p.get_edge_width(), 1.5)
+        ps.show(3)
+        p.set_edge_width(0.0)
+        self.assertAlmostEqual(p.get_edge_width(), 0.0)
+
         # Back face policy
         p.set_back_face_policy("different")
         self.assertEqual("different", p.get_back_face_policy())
@@ -3419,7 +3431,7 @@ class TestSimpleTriangleMesh(unittest.TestCase):
 
         # face scalar
         f_vals = np.random.rand(n_faces).astype(np.float32)
-        p.add_scalar_quantity("face_scalar", f_vals, defined_on='faces', enabled=True)
+        p.add_scalar_quantity("face_scalar", f_vals, defined_on="faces", enabled=True)
         ps.show(3)
 
         ps.remove_all_structures()
@@ -3436,7 +3448,7 @@ class TestSimpleTriangleMesh(unittest.TestCase):
 
         # face color
         f_cols = np.random.rand(n_faces, 3).astype(np.float32)
-        p.add_color_quantity("face_color", f_cols, defined_on='faces', enabled=True)
+        p.add_color_quantity("face_color", f_cols, defined_on="faces", enabled=True)
         ps.show(3)
 
         ps.remove_all_structures()
@@ -3457,9 +3469,13 @@ class TestSimpleTriangleMesh(unittest.TestCase):
         # Add all four quantity types before any update — they'll be replaced
         # on each iteration as the size changes.
         v_scalar = p.add_scalar_quantity("v_scalar", np.zeros(sizes[0][0], dtype=np.float32), enabled=True)
-        f_scalar = p.add_scalar_quantity("f_scalar", np.zeros(sizes[0][1], dtype=np.float32), defined_on='faces', enabled=True)
+        f_scalar = p.add_scalar_quantity(
+            "f_scalar", np.zeros(sizes[0][1], dtype=np.float32), defined_on="faces", enabled=True
+        )
         v_color = p.add_color_quantity("v_color", np.zeros((sizes[0][0], 3), dtype=np.float32), enabled=True)
-        f_color = p.add_color_quantity("f_color", np.zeros((sizes[0][1], 3), dtype=np.float32), defined_on='faces', enabled=True)
+        f_color = p.add_color_quantity(
+            "f_color", np.zeros((sizes[0][1], 3), dtype=np.float32), defined_on="faces", enabled=True
+        )
 
         ps.show(3)
 
@@ -3471,6 +3487,14 @@ class TestSimpleTriangleMesh(unittest.TestCase):
             self.assertEqual(p.n_vertices(), n_verts)
             self.assertEqual(p.n_faces(), n_faces)
 
+            # Update quantities in-place with the new size
+            v_scalar.update_data(np.random.rand(n_verts).astype(np.float32))
+            f_scalar.update_data(np.random.rand(n_faces).astype(np.float32))
+            v_color.update_data(np.random.rand(n_verts, 3).astype(np.float32))
+            f_color.update_data(np.random.rand(n_faces, 3).astype(np.float32))
+
+            ps.show(3)
+
             # Re-add quantities with the new size (replaces old ones)
             v_scalar_data = np.random.rand(n_verts).astype(np.float32)
             f_scalar_data = np.random.rand(n_faces).astype(np.float32)
@@ -3478,18 +3502,31 @@ class TestSimpleTriangleMesh(unittest.TestCase):
             f_color_data = np.random.rand(n_faces, 3).astype(np.float32)
 
             v_scalar = p.add_scalar_quantity("v_scalar", v_scalar_data, enabled=True)
-            f_scalar = p.add_scalar_quantity("f_scalar", f_scalar_data, defined_on='faces', enabled=True)
+            f_scalar = p.add_scalar_quantity("f_scalar", f_scalar_data, defined_on="faces", enabled=True)
             v_color = p.add_color_quantity("v_color", v_color_data, enabled=True)
-            f_color = p.add_color_quantity("f_color", f_color_data, defined_on='faces', enabled=True)
+            f_color = p.add_color_quantity("f_color", f_color_data, defined_on="faces", enabled=True)
 
             ps.show(3)
 
-            # Now test update_data (same size, in-place update)
-            v_scalar.update_data(np.random.rand(n_verts).astype(np.float32))
-            f_scalar.update_data(np.random.rand(n_faces).astype(np.float32))
-            v_color.update_data(np.random.rand(n_verts, 3).astype(np.float32))
-            f_color.update_data(np.random.rand(n_faces, 3).astype(np.float32))
+        ps.remove_all_structures()
 
-            ps.show(3)
+    def test_wireframe_with_quantities(self):
+        verts, faces = make_simple_triangle_mesh(20, 30)
+        p = ps.register_simple_triangle_mesh("stm_wf", verts, faces, edge_width=1.5, edge_color=(0.1, 0.1, 0.1))
+        ps.show(3)
+
+        p.add_scalar_quantity("v_scalar", np.random.rand(20).astype(np.float32), enabled=True)
+        ps.show(3)
+        p.add_scalar_quantity("f_scalar", np.random.rand(30).astype(np.float32), defined_on="faces", enabled=True)
+        ps.show(3)
+        f_color = p.add_color_quantity(
+            "f_color", np.random.rand(30, 3).astype(np.float32), defined_on="faces", enabled=True
+        )
+        ps.show(3)
+
+        verts2, faces2 = make_simple_triangle_mesh(50, 80, seed=99)
+        p.update_mesh(verts2, faces2)
+        f_color.update_data(np.random.rand(80, 3).astype(np.float32))
+        ps.show(3)
 
         ps.remove_all_structures()
