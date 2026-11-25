@@ -109,25 +109,25 @@ void GaussianParticles::ensureImagebuffersAllocated() {
   colors = std::make_unique<render::ManagedBuffer<glm::vec4>>(this, uniquePrefix() + "colors", colorsData);
 
   // re-allocate buffers
+  depths->setAsType(DeviceBufferType::Texture2d);
   depths->setTextureSize(currImageWidth, currImageHeight);
   {
     std::vector<float> depthZeros(currImageWidth * currImageHeight, 0.0f);
-    depths->resize(depthZeros.size());
     depths->setDataHost(depthZeros);
     depths->markHostBufferUpdated();
   }
 
+  colors->setAsType(DeviceBufferType::Texture2d);
   colors->setTextureSize(currImageWidth, currImageHeight);
   {
     std::vector<glm::vec4> colorZeros(currImageWidth * currImageHeight, glm::vec4(0.0f));
-    colors->resize(colorZeros.size());
     colors->setDataHost(colorZeros);
     colors->markHostBufferUpdated();
   }
 
   if (imageToScreenProgram) {
-    imageToScreenProgram->setTextureFromBuffer("t_depth", depths->getRenderTextureBuffer().get());
-    imageToScreenProgram->setTextureFromBuffer("t_color", colors->getRenderTextureBuffer().get());
+    imageToScreenProgram->setTextureFromBuffer("t_depth", *depths);
+    imageToScreenProgram->setTextureFromBuffer("t_color", *colors);
   }
 
 
@@ -168,8 +168,9 @@ void GaussianParticles::prepareImageToScreenProgram() {
   // clang-format on
 
   imageToScreenProgram->setAttribute("a_position", render::engine->screenTrianglesCoords());
-  imageToScreenProgram->setTextureFromBuffer("t_depth", depths->getRenderTextureBuffer().get());
-  imageToScreenProgram->setTextureFromBuffer("t_color", colors->getRenderTextureBuffer().get());
+  imageToScreenProgram->setDrawCount(render::engine->screenTrianglesCoords().size());
+  imageToScreenProgram->setTextureFromBuffer("t_depth", *depths);
+  imageToScreenProgram->setTextureFromBuffer("t_color", *colors);
 }
 
 } // namespace polyscope
