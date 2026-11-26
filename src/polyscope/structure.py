@@ -210,6 +210,20 @@ class Structure:
         else:
             return self.bound_instance.get_ignore_slice_plane(plane.get_name())
 
+    ## Viewport visibility
+
+    def set_viewport_visibility(self, viewport_ind: int, val: bool) -> None:
+        self.bound_instance.set_viewport_visibility(viewport_ind, val)
+
+    def set_viewport_visibility_all(self, val: bool) -> None:
+        self.bound_instance.set_viewport_visibility_all(val)
+
+    def set_viewport_visibility_exclusive(self, viewport_ind: int) -> None:
+        self.bound_instance.set_viewport_visibility_exclusive(viewport_ind)
+
+    def get_viewport_visibility(self, viewport_ind: int = -1) -> bool:
+        return self.bound_instance.get_viewport_visibility(viewport_ind)
+
     ## Image Floating Quantities
 
     def add_scalar_image_quantity(

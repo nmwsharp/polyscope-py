@@ -227,6 +227,105 @@ class TestCore(unittest.TestCase):
         world_pos = ps.screen_coords_to_world_position(screen_coords)
         self.assertEqual(len(world_pos), 3)
 
+    def test_viewports(self):
+        # basic viewport creation and navigation
+        ps.create_viewport_grid(2, 2)
+        self.assertEqual(ps.get_num_viewports(), 4)
+        self.assertGreater(ps.get_active_viewport_buffer_width(), 0)
+        self.assertGreater(ps.get_active_viewport_buffer_height(), 0)
+
+        ps.activate_viewport(1)
+        self.assertEqual(ps.get_active_viewport_index(), 1)
+        ps.activate_viewport(0)
+
+        ps.set_viewports_share_navigation(True)
+        self.assertEqual(ps.get_viewports_share_navigation(), True)
+        ps.set_viewports_share_navigation(False)
+
+        # manual viewport setup
+        ps.set_num_viewports(2)
+        ps.activate_viewport(0)
+        ps.set_active_viewport_relative_location(0.0, 0.0)
+        ps.set_active_viewport_relative_size(0.5, 1.0)
+        ps.activate_viewport(1)
+        ps.set_active_viewport_relative_location(0.5, 0.0)
+        ps.set_active_viewport_relative_size(0.5, 1.0)
+
+        ps.show(3)
+
+        # coordinate conversion (logical pixel screen_coords and integer buffer_inds, origin top-left)
+        win_w, win_h = ps.get_window_size()
+        rect0 = ps.get_viewport_imgui_rect(0)
+        rect1 = ps.get_viewport_imgui_rect(1)
+        self.assertEqual(len(rect0), 4)
+        self.assertAlmostEqual(rect0[0] + rect0[2], rect1[0], places=4)
+
+        left_sc = (0.25 * win_w, 0.5 * win_h)
+        right_sc = (0.75 * win_w, 0.5 * win_h)
+        self.assertEqual(ps.screen_coords_to_viewport_ind(left_sc), 0)
+        self.assertEqual(ps.screen_coords_to_viewport_ind(right_sc), 1)
+
+        right_bi = ps.screen_coords_to_buffer_inds(right_sc)
+        self.assertEqual(len(right_bi), 2)
+        self.assertEqual(ps.buffer_inds_to_viewport_ind(right_bi), 1)
+        recovered_sc = ps.buffer_inds_to_screen_coords(right_bi[0], right_bi[1])
+        self.assertAlmostEqual(recovered_sc[0], right_sc[0], delta=2.0)
+        self.assertAlmostEqual(recovered_sc[1], right_sc[1], delta=2.0)
+
+        local_coords, iviewport = ps.screen_coords_global_to_viewport(right_sc)
+        self.assertEqual(iviewport, 1)
+        self.assertEqual(len(local_coords), 2)
+        global_sc = ps.screen_coords_viewport_to_global(local_coords, iviewport)
+        self.assertAlmostEqual(global_sc[0], right_sc[0], places=3)
+        self.assertAlmostEqual(global_sc[1], right_sc[1], places=3)
+        # default viewport_ind=-1 uses active viewport (currently 1)
+        global_sc_default = ps.screen_coords_viewport_to_global(local_coords)
+        self.assertAlmostEqual(global_sc_default[0], right_sc[0], places=3)
+
+        local_inds, iviewport2 = ps.buffer_inds_global_to_viewport(right_bi)
+        self.assertEqual(iviewport2, 1)
+        global_bi = ps.buffer_inds_viewport_to_global(local_inds, iviewport2)
+        self.assertEqual(tuple(global_bi), right_bi)
+        global_bi_default = ps.buffer_inds_viewport_to_global(local_inds)
+        self.assertEqual(tuple(global_bi_default), right_bi)
+
+        sc = ps.buffer_inds_to_screen_coords_viewport(10, 10, 0)
+        self.assertEqual(len(sc), 2)
+
+        bi = ps.screen_coords_to_buffer_inds_viewport((50.0, 50.0), 0)
+        self.assertEqual(len(bi), 2)
+
+        # viewport variants take coordinates local to a viewport (active viewport by default)
+        ray = ps.viewport_buffer_inds_to_world_ray((10, 10), 0)
+        self.assertEqual(len(ray), 3)
+        ray = ps.viewport_screen_coords_to_world_ray((50.0, 50.0))
+        self.assertEqual(len(ray), 3)
+
+        pos = ps.viewport_screen_coords_and_depth_to_world_position((50.0, 50.0), 0.5, 0)
+        self.assertEqual(len(pos), 3)
+
+        # the plain variants take global coordinates
+        ray = ps.buffer_inds_to_world_ray(right_bi)
+        self.assertEqual(len(ray), 3)
+
+        pos = ps.screen_coords_and_depth_to_world_position(right_sc, 0.5)
+        self.assertEqual(len(pos), 3)
+
+        # PickResult exposes viewport fields, and pick() accepts optional viewport_ind
+        pr_global = ps.pick(screen_coords=right_sc)
+        self.assertEqual(pr_global.viewport_ind, 1)
+        self.assertEqual(len(pr_global.viewport_screen_coords), 2)
+        self.assertEqual(len(pr_global.viewport_buffer_inds), 2)
+        pr_local = ps.pick(buffer_inds=pr_global.viewport_buffer_inds, viewport_ind=1)
+        self.assertEqual(pr_local.viewport_ind, 1)
+        self.assertEqual(pr_local.buffer_inds, pr_global.buffer_inds)
+        pr_active = ps.pick(screen_coords=local_coords, viewport_ind=-1)
+        self.assertEqual(pr_active.viewport_ind, 1)
+
+        # reset cleanly to a single full-window viewport
+        ps.set_viewports_share_navigation(True)
+        ps.create_viewport_grid(1, 1)
+
     def test_ground_options(self):
         ps.set_ground_plane_mode("none")
         ps.set_ground_plane_mode("tile")
@@ -629,6 +728,26 @@ def test_transforms(t, s):
     s.set_transform_gizmo_enabled(False)
 
 
+def test_viewport_visibility_helper(t, s):
+    ps.create_viewport_grid(2, 1)
+
+    s.set_viewport_visibility(0, False)
+    t.assertFalse(s.get_viewport_visibility(0))
+    s.set_viewport_visibility(0, True)
+    t.assertTrue(s.get_viewport_visibility(0))
+
+    s.set_viewport_visibility_all(False)
+    t.assertFalse(s.get_viewport_visibility(0))
+    t.assertFalse(s.get_viewport_visibility(1))
+
+    s.set_viewport_visibility_exclusive(1)
+    t.assertFalse(s.get_viewport_visibility(0))
+    t.assertTrue(s.get_viewport_visibility(1))
+
+    s.set_viewport_visibility_all(True)
+    ps.set_num_viewports(1)
+
+
 class TestPointCloud(unittest.TestCase):
     def generate_points(self, n_pts=10):
         np.random.seed(777)
@@ -718,6 +837,11 @@ class TestPointCloud(unittest.TestCase):
     def test_transform(self):
         ps_cloud = ps.register_point_cloud("test_cloud", self.generate_points())
         test_transforms(self, ps_cloud)
+        ps.remove_all_structures()
+
+    def test_viewport_visibility(self):
+        ps_cloud = ps.register_point_cloud("test_cloud", self.generate_points())
+        test_viewport_visibility_helper(self, ps_cloud)
         ps.remove_all_structures()
 
     def test_update(self):
