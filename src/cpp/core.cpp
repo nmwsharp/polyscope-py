@@ -197,7 +197,7 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("set_view_from_json", &ps::view::setViewFromJson);
   m.def("get_view_as_json", &ps::view::getViewAsJson);
   m.def("screen_coords_to_world_ray", &ps::view::screenCoordsToWorldRay, "screen_coords"_a);
-  m.def("viewport_screen_coords_to_world_ray", &ps::view::viewportScreenCoordsToWorldRay, "screen_coords"_a, "viewport_ind"_a = -1);
+  m.def("screen_coords_to_world_ray_viewport", &ps::view::screenCoordsToWorldRayViewport, "screen_coords"_a, "viewport_ind"_a = -1);
   m.def("set_background_color", [](glm::vec4 c) { for(int i = 0; i < 4; i++) ps::view::bgColor[i] = c[i]; });
   m.def("get_background_color", []() { return glm2eigen(glm::vec4{
         ps::view::bgColor[0], ps::view::bgColor[1], ps::view::bgColor[2], ps::view::bgColor[3] 
@@ -250,14 +250,14 @@ NB_MODULE(polyscope_bindings, m) {
   m.def("buffer_inds_to_world_ray", [](glm::ivec2 buffer_inds) {
       return ps::view::bufferIndsToWorldRay(buffer_inds);
   }, "buffer_inds"_a);
-  m.def("viewport_buffer_inds_to_world_ray", [](glm::ivec2 buffer_inds, int32_t viewport_ind) {
-      return ps::view::viewportBufferIndsToWorldRay(buffer_inds, viewport_ind);
+  m.def("buffer_inds_to_world_ray_viewport", [](glm::ivec2 buffer_inds, int32_t viewport_ind) {
+      return ps::view::bufferIndsToWorldRayViewport(buffer_inds, viewport_ind);
   }, "buffer_inds"_a, "viewport_ind"_a = -1);
   m.def("screen_coords_and_depth_to_world_position", [](glm::vec2 screen_coords, float clip_depth) {
       return ps::view::screenCoordsAndDepthToWorldPosition(screen_coords, clip_depth);
   }, "screen_coords"_a, "clip_depth"_a);
-  m.def("viewport_screen_coords_and_depth_to_world_position", [](glm::vec2 screen_coords, float clip_depth, int32_t viewport_ind) {
-      return ps::view::viewportScreenCoordsAndDepthToWorldPosition(screen_coords, clip_depth, viewport_ind);
+  m.def("screen_coords_and_depth_to_world_position_viewport", [](glm::vec2 screen_coords, float clip_depth, int32_t viewport_ind) {
+      return ps::view::screenCoordsAndDepthToWorldPositionViewport(screen_coords, clip_depth, viewport_ind);
   }, "screen_coords"_a, "clip_depth"_a, "viewport_ind"_a = -1);
 
   // === "Advanced" UI management
@@ -316,8 +316,8 @@ NB_MODULE(polyscope_bindings, m) {
   // query what is under a pixel
   m.def("pick_at_screen_coords", &ps::pickAtScreenCoords);
   m.def("pick_at_buffer_inds", &ps::pickAtBufferInds);
-  m.def("pick_viewport_at_screen_coords", &ps::pickViewportAtScreenCoords, "screen_coords"_a, "viewport_ind"_a = -1);
-  m.def("pick_viewport_at_buffer_inds", &ps::pickViewportAtBufferInds, "buffer_inds"_a, "viewport_ind"_a = -1);
+  m.def("pick_at_screen_coords_viewport", &ps::pickAtScreenCoordsViewport, "screen_coords"_a, "viewport_ind"_a = -1);
+  m.def("pick_at_buffer_inds_viewport", &ps::pickAtBufferIndsViewport, "buffer_inds"_a, "viewport_ind"_a = -1);
 
   // === Ground plane and shadows
   m.def("set_ground_plane_mode", [](ps::GroundPlaneMode x) { ps::options::groundPlaneMode = x; });

@@ -389,8 +389,8 @@ def screen_coords_to_world_ray(screen_coords: ArrayLike) -> NDArray:
     return np.array(psb.screen_coords_to_world_ray(glm2(screen_coords)).as_tuple())
 
 
-def viewport_screen_coords_to_world_ray(screen_coords: ArrayLike, viewport_ind: int = -1) -> NDArray:
-    return np.array(psb.viewport_screen_coords_to_world_ray(glm2(screen_coords), viewport_ind).as_tuple())
+def screen_coords_to_world_ray_viewport(screen_coords: ArrayLike, viewport_ind: int = -1) -> NDArray:
+    return np.array(psb.screen_coords_to_world_ray_viewport(glm2(screen_coords), viewport_ind).as_tuple())
 
 
 ### Viewport / multi-viewport
@@ -490,19 +490,19 @@ def buffer_inds_to_world_ray(buffer_inds: ArrayLike) -> NDArray:
     return np.array(psb.buffer_inds_to_world_ray(glm2i(buffer_inds)).as_tuple())
 
 
-def viewport_buffer_inds_to_world_ray(buffer_inds: ArrayLike, viewport_ind: int = -1) -> NDArray:
-    return np.array(psb.viewport_buffer_inds_to_world_ray(glm2i(buffer_inds), viewport_ind).as_tuple())
+def buffer_inds_to_world_ray_viewport(buffer_inds: ArrayLike, viewport_ind: int = -1) -> NDArray:
+    return np.array(psb.buffer_inds_to_world_ray_viewport(glm2i(buffer_inds), viewport_ind).as_tuple())
 
 
 def screen_coords_and_depth_to_world_position(screen_coords: ArrayLike, clip_depth: float) -> NDArray:
     return np.array(psb.screen_coords_and_depth_to_world_position(glm2(screen_coords), clip_depth).as_tuple())
 
 
-def viewport_screen_coords_and_depth_to_world_position(
+def screen_coords_and_depth_to_world_position_viewport(
     screen_coords: ArrayLike, clip_depth: float, viewport_ind: int = -1
 ) -> NDArray:
     return np.array(
-        psb.viewport_screen_coords_and_depth_to_world_position(glm2(screen_coords), clip_depth, viewport_ind).as_tuple()
+        psb.screen_coords_and_depth_to_world_position_viewport(glm2(screen_coords), clip_depth, viewport_ind).as_tuple()
     )
 
 
@@ -700,7 +700,7 @@ def pick(
         if viewport_ind is None:
             raw_result = psb.pick_at_screen_coords(glm2(screen_coords))
         else:
-            raw_result = psb.pick_viewport_at_screen_coords(glm2(screen_coords), viewport_ind)
+            raw_result = psb.pick_at_screen_coords_viewport(glm2(screen_coords), viewport_ind)
     if buffer_inds is not None:
         arr = np.asarray(buffer_inds)
         if not np.issubdtype(arr.dtype, np.integer) or arr.shape != (2,):
@@ -708,7 +708,7 @@ def pick(
         if viewport_ind is None:
             raw_result = psb.pick_at_buffer_inds(glm2i(buffer_inds))
         else:
-            raw_result = psb.pick_viewport_at_buffer_inds(glm2i(buffer_inds), viewport_ind)
+            raw_result = psb.pick_at_buffer_inds_viewport(glm2i(buffer_inds), viewport_ind)
 
     return PickResult(raw_result)
 
