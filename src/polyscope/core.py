@@ -498,8 +498,12 @@ def screen_coords_and_depth_to_world_position(screen_coords: ArrayLike, clip_dep
     return np.array(psb.screen_coords_and_depth_to_world_position(glm2(screen_coords), clip_depth).as_tuple())
 
 
-def viewport_screen_coords_and_depth_to_world_position(screen_coords: ArrayLike, clip_depth: float, viewport_ind: int = -1) -> NDArray:
-    return np.array(psb.viewport_screen_coords_and_depth_to_world_position(glm2(screen_coords), clip_depth, viewport_ind).as_tuple())
+def viewport_screen_coords_and_depth_to_world_position(
+    screen_coords: ArrayLike, clip_depth: float, viewport_ind: int = -1
+) -> NDArray:
+    return np.array(
+        psb.viewport_screen_coords_and_depth_to_world_position(glm2(screen_coords), clip_depth, viewport_ind).as_tuple()
+    )
 
 
 # deprecated! use query_pick_at_screen_coords
@@ -657,7 +661,7 @@ class PickResult:
 
         if self.structure_type_name == "Volume Grid":
             volume_grid.get_volume_grid(self.structure_name).append_pick_data(self)
-        
+
         if self.structure_type_name == "Sparse Volume Grid":
             sparse_volume_grid.get_sparse_volume_grid(self.structure_name).append_pick_data(self)
 
