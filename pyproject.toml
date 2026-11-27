@@ -43,6 +43,25 @@ logging.level = "INFO"
 cmake.args = ["-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13"]
 
 
+## Local development with uv (see README)
+
+[dependency-groups]
+dev = [
+  "ruff<0.16", # 0.16 enables many more rules by default
+  "ty",
+  # used by test/scripts/polyscope_demo.py
+  "imageio",
+  "libigl",
+  "potpourri3d",
+]
+
+[tool.uv]
+# `uv sync` and `uv run` install only the dependencies, not polyscope itself. During development
+# the bindings are built with CMake, and an installed copy would shadow the local build.
+# Another uv project depending on a local checkout of this repo must add `package = true` to
+# that source in its [tool.uv.sources], or polyscope itself will not be installed.
+package = false
+
 ## Misc tools and extensions
 
 [tool.ty.src]

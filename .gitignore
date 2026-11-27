@@ -4,6 +4,7 @@ compile_commands.json
 build/
 build_debug/
 dist/
+.venv/
 *.pyc
 __pycache__/
 .cache
