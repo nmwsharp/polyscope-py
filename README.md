@@ -5,7 +5,6 @@ Python bindings for Polyscope. https://polyscope.run/py
 [![macOS](https://github.com/nmwsharp/polyscope-py/workflows/Test%20macOS/badge.svg)](https://github.com/nmwsharp/polyscope-py/actions)
 [![Windows](https://github.com/nmwsharp/polyscope-py/workflows/Test%20Windows/badge.svg)](https://github.com/nmwsharp/polyscope-py/actions)
 [![PyPI](https://img.shields.io/pypi/v/polyscope?style=plastic)](https://pypi.org/project/polyscope/)
-[![Conda](https://img.shields.io/conda/v/conda-forge/polyscope)](https://anaconda.org/conda-forge/polyscope)
 
 This library is a python wrapper and deployment system. The core library lives at https://github.com/nmwsharp/polyscope. See documentation at https://polyscope.run/py.
 
@@ -19,10 +18,10 @@ With [uv](https://docs.astral.sh/uv/), add polyscope to your project:
 uv add polyscope
 ```
 
-With conda:
+With conda, install from PyPI using pip inside your environment:
 
 ```bash
-conda install -c conda-forge polyscope
+python -m pip install polyscope
 ```
 
 polyscope-py should work out-of-the-box on any combination of Python 3.9-3.14 and Linux/macOS/Windows. Your graphics hardware must support OpenGL >= 3.3 core profile (which is >15 years old; all remotely recent machines do, but funky VMs might not).
