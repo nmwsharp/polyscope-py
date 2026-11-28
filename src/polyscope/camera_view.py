@@ -1,7 +1,7 @@
 import polyscope_bindings as psb
 
 from polyscope.core import glm3, CameraParameters
-from polyscope.structure import Structure
+from polyscope.structure import Structure, _register_structure_type
 
 from numpy.typing import ArrayLike
 
@@ -118,3 +118,6 @@ def get_camera_view(name: str) -> CameraView:
 def has_camera_view(name: str) -> bool:
     """Check if a camera view exists by name"""
     return psb.has_camera_view(name)
+
+
+_register_structure_type("Camera View", get_camera_view)

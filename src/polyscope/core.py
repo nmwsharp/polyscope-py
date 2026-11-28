@@ -642,28 +642,13 @@ class PickResult:
         self.resolve_additional_data()
 
     def resolve_additional_data(self):
-        # resolve data from various types
+        # let the picked structure add any data specific to its type
+        from polyscope.structure import _structure_type_getters  # local import to avoid circular dependencies
 
-        # Use local imports to avoid circular dependencies
-        from polyscope import point_cloud, curve_network, surface_mesh, volume_mesh, volume_grid, sparse_volume_grid
-
-        if self.structure_type_name == "Point Cloud":
-            point_cloud.get_point_cloud(self.structure_name).append_pick_data(self)
-
-        if self.structure_type_name == "Curve Network":
-            curve_network.get_curve_network(self.structure_name).append_pick_data(self)
-
-        if self.structure_type_name == "Surface Mesh":
-            surface_mesh.get_surface_mesh(self.structure_name).append_pick_data(self)
-
-        if self.structure_type_name == "Volume Mesh":
-            volume_mesh.get_volume_mesh(self.structure_name).append_pick_data(self)
-
-        if self.structure_type_name == "Volume Grid":
-            volume_grid.get_volume_grid(self.structure_name).append_pick_data(self)
-
-        if self.structure_type_name == "Sparse Volume Grid":
-            sparse_volume_grid.get_sparse_volume_grid(self.structure_name).append_pick_data(self)
+        # (a miss, or a pick of something which is not a structure, has no entry in the registry)
+        getter = _structure_type_getters.get(self.structure_type_name)
+        if getter is not None:
+            getter(self.structure_name).append_pick_data(self)
 
     def __str__(self):
         return f"""

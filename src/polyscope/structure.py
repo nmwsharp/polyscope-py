@@ -1,4 +1,4 @@
-from typing import Any, Literal, no_type_check
+from typing import Any, Callable, Literal, no_type_check
 
 import polyscope_bindings as psb
 
@@ -43,6 +43,12 @@ class Structure:
     def remove_quantity(self, name: str, error_if_absent: bool = False) -> None:
         """Remove a single quantity on the structure"""
         self.bound_instance.remove_quantity(name, error_if_absent)  # type: ignore
+
+    ## Picking
+
+    def append_pick_data(self, pick_result: Any) -> None:
+        """Add data specific to this kind of structure to a PickResult (overridden by subclasses, if there is any)"""
+        pass
 
     ## Enable/disable
 
@@ -393,3 +399,24 @@ class Structure:
             struct_ref=self,
             **option_args,
         )
+
+
+### Structure type registry
+
+# Maps a structure type name like "Surface Mesh" (matching the names used in C++) to the function which gets a
+# structure of that type by name. Each structure module adds its own entry.
+_structure_type_getters: dict[str, Callable[[str], Structure]] = {}
+
+
+def _register_structure_type(type_name: str, getter: Callable[[str], Structure]) -> None:
+    _structure_type_getters[type_name] = getter
+
+
+def get_structure(structure_type: str, name: str) -> Structure:
+    """Get a structure by its type name (such as "Surface Mesh" or "Point Cloud") and its name"""
+    if structure_type not in _structure_type_getters:
+        raise ValueError(
+            "unknown structure type {}, should be one of {}".format(structure_type, list(_structure_type_getters))
+        )
+
+    return _structure_type_getters[structure_type](name)

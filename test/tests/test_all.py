@@ -699,6 +699,41 @@ class TestStructureManagement(unittest.TestCase):
     def test_remove_all(self):
         pass
 
+    def test_get_structure(self):
+        # (Gaussian particles are omitted, as they require optional dependencies)
+        verts = np.random.rand(4, 3)
+        tris = np.array([[0, 1, 2], [0, 2, 3]])
+        camera_params = ps.CameraParameters(
+            ps.CameraIntrinsics(fov_vertical_deg=60, aspect=2),
+            ps.CameraExtrinsics(root=(2.0, 2.0, 2.0), look_dir=(-1.0, -1.0, -1.0), up_dir=(0.0, 1.0, 0.0)),
+        )
+
+        # give them all the same name, so the type is what distinguishes them
+        registered = {
+            "Surface Mesh": ps.register_surface_mesh("test", verts, tris),
+            "Simple Triangle Mesh": ps.register_simple_triangle_mesh("test", verts, tris),
+            "Point Cloud": ps.register_point_cloud("test", verts),
+            "Curve Network": ps.register_curve_network("test", verts, "line"),
+            "Volume Mesh": ps.register_volume_mesh("test", verts, tets=np.array([[0, 1, 2, 3]])),
+            "Volume Grid": ps.register_volume_grid("test", (3, 4, 5), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            "Sparse Volume Grid": ps.register_sparse_volume_grid(
+                "test", (0.0, 0.0, 0.0), (1.0, 1.0, 1.0), np.array([[0, 0, 0]])
+            ),
+            "Camera View": ps.register_camera_view("test", camera_params),
+        }
+
+        for type_name, s in registered.items():
+            found = ps.get_structure(type_name, "test")
+            self.assertIs(type(found), type(s))
+            self.assertEqual(found.get_name(), "test")
+
+        with self.assertRaisesRegex(ValueError, "unknown structure type"):
+            ps.get_structure("bad type", "test")
+        with self.assertRaises(ValueError):
+            ps.get_structure("Point Cloud", "not here")
+
+        ps.remove_all_structures()
+
 
 def test_transforms(t, s):
     T = np.array([[1.0, 0.0, 0.0, 3.0], [0.0, 0.0, -1.0, -2.0], [0.0, 1.0, 0.0, 5.0], [0.0, 0.0, 0.0, 1.0]])
@@ -2894,6 +2929,25 @@ class TestCameraView(unittest.TestCase):
         assertArrayWithShape(self, rays, [dimY, dimX, 3])
         ray_corners = params.generate_camera_ray_corners()
         assertArrayWithShape(self, ray_corners, [4, 3])
+
+    def test_remove_floating_quantity(self):
+        # nothing has been added yet
+        ps.remove_floating_quantity("not here")
+
+        ps.add_scalar_image_quantity("img", np.zeros((20, 30)))
+        ps.add_scalar_image_quantity("img2", np.zeros((20, 30)))
+
+        ps.remove_floating_quantity("img", error_if_absent=True)
+        with self.assertRaises(RuntimeError):
+            ps.remove_floating_quantity("img", error_if_absent=True)
+        ps.remove_floating_quantity("img")  # should not error
+        ps.remove_floating_quantity("img2", error_if_absent=True)  # the other quantity was left alone
+        ps.show(3)
+
+        ps.remove_all_structures()
+
+        with self.assertRaises(RuntimeError):
+            ps.remove_floating_quantity("img", error_if_absent=True)
 
     def test_floating_scalar_images(self):
         # technically these can be added to any structure, but we will test them here

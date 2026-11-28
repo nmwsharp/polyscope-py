@@ -5,7 +5,7 @@ import polyscope_bindings as psb
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum, from_enum
-from polyscope.structure import Structure
+from polyscope.structure import Structure, _register_structure_type
 
 from polyscope.common import (
     QuantityArgsBase,
@@ -311,3 +311,6 @@ def get_sparse_volume_grid(name: str) -> SparseVolumeGrid:
 def has_sparse_volume_grid(name: str) -> bool:
     """Check if a sparse volume grid exists by name"""
     return psb.has_sparse_volume_grid(name)
+
+
+_register_structure_type("Sparse Volume Grid", get_sparse_volume_grid)

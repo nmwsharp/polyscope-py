@@ -72,8 +72,11 @@ void bind_floating_quantities(nb::module_& m) {
       nb::rv_policy::reference);
   m.def("add_raw_color_render_image_quantity", &ps::addRawColorRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, 
       nb::rv_policy::reference);
-  m.def("add_raw_color_alpha_render_image_quantity", &ps::addRawColorAlphaRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>, 
+  m.def("add_raw_color_alpha_render_image_quantity", &ps::addRawColorAlphaRenderImageQuantity<Eigen::VectorXf, Eigen::MatrixXf>,
       nb::rv_policy::reference);
+
+  // global / free-floating removers
+  m.def("remove_floating_quantity", &ps::removeFloatingQuantity, nb::arg("name"), nb::arg("error_if_absent") = false);
 
 }
 

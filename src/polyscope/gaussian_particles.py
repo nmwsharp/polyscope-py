@@ -4,7 +4,7 @@ from typing import Any, Literal, overload, cast
 import polyscope_bindings as psb
 from polyscope.core import glm3, get_view_camera_parameters, get_view_projection_mode, update_scene_extents
 from polyscope.enums import to_enum, from_enum
-from polyscope.structure import Structure
+from polyscope.structure import Structure, _register_structure_type
 
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
@@ -225,3 +225,6 @@ def get_gaussian_particles(name: str) -> GaussianParticles:
 def has_gaussian_particles(name: str) -> bool:  #
     """Check if a gaussian particles exists by name"""
     return psb.has_gaussian_particles(name)
+
+
+_register_structure_type("Gaussian Particles", get_gaussian_particles)

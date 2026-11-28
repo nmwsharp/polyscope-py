@@ -5,7 +5,7 @@ import polyscope_bindings as psb
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum, from_enum
-from polyscope.structure import Structure
+from polyscope.structure import Structure, _register_structure_type
 from polyscope.common import (
     QuantityArgsBase,
     process_quantity_args,
@@ -275,3 +275,6 @@ def get_point_cloud(name: str) -> PointCloud:
 def has_point_cloud(name: str) -> bool:
     """Check if a point cloud exists by name"""
     return psb.has_point_cloud(name)
+
+
+_register_structure_type("Point Cloud", get_point_cloud)

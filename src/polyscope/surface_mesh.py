@@ -5,7 +5,7 @@ import polyscope_bindings as psb
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum, from_enum
-from polyscope.structure import Structure
+from polyscope.structure import Structure, _register_structure_type
 from polyscope.common import (
     QuantityArgsBase,
     process_quantity_args,
@@ -646,3 +646,6 @@ def get_surface_mesh(name: str) -> SurfaceMesh:
 def has_surface_mesh(name: str) -> bool:
     """Check if a surface mesh exists by name"""
     return psb.has_surface_mesh(name)
+
+
+_register_structure_type("Surface Mesh", get_surface_mesh)

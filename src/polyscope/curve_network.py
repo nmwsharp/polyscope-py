@@ -5,7 +5,7 @@ import polyscope_bindings as psb
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum, from_enum
-from polyscope.structure import Structure
+from polyscope.structure import Structure, _register_structure_type
 from polyscope.common import (
     QuantityArgsBase,
     process_quantity_args,
@@ -316,3 +316,6 @@ def get_curve_network(name: str) -> CurveNetwork:
 def has_curve_network(name: str) -> bool:
     """Check if a curve network exists by name"""
     return psb.has_curve_network(name)
+
+
+_register_structure_type("Curve Network", get_curve_network)

@@ -5,7 +5,7 @@ import polyscope_bindings as psb
 
 from polyscope.core import glm3, glm3u
 from polyscope.enums import to_enum, from_enum
-from polyscope.structure import Structure
+from polyscope.structure import Structure, _register_structure_type
 
 from polyscope.common import (
     QuantityArgsBase,
@@ -262,3 +262,6 @@ def get_volume_grid(name: str) -> VolumeGrid:
 def has_volume_grid(name: str) -> bool:
     """Check if a volume grid exists by name"""
     return psb.has_volume_grid(name)
+
+
+_register_structure_type("Volume Grid", get_volume_grid)

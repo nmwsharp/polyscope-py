@@ -5,7 +5,7 @@ import polyscope_bindings as psb
 
 from polyscope.core import glm3
 from polyscope.enums import to_enum, from_enum
-from polyscope.structure import Structure
+from polyscope.structure import Structure, _register_structure_type
 from polyscope.common import (
     QuantityArgsBase,
     process_quantity_args,
@@ -248,3 +248,6 @@ def get_simple_triangle_mesh(name: str = "") -> SimpleTriangleMesh:
 
 def has_simple_triangle_mesh(name: str = "") -> bool:
     return psb.has_simple_triangle_mesh(name)
+
+
+_register_structure_type("Simple Triangle Mesh", get_simple_triangle_mesh)

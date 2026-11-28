@@ -51,6 +51,11 @@ def get_quantity_buffer(quantity_name: str, buffer_name: str) -> Any:
     return floating_struct.get_quantity_buffer(quantity_name, buffer_name)
 
 
+def remove_floating_quantity(name: str, error_if_absent: bool = False) -> None:
+    """Remove a floating quantity which was added at the root level of the scene"""
+    psb.remove_floating_quantity(name, error_if_absent)
+
+
 def add_scalar_image_quantity(
     name: str,
     values: ArrayLike,
