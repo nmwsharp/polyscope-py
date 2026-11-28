@@ -106,8 +106,8 @@ void bind_volume_grid(nb::module_& m) {
             mapped_result = func(mapped_pos);
           };
 
-          return grid.addNodeScalarQuantityFromBatchCallable(name, wrapped_func, data_type);
-      }, 
+          return grid.addCellScalarQuantityFromBatchCallable(name, wrapped_func, data_type);
+      },
       nb::arg("name"), nb::arg("values"), nb::arg("data_type") = ps::DataType::STANDARD,
       nb::rv_policy::reference)
 
