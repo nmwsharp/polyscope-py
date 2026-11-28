@@ -421,6 +421,15 @@ NB_MODULE(polyscope_bindings, m) {
         }
         return names;
     })
+   .def("get_child_structure_types_and_names", [](ps::Group& g) { 
+        std::vector<std::pair<std::string, std::string>> typesAndNames;
+        for(ps::WeakHandle<ps::Structure>& wh : g.childrenStructures) {
+            if(wh.isValid()) {
+              typesAndNames.emplace_back(wh.get().typeName(), wh.get().getName());
+            }
+        }
+        return typesAndNames;
+    })
    .def("get_child_group_names", [](ps::Group& g) { 
         std::vector<std::string> names;
         for(ps::WeakHandle<ps::Group>& wh : g.childrenGroups) {

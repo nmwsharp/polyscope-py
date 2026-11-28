@@ -800,6 +800,17 @@ class Group:
         # Only returns first-level children, does not recurse
         return self.bound_group.get_child_group_names()
 
+    def get_child_structures(self) -> list:
+        # Only returns first-level children, does not recurse
+        from polyscope.structure import get_structure  # local import to avoid circular dependencies
+
+        types_and_names = self.bound_group.get_child_structure_types_and_names()
+        return [get_structure(structure_type, name) for structure_type, name in types_and_names]
+
+    def get_child_groups(self) -> list["Group"]:
+        # Only returns first-level children, does not recurse
+        return [get_group(name) for name in self.get_child_group_names()]
+
 
 def create_group(name: str) -> Group:
     return Group(psb.create_group(name))

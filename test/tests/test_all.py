@@ -647,6 +647,25 @@ class TestCore(unittest.TestCase):
 
         ps.remove_all_structures()
 
+    def test_group_iteration(self):
+        pts = np.zeros((4, 3))
+        group = ps.create_group("group")
+        child = ps.create_group("child group")
+        group.add_child_group(child)
+
+        # structures of different types which share a name, plus a nested one
+        ps.register_point_cloud("shared", pts).add_to_group(group)
+        ps.register_curve_network("shared", pts, "line").add_to_group(group)
+        ps.register_point_cloud("nested", pts).add_to_group(child)
+
+        # only direct children are returned, as objects of the right types
+        found = sorted((type(s).__name__, s.get_name()) for s in group.get_child_structures())
+        self.assertEqual(found, [("CurveNetwork", "shared"), ("PointCloud", "shared")])
+        self.assertEqual([g.get_name() for g in group.get_child_groups()], ["child group"])
+
+        ps.remove_all_groups()
+        ps.remove_all_structures()
+
     def test_groups_demo_example(self):
         # make a point cloud
         pts = np.zeros((300, 3))
