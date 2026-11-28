@@ -786,6 +786,13 @@ NB_MODULE(polyscope_bindings, m) {
         return std::tuple<int32_t, int32_t>(x[0], x[1]); 
         });
 
+  nb::class_<glm::ivec3>(m, "glm_ivec3").
+    def(nb::init<int32_t, int32_t, int32_t>())
+   .def("as_tuple",
+        [](const glm::ivec3& x) {
+        return std::tuple<int32_t, int32_t, int32_t>(x[0], x[1], x[2]); 
+        });
+
   nb::class_<glm::uvec3>(m, "glm_uvec3").
     def(nb::init<uint32_t, uint32_t, uint32_t>())
    .def("as_tuple",

@@ -150,11 +150,11 @@ class SparseVolumeGrid(Structure):
     def append_pick_data(self, pick_result: Any) -> None:
         struct_result = self.bound_instance.interpret_pick_result(pick_result.raw_result)
         pick_result.structure_data["element_type"] = from_enum(struct_result.element_type)
-        if struct_result.element_type == psb.SparseVolumeGridElementType.Cell:
-            pick_result.structure_data["cell_index"] = struct_result.cell_index
+        if struct_result.element_type == psb.SparseVolumeGridElement.cell:
+            pick_result.structure_data["cell_index"] = struct_result.cell_index.as_tuple()
             pick_result.structure_data["cell_flat_index"] = struct_result.cell_flat_index
-        elif struct_result.element_type == psb.SparseVolumeGridElementType.Node:
-            pick_result.structure_data["node_index"] = struct_result.node_index
+        elif struct_result.element_type == psb.SparseVolumeGridElement.node:
+            pick_result.structure_data["node_index"] = struct_result.node_index.as_tuple()
 
     ## Quantities
 
